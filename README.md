@@ -5,6 +5,16 @@ ordenada de **menor a mayor precio por metro cuadrado**. Por defecto solo muestr
 anuncios **de dueño directo (sin inmobiliaria)**, junto con su **teléfono**
 y un botón de WhatsApp.
 
+## Usarla desde el celular (publicarla gratis en Render)
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/djsierra2020-design/Comparam2)
+
+1. Abre el botón de arriba e inicia sesión en Render con tu cuenta de GitHub.
+2. Pulsa **Deploy Blueprint** y espera unos minutos.
+3. Render te da una dirección tipo `https://comparam-xxxx.onrender.com`: ábrela en el celular.
+
+El plan gratis se «duerme» si nadie lo usa; la primera búsqueda después puede tardar ~1 minuto.
+
 ## Instalación
 
 ```bash
