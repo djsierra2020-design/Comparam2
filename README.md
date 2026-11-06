@@ -1,0 +1,71 @@
+# Comparam — apartamento más económico por m² en Bogotá
+
+Escribes un barrio de Bogotá y la app te devuelve la lista de apartamentos
+ordenada de **menor a mayor precio por metro cuadrado**. Por defecto solo muestra
+anuncios **de dueño directo (sin inmobiliaria)**, junto con su **teléfono**
+y un botón de WhatsApp.
+
+## Instalación
+
+```bash
+pip install -r requirements.txt
+```
+
+## Uso
+
+### Web
+```bash
+python app.py          # abre http://localhost:5000
+```
+Escribe el barrio (con autocompletado), elige venta o arriendo y busca.
+Filtros: incluir inmobiliarias, solo con teléfono, área mínima, precio máximo y fuentes.
+
+API JSON: `GET /api/buscar?barrio=Cedritos&operacion=venta&con_telefono=1`
+
+### Terminal
+```bash
+python -m comparam.cli Cedritos
+python -m comparam.cli "Chicó Navarra" --arriendo --con-telefono --exportar resultados.csv
+python -m comparam.cli Cedritos --fuente ejemplo     # datos de ejemplo, sin internet
+```
+
+## Cómo funciona
+
+1. **Fuentes**: Finca Raíz, Metrocuadrado y Ciencuadras (`comparam/sources/portales.py`),
+   más cualquier CSV propio (`--csv archivo.csv` o variable `COMPARAM_CSV`).
+2. **Extracción**: los portales incrustan los resultados como JSON en el HTML
+   (`__NEXT_DATA__`, JSON-LD…). El extractor genérico (`comparam/sources/extractor.py`)
+   recorre ese JSON y reconoce cualquier objeto con precio y área, así que resiste
+   cambios menores en la estructura de los portales.
+3. **Dueño directo vs. inmobiliaria**: usa el tipo de anunciante que publica el portal
+   y, si no existe, el texto del anuncio («dueño directo», «sin intermediarios»,
+   «abstenerse inmobiliarias», «SAS», «inmobiliaria»…). Ver `comparam/parsing.py`.
+4. **Teléfonos**: se toman de los campos de contacto del anuncio, del texto de la
+   descripción (celulares `3xx xxx xxxx` y fijos `601 xxx xxxx`) y, para anuncios de
+   dueño directo sin teléfono, de los enlaces `tel:`/WhatsApp de la ficha del anuncio.
+5. Se eliminan duplicados entre portales y se ordena por precio/m².
+
+### Si un portal cambia su URL
+Las URL de búsqueda se pueden cambiar sin tocar código:
+```bash
+export COMPARAM_URL_FINCARAIZ="https://www.fincaraiz.com.co/{operacion}/apartamentos/{barrio}/bogota/pagina{pagina}"
+```
+
+### Importar tus propios anuncios (CSV)
+Columnas reconocidas: `titulo, barrio, operacion, precio, area_m2, telefono,
+publicado_por, habitaciones, banos, url, descripcion` (ver `data/ejemplo.csv`).
+
+## Limitaciones
+- Algunos portales ocultan el teléfono tras un botón «Ver teléfono» que exige
+  iniciar sesión; en esos casos la app muestra «Teléfono no publicado — ver anuncio».
+- Los portales pueden bloquear consultas automáticas o cambiar su estructura; cada
+  fuente falla de forma independiente y el error se muestra sin detener la búsqueda.
+- Usa la herramienta de forma razonable (pocas páginas, con pausas) y respeta los
+  términos de uso de cada portal. Los teléfonos son datos personales: úsalos solo para
+  contactar sobre el inmueble.
+- `data/ejemplo.csv` contiene datos **ficticios** solo para probar la app.
+
+## Pruebas
+```bash
+python -m pytest
+```

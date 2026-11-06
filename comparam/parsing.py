@@ -1,0 +1,83 @@
+"""Utilidades para interpretar textos de anuncios inmobiliarios colombianos."""
+from __future__ import annotations
+
+import re
+import unicodedata
+
+# Palabras que indican que quien publica es el propietario.
+_DUENO = re.compile(
+    r"due[ñn]o\s+directo|propietario\s+directo|directamente\s+(con\s+el\s+)?(due[ñn]o|propietario)"
+    r"|sin\s+intermediari|no\s+(se\s+atienden\s+|atiendo\s+|acepto\s+)?inmobiliarias"
+    r"|abstenerse\s+inmobiliarias|particular",
+    re.I,
+)
+# Palabras que indican inmobiliaria / agente.
+_INMOBILIARIA = re.compile(
+    r"inmobiliaria|bienes\s+ra[ií]ces|real\s+estate|propiedad\s+ra[ií]z|agente|asesor\s+comercial"
+    r"|broker|corredor|s\.?a\.?s\b|ltda",
+    re.I,
+)
+
+# Celulares colombianos (3xx xxx xxxx) y fijos de Bogotá (601 xxx xxxx), con o sin +57.
+_TEL = re.compile(
+    r"(?<!\d)(?:\+?57[\s.-]?)?(?:(3\d{2})[\s.-]?(\d{3})[\s.-]?(\d{4})|(60\d)[\s.-]?(\d{3})[\s.-]?(\d{4}))(?!\d)"
+)
+
+
+def slugify(texto: str) -> str:
+    t = unicodedata.normalize("NFKD", texto).encode("ascii", "ignore").decode()
+    t = re.sub(r"[^a-zA-Z0-9]+", "-", t.strip().lower())
+    return t.strip("-")
+
+
+def parse_number(valor) -> float | None:
+    """Convierte '$ 450.000.000', '450000000', '72,5 m²' o 72.5 en float."""
+    if valor is None or isinstance(valor, bool):
+        return None
+    if isinstance(valor, (int, float)):
+        return float(valor)
+    s = str(valor)
+    s = re.sub(r"[^\d.,]", "", s)
+    if not s:
+        return None
+    # En Colombia el punto es separador de miles y la coma decimal.
+    if "," in s and "." in s:
+        s = s.replace(".", "").replace(",", ".")
+    elif "," in s:
+        ent, _, dec = s.rpartition(",")
+        s = f"{ent.replace(',', '')}.{dec}" if len(dec) <= 2 else s.replace(",", "")
+    elif s.count(".") > 1 or re.search(r"\.\d{3}$", s):
+        s = s.replace(".", "")
+    try:
+        return float(s)
+    except ValueError:
+        return None
+
+
+def extract_phones(*textos: str) -> list[str]:
+    vistos: list[str] = []
+    for texto in textos:
+        if not texto:
+            continue
+        for m in _TEL.finditer(str(texto)):
+            g = [x for x in m.groups() if x]
+            numero = " ".join(g)
+            if numero not in vistos:
+                vistos.append(numero)
+    return vistos
+
+
+def clasificar_anunciante(publicado_por: str = "", nombre: str = "", descripcion: str = "") -> tuple[str, bool]:
+    """Devuelve (etiqueta, es_dueno_directo)."""
+    tipo = f"{publicado_por} {nombre}".strip()
+    if tipo:
+        if _DUENO.search(tipo) or re.search(r"\b(owner|private|propietario|due[ñn]o|persona)\b", tipo, re.I):
+            return "dueño directo", True
+        if _INMOBILIARIA.search(tipo) or re.search(r"\b(agency|company|realestate|constructora)\b", tipo, re.I):
+            return "inmobiliaria", False
+    if descripcion:
+        if _DUENO.search(descripcion):
+            return "dueño directo", True
+        if _INMOBILIARIA.search(descripcion):
+            return "inmobiliaria", False
+    return "", False
