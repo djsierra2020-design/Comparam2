@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Comparam · m² más barato en Bogotá</title>
+<style>
+  :root { --bg:#f6f7f9; --card:#fff; --tx:#1d2330; --mut:#667085; --ac:#0f766e; --ln:#e4e7ec; --ok:#ecfdf3; --okt:#067647; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#0f1218; --card:#181c24; --tx:#e6e8ec; --mut:#98a2b3; --ac:#2dd4bf; --ln:#2a303b; --ok:#0b2e22; --okt:#6ce9a6; } }
+  * { box-sizing:border-box } body { margin:0; font:15px/1.45 system-ui,-apple-system,Segoe UI,sans-serif; background:var(--bg); color:var(--tx) }
+  main { max-width:1000px; margin:0 auto; padding:24px 16px 48px }
+  h1 { font-size:24px; margin:0 0 4px } .sub { color:var(--mut); margin:0 0 20px }
+  form { background:var(--card); border:1px solid var(--ln); border-radius:12px; padding:16px; display:grid; gap:12px }
+  .fila { display:flex; flex-wrap:wrap; gap:12px; align-items:end } label { font-size:13px; color:var(--mut); display:grid; gap:4px }
+  input[type=text] { font:inherit; padding:10px 12px; border:1px solid var(--ln); border-radius:8px; background:var(--bg); color:var(--tx); min-width:0 }
+  .grande { flex:1 1 260px } .grande input { font-size:17px; width:100% } .chk { display:flex; gap:6px; align-items:center; color:var(--tx); font-size:14px }
+  select { font:inherit; padding:10px; border-radius:8px; border:1px solid var(--ln); background:var(--bg); color:var(--tx) }
+  button { font:inherit; font-weight:600; padding:10px 22px; border:0; border-radius:8px; background:var(--ac); color:#fff; cursor:pointer }
+  .aviso { margin:16px 0; padding:10px 14px; border-radius:8px; background:#fff4e5; color:#7a4100; font-size:14px }
+  @media (prefers-color-scheme: dark) { .aviso { background:#3a2606; color:#fdba74 } }
+  .lista { display:grid; gap:10px; margin-top:16px; padding:0; list-style:none }
+  .item { background:var(--card); border:1px solid var(--ln); border-radius:12px; padding:14px 16px; display:grid; grid-template-columns:auto 1fr auto; gap:6px 16px; align-items:start }
+  .pos { font-weight:700; color:var(--mut); font-variant-numeric:tabular-nums } .m2 { font-size:20px; font-weight:700; color:var(--ac); white-space:nowrap; text-align:right }
+  .m2 small { display:block; font-size:12px; color:var(--mut); font-weight:400 } .tit { font-weight:600 } .meta { color:var(--mut); font-size:13px }
+  .tels { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px } .tel { background:var(--ok); color:var(--okt); padding:3px 10px; border-radius:99px; text-decoration:none; font-weight:600; font-size:14px }
+  .tag { font-size:12px; padding:2px 8px; border-radius:99px; border:1px solid var(--ln); color:var(--mut) } a { color:var(--ac) }
+  @media (max-width:560px) { .item { grid-template-columns:1fr } .m2 { text-align:left } .pos { display:none } }
+</style>
+</head>
+<body><main>
+<h1>Apartamento más económico por m²</h1>
+<p class="sub">Escribe un barrio de Bogotá. Se muestran los anuncios ordenados por precio por metro cuadrado, por defecto solo los publicados por el dueño directo (sin inmobiliaria).</p>
+
+<form method="get">
+  <div class="fila">
+    <label class="grande">Barrio
+      <input type="text" name="barrio" list="barrios" value="{{ barrio }}" placeholder="Ej: Cedritos" required autofocus>
+      <datalist id="barrios">{% for b in barrios %}<option value="{{ b }}">{% endfor %}</datalist>
+    </label>
+    <label>Operación
+      <select name="operacion">
+        <option value="venta" {% if p.operacion=='venta' %}selected{% endif %}>Venta</option>
+        <option value="arriendo" {% if p.operacion=='arriendo' %}selected{% endif %}>Arriendo</option>
+      </select>
+    </label>
+    <label>Área mínima (m²)<input type="text" name="area_min" value="{{ args.area_min or '' }}" size="6" inputmode="numeric"></label>
+    <label>Precio máximo<input type="text" name="precio_max" value="{{ args.precio_max or '' }}" size="12" inputmode="numeric"></label>
+    <button type="submit">Buscar</button>
+  </div>
+  <div class="fila">
+    <span class="chk"><input type="checkbox" id="todos" name="todos" value="1" {% if not p.solo_dueno %}checked{% endif %}><label for="todos" class="chk">Incluir inmobiliarias</label></span>
+    <span class="chk"><input type="checkbox" id="ct" name="con_telefono" value="1" {% if p.con_telefono %}checked{% endif %}><label for="ct" class="chk">Solo con teléfono</label></span>
+    {% for f in fuentes %}
+    <span class="chk"><input type="checkbox" id="f-{{ f }}" name="fuente" value="{{ f }}" {% if f in elegidas %}checked{% endif %}><label for="f-{{ f }}" class="chk">{{ f }}</label></span>
+    {% endfor %}
+  </div>
+</form>
+
+{% if r %}
+  {% for e in r.errores %}<div class="aviso">⚠ {{ e }}</div>{% endfor %}
+  {% if r.anuncios %}
+  <p class="meta" style="margin-top:16px">{{ r.anuncios|length }} resultado(s) en <b>{{ barrio }}</b> · {{ r.total_encontrados }} anuncios revisados</p>
+  <ol class="lista">
+  {% for a in r.anuncios %}
+    <li class="item">
+      <span class="pos">{{ loop.index }}</span>
+      <div>
+        <div class="tit">{% if a.url %}<a href="{{ a.url }}" target="_blank" rel="noopener">{{ a.titulo }}</a>{% else %}{{ a.titulo }}{% endif %}</div>
+        <div class="meta">{{ a.precio|pesos }} · {{ '%g'|format(a.area_m2) }} m²{% if a.habitaciones %} · {{ a.habitaciones }} hab{% endif %}{% if a.banos %} · {{ a.banos }} baños{% endif %} · {{ a.barrio }}</div>
+        <div class="tels">
+          {% for t in a.telefonos %}<a class="tel" href="tel:+57{{ t|replace(' ', '') }}">📞 {{ t }}</a><a class="tel" href="https://wa.me/57{{ t|replace(' ', '') }}" target="_blank" rel="noopener">WhatsApp</a>{% else %}<span class="meta">Teléfono no publicado — ver anuncio</span>{% endfor %}
+          <span class="tag">{{ a.publicado_por or 'anunciante desconocido' }}</span><span class="tag">{{ a.fuente }}</span>
+        </div>
+      </div>
+      <div class="m2">{{ a.precio_m2|pesos }}<small>por m²</small></div>
+    </li>
+  {% endfor %}
+  </ol>
+  {% else %}
+  <div class="aviso">No se encontraron apartamentos {% if p.solo_dueno %}de dueño directo {% endif %}en {{ barrio }} ({{ r.total_encontrados }} anuncios revisados).{% if p.solo_dueno %} Prueba marcando «Incluir inmobiliarias».{% endif %}</div>
+  {% endif %}
+{% endif %}
+</main></body></html>
