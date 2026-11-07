@@ -101,19 +101,18 @@ _LUGAR_TITULO = re.compile(r"\ben\s+((?:(?!\ben\s)[^,|])+?),\s*bogot", re.I)
 def es_del_barrio(a: Listing, barrio: str) -> bool:
     """Los portales mezclan anuncios «destacados» de otros barrios en los resultados.
 
-    Se acepta el anuncio si su ubicación, barrio o título mencionan el barrio buscado. Se descarta
-    si dice ser de otro lugar (p. ej. título «Apartamento en venta en Chapinero, Bogotá»). Si no
-    trae ningún dato de ubicación, se acepta.
+    Se confía en la búsqueda del portal: solo se descarta un anuncio cuando su título dice
+    explícitamente que es de otro lugar de Bogotá (p. ej. «Apartamento en venta en Chapinero,
+    Bogotá» en la búsqueda de Fontibón) y ni su título ni su ubicación mencionan el barrio buscado.
+    Un barrio distinto en sus datos no basta: los portales devuelven sub-barrios de la localidad
+    buscada (p. ej. «San Bernardino XXII» al buscar Bosa).
     """
     objetivo = slugify(barrio)
     if not objetivo:
         return True
-    textos = [a.ubicacion, a.barrio, a.titulo]
-    if any(objetivo in slugify(t) for t in textos if t):
+    if any(objetivo in slugify(t) for t in (a.ubicacion, a.barrio, a.titulo) if t):
         return True
-    lugar = _LUGAR_TITULO.search(a.titulo or "")
-    tiene_ubicacion = bool(a.ubicacion or a.barrio) and slugify(a.ubicacion or a.barrio) not in ("bogota", "bogota-d-c")
-    return not (tiene_ubicacion or lugar)
+    return not _LUGAR_TITULO.search(a.titulo or "")
 
 
 def buscar(barrio: str, fuentes: list[Source], operacion: str = "venta", solo_dueno: bool = True,
