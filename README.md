@@ -13,6 +13,11 @@ y un botón de WhatsApp.
 2. Pulsa **Deploy Blueprint** y espera unos minutos.
 3. Render te da una dirección tipo `https://comparam-xxxx.onrender.com`: ábrela en el celular.
 
+**Actualización automática:** el archivo `.github/workflows/deploy-render.yml` corre las pruebas
+y avisa a Render cada vez que cambia `main`. Requiere guardar el *Deploy Hook* de Render
+(Settings → Deploy Hook) como secreto `RENDER_DEPLOY_HOOK` en GitHub
+(Settings → Secrets and variables → Actions).
+
 El plan gratis se «duerme» si nadie lo usa; la primera búsqueda después puede tardar ~1 minuto.
 
 ## Instalación

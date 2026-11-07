@@ -1,0 +1,34 @@
+# Actualiza la app en Render cada vez que cambia la rama main.
+# Requiere el secreto RENDER_DEPLOY_HOOK (Render → Comparam2 → Settings → Deploy Hook).
+name: Desplegar en Render
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  pruebas:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - run: python -m pytest -q
+
+  desplegar:
+    needs: pruebas
+    runs-on: ubuntu-latest
+    steps:
+      - name: Avisar a Render
+        env:
+          HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "Falta el secreto RENDER_DEPLOY_HOOK; no se despliega."
+            exit 0
+          fi
+          curl -fsS -X POST "$HOOK" > /dev/null
+          echo "Render recibió la orden de desplegar."
