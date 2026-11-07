@@ -222,32 +222,42 @@ def test_extractor_estado_angular():
     assert len(a) == 1 and a[0].precio == 500_000_000 and a[0].es_dueno_directo
 
 
-def test_portales_empresa_no_son_dueno_directo():
-    from comparam.sources import Habi, Houm
+def test_portales_empresa_no_son_dueno_directo(monkeypatch):
+    from comparam.sources import Habi, Houm, navegador
 
-    class Resp:
-        status_code, url = 200, ""
-
-        def __init__(self, text):
-            self.text = text
-
-    class Sesion:
-        headers = {}
-
-        def get(self, url, timeout=None):
-            self.url = url
-            return Resp(FIX.read_text())
-
-    ses = Sesion()
-    h = Habi(sesion=ses, pausa=0, paginas=1)
+    urls = []
+    monkeypatch.setattr(navegador, "renderizar", lambda url, **kw: urls.append(url) or FIX.read_text())
+    h = Habi(pausa=0, paginas=1)
     todos = h.buscar("")
     assert len(todos) == 3 and all(not a.es_dueno_directo and a.publicado_por == "Habi (empresa)" for a in todos)
-    assert "habi.co" in ses.url
+    assert "habi.co" in urls[-1]
     assert [a.barrio for a in h.buscar("Cedritos")] == ["Cedritos"]  # filtra el barrio localmente
-    assert Habi(sesion=ses).buscar("", "arriendo") == []  # Habi no arrienda
-    assert len(Houm(sesion=ses, pausa=0, paginas=1).buscar("", "arriendo")) == 3
-    assert "arriendo-propiedades" in ses.url
+    assert Habi().buscar("", "arriendo") == []  # Habi no arrienda
+    assert len(Houm(pausa=0, paginas=1).buscar("", "arriendo")) == 3
+    assert "arriendo-propiedades" in urls[-1]
+    assert Houm(paginas=8).paginas == 2  # con navegador se leen pocas páginas
 
+
+def test_navegador_lee_anuncios_cargados_con_javascript(tmp_path):
+    import pytest
+    from comparam.sources import navegador
+    from comparam.sources.extractor import extraer_anuncios
+
+    pagina = tmp_path / "spa.html"
+    pagina.write_text('''<html><body><div id="app">Cargando…</div><script>
+      setTimeout(function () {
+        document.getElementById("app").innerHTML =
+          '<div class="card"><a href="/inmueble/1"><h3>Apartamento en Cedritos</h3></a>' +
+          '<p>$ 350.000.000</p><p>70 m²</p></div>';
+      }, 300);
+    </script></body></html>''')
+    try:
+        html = navegador.renderizar(pagina.as_uri(), espera_ms=1_000, desplazamientos=1, timeout_ms=20_000)
+    except Exception as e:  # sin navegador instalado (p. ej. en CI)
+        pytest.skip(f"navegador no disponible: {e}")
+    assert "Cargando" not in html
+    a = extraer_anuncios(html, "habi", "https://habi.co")
+    assert len(a) == 1 and a[0].precio == 350_000_000 and a[0].area_m2 == 70
 
 def test_diagnostico_da_pistas_y_paginacion_no_repite():
     from comparam.sources import FincaRaiz
