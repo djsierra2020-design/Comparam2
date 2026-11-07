@@ -46,7 +46,7 @@ python -m comparam.cli Cedritos --fuente ejemplo     # datos de ejemplo, sin int
 
 ## Cómo funciona
 
-1. **Fuentes**: Finca Raíz, Metrocuadrado y Ciencuadras (`comparam/sources/portales.py`),
+1. **Fuentes**: Finca Raíz, Metrocuadrado, Ciencuadras, Habi y Houm (estos dos son empresas: sus anuncios cuentan para el precio del m² del barrio pero no como dueño directo) (`comparam/sources/portales.py`),
    más cualquier CSV propio (`--csv archivo.csv` o variable `COMPARAM_CSV`).
 2. **Extracción**: los portales incrustan los resultados como JSON en el HTML
    (`__NEXT_DATA__`, JSON-LD…). El extractor genérico (`comparam/sources/extractor.py`)
