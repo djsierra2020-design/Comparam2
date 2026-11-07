@@ -374,3 +374,17 @@ def test_metrocuadrado_usa_navegador(monkeypatch):
     assert urls[0].startswith("https://www.metrocuadrado.com/apartamentos/venta/bogota/cedritos")
     assert len(a) == 3 and any(x.es_dueno_directo for x in a)  # no se marcan como empresa
     assert m.diagnosticar("Cedritos")["estado"] == "navegador"
+
+
+def test_app_instalable():
+    import json
+    import app as webapp
+    c = webapp.app.test_client()
+    html = c.get("/").get_data(as_text=True)
+    assert 'rel="manifest"' in html and "apple-touch-icon" in html and "Cedritos" in html
+    m = json.loads(c.get("/static/manifest.webmanifest").get_data(as_text=True))
+    assert m["display"] == "standalone" and {i["sizes"] for i in m["icons"]} >= {"192x192", "512x512"}
+    sw = c.get("/sw.js")
+    assert sw.status_code == 200 and "javascript" in sw.content_type and "offline.html" in sw.get_data(as_text=True)
+    for f in ("icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png", "offline.html"):
+        assert c.get(f"/static/{f}").status_code == 200, f
