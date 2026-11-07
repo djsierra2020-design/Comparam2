@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Comparam · diagnóstico</title>
+<style>
+  :root { --bg:#f6f7f9; --card:#fff; --tx:#1d2330; --mut:#667085; --ln:#e4e7ec; --ok:#067647; --mal:#b42318 }
+  @media (prefers-color-scheme: dark) { :root { --bg:#0f1218; --card:#181c24; --tx:#e6e8ec; --mut:#98a2b3; --ln:#2a303b; --ok:#6ce9a6; --mal:#fda29b } }
+  body { margin:0; font:15px/1.45 system-ui,sans-serif; background:var(--bg); color:var(--tx) }
+  main { max-width:900px; margin:0 auto; padding:24px 16px } .card { background:var(--card); border:1px solid var(--ln); border-radius:12px; padding:14px 16px; margin-top:12px }
+  dt { color:var(--mut); font-size:13px } dd { margin:0 0 8px; overflow-wrap:anywhere } .ok { color:var(--ok); font-weight:700 } .mal { color:var(--mal); font-weight:700 }
+  a { color:inherit }
+</style></head><body><main>
+<h1>Diagnóstico de portales</h1>
+<p>Primera página de búsqueda de cada portal{% if barrio %} para <b>{{ barrio }}</b>{% else %} para toda Bogotá{% endif %}. Toma una captura de esta página.</p>
+<form><input name="barrio" value="{{ barrio }}" placeholder="barrio (opcional)"> <button>Probar</button> · <a href="/">volver</a></form>
+{% for f in filas %}
+<div class="card">
+  <h2 style="margin:0 0 8px">{{ f.portal }}
+    {% if f.error %}<span class="mal">✗ {{ f.error }}</span>
+    {% elif f.anuncios %}<span class="ok">✓ {{ f.anuncios }} anuncios</span>
+    {% else %}<span class="mal">✗ 0 anuncios</span>{% endif %}</h2>
+  <dl>
+    <dt>Dirección consultada</dt><dd><a href="{{ f.url }}" target="_blank" rel="noopener">{{ f.url }}</a></dd>
+    {% if not f.error %}
+    <dt>Respuesta</dt><dd>HTTP {{ f.estado }} · {{ '{:,}'.format(f.bytes) }} caracteres · {{ f.bloques_json }} bloques de datos</dd>
+    {% if f.url_final != f.url %}<dt>Redirigió a</dt><dd>{{ f.url_final }}</dd>{% endif %}
+    <dt>Título de la página</dt><dd>{{ f.titulo }}</dd>
+    <dt>Dueño directo detectados</dt><dd>{{ f.dueno_directo }}</dd>
+    {% if f.ejemplos %}<dt>Ejemplos</dt><dd>{% for e in f.ejemplos %}{{ e }}<br>{% endfor %}</dd>{% endif %}
+    {% endif %}
+  </dl>
+</div>
+{% endfor %}
+</main></body></html>

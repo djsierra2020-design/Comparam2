@@ -17,7 +17,7 @@ from bs4 import BeautifulSoup
 from ..models import Listing
 from ..parsing import extract_phones, slugify
 from .base import FuenteError, Source
-from .extractor import extraer_anuncios
+from .extractor import contar_bloques_json, extraer_anuncios
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -64,16 +64,22 @@ class PortalWeb(Source):
     def buscar(self, barrio: str, operacion: str = "venta") -> list[Listing]:
         resultados: list[Listing] = []
         for pagina in range(1, self.paginas + 1):
-            html = self._get(self.url_busqueda(barrio, operacion, pagina))
+            url = self.url_busqueda(barrio, operacion, pagina)
+            html = self._get(url)
             nuevos = extraer_anuncios(html, self.nombre, self.base_url, operacion) if html else []
+            if pagina == 1 and not nuevos:
+                if not html:
+                    raise FuenteError(f"{self.nombre}: la búsqueda no existe en el portal (404) — {url}")
+                raise FuenteError(f"{self.nombre}: el portal respondió pero la app no encontró anuncios "
+                                  f"en la página «{_titulo(html)}» — {url}")
             if not nuevos:
                 break
             resultados += nuevos
             time.sleep(self.pausa)
-        if self.detalle:
-            for anuncio in resultados:
-                if anuncio.url and not anuncio.telefonos and anuncio.es_dueno_directo:
-                    self.completar_detalle(anuncio, operacion)
+        if self.detalle:  # abre máximo 20 fichas para no tardar demasiado
+            pendientes = [a for a in resultados if a.url and not a.telefonos and a.es_dueno_directo]
+            for anuncio in sorted(pendientes, key=lambda a: a.precio_m2)[:20]:
+                self.completar_detalle(anuncio, operacion)
         return resultados
 
     def completar_detalle(self, anuncio: Listing, operacion: str) -> None:
@@ -94,6 +100,31 @@ class PortalWeb(Source):
                 anuncio.publicado_por, anuncio.es_dueno_directo = d.publicado_por, d.es_dueno_directo
         anuncio.telefonos = extract_phones(*tels)
         time.sleep(self.pausa)
+
+
+    def diagnosticar(self, barrio: str = "", operacion: str = "venta") -> dict:
+        """Qué responde el portal a la primera página de búsqueda (para la página /diagnostico)."""
+        url = self.url_busqueda(barrio, operacion, 1)
+        info = {"portal": self.nombre, "url": url}
+        try:
+            r = self.sesion.get(url, timeout=self.timeout)
+        except requests.RequestException as e:
+            return {**info, "error": f"no se pudo conectar: {e.__class__.__name__}"}
+        html = r.text
+        anuncios = extraer_anuncios(html, self.nombre, self.base_url, operacion)
+        info.update(
+            estado=r.status_code, url_final=r.url, bytes=len(html), titulo=_titulo(html),
+            bloques_json=contar_bloques_json(html), anuncios=len(anuncios),
+            dueno_directo=sum(a.es_dueno_directo for a in anuncios),
+            ejemplos=[f"{a.titulo[:50]} · ${a.precio:,.0f} · {a.area_m2:g} m² · {a.publicado_por or 'anunciante ?'}"
+                      for a in anuncios[:5]],
+        )
+        return info
+
+
+def _titulo(html: str) -> str:
+    m = re.search(r"<title[^>]*>(.*?)</title>", html or "", re.I | re.S)
+    return re.sub(r"\s+", " ", m.group(1)).strip()[:80] if m else "sin título"
 
 
 class FincaRaiz(PortalWeb):

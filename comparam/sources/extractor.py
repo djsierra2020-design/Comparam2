@@ -161,10 +161,20 @@ def _bloques_json(html: str) -> Iterator[Any]:
 
 def extraer_anuncios(html: str, fuente: str, base_url: str, operacion: str = "venta",
                      barrio_por_defecto: str = "") -> list[Listing]:
+    return extraer_de_json(list(_bloques_json(html)), fuente, base_url, operacion, barrio_por_defecto)
+
+
+def contar_bloques_json(html: str) -> int:
+    return sum(1 for _ in _bloques_json(html))
+
+
+def extraer_de_json(bloques: list, fuente: str, base_url: str, operacion: str = "venta",
+                    barrio_por_defecto: str = "") -> list[Listing]:
+    """Reconoce anuncios en cualquier estructura JSON de la página."""
     claves_precio = (K_PRECIO_ARRIENDO if operacion == "arriendo" else K_PRECIO_VENTA) + K_PRECIO
     vistos: set[tuple] = set()
     anuncios: list[Listing] = []
-    for bloque in _bloques_json(html):
+    for bloque in bloques:
         for d in _recorrer(bloque):
             precio = _num(_primero(d, claves_precio))
             area = _num(_primero(d, K_AREA))
@@ -188,7 +198,7 @@ def extraer_anuncios(html: str, fuente: str, base_url: str, operacion: str = "ve
             telefonos = list(dict.fromkeys(_telefonos(d) + extract_phones(descripcion)))
             anuncios.append(Listing(
                 fuente=fuente,
-                titulo=titulo or "Apartamento",
+                titulo=titulo or (f"Apartamento en {_barrio(d)}" if _barrio(d) else "Apartamento"),
                 barrio=_barrio(d) or barrio_por_defecto,
                 ubicacion=_ubicacion(d),
                 precio=precio,

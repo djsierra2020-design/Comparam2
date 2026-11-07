@@ -67,6 +67,23 @@ def extract_phones(*textos: str) -> list[str]:
     return vistos
 
 
+_EMPRESA = re.compile(
+    r"inmobiliari|bienes|ra[ií]z|ra[ií]ces|propiedad|inversion|constructor|consult|asesor|agencia|grupo|group"
+    r"|realty|real\s*estate|broker|corredor|capital|servicios|soluciones|proyectos|negocios|gesti[oó]n"
+    r"|\bs\.?a\.?s\b|\bs\.?a\b|ltda|\bcia\b|&|\.com|\bde\s+colombia\b|home|house|homes|living|arriendos",
+    re.I,
+)
+
+
+def parece_persona(nombre: str) -> bool:
+    """«Julia Clemencia Toro» sí; «Inmobiliaria XYZ SAS», «Bienes Raíces Ltda» o «Metro123» no."""
+    n = (nombre or "").strip()
+    if not n or _EMPRESA.search(n) or re.search(r"\d", n):
+        return False
+    palabras = n.split()
+    return 1 <= len(palabras) <= 5 and all(re.fullmatch(r"[A-Za-zÁÉÍÓÚÜÑáéíóúüñ.'-]+", p) for p in palabras)
+
+
 def clasificar_anunciante(publicado_por: str = "", nombre: str = "", descripcion: str = "") -> tuple[str, bool]:
     """Devuelve (etiqueta, es_dueno_directo)."""
     tipo = f"{publicado_por} {nombre}".strip()
@@ -75,9 +92,11 @@ def clasificar_anunciante(publicado_por: str = "", nombre: str = "", descripcion
             return "dueño directo", True
         if _INMOBILIARIA.search(tipo) or re.search(r"\b(agency|company|realestate|constructora)\b", tipo, re.I):
             return "inmobiliaria", False
-    if descripcion:
-        if _DUENO.search(descripcion):
-            return "dueño directo", True
-        if _INMOBILIARIA.search(descripcion):
-            return "inmobiliaria", False
+    if descripcion and _DUENO.search(descripcion):
+        return "dueño directo", True
+    # Publicado a nombre de una persona (no de una empresa): en los portales casi siempre es el propietario.
+    if not publicado_por.strip() and parece_persona(nombre):
+        return f"persona natural · {nombre.strip()}", True
+    if descripcion and _INMOBILIARIA.search(descripcion):
+        return "inmobiliaria", False
     return "", False

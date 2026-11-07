@@ -3,7 +3,7 @@ from pathlib import Path
 from comparam.busqueda import buscar, buscar_ciudad, es_del_barrio, zona_de
 from comparam.models import Listing
 from comparam.config import EJEMPLO
-from comparam.parsing import clasificar_anunciante, extract_phones, parse_number, slugify
+from comparam.parsing import parece_persona, clasificar_anunciante, extract_phones, parse_number, slugify
 from comparam.sources import ArchivoCSV
 from comparam.sources.base import FuenteError, Source
 from comparam.sources.extractor import extraer_anuncios
@@ -162,3 +162,40 @@ def test_buscar_ciudad_compara_con_su_barrio():
     assert rc.por_fuente == {"ejemplo": 13}
     assert rc.oportunidades[0].zona == "Fontibón" and rc.oportunidades[0].diferencia < 0
     assert rc.zona_pequena == 2  # Teusaquillo y Chapinero Alto: 1 anuncio cada uno
+
+
+def test_portal_sin_anuncios_avisa():
+    import pytest
+    from comparam.sources import FincaRaiz
+
+    class Resp:
+        def __init__(self, status, text):
+            self.status_code, self.text, self.url = status, text, ""
+
+    class Sesion:
+        headers = {}
+
+        def __init__(self, resp):
+            self.resp = resp
+
+        def get(self, url, timeout=None):
+            return self.resp
+
+    vacia = FincaRaiz(sesion=Sesion(Resp(200, "<html><title>Cargando…</title></html>")), pausa=0)
+    with pytest.raises(FuenteError, match="no encontró anuncios"):
+        vacia.buscar("Fontibón")
+    with pytest.raises(FuenteError, match="404"):
+        FincaRaiz(sesion=Sesion(Resp(404, "")), pausa=0).buscar("Fontibón")
+    ok = FincaRaiz(sesion=Sesion(Resp(200, FIX.read_text())), pausa=0, paginas=1, detalle=False)
+    d = ok.diagnosticar("Cedritos")
+    assert d["estado"] == 200 and d["anuncios"] == 3 and d["dueno_directo"] == 2
+
+
+def test_persona_natural_cuenta_como_dueno():
+    for n in ("Julia Clemencia Toro", "Ingrid Beltr", "Andrea", "José Pérez"):
+        assert parece_persona(n), n
+    for n in ("Inmobiliaria XYZ SAS", "Bienes Raíces Ltda", "Metro123", "Grupo Habitat", "Arriendos y Ventas"):
+        assert not parece_persona(n), n
+    assert clasificar_anunciante("", "Julia Clemencia Toro") == ("persona natural · Julia Clemencia Toro", True)
+    assert clasificar_anunciante("Inmobiliaria", "Julia Toro")[1] is False  # el portal dice que es agencia
+    assert clasificar_anunciante("", "Inmobiliaria XYZ SAS")[1] is False

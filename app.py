@@ -64,6 +64,16 @@ def inicio():
                            elegidas=elegidas, p=params, r=resultado, args=request.args)
 
 
+@app.get("/diagnostico")
+def diagnostico():
+    """Muestra qué responde cada portal a la primera página de búsqueda."""
+    barrio = request.args.get("barrio", "").strip()
+    operacion = "arriendo" if request.args.get("operacion") == "arriendo" else "venta"
+    portales = [cls(paginas=1, detalle=False) for cls in PORTALES.values()]
+    return render_template("diagnostico.html", barrio=barrio,
+                           filas=[p.diagnosticar(barrio, operacion) for p in portales])
+
+
 @app.get("/api/ciudad")
 def api_ciudad():
     _, rc = _consulta_ciudad()
