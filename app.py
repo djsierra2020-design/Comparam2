@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import os
 
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, render_template, request, send_from_directory
 
 from comparam.barrios import BARRIOS
 from comparam.busqueda import buscar, buscar_ciudad
@@ -72,6 +72,14 @@ def inicio():
     barrio, elegidas, params, resultado = _consulta()
     return render_template("index.html", barrio=barrio, barrios=BARRIOS, fuentes=FUENTES,
                            elegidas=elegidas, p=params, r=resultado, args=request.args)
+
+
+@app.get("/sw.js")
+def service_worker():
+    # Se sirve desde la raíz para que controle toda la app (no solo /static).
+    r = send_from_directory(app.static_folder, "sw.js", mimetype="application/javascript")
+    r.headers["Cache-Control"] = "no-cache"
+    return r
 
 
 @app.get("/diagnostico")

@@ -2,113 +2,238 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Comparam · m² más barato en Bogotá</title>
+<meta name="description" content="Encuentra los apartamentos más baratos por metro cuadrado en Bogotá, con el teléfono del dueño.">
+<meta name="theme-color" content="#0d7466">
+<link rel="manifest" href="/static/manifest.webmanifest">
+<link rel="icon" type="image/png" href="/static/favicon.png">
+<link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Comparam">
 <style>
-  :root { --bg:#f6f7f9; --card:#fff; --tx:#1d2330; --mut:#667085; --ac:#0f766e; --ln:#e4e7ec; --ok:#ecfdf3; --okt:#067647; }
-  @media (prefers-color-scheme: dark) { :root { --bg:#0f1218; --card:#181c24; --tx:#e6e8ec; --mut:#98a2b3; --ac:#2dd4bf; --ln:#2a303b; --ok:#0b2e22; --okt:#6ce9a6; } }
-  * { box-sizing:border-box } body { margin:0; font:15px/1.45 system-ui,-apple-system,Segoe UI,sans-serif; background:var(--bg); color:var(--tx) }
-  main { max-width:1000px; margin:0 auto; padding:24px 16px 48px }
-  h1 { font-size:24px; margin:0 0 4px } .sub { color:var(--mut); margin:0 0 20px }
-  form { background:var(--card); border:1px solid var(--ln); border-radius:12px; padding:16px; display:grid; gap:12px }
-  .fila { display:flex; flex-wrap:wrap; gap:12px; align-items:end } label { font-size:13px; color:var(--mut); display:grid; gap:4px }
-  input[type=text] { font:inherit; padding:10px 12px; border:1px solid var(--ln); border-radius:8px; background:var(--bg); color:var(--tx); min-width:0 }
-  .grande { flex:1 1 260px } .grande input { font-size:17px; width:100% } .chk { display:flex; gap:6px; align-items:center; color:var(--tx); font-size:14px }
-  select { font:inherit; padding:10px; border-radius:8px; border:1px solid var(--ln); background:var(--bg); color:var(--tx) }
-  button { font:inherit; font-weight:600; padding:10px 22px; border:0; border-radius:8px; background:var(--ac); color:#fff; cursor:pointer }
-  button.sec { background:transparent; color:var(--ac); border:1.5px solid var(--ac) }
-  #cargando { display:none; margin-top:16px } .zonas { width:100%; border-collapse:collapse; font-size:14px; margin-top:8px }
-  .zonas td, .zonas th { padding:4px 8px; border-bottom:1px solid var(--ln); text-align:left } .zonas td.n { text-align:right; font-variant-numeric:tabular-nums }
-  .aviso { margin:16px 0; padding:10px 14px; border-radius:8px; background:#fff4e5; color:#7a4100; font-size:14px }
-  @media (prefers-color-scheme: dark) { .aviso { background:#3a2606; color:#fdba74 } }
-  .lista { display:grid; gap:10px; margin-top:16px; padding:0; list-style:none }
-  .item { background:var(--card); border:1px solid var(--ln); border-radius:12px; padding:14px 16px; display:grid; grid-template-columns:auto 1fr auto; gap:6px 16px; align-items:start }
-  .pos { font-weight:700; color:var(--mut); font-variant-numeric:tabular-nums } .m2 { font-size:20px; font-weight:700; color:var(--ac); white-space:nowrap; text-align:right }
-  .m2 small { display:block; font-size:12px; color:var(--mut); font-weight:400 } .tit { font-weight:600 } .meta { color:var(--mut); font-size:13px }
-  .tels { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px } .tel { background:var(--ok); color:var(--okt); padding:3px 10px; border-radius:99px; text-decoration:none; font-weight:600; font-size:14px }
-  .zona { margin-top:16px; background:var(--card); border:1px solid var(--ln); border-radius:12px; padding:14px 16px; display:flex; flex-wrap:wrap; gap:8px 28px; align-items:baseline }
-  .zona b { font-size:22px; color:var(--tx) } .zona .meta b { font-size:inherit }
-  .usados { margin:8px 0 0; padding-left:22px; font-size:14px; display:grid; gap:6px } .usados b { font-size:inherit }
-  .vs { font-size:12px; font-weight:600; display:block; margin-top:2px } .bajo { color:var(--okt) } .alto { color:#b42318 }
-  @media (prefers-color-scheme: dark) { .alto { color:#fda29b } }
-  .tag.portal { color:var(--ac); border-color:var(--ac); font-weight:600 }
-  .tag { font-size:12px; padding:2px 8px; border-radius:99px; border:1px solid var(--ln); color:var(--mut) } a { color:var(--ac) }
-  @media (max-width:560px) { .item { grid-template-columns:1fr } .m2 { text-align:left } .pos { display:none } }
+  :root {
+    --marca:#0d7466; --marca2:#08544a; --marca-suave:#e6f4f1;
+    --bg:#f3f5f7; --card:#fff; --tx:#14181f; --mut:#667085; --ln:#e4e7ec;
+    --ok:#e8f8ef; --okt:#067647; --mal:#fdecea; --malt:#b42318; --aviso:#fff4e5; --avisot:#7a4100;
+    --sombra:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+  }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --marca:#2dd4bf; --marca2:#0d7466; --marca-suave:#0f2f2b;
+    --bg:#0c0f14; --card:#161b23; --tx:#e8eaee; --mut:#98a2b3; --ln:#262d38;
+    --ok:#0b2e22; --okt:#6ce9a6; --mal:#3a1512; --malt:#fda29b; --aviso:#3a2606; --avisot:#fdba74;
+    --sombra:0 1px 2px rgba(0,0,0,.4);
+  } }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent }
+  html, body { margin:0 }
+  body { font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--tx);
+         min-height:100vh; padding-bottom:env(safe-area-inset-bottom) }
+  a { color:var(--marca) }
+
+  /* Barra superior */
+  .barra { position:sticky; top:0; z-index:10; background:linear-gradient(180deg,var(--marca),var(--marca2)); color:#fff;
+           padding:calc(env(safe-area-inset-top) + 12px) 16px 14px; box-shadow:0 2px 10px rgba(0,0,0,.12) }
+  .barra .in { max-width:760px; margin:0 auto; display:flex; align-items:center; gap:12px }
+  .barra img { width:38px; height:38px; border-radius:10px; box-shadow:0 0 0 2px rgba(255,255,255,.25) }
+  .barra b { font-size:19px; letter-spacing:.2px; display:block; line-height:1.1 }
+  .barra small { opacity:.85; font-size:13px }
+  .barra .instalar { margin-left:auto; display:none; background:#fff; color:#0d7466; border:0; border-radius:999px;
+                     font:inherit; font-size:14px; font-weight:700; padding:8px 14px; cursor:pointer }
+
+  main { max-width:760px; margin:0 auto; padding:16px 16px 40px }
+
+  /* Buscador */
+  .buscador { background:var(--card); border-radius:20px; padding:16px; box-shadow:var(--sombra); display:grid; gap:14px }
+  .campo { position:relative }
+  .campo svg { position:absolute; left:14px; top:50%; transform:translateY(-50%); width:20px; height:20px; color:var(--mut) }
+  .campo input { width:100%; font:inherit; font-size:17px; padding:14px 14px 14px 44px; border-radius:14px;
+                 border:1.5px solid var(--ln); background:var(--bg); color:var(--tx); outline:none }
+  .campo input:focus { border-color:var(--marca) }
+  .segmento { display:grid; grid-template-columns:1fr 1fr; background:var(--bg); border-radius:12px; padding:4px }
+  .segmento input { display:none }
+  .segmento label { text-align:center; padding:9px; border-radius:9px; font-weight:600; color:var(--mut); cursor:pointer }
+  .segmento input:checked + label { background:var(--card); color:var(--tx); box-shadow:var(--sombra) }
+  .chips { display:flex; flex-wrap:wrap; gap:8px }
+  .chip input { display:none }
+  .chip label { display:inline-flex; align-items:center; gap:6px; padding:8px 14px; border-radius:999px; font-size:14px;
+                border:1.5px solid var(--ln); color:var(--mut); cursor:pointer; user-select:none }
+  .chip input:checked + label { border-color:var(--marca); background:var(--marca-suave); color:var(--marca); font-weight:600 }
+  .chip input:checked + label::before { content:"✓" }
+  details.filtros summary { cursor:pointer; color:var(--marca); font-weight:600; font-size:14px; list-style:none }
+  details.filtros summary::-webkit-details-marker { display:none }
+  .dos { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px }
+  .dos label { font-size:13px; color:var(--mut); display:grid; gap:4px }
+  .dos input { font:inherit; padding:11px 12px; border-radius:12px; border:1.5px solid var(--ln); background:var(--bg); color:var(--tx); min-width:0 }
+  .botones { display:grid; grid-template-columns:1fr 1fr; gap:10px }
+  .btn { font:inherit; font-weight:700; padding:14px; border-radius:14px; border:0; cursor:pointer; text-align:center; text-decoration:none }
+  .btn.pri { background:var(--marca); color:#fff } .btn.sec { background:var(--marca-suave); color:var(--marca) }
+  @media (prefers-color-scheme: dark) { .btn.pri { color:#05201c } }
+
+  /* Inicio */
+  .inicio { text-align:center; padding:26px 8px 6px; color:var(--mut) }
+  .inicio h2 { color:var(--tx); font-size:20px; margin:0 0 6px }
+  .rapidos { display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-top:14px }
+  .rapidos a { text-decoration:none; padding:8px 14px; border-radius:999px; background:var(--card); box-shadow:var(--sombra);
+               color:var(--tx); font-size:14px; font-weight:600 }
+  .pasos { display:grid; gap:10px; margin-top:22px; text-align:left }
+  .paso { display:flex; gap:12px; align-items:flex-start; background:var(--card); border-radius:16px; padding:12px 14px; box-shadow:var(--sombra) }
+  .paso span { flex:none; width:28px; height:28px; border-radius:50%; display:grid; place-items:center; background:var(--marca-suave);
+               color:var(--marca); font-weight:800 }
+  .paso b { color:var(--tx) }
+
+  /* Resumen (KPIs) */
+  .resumen { margin-top:16px; background:var(--card); border-radius:20px; padding:16px; box-shadow:var(--sombra) }
+  .kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px }
+  .kpi { background:var(--bg); border-radius:14px; padding:12px }
+  .kpi .meta { font-size:12px } .kpi b { display:block; font-size:22px; margin-top:2px; font-variant-numeric:tabular-nums }
+  .kpi.destacado { background:var(--marca); color:#fff } .kpi.destacado .meta { color:rgba(255,255,255,.85) }
+  @media (prefers-color-scheme: dark) { .kpi.destacado { color:#05201c } .kpi.destacado .meta { color:rgba(5,32,28,.8) } }
+  .resumen p { margin:12px 0 0 }
+  .resumen details { margin-top:10px } .resumen summary { cursor:pointer; color:var(--marca); font-weight:600; font-size:14px }
+  .meta { color:var(--mut); font-size:13px }
+  .zonas { width:100%; border-collapse:collapse; font-size:14px; margin-top:8px }
+  .zonas td, .zonas th { padding:6px 8px; border-bottom:1px solid var(--ln); text-align:left } .zonas td.n { text-align:right; font-variant-numeric:tabular-nums }
+  .usados { margin:8px 0 0; padding-left:22px; font-size:14px; display:grid; gap:6px }
+
+  /* Tarjetas de resultados */
+  .titulo-lista { margin:22px 4px 10px; font-weight:700 }
+  .lista { display:grid; gap:12px; padding:0; margin:0; list-style:none }
+  .item { background:var(--card); border-radius:20px; padding:14px 16px 16px; box-shadow:var(--sombra) }
+  .item .top { display:flex; align-items:center; gap:8px; margin-bottom:8px }
+  .pos { width:28px; height:28px; border-radius:50%; display:grid; place-items:center; font-size:13px; font-weight:800;
+         background:var(--marca-suave); color:var(--marca) }
+  .item:first-child .pos { background:var(--marca); color:#fff }
+  .tag { font-size:12px; padding:3px 9px; border-radius:999px; background:var(--bg); color:var(--mut) }
+  .tag.portal { background:var(--marca-suave); color:var(--marca); font-weight:700 }
+  .tit { font-weight:700; font-size:16px; line-height:1.3 } .tit a { color:inherit; text-decoration:none }
+  .precio { display:flex; align-items:flex-end; justify-content:space-between; gap:12px; margin-top:10px; flex-wrap:wrap }
+  .m2 { font-size:26px; font-weight:800; color:var(--marca); letter-spacing:-.3px; line-height:1 }
+  .m2 small { font-size:13px; font-weight:600; color:var(--mut); letter-spacing:0 }
+  .vs { font-size:13px; font-weight:700; padding:5px 10px; border-radius:999px }
+  .vs.bajo { background:var(--ok); color:var(--okt) } .vs.alto { background:var(--mal); color:var(--malt) }
+  .acciones { display:grid; grid-template-columns:repeat(auto-fit,minmax(100px,1fr)); gap:8px; margin-top:12px }
+  .acc { display:flex; align-items:center; justify-content:center; gap:6px; padding:11px; border-radius:12px; font-weight:700;
+         font-size:14px; text-decoration:none; background:var(--bg); color:var(--tx) }
+  .acc.llamar { background:var(--marca); color:#fff } .acc.wa { background:#25d366; color:#05301a }
+  @media (prefers-color-scheme: dark) { .acc.llamar { color:#05201c } }
+
+  .aviso { margin:16px 0; padding:12px 14px; border-radius:14px; background:var(--aviso); color:var(--avisot); font-size:14px }
+
+  /* Cargando */
+  #cargando { position:fixed; inset:0; z-index:20; display:none; place-items:center; background:rgba(8,20,18,.55);
+              backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px) }
+  #cargando .caja { background:var(--card); border-radius:20px; padding:24px 22px; text-align:center; width:min(320px,88vw) }
+  .giro { width:44px; height:44px; margin:0 auto 12px; border-radius:50%; border:4px solid var(--marca-suave);
+          border-top-color:var(--marca); animation:g 0.9s linear infinite }
+  @keyframes g { to { transform:rotate(360deg) } }
+  @media (prefers-reduced-motion: reduce) { .giro { animation-duration:3s } }
 </style>
 </head>
-<body><main>
-<h1>Apartamento más económico por m²</h1>
-<p class="sub">Escribe un barrio de Bogotá, o usa «Buscar en toda Bogotá» para ver los apartamentos más baratos frente al precio de su propio barrio. Por defecto solo se muestran los publicados por el dueño directo (sin inmobiliaria).</p>
-
-<form method="get" id="f">
-  <div class="fila">
-    <label class="grande">Barrio
-      <input type="text" name="barrio" list="barrios" value="{{ barrio }}" placeholder="Ej: Cedritos (vacío = toda Bogotá)" autofocus>
-      <datalist id="barrios">{% for b in barrios %}<option value="{{ b }}">{% endfor %}</datalist>
-    </label>
-    <label>Operación
-      <select name="operacion">
-        <option value="venta" {% if p.operacion=='venta' %}selected{% endif %}>Venta</option>
-        <option value="arriendo" {% if p.operacion=='arriendo' %}selected{% endif %}>Arriendo</option>
-      </select>
-    </label>
-    <label>Área mínima (m²)<input type="text" name="area_min" value="{{ args.area_min or '' }}" size="6" inputmode="numeric"></label>
-    <label>Precio máximo<input type="text" name="precio_max" value="{{ args.precio_max or '' }}" size="12" inputmode="numeric"></label>
-    <button type="submit" name="modo" value="barrio">Buscar en el barrio</button>
-    <button type="submit" name="modo" value="ciudad" class="sec">Buscar en toda Bogotá</button>
+{% macro telefonos(a) %}
+  <div class="acciones">
+    {% for t in a.telefonos[:1] %}
+      <a class="acc llamar" href="tel:+57{{ t|replace(' ', '') }}">📞 {{ t }}</a>
+      <a class="acc wa" href="https://wa.me/57{{ t|replace(' ', '') }}" target="_blank" rel="noopener">WhatsApp</a>
+    {% endfor %}
+    {% if a.url %}<a class="acc" href="{{ a.url }}" target="_blank" rel="noopener">Ver anuncio ↗</a>{% endif %}
   </div>
-  <div class="fila">
-    <span class="chk"><input type="checkbox" id="todos" name="todos" value="1" {% if not p.solo_dueno %}checked{% endif %}><label for="todos" class="chk">Incluir inmobiliarias</label></span>
-    <span class="chk"><input type="checkbox" id="ct" name="con_telefono" value="1" {% if p.con_telefono %}checked{% endif %}><label for="ct" class="chk">Solo con teléfono</label></span>
-    {# Siempre se busca en todos los portales. ?fuente=... en la URL (p. ej. «ejemplo») se conserva oculto. #}
-    {% if args.getlist('fuente') %}{% for f in elegidas %}<input type="hidden" name="fuente" value="{{ f }}">{% endfor %}{% endif %}
+  {% if not a.telefonos %}<div class="meta" style="margin-top:6px">Teléfono no publicado — ver anuncio</div>{% endif %}
+  {% if a.telefonos|length > 1 %}<div class="meta" style="margin-top:6px">Otros: {{ a.telefonos[1:]|join(', ') }}</div>{% endif %}
+{% endmacro %}
+<body>
+<header class="barra"><div class="in">
+  <img src="/static/icon-192.png" alt="">
+  <div><b>Comparam</b><small>El m² más barato de Bogotá</small></div>
+  <button class="instalar" id="instalar" type="button">Instalar</button>
+</div></header>
+
+<main>
+<form method="get" id="f" class="buscador">
+  <div class="campo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input type="search" name="barrio" list="barrios" value="{{ barrio }}" placeholder="¿En qué barrio buscas?" autocomplete="off" enterkeyhint="search">
+    <datalist id="barrios">{% for b in barrios %}<option value="{{ b }}">{% endfor %}</datalist>
+  </div>
+  <div class="segmento">
+    <input type="radio" id="op-v" name="operacion" value="venta" {% if p.operacion=='venta' %}checked{% endif %}><label for="op-v">Comprar</label>
+    <input type="radio" id="op-a" name="operacion" value="arriendo" {% if p.operacion=='arriendo' %}checked{% endif %}><label for="op-a">Arrendar</label>
+  </div>
+  <div class="chips">
+    <span class="chip"><input type="checkbox" id="todos" name="todos" value="1" {% if not p.solo_dueno %}checked{% endif %}><label for="todos">Incluir inmobiliarias</label></span>
+    <span class="chip"><input type="checkbox" id="ct" name="con_telefono" value="1" {% if p.con_telefono %}checked{% endif %}><label for="ct">Solo con teléfono</label></span>
+  </div>
+  <details class="filtros" {% if args.area_min or args.precio_max %}open{% endif %}>
+    <summary>Más filtros ▾</summary>
+    <div class="dos">
+      <label>Área mínima (m²)<input type="text" name="area_min" value="{{ args.area_min or '' }}" inputmode="numeric" placeholder="Ej: 50"></label>
+      <label>Precio máximo<input type="text" name="precio_max" value="{{ args.precio_max or '' }}" inputmode="numeric" placeholder="Ej: 400000000"></label>
+    </div>
+  </details>
+  {# Siempre se busca en todos los portales. ?fuente=... en la URL (p. ej. «ejemplo») se conserva oculto. #}
+  {% if args.getlist('fuente') %}{% for f in elegidas %}<input type="hidden" name="fuente" value="{{ f }}">{% endfor %}{% endif %}
+  <div class="botones">
+    <button class="btn pri" type="submit" name="modo" value="barrio">Buscar</button>
+    <button class="btn sec" type="submit" name="modo" value="ciudad">Toda Bogotá</button>
   </div>
 </form>
 
-<div id="cargando" class="aviso">⏳ Buscando en los portales… En toda Bogotá puede tardar 1–2 minutos.</div>
-<script>
-document.getElementById('f').addEventListener('submit', function (e) {
-  var modo = e.submitter && e.submitter.value;
-  if (modo === 'barrio' && !this.barrio.value.trim()) { e.preventDefault(); this.barrio.focus(); return; }
-  document.getElementById('cargando').style.display = 'block';
-});
-</script>
+<div id="cargando"><div class="caja"><div class="giro"></div><b>Buscando en los portales…</b>
+  <div class="meta" id="cargando-txt">Esto tarda unos segundos.</div></div></div>
+
+{% if not r and not rc %}
+<section class="inicio">
+  <h2>Encuentra el apartamento más barato por m²</h2>
+  <div>Compara los anuncios de los portales y te mostramos primero los de dueño directo, con su teléfono.</div>
+  <div class="rapidos">
+    {% for b in ["Cedritos", "Chapinero", "Suba", "Fontibón", "Kennedy", "Bosa", "Teusaquillo"] %}
+    <a href="/?barrio={{ b }}&modo=barrio">{{ b }}</a>
+    {% endfor %}
+  </div>
+  <div class="pasos">
+    <div class="paso"><span>1</span><div><b>Escribe el barrio</b><div class="meta">O toca «Toda Bogotá» para ver las mejores oportunidades de la ciudad.</div></div></div>
+    <div class="paso"><span>2</span><div><b>Mira el precio del m²</b><div class="meta">Ordenados del más barato al más caro, comparados con el precio de su zona.</div></div></div>
+    <div class="paso"><span>3</span><div><b>Llama al dueño</b><div class="meta">Con un toque: llamada o WhatsApp, sin inmobiliaria de por medio.</div></div></div>
+  </div>
+</section>
+{% endif %}
 
 {% if rc %}
-  <div class="zona">
-    {% if rc.publicados > rc.total_encontrados %}
-    <div><div class="meta">Anuncios publicados en los portales</div><b>{{ rc.publicados|miles }}</b></div>
-    <div><div class="meta">Analizados (los más recientes)</div><b>{{ rc.total_encontrados|miles }}</b></div>
-    {% else %}
-    <div><div class="meta">Anuncios analizados en toda Bogotá</div><b>{{ rc.total_encontrados|miles }}</b></div>
-    {% endif %}
-    <div><div class="meta">Barrios y localidades comparables</div><b>{{ rc.zonas|length }}</b></div>
-    <div class="meta" style="flex-basis:100%">Cada apartamento se compara con la mediana del precio de oferta del m² de <b>su propio barrio</b> (calculada con todos los anuncios de ese barrio, incluidas inmobiliarias). Si su barrio tiene menos de 3 anuncios, se compara con su <b>localidad</b>{% if rc.zona_pequena %}; {{ rc.zona_pequena }} anuncios quedaron por fuera porque no se pudo saber su localidad o tenía muy pocos anuncios{% endif %}{% if rc.sin_zona %}, y {{ rc.sin_zona }} no indicaban su barrio{% endif %}.</div>
+  <section class="resumen">
+    <div class="kpis">
+      {% if rc.publicados > rc.total_encontrados %}
+      <div class="kpi destacado"><div class="meta">Anuncios publicados en los portales</div><b>{{ rc.publicados|miles }}</b></div>
+      <div class="kpi"><div class="meta">Analizados (los más recientes)</div><b>{{ rc.total_encontrados|miles }}</b></div>
+      {% else %}
+      <div class="kpi destacado"><div class="meta">Anuncios analizados en toda Bogotá</div><b>{{ rc.total_encontrados|miles }}</b></div>
+      {% endif %}
+      <div class="kpi"><div class="meta">Barrios y localidades comparables</div><b>{{ rc.zonas|length }}</b></div>
+    </div>
+    <p class="meta">Cada apartamento se compara con la mediana del precio de oferta del m² de <b>su propio barrio</b> (calculada con todos los anuncios de ese barrio, incluidas inmobiliarias). Si su barrio tiene menos de 3 anuncios, se compara con su <b>localidad</b>{% if rc.zona_pequena %}; {{ rc.zona_pequena }} anuncios quedaron por fuera porque no se pudo saber su localidad o tenía muy pocos anuncios{% endif %}{% if rc.sin_zona %}, y {{ rc.sin_zona }} no indicaban su barrio{% endif %}.</p>
     {% if rc.zonas %}
-    <details style="flex-basis:100%">
-      <summary class="meta" style="cursor:pointer">Ver precio del m² por barrio y localidad ({{ rc.zonas|length }})</summary>
+    <details>
+      <summary>Ver precio del m² por barrio y localidad ({{ rc.zonas|length }})</summary>
       <table class="zonas"><tr><th>Zona</th><th>m² (mediana)</th><th>Anuncios</th></tr>
       {% for z, v in rc.zonas.items() %}<tr><td>{{ z }}</td><td class="n">{{ v.mediana|pesos }}</td><td class="n">{{ v.anuncios }}</td></tr>{% endfor %}
       </table>
     </details>
     {% endif %}
-  </div>
+  </section>
   {% if rc.oportunidades %}
-  <p class="meta" style="margin-top:16px">Los {{ rc.oportunidades|length }} más baratos frente a su barrio{% if p.solo_dueno %} (dueño directo){% endif %}</p>
+  <div class="titulo-lista">Los {{ rc.oportunidades|length }} más baratos frente a su barrio{% if p.solo_dueno %} · dueño directo{% endif %}</div>
   <ol class="lista">
   {% for o in rc.oportunidades %}{% set a = o.anuncio %}
     <li class="item">
-      <span class="pos">{{ loop.index }}</span>
-      <div>
-        <div class="tit">{% if a.url %}<a href="{{ a.url }}" target="_blank" rel="noopener">{{ a.titulo }}</a>{% else %}{{ a.titulo }}{% endif %}</div>
-        <div class="meta"><b>{{ o.zona }}</b> · {{ a.precio|pesos }} · {{ '%g'|format(a.area_m2) }} m²{% if a.habitaciones %} · {{ a.habitaciones }} hab{% endif %}{% if a.banos %} · {{ a.banos }} baños{% endif %}</div>
-        <div class="meta">m² en {{ o.zona }}: {{ o.valor.mediana|pesos }} (calculado con {{ o.valor.anuncios }} anuncios)</div>
-        <div class="tels">
-          {% for t in a.telefonos %}<a class="tel" href="tel:+57{{ t|replace(' ', '') }}">📞 {{ t }}</a><a class="tel" href="https://wa.me/57{{ t|replace(' ', '') }}" target="_blank" rel="noopener">WhatsApp</a>{% else %}<span class="meta">Teléfono no publicado — ver anuncio</span>{% endfor %}
-          <span class="tag portal">{{ a.fuente|portal }}</span><span class="tag">{{ a.publicado_por or 'anunciante desconocido' }}</span>
-        </div>
+      <div class="top"><span class="pos">{{ loop.index }}</span><span class="tag portal">{{ a.fuente|portal }}</span><span class="tag">{{ a.publicado_por or 'anunciante desconocido' }}</span></div>
+      <div class="tit">{% if a.url %}<a href="{{ a.url }}" target="_blank" rel="noopener">{{ a.titulo }}</a>{% else %}{{ a.titulo }}{% endif %}</div>
+      <div class="meta"><b>{{ o.zona }}</b> · {{ a.precio|pesos }} · {{ '%g'|format(a.area_m2) }} m²{% if a.habitaciones %} · {{ a.habitaciones }} hab{% endif %}{% if a.banos %} · {{ a.banos }} baños{% endif %}</div>
+      <div class="precio">
+        <div class="m2">{{ a.precio_m2|pesos }} <small>/m²</small></div>
+        {% set d = o.diferencia %}<span class="vs {{ 'bajo' if d < 0 else 'alto' }}">{{ '%.0f'|format(d|abs) }}% {{ 'bajo' if d < 0 else 'sobre' }} su {{ o.nivel }}</span>
       </div>
-      <div class="m2">{{ a.precio_m2|pesos }}<small>por m²</small>{% set d = o.diferencia %}<span class="vs {{ 'bajo' if d < 0 else 'alto' }}">{{ '%.0f'|format(d|abs) }}% {{ 'bajo' if d < 0 else 'sobre' }} su {{ o.nivel }}</span></div>
+      <div class="meta" style="margin-top:4px">m² en {{ o.zona }}: {{ o.valor.mediana|pesos }} (calculado con {{ o.valor.anuncios }} anuncios)</div>
+      {{ telefonos(a) }}
     </li>
   {% endfor %}
   </ol>
@@ -119,14 +244,16 @@ document.getElementById('f').addEventListener('submit', function (e) {
 
 {% if r %}
   {% if r.zona %}
-  <div class="zona">
-    <div><div class="meta">Precio de oferta del m² en {{ barrio }}</div><b>{{ r.zona.mediana|pesos }}</b></div>
-    <div><div class="meta">Calculado con</div><b>{{ r.zona.anuncios }} anuncio{{ 's' if r.zona.anuncios != 1 }}</b></div>
-    {% if r.publicados > r.total_encontrados %}<div><div class="meta">Publicados en los portales para {{ barrio }}</div><b>{{ r.publicados|miles }}</b></div>{% endif %}
-    <div class="meta">Promedio <b>{{ r.zona.promedio|pesos }}</b><br>Rango {{ r.zona.minimo|pesos }} – {{ r.zona.maximo|pesos }}</div>
-    <div class="meta" style="flex-basis:100%">Mediana del precio pedido por m² en los anuncios encontrados ({% if p.solo_dueno %}incluye inmobiliarias{% else %}todos los anunciantes{% endif %}). No es el avalúo catastral.{% if r.zona.anuncios < 10 %} <b>Pocos anuncios: tómalo como referencia aproximada.</b>{% endif %}</div>
-    <details style="flex-basis:100%">
-      <summary class="meta" style="cursor:pointer">Ver los {{ r.zona.anuncios }} anuncios usados en el cálculo</summary>
+  <section class="resumen">
+    <div class="kpis">
+      <div class="kpi destacado"><div class="meta">Precio de oferta del m² en {{ barrio }}</div><b>{{ r.zona.mediana|pesos }}</b></div>
+      <div class="kpi"><div class="meta">Calculado con</div><b>{{ r.zona.anuncios }} anuncio{{ 's' if r.zona.anuncios != 1 }}</b></div>
+      {% if r.publicados > r.total_encontrados %}<div class="kpi"><div class="meta">Publicados en los portales para {{ barrio }}</div><b>{{ r.publicados|miles }}</b></div>{% endif %}
+    </div>
+    <p class="meta">Promedio <b>{{ r.zona.promedio|pesos }}</b> · Rango {{ r.zona.minimo|pesos }} – {{ r.zona.maximo|pesos }}<br>
+    Mediana del precio pedido por m² en los anuncios encontrados ({% if p.solo_dueno %}incluye inmobiliarias{% else %}todos los anunciantes{% endif %}). No es el avalúo catastral.{% if r.zona.anuncios < 10 %} <b>Pocos anuncios: tómalo como referencia aproximada.</b>{% endif %}</p>
+    <details>
+      <summary>Ver los {{ r.zona.anuncios }} anuncios usados en el cálculo</summary>
       <ol class="usados">
       {% for a in r.usados_zona %}
         <li><b>{{ a.precio_m2|pesos }}/m²</b> · {{ a.precio|pesos }} · {{ '%g'|format(a.area_m2) }} m² ·
@@ -136,8 +263,9 @@ document.getElementById('f').addEventListener('submit', function (e) {
       </ol>
     </details>
     {% if r.otros_barrios %}
-    <details style="flex-basis:100%">
-      <summary class="meta" style="cursor:pointer">Se descartaron {{ r.otros_barrios|length }} anuncio{{ 's' if r.otros_barrios|length != 1 }} de otros barrios (destacados que el portal mezcla en los resultados)</summary>
+    <details>
+      <summary>Se descartaron {{ r.otros_barrios|length }} anuncio{{ 's' if r.otros_barrios|length != 1 }} de otros barrios</summary>
+      <p class="meta">Son destacados que el portal mezcla en los resultados.</p>
       <ol class="usados">
       {% for a in r.otros_barrios %}
         <li>{{ a.precio_m2|pesos }}/m² · {% if a.url %}<a href="{{ a.url }}" target="_blank" rel="noopener">{{ a.titulo[:60] }}</a>{% else %}{{ a.titulo[:60] }}{% endif %}
@@ -146,23 +274,21 @@ document.getElementById('f').addEventListener('submit', function (e) {
       </ol>
     </details>
     {% endif %}
-  </div>
+  </section>
   {% endif %}
   {% if r.anuncios %}
-  <p class="meta" style="margin-top:16px">{{ r.anuncios|length }} resultado(s) en <b>{{ barrio }}</b> · {{ r.total_encontrados }} anuncios revisados</p>
+  <div class="titulo-lista">{{ r.anuncios|length }} resultado(s) en {{ barrio }} <span class="meta">· {{ r.total_encontrados }} anuncios revisados</span></div>
   <ol class="lista">
   {% for a in r.anuncios %}
     <li class="item">
-      <span class="pos">{{ loop.index }}</span>
-      <div>
-        <div class="tit">{% if a.url %}<a href="{{ a.url }}" target="_blank" rel="noopener">{{ a.titulo }}</a>{% else %}{{ a.titulo }}{% endif %}</div>
-        <div class="meta">{{ a.precio|pesos }} · {{ '%g'|format(a.area_m2) }} m²{% if a.habitaciones %} · {{ a.habitaciones }} hab{% endif %}{% if a.banos %} · {{ a.banos }} baños{% endif %} · {{ a.barrio }}</div>
-        <div class="tels">
-          {% for t in a.telefonos %}<a class="tel" href="tel:+57{{ t|replace(' ', '') }}">📞 {{ t }}</a><a class="tel" href="https://wa.me/57{{ t|replace(' ', '') }}" target="_blank" rel="noopener">WhatsApp</a>{% else %}<span class="meta">Teléfono no publicado — ver anuncio</span>{% endfor %}
-          <span class="tag portal">{{ a.fuente|portal }}</span><span class="tag">{{ a.publicado_por or 'anunciante desconocido' }}</span>
-        </div>
+      <div class="top"><span class="pos">{{ loop.index }}</span><span class="tag portal">{{ a.fuente|portal }}</span><span class="tag">{{ a.publicado_por or 'anunciante desconocido' }}</span></div>
+      <div class="tit">{% if a.url %}<a href="{{ a.url }}" target="_blank" rel="noopener">{{ a.titulo }}</a>{% else %}{{ a.titulo }}{% endif %}</div>
+      <div class="meta">{{ a.precio|pesos }} · {{ '%g'|format(a.area_m2) }} m²{% if a.habitaciones %} · {{ a.habitaciones }} hab{% endif %}{% if a.banos %} · {{ a.banos }} baños{% endif %} · {{ a.barrio }}</div>
+      <div class="precio">
+        <div class="m2">{{ a.precio_m2|pesos }} <small>/m²</small></div>
+        {% if r.zona %}{% set d = r.zona.diferencia(a.precio_m2) %}<span class="vs {{ 'bajo' if d < 0 else 'alto' }}">{{ '%.0f'|format(d|abs) }}% {{ 'bajo' if d < 0 else 'sobre' }} la zona</span>{% endif %}
       </div>
-      <div class="m2">{{ a.precio_m2|pesos }}<small>por m²</small>{% if r.zona %}{% set d = r.zona.diferencia(a.precio_m2) %}<span class="vs {{ 'bajo' if d < 0 else 'alto' }}">{{ '%.0f'|format(d|abs) }}% {{ 'bajo' if d < 0 else 'sobre' }} la zona</span>{% endif %}</div>
+      {{ telefonos(a) }}
     </li>
   {% endfor %}
   </ol>
@@ -170,4 +296,26 @@ document.getElementById('f').addEventListener('submit', function (e) {
   <div class="aviso">No se encontraron apartamentos {% if p.solo_dueno %}de dueño directo {% endif %}en {{ barrio }} ({{ r.total_encontrados }} anuncios revisados).{% if p.solo_dueno %} Prueba marcando «Incluir inmobiliarias».{% endif %}</div>
   {% endif %}
 {% endif %}
-</main></body></html>
+</main>
+
+<script>
+// Buscar: valida el barrio y muestra el aviso de carga.
+document.getElementById('f').addEventListener('submit', function (e) {
+  var modo = e.submitter && e.submitter.value;
+  if (modo === 'barrio' && !this.barrio.value.trim()) { e.preventDefault(); this.barrio.focus(); return; }
+  if (modo === 'ciudad') document.getElementById('cargando-txt').textContent = 'En toda Bogotá puede tardar hasta 1 minuto.';
+  document.getElementById('cargando').style.display = 'grid';
+});
+document.querySelectorAll('.rapidos a').forEach(function (a) {
+  a.addEventListener('click', function () { document.getElementById('cargando').style.display = 'grid'; });
+});
+// Al volver con «atrás», ocultar el aviso de carga.
+window.addEventListener('pageshow', function () { document.getElementById('cargando').style.display = 'none'; });
+
+// App instalable (PWA).
+if ('serviceWorker' in navigator) { navigator.serviceWorker.register('/sw.js').catch(function () {}); }
+var aviso = null, btn = document.getElementById('instalar');
+window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); aviso = e; btn.style.display = 'block'; });
+btn.addEventListener('click', function () { if (aviso) { aviso.prompt(); aviso = null; btn.style.display = 'none'; } });
+</script>
+</body></html>
