@@ -76,10 +76,10 @@ class PortalWeb(Source):
                 break
             resultados += nuevos
             time.sleep(self.pausa)
-        if self.detalle:
-            for anuncio in resultados:
-                if anuncio.url and not anuncio.telefonos and anuncio.es_dueno_directo:
-                    self.completar_detalle(anuncio, operacion)
+        if self.detalle:  # abre máximo 20 fichas para no tardar demasiado
+            pendientes = [a for a in resultados if a.url and not a.telefonos and a.es_dueno_directo]
+            for anuncio in sorted(pendientes, key=lambda a: a.precio_m2)[:20]:
+                self.completar_detalle(anuncio, operacion)
         return resultados
 
     def completar_detalle(self, anuncio: Listing, operacion: str) -> None:
