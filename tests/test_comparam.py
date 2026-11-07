@@ -82,6 +82,9 @@ def test_web(monkeypatch):
     assert "300 000 0002" in html and "Inmobiliaria Ejemplo" not in html
     html = c.get("/?modo=ciudad&fuente=ejemplo").get_data(as_text=True)
     assert "su barrio" in html and "Fontibón" in html
+    for escrito in ("toda bogotá", "Bogotá", "Toda Bogota"):
+        html = c.get(f"/?barrio={escrito}&fuente=ejemplo").get_data(as_text=True)
+        assert "Barrios comparables" in html
     j = c.get("/api/ciudad?fuente=ejemplo").get_json()
     assert j["anuncios"][0]["vs_zona_pct"] < 0 and "Cedritos" in j["zonas"]
     j = c.get("/api/buscar?barrio=Chapinero&fuente=ejemplo").get_json()

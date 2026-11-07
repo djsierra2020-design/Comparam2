@@ -44,9 +44,18 @@ def _consulta_ciudad():
     return elegidas, buscar_ciudad(fuentes, **_params())
 
 
+_CIUDAD = {"bogota", "toda-bogota", "todo-bogota", "toda-la-ciudad", "todas", "todos", "bogota-d-c"}
+
+
+def _es_ciudad() -> bool:
+    """Botón «Buscar en toda Bogotá», o escribir «toda Bogotá» / «Bogotá» como barrio."""
+    from comparam.parsing import slugify
+    return request.args.get("modo") == "ciudad" or slugify(request.args.get("barrio", "")) in _CIUDAD
+
+
 @app.get("/")
 def inicio():
-    if request.args.get("modo") == "ciudad":
+    if _es_ciudad():
         elegidas, rc = _consulta_ciudad()
         return render_template("index.html", barrio="", barrios=BARRIOS, fuentes=FUENTES, elegidas=elegidas,
                                p=_params(), r=None, rc=rc, args=request.args)
