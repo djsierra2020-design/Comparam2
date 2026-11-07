@@ -54,6 +54,9 @@ python -m comparam.cli Cedritos --fuente ejemplo     # datos de ejemplo, sin int
    descripción (celulares `3xx xxx xxxx` y fijos `601 xxx xxxx`) y, para anuncios de
    dueño directo sin teléfono, de los enlaces `tel:`/WhatsApp de la ficha del anuncio.
 5. Se eliminan duplicados entre portales y se ordena por precio/m².
+6. **Valor del m² de la zona**: mediana del precio/m² de todos los anuncios encontrados
+   en el barrio (dueños directos e inmobiliarias, antes de los filtros). Cada apartamento
+   muestra cuánto está por debajo o por encima de ese valor.
 
 ### Si un portal cambia su URL
 Las URL de búsqueda se pueden cambiar sin tocar código:

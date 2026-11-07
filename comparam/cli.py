@@ -36,10 +36,16 @@ def main(argv=None) -> int:
     if not r.anuncios:
         print(f"No se encontraron apartamentos en {barrio} ({r.total_encontrados} anuncios revisados).")
         return 1
-    print(f"\nApartamentos en {barrio} — del más económico al más caro por m²\n")
+    z = r.zona
+    print(f"\nApartamentos en {barrio} — del más económico al más caro por m²")
+    if z:
+        print(f"Valor del m² en la zona: {pesos(z.mediana)} (mediana de {z.anuncios} anuncios; "
+              f"promedio {pesos(z.promedio)}, rango {pesos(z.minimo)} – {pesos(z.maximo)})")
+    print()
     for i, x in enumerate(r.anuncios, 1):
         tels = ", ".join(x.telefonos) or "ver anuncio"
-        print(f"{i:>2}. {pesos(x.precio_m2)}/m²  |  {pesos(x.precio)}  |  {x.area_m2:g} m²  |  {x.titulo[:50]}")
+        vs = f"  ({z.diferencia(x.precio_m2):+.0f}% vs zona)" if z else ""
+        print(f"{i:>2}. {pesos(x.precio_m2)}/m²{vs}  |  {pesos(x.precio)}  |  {x.area_m2:g} m²  |  {x.titulo[:50]}")
         print(f"    📞 {tels}  |  {x.publicado_por or 'anunciante desconocido'}  |  {x.fuente}  {x.url}")
     if a.exportar:
         with open(a.exportar, "w", newline="", encoding="utf-8") as f:
