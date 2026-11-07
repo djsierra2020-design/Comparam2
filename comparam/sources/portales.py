@@ -17,7 +17,7 @@ from bs4 import BeautifulSoup
 from ..models import Listing
 from ..parsing import extract_phones, slugify
 from .base import FuenteError, Source
-from .extractor import contar_bloques_json, extraer_anuncios
+from .extractor import contar_bloques_json, extraer_anuncios, total_publicados
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -28,6 +28,7 @@ HEADERS = {
 
 class PortalWeb(Source):
     nombre = "portal"
+    total_publicados: int | None = None  # cuántos anuncios dice tener el portal para la búsqueda
     base_url = ""
     plantilla = ""  # URL de búsqueda en un barrio
     plantilla_ciudad = ""  # URL de búsqueda en toda Bogotá
@@ -67,6 +68,8 @@ class PortalWeb(Source):
             url = self.url_busqueda(barrio, operacion, pagina)
             html = self._get(url)
             nuevos = extraer_anuncios(html, self.nombre, self.base_url, operacion) if html else []
+            if pagina == 1:
+                self.total_publicados = total_publicados(html, len(nuevos)) if html else None
             if pagina == 1 and not nuevos:
                 if not html:
                     raise FuenteError(f"{self.nombre}: la búsqueda no existe en el portal (404) — {url}")
@@ -118,6 +121,7 @@ class PortalWeb(Source):
         info.update(
             estado=r.status_code, url_final=r.url, bytes=len(html), titulo=_titulo(html),
             bloques_json=contar_bloques_json(html), anuncios=len(anuncios),
+            total_publicado=total_publicados(html, len(anuncios)),
             dueno_directo=sum(a.es_dueno_directo for a in anuncios),
             ejemplos=[f"{a.titulo[:50]} · ${a.precio:,.0f} · {a.area_m2:g} m² · {a.publicado_por or 'anunciante ?'}"
                       for a in anuncios[:5]],

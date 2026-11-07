@@ -19,6 +19,13 @@ app.jinja_env.filters["portal"] = lambda f: NOMBRES_PORTAL.get(f, f)
 FUENTES = [*PORTALES, "ejemplo"]
 
 
+def miles(n) -> str:
+    return f"{n:,.0f}".replace(",", ".")
+
+
+app.jinja_env.filters["miles"] = miles
+
+
 def _float(nombre):
     v = request.args.get(nombre, "").replace(".", "").replace(",", "").strip()
     return float(v) if v.isdigit() else None

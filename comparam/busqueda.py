@@ -21,6 +21,7 @@ class Resultado:
     usados_zona: list[Listing] = field(default_factory=list)  # anuncios con los que se calculó la zona
     otros_barrios: list[Listing] = field(default_factory=list)  # descartados: son de otro barrio
     por_fuente: dict[str, int] = field(default_factory=dict)  # anuncios leídos de cada portal
+    publicados: int = 0  # anuncios que los portales dicen tener para la búsqueda
 
 
 @dataclass
@@ -72,7 +73,8 @@ def _filtrar(anuncios, solo_dueno, con_telefono, area_min, precio_max) -> list[L
     ]
 
 
-def _recolectar(fuentes: list[Source], barrio: str, operacion: str) -> tuple[list[Listing], list[str], dict[str, int]]:
+def _recolectar(fuentes: list[Source], barrio: str, operacion: str
+                ) -> tuple[list[Listing], list[str], dict[str, int], int]:
     """Consulta todas las fuentes al mismo tiempo (cada una en su hilo)."""
     def una(f):
         try:
@@ -84,16 +86,19 @@ def _recolectar(fuentes: list[Source], barrio: str, operacion: str) -> tuple[lis
     errores: list[str] = []
     por_fuente: dict[str, int] = {}
     if not fuentes:
-        return todos, errores, por_fuente
+        return todos, errores, por_fuente, 0
+    publicados = 0
     with ThreadPoolExecutor(max_workers=len(fuentes)) as ex:
         for f, (anuncios, error) in zip(fuentes, ex.map(una, fuentes)):
             todos += anuncios
             nombre = getattr(f, "ruta", None)
             nombre = nombre.stem if nombre else getattr(f, "nombre", "fuente")
             por_fuente[nombre] = por_fuente.get(nombre, 0) + len(anuncios)
+            # Total que el portal dice tener; si no lo indica, se cuentan los anuncios leídos.
+            publicados += max(getattr(f, "total_publicados", None) or 0, len(anuncios))
             if error:
                 errores.append(error)
-    return todos, errores, por_fuente
+    return todos, errores, por_fuente, publicados
 
 
 _LUGAR_TITULO = re.compile(r"\ben\s+((?:(?!\ben\s)[^,|])+?),\s*bogot", re.I)
@@ -120,7 +125,7 @@ def buscar(barrio: str, fuentes: list[Source], operacion: str = "venta", solo_du
            con_telefono: bool = False, area_min: float | None = None, precio_max: float | None = None,
            limite: int | None = None) -> Resultado:
     """Busca en todas las fuentes y ordena de menor a mayor precio por m²."""
-    todos, errores, por_fuente = _recolectar(fuentes, barrio, operacion)
+    todos, errores, por_fuente, publicados = _recolectar(fuentes, barrio, operacion)
     otros = [a for a in todos if not es_del_barrio(a, barrio)]
     todos = [a for a in todos if es_del_barrio(a, barrio)]
     for a in todos:
@@ -129,7 +134,7 @@ def buscar(barrio: str, fuentes: list[Source], operacion: str = "venta", solo_du
     filtrados = _filtrar(unicos, solo_dueno, con_telefono, area_min, precio_max)
     filtrados.sort(key=lambda a: a.precio_m2)
     return Resultado(filtrados[:limite] if limite else filtrados, errores, len(unicos), valor_zona(unicos),
-                     sorted(unicos, key=lambda a: a.precio_m2), otros, por_fuente)
+                     sorted(unicos, key=lambda a: a.precio_m2), otros, por_fuente, publicados)
 
 
 # --------------------------------------------------------------------------- toda Bogotá
@@ -172,9 +177,10 @@ class ResultadoCiudad:
     sin_zona: int = 0  # anuncios sin barrio identificable
     zona_pequena: int = 0  # anuncios de barrios con muy pocos anuncios para comparar
     por_fuente: dict[str, int] = field(default_factory=dict)
+    publicados: int = 0
 
 
-_CACHE: dict[tuple, tuple[float, list[Listing], list[str], dict[str, int]]] = {}
+_CACHE: dict[tuple, tuple] = {}
 CACHE_SEGUNDOS = 15 * 60
 
 
@@ -188,12 +194,12 @@ def buscar_ciudad(fuentes: list[Source], operacion: str = "venta", solo_dueno: b
              operacion)
     cache = _CACHE.get(clave)
     if cache and time.time() - cache[0] < CACHE_SEGUNDOS:
-        unicos, errores, por_fuente = cache[1], cache[2], cache[3]
+        unicos, errores, por_fuente, publicados = cache[1], cache[2], cache[3], cache[4]
     else:
-        todos, errores, por_fuente = _recolectar(fuentes, "", operacion)
+        todos, errores, por_fuente, publicados = _recolectar(fuentes, "", operacion)
         unicos = _sin_duplicados(todos)
         if not errores or unicos:
-            _CACHE[clave] = (time.time(), unicos, errores, por_fuente)
+            _CACHE[clave] = (time.time(), unicos, errores, por_fuente, publicados)
 
     # 1) Por barrio. 2) Si el barrio tiene menos de `min_por_zona` anuncios, por localidad.
     grupos: dict[str, list[Listing]] = {}
@@ -246,4 +252,4 @@ def buscar_ciudad(fuentes: list[Source], operacion: str = "venta", solo_dueno: b
             f.completar_detalle(o.anuncio, operacion)
 
     return ResultadoCiudad(oportunidades, dict(sorted(usadas.items(), key=lambda kv: kv[1].mediana)),
-                           errores, len(unicos), sin_zona, pequena, por_fuente)
+                           errores, len(unicos), sin_zona, pequena, por_fuente, publicados)

@@ -305,3 +305,28 @@ def test_ciudad_usa_localidad_si_el_barrio_tiene_pocos():
     o = rc.oportunidades[0]
     assert (o.zona, o.nivel, o.valor.anuncios) == ("localidad Usaquén", "localidad", 4)
     assert o.diferencia < 0
+
+
+def test_total_publicados():
+    from comparam.sources.extractor import total_publicados
+    assert total_publicados('<script id="__NEXT_DATA__" type="application/json">{"a":{"total":18432,"x":[]}}</script>', 25) == 18432
+    assert total_publicados('<script type="application/json">{"hits":{"total":{"value":950}}}</script>', 20) == 950
+    assert total_publicados("<html><h1>3.214 apartamentos en venta en Bogotá</h1></html>", 25) == 3214
+    assert total_publicados("<html><p>2 baños</p></html>", 25) is None
+    assert total_publicados('<script type="application/json">{"total":5}</script>', 25) is None  # menor que lo leído
+
+
+def test_publicados_se_suman_en_la_busqueda():
+    class P:
+        nombre = "p"
+
+        def __init__(self, total):
+            self.total_publicados = total
+
+        def buscar(self, barrio, operacion="venta"):
+            return [_l("Apartamento en Venta en Cedritos, Bogotá")] * 2
+
+    r = buscar("Cedritos", [P(1500), P(None)], solo_dueno=False)
+    assert r.publicados == 1500 + 2
+    import app as webapp
+    assert webapp.miles(18432) == "18.432"

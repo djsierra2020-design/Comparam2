@@ -279,3 +279,38 @@ def extraer_de_json(bloques: list, fuente: str, base_url: str, operacion: str = 
                 descripcion=descripcion[:500],
             ))
     return anuncios
+
+
+_CLAVES_TOTAL = ("total", "totalHits", "totalResults", "totalCount", "total_results", "totalElements",
+                 "numFound", "totalItems", "nbHits", "resultsCount", "totalListings", "totalRecords",
+                 "numberOfItems", "total_count", "cantidad", "totalInmuebles")
+_TOTAL_TXT = re.compile(r"(\d{1,3}(?:[.,]\d{3})+|\d{2,6})\s+(?:apartamentos|inmuebles|resultados|propiedades|anuncios)\b",
+                        re.I)
+
+
+def total_publicados(html: str, encontrados: int = 0) -> int | None:
+    """Cuántos anuncios dice tener el portal para esa búsqueda (no solo los de esta página).
+    Se busca en los datos de la página (total, totalHits...) y, si no, en el texto visible
+    («1.234 apartamentos»). Devuelve None si el portal no lo indica."""
+    def valido(n) -> bool:
+        return isinstance(n, int) and encontrados <= n <= 500_000 and n > 0
+
+    candidatos: list[int] = []
+    for bloque in _bloques_json(html):
+        for d in _recorrer(bloque):
+            for k in _CLAVES_TOTAL:
+                v = d.get(k)
+                if isinstance(v, dict):  # {"value": 1234} (Elasticsearch)
+                    v = v.get("value")
+                if isinstance(v, str) and v.replace(".", "").replace(",", "").isdigit():
+                    v = int(v.replace(".", "").replace(",", ""))
+                if valido(v) and not isinstance(v, bool):
+                    candidatos.append(v)
+    if candidatos:
+        return max(candidatos)
+    soup = BeautifulSoup(html or "", "html.parser")
+    for x in soup(["script", "style", "noscript"]):
+        x.decompose()
+    textos = [int(re.sub(r"[.,]", "", m.group(1))) for m in _TOTAL_TXT.finditer(soup.get_text(" ", strip=True))]
+    textos = [n for n in textos if valido(n)]
+    return max(textos) if textos else None

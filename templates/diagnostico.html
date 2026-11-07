@@ -23,6 +23,7 @@
     {% if not f.error %}
     <dt>Respuesta</dt><dd>HTTP {{ f.estado }} · {{ '{:,}'.format(f.bytes) }} caracteres · {{ f.bloques_json }} bloques de datos</dd>
     {% if f.url_final != f.url %}<dt>Redirigió a</dt><dd>{{ f.url_final }}</dd>{% endif %}
+    <dt>Total que dice tener el portal</dt><dd>{{ f.total_publicado if f.total_publicado else 'no lo indica' }}</dd>
     <dt>Título de la página</dt><dd>{{ f.titulo }}</dd>
     <dt>Dueño directo detectados</dt><dd>{{ f.dueno_directo }}</dd>
     {% if f.pistas %}<dt>Pistas (para ajustar la app)</dt><dd style="font-size:13px">{% for x in f.pistas %}{{ x }}<br>{% endfor %}</dd>{% endif %}
