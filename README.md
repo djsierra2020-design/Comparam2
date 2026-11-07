@@ -77,8 +77,8 @@ anuncios de dueño directo, pero la búsqueda tarda más.
 ### Habi y Houm (navegador)
 Estos portales cargan los anuncios con JavaScript, así que se abren con un navegador sin ventana
 (Playwright + Chromium). En Render: **Build Command** `bash build.sh` y **Start Command**
-`gunicorn app:app --bind 0.0.0.0:$PORT --timeout 300 --workers 1 --threads 4`. Se puede
-desactivar con `COMPARAM_NAVEGADOR=0`.
+`gunicorn app:app --bind 0.0.0.0:$PORT --timeout 300 --workers 1 --threads 4`. Está **apagado por
+defecto** (en Render daba error 502); se enciende con `COMPARAM_NAVEGADOR=1`.
 
 ### Si un portal cambia su URL
 Las URL de búsqueda se pueden cambiar sin tocar código:

@@ -239,7 +239,14 @@ def test_portales_empresa_no_son_dueno_directo(monkeypatch):
     assert Houm(paginas=8).paginas == 1  # con navegador se lee una página
 
 
-def test_navegador_lee_anuncios_cargados_con_javascript(tmp_path):
+def test_navegador_apagado_por_defecto(monkeypatch):
+    from comparam.sources import navegador
+    monkeypatch.delenv("COMPARAM_NAVEGADOR", raising=False)
+    assert not navegador.disponible()
+
+
+def test_navegador_lee_anuncios_cargados_con_javascript(tmp_path, monkeypatch):
+    monkeypatch.setenv("COMPARAM_NAVEGADOR", "1")
     import pytest
     from comparam.sources import navegador
     from comparam.sources.extractor import extraer_anuncios

@@ -2,7 +2,7 @@
 anuncios con JavaScript después de abrir la página (Habi, Houm).
 
 Requiere el paquete ``playwright`` y el navegador instalado (``playwright install chromium``).
-Se puede desactivar con COMPARAM_NAVEGADOR=0. Solo se abre un navegador a la vez para no
+Está APAGADO por defecto (en Render daba error 502); se enciende con COMPARAM_NAVEGADOR=1. Solo se abre un navegador a la vez para no
 agotar la memoria del servidor.
 """
 from __future__ import annotations
@@ -25,7 +25,7 @@ if "PLAYWRIGHT_BROWSERS_PATH" not in os.environ and os.path.isdir(_LOCAL):
 
 
 def disponible() -> bool:
-    if os.environ.get("COMPARAM_NAVEGADOR", "1") == "0":
+    if os.environ.get("COMPARAM_NAVEGADOR", "0") != "1":
         return False
     try:
         import playwright.sync_api  # noqa: F401
