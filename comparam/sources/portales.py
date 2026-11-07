@@ -264,4 +264,5 @@ class Houm(PortalConNavegador):
     nombre = "houm"
     empresa = "Houm"
     base_url = "https://houm.com"
-    plantilla_ciudad = base_url + "/co/{operacion}-propiedades/bogota?page={pagina}"
+    # Dirección confirmada por el usuario: https://houm.com/co/venta-apartamentos-bogota
+    plantilla_ciudad = base_url + "/co/{operacion}-apartamentos-bogota?page={pagina}"

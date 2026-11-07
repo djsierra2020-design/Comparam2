@@ -184,7 +184,13 @@ def _datos_tarjeta(texto: str, operacion: str) -> tuple[float, float] | None:
     minimo = 300_000 if operacion == "arriendo" else 20_000_000
     precios = [p for m in _PRECIO_TXT.finditer(texto) if (p := parse_number(m.group(1))) and p >= minimo]
     areas = [a for m in _AREA_TXT.finditer(texto) if (a := parse_number(m.group(1))) and 15 <= a <= 2_000]
-    return (max(precios), areas[0]) if precios and areas else None
+    if not precios or not areas:
+        return None
+    # El precio más alto que dé un precio por m² razonable (descarta la administración y
+    # números pegados por error).
+    bajo, alto = M2_ARRIENDO if operacion == "arriendo" else M2_VENTA
+    buenos = [p for p in precios if bajo <= p / areas[0] <= alto]
+    return (max(buenos), areas[0]) if buenos else None
 
 
 def extraer_de_tarjetas(html: str, fuente: str, base_url: str, operacion: str = "venta",
@@ -218,6 +224,8 @@ def extraer_de_tarjetas(html: str, fuente: str, base_url: str, operacion: str = 
         vistos.add(clave)
         titulo_el = el.find(["h1", "h2", "h3", "h4"]) or enlace
         titulo = (titulo_el.get_text(" ", strip=True) if titulo_el is not None else "")[:120]
+        if _NO_APTO.search(titulo) or _NO_APTO.search(texto[:200]):
+            continue
         etiqueta, dueno = clasificar_anunciante("", "", texto)
         hab = re.search(r"(\d+)\s*(?:hab|alcoba)", texto, re.I)
         ban = re.search(r"(\d+)\s*baño", texto, re.I)
@@ -229,6 +237,23 @@ def extraer_de_tarjetas(html: str, fuente: str, base_url: str, operacion: str = 
             descripcion=texto[:500],
         ))
     return anuncios
+
+
+# Rango razonable del precio por m² en Bogotá: fuera de él casi siempre es un error de lectura
+# (p. ej. dos precios pegados) o no es un apartamento.
+M2_VENTA = (700_000, 35_000_000)
+M2_ARRIENDO = (5_000, 250_000)
+_NO_APTO = re.compile(r"\b(casas?|lotes?|locales?|oficinas?|bodegas?|fincas?|consultorios?|edificios?|"
+                      r"casalotes?|parqueaderos?)\s+en\s+(venta|arriendo)", re.I)
+
+
+def es_valido(titulo: str, precio: float, area: float, operacion: str) -> bool:
+    if _NO_APTO.search(titulo or ""):
+        return False
+    if not (15 <= area <= 2_000):
+        return False
+    bajo, alto = M2_ARRIENDO if operacion == "arriendo" else M2_VENTA
+    return bajo <= precio / area <= alto
 
 
 def contar_bloques_json(html: str) -> int:
@@ -252,6 +277,8 @@ def extraer_de_json(bloques: list, fuente: str, base_url: str, operacion: str = 
             if precio < minimo or not (15 <= area <= 2_000):
                 continue
             titulo = _texto(_primero(d, K_TITULO))
+            if not es_valido(titulo, precio, area, operacion):
+                continue
             descripcion = _texto(_primero(d, K_DESC))
             url = _texto(_primero(d, K_URL))
             if url and not url.startswith("http"):

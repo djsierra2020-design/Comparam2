@@ -233,8 +233,9 @@ def test_portales_empresa_no_son_dueno_directo(monkeypatch):
     assert "habi.co" in urls[-1]
     assert [a.barrio for a in h.buscar("Cedritos")] == ["Cedritos"]  # filtra el barrio localmente
     assert Habi().buscar("", "arriendo") == []  # Habi no arrienda
-    assert len(Houm(pausa=0, paginas=1).buscar("", "arriendo")) == 3
-    assert "arriendo-propiedades" in urls[-1]
+    assert len(Houm(pausa=0, paginas=1).buscar("", "venta")) == 3
+    assert urls[-1].startswith("https://houm.com/co/venta-apartamentos-bogota")
+    assert "arriendo-apartamentos-bogota" in Houm().url_busqueda("", "arriendo", 1)
     assert Houm(paginas=8).paginas == 2  # con navegador se leen pocas páginas
 
 
@@ -340,3 +341,16 @@ def test_publicados_se_suman_en_la_busqueda():
     assert r.publicados == 1500 + 2
     import app as webapp
     assert webapp.miles(18432) == "18.432"
+
+
+def test_descarta_precios_imposibles_y_casas():
+    from comparam.sources.extractor import es_valido
+    assert es_valido("Apartamento en Venta en Cedritos", 350_000_000, 70, "venta")
+    assert not es_valido("Torres de Madeira - Apartamento", 3_240_000_000, 63, "venta")  # 51 M/m²
+    assert not es_valido("Casa de Barrio - Casa en Venta en Parques de Salamanca", 832_600_000, 181, "venta")
+    html = """<div class="c"><a href="/1"><h3>Torres - Apartamento en Venta en San Cristóbal Norte</h3></a>
+      <p>$ 324.000.000</p><p>$ 3.240.000.000</p><p>63 m²</p></div>
+      <div class="c"><a href="/2"><h3>Casa de Barrio - Casa en Venta en Parques</h3></a><p>$ 832.600.000</p><p>181 m²</p></div>"""
+    a = extraer_anuncios(html, "habi", "https://habi.co")
+    assert len(a) == 1 and a[0].precio == 324_000_000
+    assert zona_de(a[0]) == "San Cristóbal Norte"
