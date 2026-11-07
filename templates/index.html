@@ -16,6 +16,9 @@
   .grande { flex:1 1 260px } .grande input { font-size:17px; width:100% } .chk { display:flex; gap:6px; align-items:center; color:var(--tx); font-size:14px }
   select { font:inherit; padding:10px; border-radius:8px; border:1px solid var(--ln); background:var(--bg); color:var(--tx) }
   button { font:inherit; font-weight:600; padding:10px 22px; border:0; border-radius:8px; background:var(--ac); color:#fff; cursor:pointer }
+  button.sec { background:transparent; color:var(--ac); border:1.5px solid var(--ac) }
+  #cargando { display:none; margin-top:16px } .zonas { width:100%; border-collapse:collapse; font-size:14px; margin-top:8px }
+  .zonas td, .zonas th { padding:4px 8px; border-bottom:1px solid var(--ln); text-align:left } .zonas td.n { text-align:right; font-variant-numeric:tabular-nums }
   .aviso { margin:16px 0; padding:10px 14px; border-radius:8px; background:#fff4e5; color:#7a4100; font-size:14px }
   @media (prefers-color-scheme: dark) { .aviso { background:#3a2606; color:#fdba74 } }
   .lista { display:grid; gap:10px; margin-top:16px; padding:0; list-style:none }
@@ -34,12 +37,12 @@
 </head>
 <body><main>
 <h1>Apartamento más económico por m²</h1>
-<p class="sub">Escribe un barrio de Bogotá. Se muestran los anuncios ordenados por precio por metro cuadrado, por defecto solo los publicados por el dueño directo (sin inmobiliaria).</p>
+<p class="sub">Escribe un barrio de Bogotá, o usa «Buscar en toda Bogotá» para ver los apartamentos más baratos frente al precio de su propio barrio. Por defecto solo se muestran los publicados por el dueño directo (sin inmobiliaria).</p>
 
-<form method="get">
+<form method="get" id="f">
   <div class="fila">
     <label class="grande">Barrio
-      <input type="text" name="barrio" list="barrios" value="{{ barrio }}" placeholder="Ej: Cedritos" required autofocus>
+      <input type="text" name="barrio" list="barrios" value="{{ barrio }}" placeholder="Ej: Cedritos (vacío = toda Bogotá)" autofocus>
       <datalist id="barrios">{% for b in barrios %}<option value="{{ b }}">{% endfor %}</datalist>
     </label>
     <label>Operación
@@ -50,7 +53,8 @@
     </label>
     <label>Área mínima (m²)<input type="text" name="area_min" value="{{ args.area_min or '' }}" size="6" inputmode="numeric"></label>
     <label>Precio máximo<input type="text" name="precio_max" value="{{ args.precio_max or '' }}" size="12" inputmode="numeric"></label>
-    <button type="submit">Buscar</button>
+    <button type="submit" name="modo" value="barrio">Buscar en el barrio</button>
+    <button type="submit" name="modo" value="ciudad" class="sec">Buscar en toda Bogotá</button>
   </div>
   <div class="fila">
     <span class="chk"><input type="checkbox" id="todos" name="todos" value="1" {% if not p.solo_dueno %}checked{% endif %}><label for="todos" class="chk">Incluir inmobiliarias</label></span>
@@ -60,6 +64,54 @@
     {% endfor %}
   </div>
 </form>
+
+<div id="cargando" class="aviso">⏳ Buscando en los portales… En toda Bogotá puede tardar 1–2 minutos.</div>
+<script>
+document.getElementById('f').addEventListener('submit', function (e) {
+  var modo = e.submitter && e.submitter.value;
+  if (modo === 'barrio' && !this.barrio.value.trim()) { e.preventDefault(); this.barrio.focus(); return; }
+  document.getElementById('cargando').style.display = 'block';
+});
+</script>
+
+{% if rc %}
+  {% for e in rc.errores %}<div class="aviso">⚠ {{ e }}</div>{% endfor %}
+  <div class="zona">
+    <div><div class="meta">Anuncios revisados en toda Bogotá</div><b>{{ rc.total_encontrados }}</b></div>
+    <div><div class="meta">Barrios comparables</div><b>{{ rc.zonas|length }}</b></div>
+    <div class="meta" style="flex-basis:100%">Cada apartamento se compara con la mediana del precio de oferta del m² de <b>su propio barrio</b> (calculada con todos los anuncios de ese barrio, incluidas inmobiliarias). Solo se comparan barrios con al menos 3 anuncios{% if rc.zona_pequena %}; {{ rc.zona_pequena }} anuncios quedaron por fuera por estar en barrios con menos{% endif %}{% if rc.sin_zona %}, y {{ rc.sin_zona }} no indicaban su barrio{% endif %}.</div>
+    {% if rc.zonas %}
+    <details style="flex-basis:100%">
+      <summary class="meta" style="cursor:pointer">Ver precio del m² por barrio ({{ rc.zonas|length }})</summary>
+      <table class="zonas"><tr><th>Barrio</th><th>m² (mediana)</th><th>Anuncios</th></tr>
+      {% for z, v in rc.zonas.items() %}<tr><td>{{ z }}</td><td class="n">{{ v.mediana|pesos }}</td><td class="n">{{ v.anuncios }}</td></tr>{% endfor %}
+      </table>
+    </details>
+    {% endif %}
+  </div>
+  {% if rc.oportunidades %}
+  <p class="meta" style="margin-top:16px">Los {{ rc.oportunidades|length }} más baratos frente a su barrio{% if p.solo_dueno %} (dueño directo){% endif %}</p>
+  <ol class="lista">
+  {% for o in rc.oportunidades %}{% set a = o.anuncio %}
+    <li class="item">
+      <span class="pos">{{ loop.index }}</span>
+      <div>
+        <div class="tit">{% if a.url %}<a href="{{ a.url }}" target="_blank" rel="noopener">{{ a.titulo }}</a>{% else %}{{ a.titulo }}{% endif %}</div>
+        <div class="meta"><b>{{ o.zona }}</b> · {{ a.precio|pesos }} · {{ '%g'|format(a.area_m2) }} m²{% if a.habitaciones %} · {{ a.habitaciones }} hab{% endif %}{% if a.banos %} · {{ a.banos }} baños{% endif %}</div>
+        <div class="meta">m² en {{ o.zona }}: {{ o.valor.mediana|pesos }} (calculado con {{ o.valor.anuncios }} anuncios)</div>
+        <div class="tels">
+          {% for t in a.telefonos %}<a class="tel" href="tel:+57{{ t|replace(' ', '') }}">📞 {{ t }}</a><a class="tel" href="https://wa.me/57{{ t|replace(' ', '') }}" target="_blank" rel="noopener">WhatsApp</a>{% else %}<span class="meta">Teléfono no publicado — ver anuncio</span>{% endfor %}
+          <span class="tag">{{ a.publicado_por or 'anunciante desconocido' }}</span><span class="tag">{{ a.fuente }}</span>
+        </div>
+      </div>
+      <div class="m2">{{ a.precio_m2|pesos }}<small>por m²</small>{% set d = o.diferencia %}<span class="vs {{ 'bajo' if d < 0 else 'alto' }}">{{ '%.0f'|format(d|abs) }}% {{ 'bajo' if d < 0 else 'sobre' }} su barrio</span></div>
+    </li>
+  {% endfor %}
+  </ol>
+  {% else %}
+  <div class="aviso">No se encontraron apartamentos para comparar ({{ rc.total_encontrados }} anuncios revisados).{% if p.solo_dueno %} Prueba marcando «Incluir inmobiliarias».{% endif %}</div>
+  {% endif %}
+{% endif %}
 
 {% if r %}
   {% for e in r.errores %}<div class="aviso">⚠ {{ e }}</div>{% endfor %}

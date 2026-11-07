@@ -59,10 +59,21 @@ python -m comparam.cli Cedritos --fuente ejemplo     # datos de ejemplo, sin int
    muestra cuánto está por debajo o por encima de ese valor. La página indica con cuántos
    anuncios se calculó y permite ver la lista. No es el avalúo catastral.
 
+### Buscar en toda Bogotá
+Botón **«Buscar en toda Bogotá»** (o `python -m comparam.cli` sin barrio). La app lee varias
+páginas de cada portal para toda la ciudad, agrupa los anuncios por barrio, calcula la mediana
+del precio del m² de cada barrio (con al menos 3 anuncios) y ordena los de dueño directo por
+**cuánto más baratos están frente a su propio barrio**. Solo abre la ficha de los 15 mejores
+para buscar teléfonos. Los resultados se guardan 15 minutos para que cambiar filtros sea rápido.
+
+Páginas por portal: variable `COMPARAM_PAGINAS_CIUDAD` (por defecto 5). Más páginas = más
+anuncios de dueño directo, pero la búsqueda tarda más.
+
 ### Si un portal cambia su URL
 Las URL de búsqueda se pueden cambiar sin tocar código:
 ```bash
 export COMPARAM_URL_FINCARAIZ="https://www.fincaraiz.com.co/{operacion}/apartamentos/{barrio}/bogota/pagina{pagina}"
+export COMPARAM_URL_CIUDAD_FINCARAIZ="https://www.fincaraiz.com.co/{operacion}/apartamentos/bogota/pagina{pagina}"
 ```
 
 ### Importar tus propios anuncios (CSV)
