@@ -74,6 +74,12 @@ para buscar teléfonos. Los resultados se guardan 15 minutos para que cambiar fi
 Páginas por portal: variable `COMPARAM_PAGINAS_CIUDAD` (por defecto 5). Más páginas = más
 anuncios de dueño directo, pero la búsqueda tarda más.
 
+### Habi y Houm (navegador)
+Estos portales cargan los anuncios con JavaScript, así que se abren con un navegador sin ventana
+(Playwright + Chromium). En Render: **Build Command** `bash build.sh` y **Start Command**
+`gunicorn app:app --bind 0.0.0.0:$PORT --timeout 300 --workers 1 --threads 4`. Se puede
+desactivar con `COMPARAM_NAVEGADOR=0`.
+
 ### Si un portal cambia su URL
 Las URL de búsqueda se pueden cambiar sin tocar código:
 ```bash

@@ -112,11 +112,18 @@ class PortalWeb(Source):
         """Qué responde el portal a la primera página de búsqueda (para la página /diagnostico)."""
         url = self.url_busqueda(barrio, operacion, 1)
         info = {"portal": self.nombre, "url": url}
-        try:
-            r = self.sesion.get(url, timeout=self.timeout)
-        except requests.RequestException as e:
-            return {**info, "error": f"no se pudo conectar: {e.__class__.__name__}"}
-        html = r.text
+        if isinstance(self, PortalConNavegador):
+            try:
+                html = self._get(url)
+            except FuenteError as e:
+                return {**info, "error": str(e)}
+            r = type("R", (), {"status_code": "navegador", "url": url})()
+        else:
+            try:
+                r = self.sesion.get(url, timeout=self.timeout)
+            except requests.RequestException as e:
+                return {**info, "error": f"no se pudo conectar: {e.__class__.__name__}"}
+            html = r.text
         anuncios = extraer_anuncios(html, self.nombre, self.base_url, operacion)
         info.update(
             estado=r.status_code, url_final=r.url, bytes=len(html), titulo=_titulo(html),
@@ -228,7 +235,23 @@ class PortalEmpresa(PortalWeb):
         return anuncios
 
 
-class Habi(PortalEmpresa):
+class PortalConNavegador(PortalEmpresa):
+    """Portal que solo muestra los anuncios después de ejecutar JavaScript: se abre con un navegador."""
+    paginas_navegador = 2  # abrir un navegador es lento: pocas páginas
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.paginas = min(self.paginas, self.paginas_navegador)
+
+    def _get(self, url: str) -> str:
+        from . import navegador
+        try:
+            return navegador.renderizar(url)
+        except FuenteError as e:
+            raise FuenteError(f"{self.nombre}: {e}") from e
+
+
+class Habi(PortalConNavegador):
     # Habi compra apartamentos y los revende; solo tiene venta.
     nombre = "habi"
     empresa = "Habi"
@@ -237,7 +260,7 @@ class Habi(PortalEmpresa):
     plantilla_ciudad = base_url + "/venta-apartamentos/bogota?page={pagina}"
 
 
-class Houm(PortalEmpresa):
+class Houm(PortalConNavegador):
     nombre = "houm"
     empresa = "Houm"
     base_url = "https://houm.com"
