@@ -27,4 +27,4 @@ def crear_fuentes(nombres: list[str] | None = None, csv: list[str] | None = None
 
 
 # Páginas que se leen de cada portal al buscar en toda Bogotá (más páginas = más anuncios, más lento).
-PAGINAS_CIUDAD = int(os.environ.get("COMPARAM_PAGINAS_CIUDAD", "5"))
+PAGINAS_CIUDAD = int(os.environ.get("COMPARAM_PAGINAS_CIUDAD", "8"))

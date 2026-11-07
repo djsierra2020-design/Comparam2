@@ -85,7 +85,7 @@ def test_web(monkeypatch):
     assert "su barrio" in html and "Fontibón" in html
     for escrito in ("toda bogotá", "Bogotá", "Toda Bogota"):
         html = c.get(f"/?barrio={escrito}&fuente=ejemplo").get_data(as_text=True)
-        assert "Barrios comparables" in html
+        assert "Barrios y localidades comparables" in html
     j = c.get("/api/ciudad?fuente=ejemplo").get_json()
     assert j["anuncios"][0]["vs_zona_pct"] < 0 and "Cedritos" in j["zonas"]
     j = c.get("/api/buscar?barrio=Chapinero&fuente=ejemplo").get_json()
@@ -157,14 +157,15 @@ def test_zona_de():
 
 def test_buscar_ciudad_compara_con_su_barrio():
     rc = buscar_ciudad([ArchivoCSV(EJEMPLO)])
-    assert set(rc.zonas) == {"Cedritos", "Fontibón", "Chapinero"}
+    # Chapinero Alto (1 anuncio) se compara con la localidad Chapinero; Teusaquillo (1) queda por fuera
+    assert set(rc.zonas) == {"Cedritos", "Fontibón", "Chapinero", "localidad Chapinero"}
     assert all(o.anuncio.es_dueno_directo for o in rc.oportunidades)
     difs = [o.diferencia for o in rc.oportunidades]
     assert difs == sorted(difs)
     # El más barato en pesos/m² de Fontibón queda primero frente a SU barrio
     assert rc.por_fuente == {"ejemplo": 13}
     assert rc.oportunidades[0].zona == "Fontibón" and rc.oportunidades[0].diferencia < 0
-    assert rc.zona_pequena == 2  # Teusaquillo y Chapinero Alto: 1 anuncio cada uno
+    assert rc.zona_pequena == 1
 
 
 def test_portal_sin_anuncios_avisa():
@@ -276,3 +277,31 @@ def test_diagnostico_da_pistas_y_paginacion_no_repite():
     ses = Sesion(FIX.read_text())
     assert len(FincaRaiz(sesion=ses, pausa=0, paginas=5, detalle=False).buscar("")) == 3
     assert ses.llamadas == 2
+
+
+def test_localidad_de():
+    from comparam.localidades import localidad_de
+    assert localidad_de("Cedritos") == "Usaquén"
+    assert localidad_de("Apartamento en Venta en Chicó Navarra, Bogotá") == "Chapinero"
+    assert localidad_de("San Bernardino XXII") == "Bosa"
+    assert localidad_de("Modelia | Fontibón") == "Fontibón"
+    assert localidad_de("Barrio desconocido") == ""
+
+
+def test_ciudad_usa_localidad_si_el_barrio_tiene_pocos():
+    class Portal:
+        nombre = "p"
+
+        def buscar(self, barrio, operacion="venta"):
+            l = [_l("Apartamento en Venta en Cedritos, Bogotá"), _l("Apartamento en Venta en Lisboa, Bogotá"),
+                 _l("Apartamento en Venta en Toberín, Bogotá"), _l("Apartamento en Venta en Usaquén, Bogotá")]
+            l[0].precio, l[0].es_dueno_directo = 300_000_000, True
+            return l
+
+    from comparam import busqueda
+    busqueda._CACHE.clear()
+    rc = buscar_ciudad([Portal()])
+    assert len(rc.oportunidades) == 1
+    o = rc.oportunidades[0]
+    assert (o.zona, o.nivel, o.valor.anuncios) == ("localidad Usaquén", "localidad", 4)
+    assert o.diferencia < 0

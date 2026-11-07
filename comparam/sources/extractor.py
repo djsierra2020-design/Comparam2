@@ -101,6 +101,8 @@ def _barrio(d: dict) -> str:
             sub = d.get(k)
             if isinstance(sub, dict) and (b := _primero(sub, K_BARRIO)) is not None:
                 break
+    if isinstance(b, list):  # algunos portales traen varios barrios: se toma el primero
+        b = b[0] if b else None
     return _texto(b)
 
 
