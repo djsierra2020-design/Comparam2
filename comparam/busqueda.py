@@ -14,6 +14,7 @@ class Resultado:
     errores: list[str] = field(default_factory=list)
     total_encontrados: int = 0
     zona: "ValorZona | None" = None
+    usados_zona: list[Listing] = field(default_factory=list)  # anuncios con los que se calculó la zona
 
 
 @dataclass
@@ -70,4 +71,5 @@ def buscar(barrio: str, fuentes: list[Source], operacion: str = "venta", solo_du
         and (precio_max is None or a.precio <= precio_max)
     ]
     filtrados.sort(key=lambda a: a.precio_m2)
-    return Resultado(filtrados[:limite] if limite else filtrados, errores, len(unicos), valor_zona(unicos))
+    return Resultado(filtrados[:limite] if limite else filtrados, errores, len(unicos), valor_zona(unicos),
+                     sorted(unicos, key=lambda a: a.precio_m2))

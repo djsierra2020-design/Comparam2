@@ -39,7 +39,8 @@ def main(argv=None) -> int:
     z = r.zona
     print(f"\nApartamentos en {barrio} — del más económico al más caro por m²")
     if z:
-        print(f"Valor del m² en la zona: {pesos(z.mediana)} (mediana de {z.anuncios} anuncios; "
+        print(f"Precio de oferta del m² en la zona: {pesos(z.mediana)} — calculado con {z.anuncios} anuncios "
+              f"(mediana; "
               f"promedio {pesos(z.promedio)}, rango {pesos(z.minimo)} – {pesos(z.maximo)})")
     print()
     for i, x in enumerate(r.anuncios, 1):

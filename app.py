@@ -48,7 +48,8 @@ def api():
         return jsonify(error="Falta el parámetro 'barrio'"), 400
     z = resultado.zona
     zona = None if not z else dict(mediana_m2=round(z.mediana), promedio_m2=round(z.promedio),
-                                   minimo_m2=round(z.minimo), maximo_m2=round(z.maximo), anuncios=z.anuncios)
+                                   minimo_m2=round(z.minimo), maximo_m2=round(z.maximo), anuncios=z.anuncios,
+                                   anuncios_usados=[a.to_dict() for a in resultado.usados_zona])
     anuncios = []
     for a in resultado.anuncios:
         d = a.to_dict()

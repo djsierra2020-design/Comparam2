@@ -94,4 +94,12 @@ def test_valor_zona():
 def test_api_valor_zona():
     import app as webapp
     j = webapp.app.test_client().get("/api/buscar?barrio=Cedritos&fuente=ejemplo").get_json()
+    assert len(j["valor_zona"]["anuncios_usados"]) == 4
     assert j["valor_zona"]["anuncios"] == 4 and j["anuncios"][0]["vs_zona_pct"] < 0
+
+
+def test_web_muestra_numero_de_anuncios():
+    import app as webapp
+    html = webapp.app.test_client().get("/?barrio=Cedritos&fuente=ejemplo").get_data(as_text=True)
+    assert "Calculado con" in html and "4 anuncios" in html and "Ver los 4 anuncios usados" in html
+    assert "Apto con balcón" in html  # el de inmobiliaria aparece en el cálculo, no en la lista

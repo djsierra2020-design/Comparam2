@@ -25,6 +25,7 @@
   .tels { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px } .tel { background:var(--ok); color:var(--okt); padding:3px 10px; border-radius:99px; text-decoration:none; font-weight:600; font-size:14px }
   .zona { margin-top:16px; background:var(--card); border:1px solid var(--ln); border-radius:12px; padding:14px 16px; display:flex; flex-wrap:wrap; gap:8px 28px; align-items:baseline }
   .zona b { font-size:22px; color:var(--tx) } .zona .meta b { font-size:inherit }
+  .usados { margin:8px 0 0; padding-left:22px; font-size:14px; display:grid; gap:6px } .usados b { font-size:inherit }
   .vs { font-size:12px; font-weight:600; display:block; margin-top:2px } .bajo { color:var(--okt) } .alto { color:#b42318 }
   @media (prefers-color-scheme: dark) { .alto { color:#fda29b } }
   .tag { font-size:12px; padding:2px 8px; border-radius:99px; border:1px solid var(--ln); color:var(--mut) } a { color:var(--ac) }
@@ -64,9 +65,20 @@
   {% for e in r.errores %}<div class="aviso">⚠ {{ e }}</div>{% endfor %}
   {% if r.zona %}
   <div class="zona">
-    <div><div class="meta">Valor del m² en {{ barrio }}</div><b>{{ r.zona.mediana|pesos }}</b></div>
+    <div><div class="meta">Precio de oferta del m² en {{ barrio }}</div><b>{{ r.zona.mediana|pesos }}</b></div>
+    <div><div class="meta">Calculado con</div><b>{{ r.zona.anuncios }} anuncio{{ 's' if r.zona.anuncios != 1 }}</b></div>
     <div class="meta">Promedio <b>{{ r.zona.promedio|pesos }}</b><br>Rango {{ r.zona.minimo|pesos }} – {{ r.zona.maximo|pesos }}</div>
-    <div class="meta" style="flex-basis:100%">Mediana de {{ r.zona.anuncios }} anuncios encontrados ({% if p.solo_dueno %}incluye inmobiliarias{% else %}todos los anunciantes{% endif %}).</div>
+    <div class="meta" style="flex-basis:100%">Mediana del precio pedido por m² en los anuncios encontrados en los portales ({% if p.solo_dueno %}incluye inmobiliarias{% else %}todos los anunciantes{% endif %}). No es el avalúo catastral.{% if r.zona.anuncios < 10 %} <b>Pocos anuncios: tómalo como referencia aproximada.</b>{% endif %}</div>
+    <details style="flex-basis:100%">
+      <summary class="meta" style="cursor:pointer">Ver los {{ r.zona.anuncios }} anuncios usados en el cálculo</summary>
+      <ol class="usados">
+      {% for a in r.usados_zona %}
+        <li><b>{{ a.precio_m2|pesos }}/m²</b> · {{ a.precio|pesos }} · {{ '%g'|format(a.area_m2) }} m² ·
+          {% if a.url %}<a href="{{ a.url }}" target="_blank" rel="noopener">{{ a.titulo[:60] }}</a>{% else %}{{ a.titulo[:60] }}{% endif %}
+          <span class="meta">· {{ a.barrio or '¿barrio?' }} · {{ a.publicado_por or 'anunciante desconocido' }} · {{ a.fuente }}</span></li>
+      {% endfor %}
+      </ol>
+    </details>
   </div>
   {% endif %}
   {% if r.anuncios %}
