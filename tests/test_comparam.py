@@ -125,7 +125,9 @@ def test_es_del_barrio():
     assert not es_del_barrio(_l("Apartamento En Venta En Casa Blanca Suba, Bogotá"), "Fontibón")
     # barrio dentro de la localidad buscada
     assert es_del_barrio(_l("Apto en Modelia, Bogotá", "Modelia", "Modelia | Fontibón | Bogotá"), "fontibon")
-    assert not es_del_barrio(_l("Apto amplio", "Salitre", "Salitre | Bogotá"), "Fontibón")
+    # sub-barrio que el portal devolvió al buscar la localidad (Ciencuadras en Bosa): se conserva
+    assert es_del_barrio(_l("Apartamento en San Bernardino XXII", "San Bernardino XXII"), "Bosa")
+    assert es_del_barrio(_l("Apto amplio", "Salitre", "Salitre | Bogotá"), "Fontibón")
     assert es_del_barrio(_l("Apartamento en Bogotá, d.c."), "Fontibón")  # sin datos: se acepta
 
 

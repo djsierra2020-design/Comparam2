@@ -110,7 +110,8 @@ K_UBICACION = K_BARRIO + ("locality", "localidad", "zone", "zona", "city", "ciud
 
 def _ubicacion(d: dict) -> str:
     """Junta todo el texto de ubicación del anuncio (barrio, localidad, zona...)."""
-    partes = [_texto(d.get(k)) for k in K_BARRIO if d.get(k)]
+    partes = [_texto(d.get(k)) for k in K_BARRIO + ("locality", "localidad", "zone", "zona", "upz", "district")
+              if d.get(k) and not isinstance(d.get(k), bool)]
     for k in ("location", "locations", "address", "ubicacion", "direccion"):
         sub = d.get(k)
         subs = sub if isinstance(sub, list) else [sub]
