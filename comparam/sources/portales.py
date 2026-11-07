@@ -192,7 +192,7 @@ class ConNavegador:
     """Para portales que solo muestran los anuncios después de ejecutar JavaScript: se abren con un
     navegador sin ventana (ver navegador.py)."""
     usa_navegador = True
-    paginas_navegador = 2  # abrir un navegador es lento: pocas páginas
+    paginas_navegador = 1  # abrir un navegador es lento y gasta memoria: una página
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
