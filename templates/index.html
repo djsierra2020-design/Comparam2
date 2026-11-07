@@ -59,9 +59,8 @@
   <div class="fila">
     <span class="chk"><input type="checkbox" id="todos" name="todos" value="1" {% if not p.solo_dueno %}checked{% endif %}><label for="todos" class="chk">Incluir inmobiliarias</label></span>
     <span class="chk"><input type="checkbox" id="ct" name="con_telefono" value="1" {% if p.con_telefono %}checked{% endif %}><label for="ct" class="chk">Solo con teléfono</label></span>
-    {% for f in fuentes %}
-    <span class="chk"><input type="checkbox" id="f-{{ f }}" name="fuente" value="{{ f }}" {% if f in elegidas %}checked{% endif %}><label for="f-{{ f }}" class="chk">{{ f }}</label></span>
-    {% endfor %}
+    {# Siempre se busca en todos los portales. ?fuente=... en la URL (p. ej. «ejemplo») se conserva oculto. #}
+    {% if args.getlist('fuente') %}{% for f in elegidas %}<input type="hidden" name="fuente" value="{{ f }}">{% endfor %}{% endif %}
   </div>
 </form>
 
@@ -75,7 +74,6 @@ document.getElementById('f').addEventListener('submit', function (e) {
 </script>
 
 {% if rc %}
-  {% for e in rc.errores %}<div class="aviso">⚠ {{ e }}</div>{% endfor %}
   <div class="zona">
     <div><div class="meta">Anuncios revisados en toda Bogotá</div><b>{{ rc.total_encontrados }}</b></div>
     <div><div class="meta">Barrios comparables</div><b>{{ rc.zonas|length }}</b></div>
@@ -101,7 +99,7 @@ document.getElementById('f').addEventListener('submit', function (e) {
         <div class="meta">m² en {{ o.zona }}: {{ o.valor.mediana|pesos }} (calculado con {{ o.valor.anuncios }} anuncios)</div>
         <div class="tels">
           {% for t in a.telefonos %}<a class="tel" href="tel:+57{{ t|replace(' ', '') }}">📞 {{ t }}</a><a class="tel" href="https://wa.me/57{{ t|replace(' ', '') }}" target="_blank" rel="noopener">WhatsApp</a>{% else %}<span class="meta">Teléfono no publicado — ver anuncio</span>{% endfor %}
-          <span class="tag">{{ a.publicado_por or 'anunciante desconocido' }}</span><span class="tag">{{ a.fuente }}</span>
+          <span class="tag">{{ a.publicado_por or 'anunciante desconocido' }}</span>
         </div>
       </div>
       <div class="m2">{{ a.precio_m2|pesos }}<small>por m²</small>{% set d = o.diferencia %}<span class="vs {{ 'bajo' if d < 0 else 'alto' }}">{{ '%.0f'|format(d|abs) }}% {{ 'bajo' if d < 0 else 'sobre' }} su barrio</span></div>
@@ -114,20 +112,19 @@ document.getElementById('f').addEventListener('submit', function (e) {
 {% endif %}
 
 {% if r %}
-  {% for e in r.errores %}<div class="aviso">⚠ {{ e }}</div>{% endfor %}
   {% if r.zona %}
   <div class="zona">
     <div><div class="meta">Precio de oferta del m² en {{ barrio }}</div><b>{{ r.zona.mediana|pesos }}</b></div>
     <div><div class="meta">Calculado con</div><b>{{ r.zona.anuncios }} anuncio{{ 's' if r.zona.anuncios != 1 }}</b></div>
     <div class="meta">Promedio <b>{{ r.zona.promedio|pesos }}</b><br>Rango {{ r.zona.minimo|pesos }} – {{ r.zona.maximo|pesos }}</div>
-    <div class="meta" style="flex-basis:100%">Mediana del precio pedido por m² en los anuncios encontrados en los portales ({% if p.solo_dueno %}incluye inmobiliarias{% else %}todos los anunciantes{% endif %}). No es el avalúo catastral.{% if r.zona.anuncios < 10 %} <b>Pocos anuncios: tómalo como referencia aproximada.</b>{% endif %}</div>
+    <div class="meta" style="flex-basis:100%">Mediana del precio pedido por m² en los anuncios encontrados ({% if p.solo_dueno %}incluye inmobiliarias{% else %}todos los anunciantes{% endif %}). No es el avalúo catastral.{% if r.zona.anuncios < 10 %} <b>Pocos anuncios: tómalo como referencia aproximada.</b>{% endif %}</div>
     <details style="flex-basis:100%">
       <summary class="meta" style="cursor:pointer">Ver los {{ r.zona.anuncios }} anuncios usados en el cálculo</summary>
       <ol class="usados">
       {% for a in r.usados_zona %}
         <li><b>{{ a.precio_m2|pesos }}/m²</b> · {{ a.precio|pesos }} · {{ '%g'|format(a.area_m2) }} m² ·
           {% if a.url %}<a href="{{ a.url }}" target="_blank" rel="noopener">{{ a.titulo[:60] }}</a>{% else %}{{ a.titulo[:60] }}{% endif %}
-          <span class="meta">· {{ a.barrio or '¿barrio?' }} · {{ a.publicado_por or 'anunciante desconocido' }} · {{ a.fuente }}</span></li>
+          <span class="meta">· {{ a.barrio or '¿barrio?' }} · {{ a.publicado_por or 'anunciante desconocido' }}</span></li>
       {% endfor %}
       </ol>
     </details>
@@ -137,7 +134,7 @@ document.getElementById('f').addEventListener('submit', function (e) {
       <ol class="usados">
       {% for a in r.otros_barrios %}
         <li>{{ a.precio_m2|pesos }}/m² · {% if a.url %}<a href="{{ a.url }}" target="_blank" rel="noopener">{{ a.titulo[:60] }}</a>{% else %}{{ a.titulo[:60] }}{% endif %}
-          <span class="meta">· {{ a.ubicacion or a.barrio }} · {{ a.fuente }}</span></li>
+          <span class="meta">· {{ a.ubicacion or a.barrio }}</span></li>
       {% endfor %}
       </ol>
     </details>
@@ -155,7 +152,7 @@ document.getElementById('f').addEventListener('submit', function (e) {
         <div class="meta">{{ a.precio|pesos }} · {{ '%g'|format(a.area_m2) }} m²{% if a.habitaciones %} · {{ a.habitaciones }} hab{% endif %}{% if a.banos %} · {{ a.banos }} baños{% endif %} · {{ a.barrio }}</div>
         <div class="tels">
           {% for t in a.telefonos %}<a class="tel" href="tel:+57{{ t|replace(' ', '') }}">📞 {{ t }}</a><a class="tel" href="https://wa.me/57{{ t|replace(' ', '') }}" target="_blank" rel="noopener">WhatsApp</a>{% else %}<span class="meta">Teléfono no publicado — ver anuncio</span>{% endfor %}
-          <span class="tag">{{ a.publicado_por or 'anunciante desconocido' }}</span><span class="tag">{{ a.fuente }}</span>
+          <span class="tag">{{ a.publicado_por or 'anunciante desconocido' }}</span>
         </div>
       </div>
       <div class="m2">{{ a.precio_m2|pesos }}<small>por m²</small>{% if r.zona %}{% set d = r.zona.diferencia(a.precio_m2) %}<span class="vs {{ 'bajo' if d < 0 else 'alto' }}">{{ '%.0f'|format(d|abs) }}% {{ 'bajo' if d < 0 else 'sobre' }} la zona</span>{% endif %}</div>
