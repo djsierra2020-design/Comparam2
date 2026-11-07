@@ -109,7 +109,7 @@ def test_api_valor_zona():
 def test_web_muestra_numero_de_anuncios():
     import app as webapp
     html = webapp.app.test_client().get("/?barrio=Cedritos&fuente=ejemplo").get_data(as_text=True)
-    assert "Anuncios leídos por portal" in html
+    assert "Anuncios leídos por portal" not in html
     assert "Calculado con" in html and "4 anuncios" in html and "Ver los 4 anuncios usados" in html
     assert "Apto con balcón" in html  # el de inmobiliaria aparece en el cálculo, no en la lista
 
