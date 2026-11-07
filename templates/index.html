@@ -77,12 +77,12 @@ document.getElementById('f').addEventListener('submit', function (e) {
 {% if rc %}
   <div class="zona">
     <div><div class="meta">Anuncios revisados en toda Bogotá</div><b>{{ rc.total_encontrados }}</b></div>
-    <div><div class="meta">Barrios comparables</div><b>{{ rc.zonas|length }}</b></div>
-    <div class="meta" style="flex-basis:100%">Cada apartamento se compara con la mediana del precio de oferta del m² de <b>su propio barrio</b> (calculada con todos los anuncios de ese barrio, incluidas inmobiliarias). Solo se comparan barrios con al menos 3 anuncios{% if rc.zona_pequena %}; {{ rc.zona_pequena }} anuncios quedaron por fuera por estar en barrios con menos{% endif %}{% if rc.sin_zona %}, y {{ rc.sin_zona }} no indicaban su barrio{% endif %}.</div>
+    <div><div class="meta">Barrios y localidades comparables</div><b>{{ rc.zonas|length }}</b></div>
+    <div class="meta" style="flex-basis:100%">Cada apartamento se compara con la mediana del precio de oferta del m² de <b>su propio barrio</b> (calculada con todos los anuncios de ese barrio, incluidas inmobiliarias). Si su barrio tiene menos de 3 anuncios, se compara con su <b>localidad</b>{% if rc.zona_pequena %}; {{ rc.zona_pequena }} anuncios quedaron por fuera porque no se pudo saber su localidad o tenía muy pocos anuncios{% endif %}{% if rc.sin_zona %}, y {{ rc.sin_zona }} no indicaban su barrio{% endif %}.</div>
     {% if rc.zonas %}
     <details style="flex-basis:100%">
-      <summary class="meta" style="cursor:pointer">Ver precio del m² por barrio ({{ rc.zonas|length }})</summary>
-      <table class="zonas"><tr><th>Barrio</th><th>m² (mediana)</th><th>Anuncios</th></tr>
+      <summary class="meta" style="cursor:pointer">Ver precio del m² por barrio y localidad ({{ rc.zonas|length }})</summary>
+      <table class="zonas"><tr><th>Zona</th><th>m² (mediana)</th><th>Anuncios</th></tr>
       {% for z, v in rc.zonas.items() %}<tr><td>{{ z }}</td><td class="n">{{ v.mediana|pesos }}</td><td class="n">{{ v.anuncios }}</td></tr>{% endfor %}
       </table>
     </details>
@@ -103,7 +103,7 @@ document.getElementById('f').addEventListener('submit', function (e) {
           <span class="tag portal">{{ a.fuente|portal }}</span><span class="tag">{{ a.publicado_por or 'anunciante desconocido' }}</span>
         </div>
       </div>
-      <div class="m2">{{ a.precio_m2|pesos }}<small>por m²</small>{% set d = o.diferencia %}<span class="vs {{ 'bajo' if d < 0 else 'alto' }}">{{ '%.0f'|format(d|abs) }}% {{ 'bajo' if d < 0 else 'sobre' }} su barrio</span></div>
+      <div class="m2">{{ a.precio_m2|pesos }}<small>por m²</small>{% set d = o.diferencia %}<span class="vs {{ 'bajo' if d < 0 else 'alto' }}">{{ '%.0f'|format(d|abs) }}% {{ 'bajo' if d < 0 else 'sobre' }} su {{ o.nivel }}</span></div>
     </li>
   {% endfor %}
   </ol>

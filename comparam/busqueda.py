@@ -6,6 +6,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 
+from .localidades import localidad_de
 from .models import Listing
 from .parsing import slugify
 from .sources import FuenteError, Source
@@ -137,10 +138,11 @@ _GENERICOS = {"", "bogota", "bogota-d-c", "bogota-dc", "cundinamarca", "colombia
 
 
 def zona_de(a: Listing) -> str:
-    """Nombre del barrio del anuncio: campo barrio, o «En X, Bogotá» del título, o su ubicación."""
-    candidatos = [a.barrio]
+    """Nombre del barrio del anuncio: «En X, Bogotá» del título, o su campo barrio, o su ubicación."""
+    candidatos = []
     if m := _LUGAR_TITULO.search(a.titulo or ""):
         candidatos.append(m.group(1))
+    candidatos.append(a.barrio)
     candidatos += (a.ubicacion or "").split("|")
     for c in candidatos:
         c = (c or "").strip()
@@ -154,6 +156,7 @@ class Oportunidad:
     anuncio: Listing
     zona: str
     valor: ValorZona
+    nivel: str = "barrio"  # "barrio" o "localidad": con qué se compara
 
     @property
     def diferencia(self) -> float:
@@ -192,27 +195,45 @@ def buscar_ciudad(fuentes: list[Source], operacion: str = "venta", solo_dueno: b
         if not errores or unicos:
             _CACHE[clave] = (time.time(), unicos, errores, por_fuente)
 
+    # 1) Por barrio. 2) Si el barrio tiene menos de `min_por_zona` anuncios, por localidad.
     grupos: dict[str, list[Listing]] = {}
     nombres: dict[str, str] = {}
+    por_localidad: dict[str, list[Listing]] = {}
+    clave_de: dict[int, tuple[str, str]] = {}
     sin_zona = 0
     for a in unicos:
         z = zona_de(a)
-        if not z:
+        loc = localidad_de(z, a.titulo, a.barrio, a.ubicacion)
+        if loc:
+            por_localidad.setdefault(loc, []).append(a)
+        if not z and not loc:
             sin_zona += 1
             continue
-        k = slugify(z)
-        grupos.setdefault(k, []).append(a)
-        nombres.setdefault(k, z)
-    zonas = {nombres[k]: v for k, g in grupos.items()
-             if len(g) >= min_por_zona and (v := valor_zona(g))}
+        k = slugify(z) if z else ""
+        if k:
+            grupos.setdefault(k, []).append(a)
+            nombres.setdefault(k, z)
+        clave_de[id(a)] = (k, loc)
+    zonas_barrio = {k: v for k, g in grupos.items() if len(g) >= min_por_zona and (v := valor_zona(g))}
+    zonas_loc = {loc: v for loc, g in por_localidad.items() if len(g) >= min_por_zona and (v := valor_zona(g))}
 
     oportunidades, pequena = [], 0
-    for k, g in grupos.items():
-        if nombres[k] not in zonas:
-            pequena += len(g)
+    usadas: dict[str, ValorZona] = {}
+    filtrados = {id(a) for a in _filtrar(unicos, solo_dueno, con_telefono, area_min, precio_max)}
+    for a in unicos:
+        if id(a) not in clave_de:
             continue
-        for a in _filtrar(g, solo_dueno, con_telefono, area_min, precio_max):
-            oportunidades.append(Oportunidad(a, nombres[k], zonas[nombres[k]]))
+        k, loc = clave_de[id(a)]
+        if k in zonas_barrio:
+            zona, valor, nivel = nombres[k], zonas_barrio[k], "barrio"
+        elif loc in zonas_loc:
+            zona, valor, nivel = f"localidad {loc}", zonas_loc[loc], "localidad"
+        else:
+            pequena += 1
+            continue
+        usadas[zona] = valor
+        if id(a) in filtrados:
+            oportunidades.append(Oportunidad(a, zona, valor, nivel))
     oportunidades.sort(key=lambda o: o.diferencia)
     if limite:
         oportunidades = oportunidades[:limite]
@@ -224,5 +245,5 @@ def buscar_ciudad(fuentes: list[Source], operacion: str = "venta", solo_dueno: b
         if hasattr(f, "completar_detalle"):
             f.completar_detalle(o.anuncio, operacion)
 
-    return ResultadoCiudad(oportunidades, dict(sorted(zonas.items(), key=lambda kv: kv[1].mediana)),
+    return ResultadoCiudad(oportunidades, dict(sorted(usadas.items(), key=lambda kv: kv[1].mediana)),
                            errores, len(unicos), sin_zona, pequena, por_fuente)
