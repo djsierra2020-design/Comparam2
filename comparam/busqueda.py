@@ -104,6 +104,9 @@ def _recolectar(fuentes: list[Source], barrio: str, operacion: str
 _LUGAR_TITULO = re.compile(r"\ben\s+((?:(?!\ben\s)[^,|])+?),\s*bogot", re.I)
 
 
+_LUGAR_FINAL = re.compile(r"\ben\s+(?:venta|arriendo)\s+en\s+([^,|]+?)\s*$", re.I)
+
+
 def es_del_barrio(a: Listing, barrio: str) -> bool:
     """Los portales mezclan anuncios «destacados» de otros barrios en los resultados.
 
@@ -146,6 +149,8 @@ def zona_de(a: Listing) -> str:
     """Nombre del barrio del anuncio: «En X, Bogotá» del título, o su campo barrio, o su ubicación."""
     candidatos = []
     if m := _LUGAR_TITULO.search(a.titulo or ""):
+        candidatos.append(m.group(1))
+    elif m := _LUGAR_FINAL.search(a.titulo or ""):  # «Torres X - Apartamento en Venta en San Cristóbal Norte»
         candidatos.append(m.group(1))
     candidatos.append(a.barrio)
     candidatos += (a.ubicacion or "").split("|")
