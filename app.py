@@ -68,6 +68,7 @@ def inicio():
 def api_ciudad():
     _, rc = _consulta_ciudad()
     return jsonify(errores=rc.errores, revisados=rc.total_encontrados, sin_barrio=rc.sin_zona,
+                   por_portal=rc.por_fuente,
                    zonas={z: dict(mediana_m2=round(v.mediana), anuncios=v.anuncios) for z, v in rc.zonas.items()},
                    anuncios=[{**o.anuncio.to_dict(), "zona": o.zona, "zona_mediana_m2": round(o.valor.mediana),
                               "vs_zona_pct": round(o.diferencia, 1)} for o in rc.oportunidades])
@@ -88,7 +89,7 @@ def api():
         d["vs_zona_pct"] = round(z.diferencia(a.precio_m2), 1) if z else None
         anuncios.append(d)
     return jsonify(barrio=barrio, errores=resultado.errores, revisados=resultado.total_encontrados,
-                   descartados_otros_barrios=len(resultado.otros_barrios),
+                   descartados_otros_barrios=len(resultado.otros_barrios), por_portal=resultado.por_fuente,
                    valor_zona=zona, anuncios=anuncios)
 
 
