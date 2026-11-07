@@ -199,3 +199,20 @@ def test_persona_natural_cuenta_como_dueno():
     assert clasificar_anunciante("", "Julia Clemencia Toro") == ("persona natural · Julia Clemencia Toro", True)
     assert clasificar_anunciante("Inmobiliaria", "Julia Toro")[1] is False  # el portal dice que es agencia
     assert clasificar_anunciante("", "Inmobiliaria XYZ SAS")[1] is False
+
+
+def test_extractor_tarjetas_html():
+    html = (Path(__file__).parent / "fixtures" / "tarjetas.html").read_text()
+    a = extraer_anuncios(html, "ciencuadras", "https://www.ciencuadras.com")
+    assert len(a) == 2
+    a1, a2 = sorted(a, key=lambda x: x.precio)
+    assert (a2.precio, a2.area_m2, a2.habitaciones, a2.banos) == (450_000_000, 75, 3, 2)  # no toma la admin
+    assert a2.url == "https://www.ciencuadras.com/inmueble/apartamento-en-venta-chapinero-101"
+    assert a2.publicado_por == "inmobiliaria" and not a2.es_dueno_directo
+    assert a1.es_dueno_directo and a1.area_m2 == 60 and "Chapinero Alto" in a1.titulo
+
+
+def test_extractor_estado_angular():
+    html = (Path(__file__).parent / "fixtures" / "angular.html").read_text()
+    a = extraer_anuncios(html, "ciencuadras", "https://www.ciencuadras.com")
+    assert len(a) == 1 and a[0].precio == 500_000_000 and a[0].es_dueno_directo

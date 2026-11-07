@@ -149,7 +149,14 @@ def _bloques_json(html: str) -> Iterator[Any]:
             try:
                 yield json.loads(txt)
             except json.JSONDecodeError:
-                pass
+                # Angular (TransferState) escapa el JSON: &q; = comillas, &a; = &, &s; = ', &l; = <, &g; = >
+                if "&q;" in txt:
+                    t = (txt.replace("&q;", '"').replace("&s;", "'").replace("&l;", "<")
+                         .replace("&g;", ">").replace("&a;", "&"))
+                    try:
+                        yield json.loads(t)
+                    except json.JSONDecodeError:
+                        pass
         else:  # window.__INITIAL_STATE__ = {...};
             m = re.search(r"=\s*(\{.*\})\s*;?\s*$", txt, re.S)
             if m:
@@ -161,7 +168,64 @@ def _bloques_json(html: str) -> Iterator[Any]:
 
 def extraer_anuncios(html: str, fuente: str, base_url: str, operacion: str = "venta",
                      barrio_por_defecto: str = "") -> list[Listing]:
-    return extraer_de_json(list(_bloques_json(html)), fuente, base_url, operacion, barrio_por_defecto)
+    anuncios = extraer_de_json(list(_bloques_json(html)), fuente, base_url, operacion, barrio_por_defecto)
+    return anuncios or extraer_de_tarjetas(html, fuente, base_url, operacion, barrio_por_defecto)
+
+
+_PRECIO_TXT = re.compile(r"\$\s?(\d{1,3}(?:[.,]\d{3}){2,})")
+_AREA_TXT = re.compile(r"(\d{2,4}(?:[.,]\d{1,2})?)\s?(?:m²|m2|mts2?|mt2|metros)", re.I)
+_TELEFONO_TXT = re.compile(r"tel(?:é|e)fono|whatsapp|llamar", re.I)
+
+
+def _datos_tarjeta(texto: str, operacion: str) -> tuple[float, float] | None:
+    minimo = 300_000 if operacion == "arriendo" else 20_000_000
+    precios = [p for m in _PRECIO_TXT.finditer(texto) if (p := parse_number(m.group(1))) and p >= minimo]
+    areas = [a for m in _AREA_TXT.finditer(texto) if (a := parse_number(m.group(1))) and 15 <= a <= 2_000]
+    return (max(precios), areas[0]) if precios and areas else None
+
+
+def extraer_de_tarjetas(html: str, fuente: str, base_url: str, operacion: str = "venta",
+                        barrio_por_defecto: str = "") -> list[Listing]:
+    """Lee los anuncios desde las tarjetas visibles de la página (precio, área y enlace), para
+    portales que no incluyen los datos en JSON. Toma el elemento más pequeño que contenga un
+    precio y un área, para no mezclar varios anuncios en uno."""
+    soup = BeautifulSoup(html or "", "html.parser")
+    for basura in soup(["script", "style", "noscript", "svg"]):
+        basura.decompose()
+    candidatos = []
+    for el in soup.find_all(["article", "li", "div", "a", "section"]):
+        texto = el.get_text(" ", strip=True)
+        if len(texto) > 2_000 or not (datos := _datos_tarjeta(texto, operacion)):
+            continue
+        candidatos.append((el, texto, datos))
+    ids = {id(el) for el, _, _ in candidatos}
+    anuncios: list[Listing] = []
+    vistos: set = set()
+    for el, texto, (precio, area) in candidatos:
+        # Si un elemento hijo ya es una tarjeta completa, este es un contenedor: se omite.
+        if any(id(h) in ids for h in el.find_all(["article", "li", "div", "a", "section"])):
+            continue
+        enlace = el if el.name == "a" and el.get("href") else el.find("a", href=True)
+        if enlace is None:
+            enlace = el.find_parent("a", href=True)
+        url = urljoin(base_url, enlace["href"]) if enlace is not None else ""
+        clave = (url, precio, area)
+        if clave in vistos:
+            continue
+        vistos.add(clave)
+        titulo_el = el.find(["h1", "h2", "h3", "h4"]) or enlace
+        titulo = (titulo_el.get_text(" ", strip=True) if titulo_el is not None else "")[:120]
+        etiqueta, dueno = clasificar_anunciante("", "", texto)
+        hab = re.search(r"(\d+)\s*(?:hab|alcoba)", texto, re.I)
+        ban = re.search(r"(\d+)\s*baño", texto, re.I)
+        anuncios.append(Listing(
+            fuente=fuente, titulo=titulo or "Apartamento", barrio=barrio_por_defecto, precio=precio,
+            area_m2=area, url=url, telefonos=extract_phones(texto) if _TELEFONO_TXT.search(texto) else [],
+            publicado_por=etiqueta, es_dueno_directo=dueno,
+            habitaciones=int(hab.group(1)) if hab else None, banos=int(ban.group(1)) if ban else None,
+            descripcion=texto[:500],
+        ))
+    return anuncios
 
 
 def contar_bloques_json(html: str) -> int:
