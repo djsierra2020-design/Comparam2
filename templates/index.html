@@ -31,6 +31,7 @@
   .usados { margin:8px 0 0; padding-left:22px; font-size:14px; display:grid; gap:6px } .usados b { font-size:inherit }
   .vs { font-size:12px; font-weight:600; display:block; margin-top:2px } .bajo { color:var(--okt) } .alto { color:#b42318 }
   @media (prefers-color-scheme: dark) { .alto { color:#fda29b } }
+  .tag.portal { color:var(--ac); border-color:var(--ac); font-weight:600 }
   .tag { font-size:12px; padding:2px 8px; border-radius:99px; border:1px solid var(--ln); color:var(--mut) } a { color:var(--ac) }
   @media (max-width:560px) { .item { grid-template-columns:1fr } .m2 { text-align:left } .pos { display:none } }
 </style>
@@ -99,7 +100,7 @@ document.getElementById('f').addEventListener('submit', function (e) {
         <div class="meta">m² en {{ o.zona }}: {{ o.valor.mediana|pesos }} (calculado con {{ o.valor.anuncios }} anuncios)</div>
         <div class="tels">
           {% for t in a.telefonos %}<a class="tel" href="tel:+57{{ t|replace(' ', '') }}">📞 {{ t }}</a><a class="tel" href="https://wa.me/57{{ t|replace(' ', '') }}" target="_blank" rel="noopener">WhatsApp</a>{% else %}<span class="meta">Teléfono no publicado — ver anuncio</span>{% endfor %}
-          <span class="tag">{{ a.publicado_por or 'anunciante desconocido' }}</span>
+          <span class="tag portal">{{ a.fuente|portal }}</span><span class="tag">{{ a.publicado_por or 'anunciante desconocido' }}</span>
         </div>
       </div>
       <div class="m2">{{ a.precio_m2|pesos }}<small>por m²</small>{% set d = o.diferencia %}<span class="vs {{ 'bajo' if d < 0 else 'alto' }}">{{ '%.0f'|format(d|abs) }}% {{ 'bajo' if d < 0 else 'sobre' }} su barrio</span></div>
@@ -124,7 +125,7 @@ document.getElementById('f').addEventListener('submit', function (e) {
       {% for a in r.usados_zona %}
         <li><b>{{ a.precio_m2|pesos }}/m²</b> · {{ a.precio|pesos }} · {{ '%g'|format(a.area_m2) }} m² ·
           {% if a.url %}<a href="{{ a.url }}" target="_blank" rel="noopener">{{ a.titulo[:60] }}</a>{% else %}{{ a.titulo[:60] }}{% endif %}
-          <span class="meta">· {{ a.barrio or '¿barrio?' }} · {{ a.publicado_por or 'anunciante desconocido' }}</span></li>
+          <span class="meta">· {{ a.barrio or '¿barrio?' }} · {{ a.publicado_por or 'anunciante desconocido' }} · {{ a.fuente|portal }}</span></li>
       {% endfor %}
       </ol>
     </details>
@@ -152,7 +153,7 @@ document.getElementById('f').addEventListener('submit', function (e) {
         <div class="meta">{{ a.precio|pesos }} · {{ '%g'|format(a.area_m2) }} m²{% if a.habitaciones %} · {{ a.habitaciones }} hab{% endif %}{% if a.banos %} · {{ a.banos }} baños{% endif %} · {{ a.barrio }}</div>
         <div class="tels">
           {% for t in a.telefonos %}<a class="tel" href="tel:+57{{ t|replace(' ', '') }}">📞 {{ t }}</a><a class="tel" href="https://wa.me/57{{ t|replace(' ', '') }}" target="_blank" rel="noopener">WhatsApp</a>{% else %}<span class="meta">Teléfono no publicado — ver anuncio</span>{% endfor %}
-          <span class="tag">{{ a.publicado_por or 'anunciante desconocido' }}</span>
+          <span class="tag portal">{{ a.fuente|portal }}</span><span class="tag">{{ a.publicado_por or 'anunciante desconocido' }}</span>
         </div>
       </div>
       <div class="m2">{{ a.precio_m2|pesos }}<small>por m²</small>{% if r.zona %}{% set d = r.zona.diferencia(a.precio_m2) %}<span class="vs {{ 'bajo' if d < 0 else 'alto' }}">{{ '%.0f'|format(d|abs) }}% {{ 'bajo' if d < 0 else 'sobre' }} la zona</span>{% endif %}</div>
