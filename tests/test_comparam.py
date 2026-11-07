@@ -243,3 +243,33 @@ def test_portales_empresa_no_son_dueno_directo():
     assert Habi(sesion=ses).buscar("", "arriendo") == []  # Habi no arrienda
     assert len(Houm(sesion=ses, pausa=0, paginas=1).buscar("", "arriendo")) == 3
     assert "arriendo-propiedades" in ses.url
+
+
+def test_diagnostico_da_pistas_y_paginacion_no_repite():
+    from comparam.sources import FincaRaiz
+
+    class Resp:
+        status_code, url = 200, ""
+
+        def __init__(self, text):
+            self.text = text
+
+    class Sesion:
+        headers = {}
+
+        def __init__(self, text):
+            self.text, self.llamadas = text, 0
+
+        def get(self, url, timeout=None):
+            self.llamadas += 1
+            return Resp(self.text)
+
+    raro = ('<html><title>X</title><script id="__NEXT_DATA__" type="application/json">'
+            '{"props":{"lista":[{"mPrecio":"450","otro":1}]}}</script><p>Desde $ 450.000.000 en Chapinero</p></html>')
+    d = FincaRaiz(sesion=Sesion(raro), pausa=0).diagnosticar("")
+    assert d["anuncios"] == 0 and any("mPrecio" in p for p in d["pistas"])
+    assert any("$ 450.000.000" in p for p in d["pistas"])
+    # Un portal que siempre devuelve la misma página no se lee 5 veces
+    ses = Sesion(FIX.read_text())
+    assert len(FincaRaiz(sesion=ses, pausa=0, paginas=5, detalle=False).buscar("")) == 3
+    assert ses.llamadas == 2

@@ -25,6 +25,7 @@
     {% if f.url_final != f.url %}<dt>Redirigió a</dt><dd>{{ f.url_final }}</dd>{% endif %}
     <dt>Título de la página</dt><dd>{{ f.titulo }}</dd>
     <dt>Dueño directo detectados</dt><dd>{{ f.dueno_directo }}</dd>
+    {% if f.pistas %}<dt>Pistas (para ajustar la app)</dt><dd style="font-size:13px">{% for x in f.pistas %}{{ x }}<br>{% endfor %}</dd>{% endif %}
     {% if f.ejemplos %}<dt>Ejemplos</dt><dd>{% for e in f.ejemplos %}{{ e }}<br>{% endfor %}</dd>{% endif %}
     {% endif %}
   </dl>
