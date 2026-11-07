@@ -146,3 +146,45 @@ class Ciencuadras(PortalWeb):
     base_url = "https://www.ciencuadras.com"
     plantilla = base_url + "/{operacion}/bogota/apartamento/{barrio}?page={pagina}"
     plantilla_ciudad = base_url + "/{operacion}/bogota/apartamento?page={pagina}"
+
+
+class PortalEmpresa(PortalWeb):
+    """Portales de empresas que compran/venden o administran inmuebles (no son dueños directos).
+
+    Sus anuncios se marcan como empresa: sirven para calcular el precio del m² de cada barrio y
+    aparecen en la lista si se marca «Incluir inmobiliarias». Su búsqueda es por ciudad; cuando
+    se busca un barrio, se filtran aquí los anuncios de ese barrio.
+    """
+    empresa = ""
+
+    def url_busqueda(self, barrio: str, operacion: str, pagina: int) -> str:
+        return self.plantilla_ciudad.format(operacion=self.operaciones[operacion], barrio="", pagina=pagina)
+
+    def buscar(self, barrio: str, operacion: str = "venta") -> list[Listing]:
+        if operacion not in self.operaciones:
+            return []
+        self.detalle = False  # no hay teléfonos de propietarios que buscar
+        objetivo = slugify(barrio)
+        anuncios = super().buscar("", operacion)
+        for a in anuncios:
+            a.publicado_por, a.es_dueno_directo = f"{self.empresa} (empresa)", False
+        if objetivo:
+            anuncios = [a for a in anuncios
+                        if objetivo in slugify(f"{a.barrio} {a.ubicacion} {a.titulo} {a.url}")]
+        return anuncios
+
+
+class Habi(PortalEmpresa):
+    # Habi compra apartamentos y los revende; solo tiene venta.
+    nombre = "habi"
+    empresa = "Habi"
+    base_url = "https://habi.co"
+    operaciones = {"venta": "venta"}
+    plantilla_ciudad = base_url + "/venta-apartamentos/bogota?page={pagina}"
+
+
+class Houm(PortalEmpresa):
+    nombre = "houm"
+    empresa = "Houm"
+    base_url = "https://houm.com"
+    plantilla_ciudad = base_url + "/co/{operacion}-propiedades/bogota?page={pagina}"

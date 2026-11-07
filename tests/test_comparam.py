@@ -216,3 +216,30 @@ def test_extractor_estado_angular():
     html = (Path(__file__).parent / "fixtures" / "angular.html").read_text()
     a = extraer_anuncios(html, "ciencuadras", "https://www.ciencuadras.com")
     assert len(a) == 1 and a[0].precio == 500_000_000 and a[0].es_dueno_directo
+
+
+def test_portales_empresa_no_son_dueno_directo():
+    from comparam.sources import Habi, Houm
+
+    class Resp:
+        status_code, url = 200, ""
+
+        def __init__(self, text):
+            self.text = text
+
+    class Sesion:
+        headers = {}
+
+        def get(self, url, timeout=None):
+            self.url = url
+            return Resp(FIX.read_text())
+
+    ses = Sesion()
+    h = Habi(sesion=ses, pausa=0, paginas=1)
+    todos = h.buscar("")
+    assert len(todos) == 3 and all(not a.es_dueno_directo and a.publicado_por == "Habi (empresa)" for a in todos)
+    assert "habi.co" in ses.url
+    assert [a.barrio for a in h.buscar("Cedritos")] == ["Cedritos"]  # filtra el barrio localmente
+    assert Habi(sesion=ses).buscar("", "arriendo") == []  # Habi no arrienda
+    assert len(Houm(sesion=ses, pausa=0, paginas=1).buscar("", "arriendo")) == 3
+    assert "arriendo-propiedades" in ses.url
