@@ -1,6 +1,7 @@
 from pathlib import Path
 
-from comparam.busqueda import buscar
+from comparam.busqueda import buscar, buscar_ciudad, es_del_barrio, zona_de
+from comparam.models import Listing
 from comparam.config import EJEMPLO
 from comparam.parsing import clasificar_anunciante, extract_phones, parse_number, slugify
 from comparam.sources import ArchivoCSV
@@ -79,6 +80,10 @@ def test_web(monkeypatch):
     assert c.get("/").status_code == 200
     html = c.get("/?barrio=Cedritos&fuente=ejemplo").get_data(as_text=True)
     assert "300 000 0002" in html and "Inmobiliaria Ejemplo" not in html
+    html = c.get("/?modo=ciudad&fuente=ejemplo").get_data(as_text=True)
+    assert "su barrio" in html and "Fontibón" in html
+    j = c.get("/api/ciudad?fuente=ejemplo").get_json()
+    assert j["anuncios"][0]["vs_zona_pct"] < 0 and "Cedritos" in j["zonas"]
     j = c.get("/api/buscar?barrio=Chapinero&fuente=ejemplo").get_json()
     assert [a["precio_m2"] for a in j["anuncios"]] == sorted(a["precio_m2"] for a in j["anuncios"])
 
@@ -94,4 +99,61 @@ def test_valor_zona():
 def test_api_valor_zona():
     import app as webapp
     j = webapp.app.test_client().get("/api/buscar?barrio=Cedritos&fuente=ejemplo").get_json()
+    assert len(j["valor_zona"]["anuncios_usados"]) == 4
     assert j["valor_zona"]["anuncios"] == 4 and j["anuncios"][0]["vs_zona_pct"] < 0
+
+
+def test_web_muestra_numero_de_anuncios():
+    import app as webapp
+    html = webapp.app.test_client().get("/?barrio=Cedritos&fuente=ejemplo").get_data(as_text=True)
+    assert "Calculado con" in html and "4 anuncios" in html and "Ver los 4 anuncios usados" in html
+    assert "Apto con balcón" in html  # el de inmobiliaria aparece en el cálculo, no en la lista
+
+
+def _l(titulo, barrio="", ubicacion=""):
+    return Listing("t", titulo, barrio, 400_000_000, 100, ubicacion=ubicacion)
+
+
+def test_es_del_barrio():
+    assert es_del_barrio(_l("Apartamento En Venta En Fontibón, Bogotá"), "Fontibon")
+    assert not es_del_barrio(_l("Apartamento En Venta En Chapinero, Bogotá"), "Fontibón")
+    assert not es_del_barrio(_l("Apartamento En Venta En Casa Blanca Suba, Bogotá"), "Fontibón")
+    # barrio dentro de la localidad buscada
+    assert es_del_barrio(_l("Apto en Modelia, Bogotá", "Modelia", "Modelia | Fontibón | Bogotá"), "fontibon")
+    assert not es_del_barrio(_l("Apto amplio", "Salitre", "Salitre | Bogotá"), "Fontibón")
+    assert es_del_barrio(_l("Apartamento en Bogotá, d.c."), "Fontibón")  # sin datos: se acepta
+
+
+def test_destacados_de_otros_barrios_se_descartan():
+    class Portal:
+        def buscar(self, barrio, operacion="venta"):
+            return [_l("Apartamento En Venta En Fontibón, Bogotá"),
+                    _l("Apartamento En Venta En Chapinero, Bogotá")]
+
+    r = buscar("Fontibón", [Portal()], solo_dueno=False)
+    assert [a.titulo for a in r.anuncios] == ["Apartamento En Venta En Fontibón, Bogotá"]
+    assert r.zona.anuncios == 1 and len(r.otros_barrios) == 1
+
+
+def test_extractor_guarda_ubicacion():
+    a = {x.url: x for x in extraer_anuncios(FIX.read_text(), "p", "https://portal.co")}
+    assert "Cedritos" in a["https://portal.co/inmueble/1"].ubicacion
+
+
+def test_zona_de():
+    assert zona_de(_l("Apartamento En Venta En Chapinero, Bogotá")) == "Chapinero"
+    assert zona_de(_l("Apto", "Modelia", "Modelia | Fontibón")) == "Modelia"
+    assert zona_de(_l("Apto", "", "Bogotá | Hayuelos")) == "Hayuelos"
+    assert zona_de(_l("Apartamento en Bogotá, d.c.")) == ""
+    assert zona_de(_l("Apartamento En Venta En Casa Blanca Suba, Bogotá")) == "Casa Blanca Suba"
+
+
+def test_buscar_ciudad_compara_con_su_barrio():
+    rc = buscar_ciudad([ArchivoCSV(EJEMPLO)])
+    assert set(rc.zonas) == {"Cedritos", "Fontibón", "Chapinero"}
+    assert all(o.anuncio.es_dueno_directo for o in rc.oportunidades)
+    difs = [o.diferencia for o in rc.oportunidades]
+    assert difs == sorted(difs)
+    # El más barato en pesos/m² de Fontibón queda primero frente a SU barrio
+    assert rc.oportunidades[0].zona == "Fontibón" and rc.oportunidades[0].diferencia < 0
+    assert rc.zona_pequena == 2  # Teusaquillo y Chapinero Alto: 1 anuncio cada uno

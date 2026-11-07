@@ -17,6 +17,7 @@ class Listing:
     habitaciones: int | None = None
     banos: int | None = None
     descripcion: str = ""
+    ubicacion: str = ""  # todo el texto de ubicación del anuncio (barrio, localidad, zona, ciudad)
 
     @property
     def precio_m2(self) -> float:

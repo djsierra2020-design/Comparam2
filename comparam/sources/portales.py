@@ -29,7 +29,8 @@ HEADERS = {
 class PortalWeb(Source):
     nombre = "portal"
     base_url = ""
-    plantilla = ""  # URL de búsqueda
+    plantilla = ""  # URL de búsqueda en un barrio
+    plantilla_ciudad = ""  # URL de búsqueda en toda Bogotá
     operaciones = {"venta": "venta", "arriendo": "arriendo"}
 
     def __init__(self, paginas: int = 2, detalle: bool = True, timeout: float = 20,
@@ -42,9 +43,11 @@ class PortalWeb(Source):
         self.pausa = pausa
         env = f"COMPARAM_URL_{self.nombre.upper().replace(' ', '')}"
         self.plantilla = os.environ.get(env, self.plantilla)
+        self.plantilla_ciudad = os.environ.get(env.replace("_URL_", "_URL_CIUDAD_"), self.plantilla_ciudad)
 
     def url_busqueda(self, barrio: str, operacion: str, pagina: int) -> str:
-        return self.plantilla.format(operacion=self.operaciones[operacion], barrio=slugify(barrio),
+        plantilla = self.plantilla if barrio.strip() else self.plantilla_ciudad
+        return plantilla.format(operacion=self.operaciones[operacion], barrio=slugify(barrio),
                                      pagina=pagina)
 
     def _get(self, url: str) -> str:
@@ -62,7 +65,7 @@ class PortalWeb(Source):
         resultados: list[Listing] = []
         for pagina in range(1, self.paginas + 1):
             html = self._get(self.url_busqueda(barrio, operacion, pagina))
-            nuevos = extraer_anuncios(html, self.nombre, self.base_url, operacion, barrio) if html else []
+            nuevos = extraer_anuncios(html, self.nombre, self.base_url, operacion) if html else []
             if not nuevos:
                 break
             resultados += nuevos
@@ -97,15 +100,18 @@ class FincaRaiz(PortalWeb):
     nombre = "fincaraiz"
     base_url = "https://www.fincaraiz.com.co"
     plantilla = base_url + "/{operacion}/apartamentos/{barrio}/bogota/pagina{pagina}"
+    plantilla_ciudad = base_url + "/{operacion}/apartamentos/bogota/pagina{pagina}"
 
 
 class Metrocuadrado(PortalWeb):
     nombre = "metrocuadrado"
     base_url = "https://www.metrocuadrado.com"
     plantilla = base_url + "/apartamentos/{operacion}/bogota/{barrio}/?page={pagina}"
+    plantilla_ciudad = base_url + "/apartamentos/{operacion}/bogota/?page={pagina}"
 
 
 class Ciencuadras(PortalWeb):
     nombre = "ciencuadras"
     base_url = "https://www.ciencuadras.com"
     plantilla = base_url + "/{operacion}/bogota/apartamento/{barrio}?page={pagina}"
+    plantilla_ciudad = base_url + "/{operacion}/bogota/apartamento?page={pagina}"

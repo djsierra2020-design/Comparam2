@@ -8,3 +8,8 @@ titulo,barrio,operacion,precio,area_m2,telefono,publicado_por,habitaciones,banos
 (EJEMPLO) Apto Chapinero Central,Chapinero,venta,"$330.000.000",55,601 000 0006,Particular,2,1,,
 (EJEMPLO) Apto arriendo,Cedritos,arriendo,"$2.300.000",65,300 000 0007,Dueño directo,2,2,,Arriendo directo
 (EJEMPLO) Apto Teusaquillo,Teusaquillo,venta,"$400.000.000",90,300 000 0008,Dueño directo,3,2,,Casa convertida en apartamentos
+(EJEMPLO) Apto Fontibón centro,Fontibón,venta,"$260.000.000",58,300 000 0009,Dueño directo,2,1,,Vendo directo
+(EJEMPLO) Apto Fontibón conjunto,Fontibón,venta,"$310.000.000",60,,Inmobiliaria Ejemplo SAS,3,2,,
+(EJEMPLO) Apto Fontibón remodelado,Fontibón,venta,"$330.000.000",62,,Inmobiliaria Ejemplo SAS,3,2,,
+(EJEMPLO) Apto Fontibón piso 5,Fontibón,venta,"$300.000.000",55,300 000 0010,Particular,2,2,,
+(EJEMPLO) Apto Chapinero 2 hab,Chapinero,venta,"$380.000.000",60,,Inmobiliaria Ejemplo SAS,2,2,,

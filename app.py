@@ -6,8 +6,8 @@ import os
 from flask import Flask, jsonify, render_template, request
 
 from comparam.barrios import BARRIOS
-from comparam.busqueda import buscar
-from comparam.config import crear_fuentes
+from comparam.busqueda import buscar, buscar_ciudad
+from comparam.config import PAGINAS_CIUDAD, crear_fuentes
 from comparam.formato import pesos
 from comparam.sources import PORTALES
 
@@ -24,21 +24,44 @@ def _float(nombre):
 def _consulta():
     barrio = request.args.get("barrio", "").strip()
     elegidas = [f for f in request.args.getlist("fuente") if f in FUENTES] or list(PORTALES)
-    params = dict(
+    params = _params()
+    resultado = buscar(barrio, crear_fuentes(elegidas), **params) if barrio else None
+    return barrio, elegidas, params, resultado
+
+
+def _params():
+    return dict(
         operacion="arriendo" if request.args.get("operacion") == "arriendo" else "venta",
         solo_dueno=request.args.get("todos") != "1",
         con_telefono=request.args.get("con_telefono") == "1",
         area_min=_float("area_min"), precio_max=_float("precio_max"),
     )
-    resultado = buscar(barrio, crear_fuentes(elegidas), **params) if barrio else None
-    return barrio, elegidas, params, resultado
+
+
+def _consulta_ciudad():
+    elegidas = [f for f in request.args.getlist("fuente") if f in FUENTES] or list(PORTALES)
+    fuentes = crear_fuentes(elegidas, paginas=PAGINAS_CIUDAD, detalle=False)
+    return elegidas, buscar_ciudad(fuentes, **_params())
 
 
 @app.get("/")
 def inicio():
+    if request.args.get("modo") == "ciudad":
+        elegidas, rc = _consulta_ciudad()
+        return render_template("index.html", barrio="", barrios=BARRIOS, fuentes=FUENTES, elegidas=elegidas,
+                               p=_params(), r=None, rc=rc, args=request.args)
     barrio, elegidas, params, resultado = _consulta()
     return render_template("index.html", barrio=barrio, barrios=BARRIOS, fuentes=FUENTES,
                            elegidas=elegidas, p=params, r=resultado, args=request.args)
+
+
+@app.get("/api/ciudad")
+def api_ciudad():
+    _, rc = _consulta_ciudad()
+    return jsonify(errores=rc.errores, revisados=rc.total_encontrados, sin_barrio=rc.sin_zona,
+                   zonas={z: dict(mediana_m2=round(v.mediana), anuncios=v.anuncios) for z, v in rc.zonas.items()},
+                   anuncios=[{**o.anuncio.to_dict(), "zona": o.zona, "zona_mediana_m2": round(o.valor.mediana),
+                              "vs_zona_pct": round(o.diferencia, 1)} for o in rc.oportunidades])
 
 
 @app.get("/api/buscar")
@@ -48,13 +71,15 @@ def api():
         return jsonify(error="Falta el parámetro 'barrio'"), 400
     z = resultado.zona
     zona = None if not z else dict(mediana_m2=round(z.mediana), promedio_m2=round(z.promedio),
-                                   minimo_m2=round(z.minimo), maximo_m2=round(z.maximo), anuncios=z.anuncios)
+                                   minimo_m2=round(z.minimo), maximo_m2=round(z.maximo), anuncios=z.anuncios,
+                                   anuncios_usados=[a.to_dict() for a in resultado.usados_zona])
     anuncios = []
     for a in resultado.anuncios:
         d = a.to_dict()
         d["vs_zona_pct"] = round(z.diferencia(a.precio_m2), 1) if z else None
         anuncios.append(d)
     return jsonify(barrio=barrio, errores=resultado.errores, revisados=resultado.total_encontrados,
+                   descartados_otros_barrios=len(resultado.otros_barrios),
                    valor_zona=zona, anuncios=anuncios)
 
 
