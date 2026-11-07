@@ -80,6 +80,7 @@ def test_web(monkeypatch):
     assert c.get("/").status_code == 200
     html = c.get("/?barrio=Cedritos&fuente=ejemplo").get_data(as_text=True)
     assert "300 000 0002" in html and "Inmobiliaria Ejemplo" not in html
+    assert '<span class="tag portal">Ejemplo</span>' in html
     html = c.get("/?modo=ciudad&fuente=ejemplo").get_data(as_text=True)
     assert "su barrio" in html and "Fontibón" in html
     for escrito in ("toda bogotá", "Bogotá", "Toda Bogota"):
