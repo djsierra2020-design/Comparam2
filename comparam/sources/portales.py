@@ -112,7 +112,7 @@ class PortalWeb(Source):
         """Qué responde el portal a la primera página de búsqueda (para la página /diagnostico)."""
         url = self.url_busqueda(barrio, operacion, 1)
         info = {"portal": self.nombre, "url": url}
-        if isinstance(self, PortalConNavegador):
+        if getattr(self, "usa_navegador", False):
             try:
                 html = self._get(url)
             except FuenteError as e:
@@ -188,6 +188,24 @@ def _titulo(html: str) -> str:
     return re.sub(r"\s+", " ", m.group(1)).strip()[:80] if m else "sin título"
 
 
+class ConNavegador:
+    """Para portales que solo muestran los anuncios después de ejecutar JavaScript: se abren con un
+    navegador sin ventana (ver navegador.py)."""
+    usa_navegador = True
+    paginas_navegador = 2  # abrir un navegador es lento: pocas páginas
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.paginas = min(self.paginas, self.paginas_navegador)
+
+    def _get(self, url: str) -> str:
+        from . import navegador
+        try:
+            return navegador.renderizar(url)
+        except FuenteError as e:
+            raise FuenteError(f"{self.nombre}: {e}") from e
+
+
 class FincaRaiz(PortalWeb):
     nombre = "fincaraiz"
     base_url = "https://www.fincaraiz.com.co"
@@ -195,7 +213,8 @@ class FincaRaiz(PortalWeb):
     plantilla_ciudad = base_url + "/{operacion}/apartamentos/bogota-dc/pagina{pagina}"
 
 
-class Metrocuadrado(PortalWeb):
+class Metrocuadrado(ConNavegador, PortalWeb):
+    # La página llega solo con 6 enlaces (JSON-LD); los anuncios se cargan con JavaScript.
     nombre = "metrocuadrado"
     base_url = "https://www.metrocuadrado.com"
     plantilla = base_url + "/apartamentos/{operacion}/bogota/{barrio}/?page={pagina}"
@@ -235,20 +254,8 @@ class PortalEmpresa(PortalWeb):
         return anuncios
 
 
-class PortalConNavegador(PortalEmpresa):
-    """Portal que solo muestra los anuncios después de ejecutar JavaScript: se abre con un navegador."""
-    paginas_navegador = 2  # abrir un navegador es lento: pocas páginas
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.paginas = min(self.paginas, self.paginas_navegador)
-
-    def _get(self, url: str) -> str:
-        from . import navegador
-        try:
-            return navegador.renderizar(url)
-        except FuenteError as e:
-            raise FuenteError(f"{self.nombre}: {e}") from e
+class PortalConNavegador(ConNavegador, PortalEmpresa):
+    pass
 
 
 class Habi(PortalConNavegador):
