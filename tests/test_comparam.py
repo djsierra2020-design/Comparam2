@@ -81,3 +81,17 @@ def test_web(monkeypatch):
     assert "300 000 0002" in html and "Inmobiliaria Ejemplo" not in html
     j = c.get("/api/buscar?barrio=Chapinero&fuente=ejemplo").get_json()
     assert [a["precio_m2"] for a in j["anuncios"]] == sorted(a["precio_m2"] for a in j["anuncios"])
+
+
+def test_valor_zona():
+    r = buscar("cedritos", [ArchivoCSV(EJEMPLO)])
+    # 4 anuncios de venta en Cedritos (incluida la inmobiliaria): 5.000.000, 5.384.615, 6.000.000, 6.209.677
+    assert r.zona.anuncios == 4
+    assert round(r.zona.mediana) == round((5_384_615.38 + 6_000_000) / 2)
+    assert r.zona.diferencia(r.anuncios[0].precio_m2) < 0
+
+
+def test_api_valor_zona():
+    import app as webapp
+    j = webapp.app.test_client().get("/api/buscar?barrio=Cedritos&fuente=ejemplo").get_json()
+    assert j["valor_zona"]["anuncios"] == 4 and j["anuncios"][0]["vs_zona_pct"] < 0

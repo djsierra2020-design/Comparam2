@@ -23,6 +23,10 @@
   .pos { font-weight:700; color:var(--mut); font-variant-numeric:tabular-nums } .m2 { font-size:20px; font-weight:700; color:var(--ac); white-space:nowrap; text-align:right }
   .m2 small { display:block; font-size:12px; color:var(--mut); font-weight:400 } .tit { font-weight:600 } .meta { color:var(--mut); font-size:13px }
   .tels { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px } .tel { background:var(--ok); color:var(--okt); padding:3px 10px; border-radius:99px; text-decoration:none; font-weight:600; font-size:14px }
+  .zona { margin-top:16px; background:var(--card); border:1px solid var(--ln); border-radius:12px; padding:14px 16px; display:flex; flex-wrap:wrap; gap:8px 28px; align-items:baseline }
+  .zona b { font-size:22px; color:var(--tx) } .zona .meta b { font-size:inherit }
+  .vs { font-size:12px; font-weight:600; display:block; margin-top:2px } .bajo { color:var(--okt) } .alto { color:#b42318 }
+  @media (prefers-color-scheme: dark) { .alto { color:#fda29b } }
   .tag { font-size:12px; padding:2px 8px; border-radius:99px; border:1px solid var(--ln); color:var(--mut) } a { color:var(--ac) }
   @media (max-width:560px) { .item { grid-template-columns:1fr } .m2 { text-align:left } .pos { display:none } }
 </style>
@@ -58,6 +62,13 @@
 
 {% if r %}
   {% for e in r.errores %}<div class="aviso">⚠ {{ e }}</div>{% endfor %}
+  {% if r.zona %}
+  <div class="zona">
+    <div><div class="meta">Valor del m² en {{ barrio }}</div><b>{{ r.zona.mediana|pesos }}</b></div>
+    <div class="meta">Promedio <b>{{ r.zona.promedio|pesos }}</b><br>Rango {{ r.zona.minimo|pesos }} – {{ r.zona.maximo|pesos }}</div>
+    <div class="meta" style="flex-basis:100%">Mediana de {{ r.zona.anuncios }} anuncios encontrados ({% if p.solo_dueno %}incluye inmobiliarias{% else %}todos los anunciantes{% endif %}).</div>
+  </div>
+  {% endif %}
   {% if r.anuncios %}
   <p class="meta" style="margin-top:16px">{{ r.anuncios|length }} resultado(s) en <b>{{ barrio }}</b> · {{ r.total_encontrados }} anuncios revisados</p>
   <ol class="lista">
@@ -72,7 +83,7 @@
           <span class="tag">{{ a.publicado_por or 'anunciante desconocido' }}</span><span class="tag">{{ a.fuente }}</span>
         </div>
       </div>
-      <div class="m2">{{ a.precio_m2|pesos }}<small>por m²</small></div>
+      <div class="m2">{{ a.precio_m2|pesos }}<small>por m²</small>{% if r.zona %}{% set d = r.zona.diferencia(a.precio_m2) %}<span class="vs {{ 'bajo' if d < 0 else 'alto' }}">{{ '%.0f'|format(d|abs) }}% {{ 'bajo' if d < 0 else 'sobre' }} la zona</span>{% endif %}</div>
     </li>
   {% endfor %}
   </ol>

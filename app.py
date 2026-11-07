@@ -46,8 +46,16 @@ def api():
     barrio, _, _, resultado = _consulta()
     if not barrio:
         return jsonify(error="Falta el parámetro 'barrio'"), 400
+    z = resultado.zona
+    zona = None if not z else dict(mediana_m2=round(z.mediana), promedio_m2=round(z.promedio),
+                                   minimo_m2=round(z.minimo), maximo_m2=round(z.maximo), anuncios=z.anuncios)
+    anuncios = []
+    for a in resultado.anuncios:
+        d = a.to_dict()
+        d["vs_zona_pct"] = round(z.diferencia(a.precio_m2), 1) if z else None
+        anuncios.append(d)
     return jsonify(barrio=barrio, errores=resultado.errores, revisados=resultado.total_encontrados,
-                   anuncios=[a.to_dict() for a in resultado.anuncios])
+                   valor_zona=zona, anuncios=anuncios)
 
 
 if __name__ == "__main__":

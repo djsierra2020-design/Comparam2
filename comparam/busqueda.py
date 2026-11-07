@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import statistics
 from dataclasses import dataclass, field
 
 from .models import Listing
@@ -12,6 +13,30 @@ class Resultado:
     anuncios: list[Listing]
     errores: list[str] = field(default_factory=list)
     total_encontrados: int = 0
+    zona: "ValorZona | None" = None
+
+
+@dataclass
+class ValorZona:
+    """Valor del m² en el barrio, calculado con todos los anuncios encontrados
+    (dueños directos e inmobiliarias), antes de aplicar los filtros."""
+    mediana: float
+    promedio: float
+    minimo: float
+    maximo: float
+    anuncios: int
+
+    def diferencia(self, precio_m2: float) -> float:
+        """Porcentaje frente a la mediana: negativo = más barato que la zona."""
+        return (precio_m2 / self.mediana - 1) * 100
+
+
+def valor_zona(anuncios: list[Listing]) -> ValorZona | None:
+    valores = [a.precio_m2 for a in anuncios if a.area_m2]
+    if not valores:
+        return None
+    return ValorZona(statistics.median(valores), statistics.fmean(valores), min(valores), max(valores),
+                     len(valores))
 
 
 def _duplicado(a: Listing, b: Listing) -> bool:
@@ -45,4 +70,4 @@ def buscar(barrio: str, fuentes: list[Source], operacion: str = "venta", solo_du
         and (precio_max is None or a.precio <= precio_max)
     ]
     filtrados.sort(key=lambda a: a.precio_m2)
-    return Resultado(filtrados[:limite] if limite else filtrados, errores, len(unicos))
+    return Resultado(filtrados[:limite] if limite else filtrados, errores, len(unicos), valor_zona(unicos))
