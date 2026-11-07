@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import statistics
 from dataclasses import dataclass, field
 
@@ -15,6 +16,7 @@ class Resultado:
     total_encontrados: int = 0
     zona: "ValorZona | None" = None
     usados_zona: list[Listing] = field(default_factory=list)  # anuncios con los que se calculó la zona
+    otros_barrios: list[Listing] = field(default_factory=list)  # descartados: son de otro barrio
 
 
 @dataclass
@@ -48,6 +50,27 @@ def _duplicado(a: Listing, b: Listing) -> bool:
             and (mismos_tels or slugify(a.titulo) == slugify(b.titulo)))
 
 
+_LUGAR_TITULO = re.compile(r"\ben\s+([^,|]+?),\s*bogot", re.I)
+
+
+def es_del_barrio(a: Listing, barrio: str) -> bool:
+    """Los portales mezclan anuncios «destacados» de otros barrios en los resultados.
+
+    Se acepta el anuncio si su ubicación, barrio o título mencionan el barrio buscado. Se descarta
+    si dice ser de otro lugar (p. ej. título «Apartamento en venta en Chapinero, Bogotá»). Si no
+    trae ningún dato de ubicación, se acepta.
+    """
+    objetivo = slugify(barrio)
+    if not objetivo:
+        return True
+    textos = [a.ubicacion, a.barrio, a.titulo]
+    if any(objetivo in slugify(t) for t in textos if t):
+        return True
+    lugar = _LUGAR_TITULO.search(a.titulo or "")
+    tiene_ubicacion = bool(a.ubicacion or a.barrio) and slugify(a.ubicacion or a.barrio) not in ("bogota", "bogota-d-c")
+    return not (tiene_ubicacion or lugar)
+
+
 def buscar(barrio: str, fuentes: list[Source], operacion: str = "venta", solo_dueno: bool = True,
            con_telefono: bool = False, area_min: float | None = None, precio_max: float | None = None,
            limite: int | None = None) -> Resultado:
@@ -59,6 +82,10 @@ def buscar(barrio: str, fuentes: list[Source], operacion: str = "venta", solo_du
             todos += f.buscar(barrio, operacion)
         except FuenteError as e:
             errores.append(str(e))
+    otros = [a for a in todos if not es_del_barrio(a, barrio)]
+    todos = [a for a in todos if es_del_barrio(a, barrio)]
+    for a in todos:
+        a.barrio = a.barrio or barrio
     unicos: list[Listing] = []
     for a in todos:
         if not any(_duplicado(a, u) for u in unicos):
@@ -72,4 +99,4 @@ def buscar(barrio: str, fuentes: list[Source], operacion: str = "venta", solo_du
     ]
     filtrados.sort(key=lambda a: a.precio_m2)
     return Resultado(filtrados[:limite] if limite else filtrados, errores, len(unicos), valor_zona(unicos),
-                     sorted(unicos, key=lambda a: a.precio_m2))
+                     sorted(unicos, key=lambda a: a.precio_m2), otros)

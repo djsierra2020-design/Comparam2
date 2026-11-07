@@ -104,6 +104,29 @@ def _barrio(d: dict) -> str:
     return _texto(b)
 
 
+K_UBICACION = K_BARRIO + ("locality", "localidad", "zone", "zona", "city", "ciudad", "district",
+                          "upz", "name", "nombre", "label")
+
+
+def _ubicacion(d: dict) -> str:
+    """Junta todo el texto de ubicación del anuncio (barrio, localidad, zona...)."""
+    partes = [_texto(d.get(k)) for k in K_BARRIO if d.get(k)]
+    for k in ("location", "locations", "address", "ubicacion", "direccion"):
+        sub = d.get(k)
+        subs = sub if isinstance(sub, list) else [sub]
+        for x in subs:
+            if isinstance(x, dict):
+                for kk in K_UBICACION:
+                    v = x.get(kk)
+                    if isinstance(v, list):
+                        partes += [_texto(i) for i in v]
+                    elif v:
+                        partes.append(_texto(v))
+            elif isinstance(x, str):
+                partes.append(x)
+    return " | ".join(dict.fromkeys(p for p in partes if p))
+
+
 def _recorrer(nodo: Any) -> Iterator[dict]:
     pila = [nodo]
     while pila:
@@ -167,6 +190,7 @@ def extraer_anuncios(html: str, fuente: str, base_url: str, operacion: str = "ve
                 fuente=fuente,
                 titulo=titulo or "Apartamento",
                 barrio=_barrio(d) or barrio_por_defecto,
+                ubicacion=_ubicacion(d),
                 precio=precio,
                 area_m2=area,
                 url=url,

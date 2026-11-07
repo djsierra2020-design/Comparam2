@@ -1,6 +1,7 @@
 from pathlib import Path
 
-from comparam.busqueda import buscar
+from comparam.busqueda import buscar, es_del_barrio
+from comparam.models import Listing
 from comparam.config import EJEMPLO
 from comparam.parsing import clasificar_anunciante, extract_phones, parse_number, slugify
 from comparam.sources import ArchivoCSV
@@ -103,3 +104,33 @@ def test_web_muestra_numero_de_anuncios():
     html = webapp.app.test_client().get("/?barrio=Cedritos&fuente=ejemplo").get_data(as_text=True)
     assert "Calculado con" in html and "4 anuncios" in html and "Ver los 4 anuncios usados" in html
     assert "Apto con balcón" in html  # el de inmobiliaria aparece en el cálculo, no en la lista
+
+
+def _l(titulo, barrio="", ubicacion=""):
+    return Listing("t", titulo, barrio, 400_000_000, 100, ubicacion=ubicacion)
+
+
+def test_es_del_barrio():
+    assert es_del_barrio(_l("Apartamento En Venta En Fontibón, Bogotá"), "Fontibon")
+    assert not es_del_barrio(_l("Apartamento En Venta En Chapinero, Bogotá"), "Fontibón")
+    assert not es_del_barrio(_l("Apartamento En Venta En Casa Blanca Suba, Bogotá"), "Fontibón")
+    # barrio dentro de la localidad buscada
+    assert es_del_barrio(_l("Apto en Modelia, Bogotá", "Modelia", "Modelia | Fontibón | Bogotá"), "fontibon")
+    assert not es_del_barrio(_l("Apto amplio", "Salitre", "Salitre | Bogotá"), "Fontibón")
+    assert es_del_barrio(_l("Apartamento en Bogotá, d.c."), "Fontibón")  # sin datos: se acepta
+
+
+def test_destacados_de_otros_barrios_se_descartan():
+    class Portal:
+        def buscar(self, barrio, operacion="venta"):
+            return [_l("Apartamento En Venta En Fontibón, Bogotá"),
+                    _l("Apartamento En Venta En Chapinero, Bogotá")]
+
+    r = buscar("Fontibón", [Portal()], solo_dueno=False)
+    assert [a.titulo for a in r.anuncios] == ["Apartamento En Venta En Fontibón, Bogotá"]
+    assert r.zona.anuncios == 1 and len(r.otros_barrios) == 1
+
+
+def test_extractor_guarda_ubicacion():
+    a = {x.url: x for x in extraer_anuncios(FIX.read_text(), "p", "https://portal.co")}
+    assert "Cedritos" in a["https://portal.co/inmueble/1"].ubicacion

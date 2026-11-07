@@ -79,6 +79,17 @@
       {% endfor %}
       </ol>
     </details>
+    {% if r.otros_barrios %}
+    <details style="flex-basis:100%">
+      <summary class="meta" style="cursor:pointer">Se descartaron {{ r.otros_barrios|length }} anuncio{{ 's' if r.otros_barrios|length != 1 }} de otros barrios (destacados que el portal mezcla en los resultados)</summary>
+      <ol class="usados">
+      {% for a in r.otros_barrios %}
+        <li>{{ a.precio_m2|pesos }}/m² · {% if a.url %}<a href="{{ a.url }}" target="_blank" rel="noopener">{{ a.titulo[:60] }}</a>{% else %}{{ a.titulo[:60] }}{% endif %}
+          <span class="meta">· {{ a.ubicacion or a.barrio }} · {{ a.fuente }}</span></li>
+      {% endfor %}
+      </ol>
+    </details>
+    {% endif %}
   </div>
   {% endif %}
   {% if r.anuncios %}

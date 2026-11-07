@@ -56,6 +56,7 @@ def api():
         d["vs_zona_pct"] = round(z.diferencia(a.precio_m2), 1) if z else None
         anuncios.append(d)
     return jsonify(barrio=barrio, errores=resultado.errores, revisados=resultado.total_encontrados,
+                   descartados_otros_barrios=len(resultado.otros_barrios),
                    valor_zona=zona, anuncios=anuncios)
 
 

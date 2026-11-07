@@ -62,7 +62,7 @@ class PortalWeb(Source):
         resultados: list[Listing] = []
         for pagina in range(1, self.paginas + 1):
             html = self._get(self.url_busqueda(barrio, operacion, pagina))
-            nuevos = extraer_anuncios(html, self.nombre, self.base_url, operacion, barrio) if html else []
+            nuevos = extraer_anuncios(html, self.nombre, self.base_url, operacion) if html else []
             if not nuevos:
                 break
             resultados += nuevos
