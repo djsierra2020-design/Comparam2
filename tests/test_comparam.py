@@ -236,7 +236,7 @@ def test_portales_empresa_no_son_dueno_directo(monkeypatch):
     assert len(Houm(pausa=0, paginas=1).buscar("", "venta")) == 3
     assert urls[-1].startswith("https://houm.com/co/venta-apartamentos-bogota")
     assert "arriendo-apartamentos-bogota" in Houm().url_busqueda("", "arriendo", 1)
-    assert Houm(paginas=8).paginas == 2  # con navegador se leen pocas páginas
+    assert Houm(paginas=8).paginas == 1  # con navegador se lee una página
 
 
 def test_navegador_lee_anuncios_cargados_con_javascript(tmp_path):
@@ -362,7 +362,7 @@ def test_metrocuadrado_usa_navegador(monkeypatch):
     urls = []
     monkeypatch.setattr(navegador, "renderizar", lambda url, **kw: urls.append(url) or FIX.read_text())
     m = Metrocuadrado(pausa=0, paginas=8, detalle=False)
-    assert m.paginas == 2
+    assert m.paginas == 1
     a = m.buscar("Cedritos")
     assert urls[0].startswith("https://www.metrocuadrado.com/apartamentos/venta/bogota/cedritos")
     assert len(a) == 3 and any(x.es_dueno_directo for x in a)  # no se marcan como empresa

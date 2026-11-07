@@ -9,10 +9,14 @@ from __future__ import annotations
 
 import os
 import threading
+import time
 
 from .base import FuenteError
 
 _CANDADO = threading.Lock()
+# Páginas ya abiertas: {url: (momento, html)}. Abrir un navegador es lento y gasta memoria.
+_CACHE: dict[str, tuple[float, str]] = {}
+CACHE_SEGUNDOS = 30 * 60
 
 # build.sh instala el navegador en <proyecto>/.playwright: se usa si existe.
 _LOCAL = os.path.join(os.path.dirname(__file__), "..", "..", ".playwright")
@@ -30,7 +34,7 @@ def disponible() -> bool:
     return True
 
 
-def renderizar(url: str, espera_ms: int = 4_000, desplazamientos: int = 4, timeout_ms: int = 45_000) -> str:
+def renderizar(url: str, espera_ms: int = 2_000, desplazamientos: int = 3, timeout_ms: int = 25_000) -> str:
     """Devuelve el HTML de la página después de ejecutar su JavaScript y bajar por ella (para que
     carguen los anuncios que aparecen al desplazarse)."""
     if not disponible():
@@ -38,10 +42,18 @@ def renderizar(url: str, espera_ms: int = 4_000, desplazamientos: int = 4, timeo
     from playwright.sync_api import Error as PWError
     from playwright.sync_api import sync_playwright
 
-    opciones = {"headless": True, "args": ["--no-sandbox", "--disable-dev-shm-usage", "--disable-gpu"]}
+    if (c := _CACHE.get(url)) and time.time() - c[0] < CACHE_SEGUNDOS:
+        return c[1]
+    # Opciones para gastar poca memoria (el plan gratis de Render tiene 512 MB).
+    opciones = {"headless": True, "args": [
+        "--no-sandbox", "--disable-dev-shm-usage", "--disable-gpu", "--disable-extensions",
+        "--renderer-process-limit=1", "--disable-background-networking", "--mute-audio",
+        "--js-flags=--max-old-space-size=192"]}
     if ruta := os.environ.get("COMPARAM_CHROMIUM"):
         opciones["executable_path"] = ruta
     with _CANDADO:
+        if (c := _CACHE.get(url)) and time.time() - c[0] < CACHE_SEGUNDOS:  # otro hilo la abrió
+            return c[1]
         try:
             with sync_playwright() as p:
                 navegador = p.chromium.launch(**opciones)
@@ -52,13 +64,17 @@ def renderizar(url: str, espera_ms: int = 4_000, desplazamientos: int = 4, timeo
                                  ("image", "media", "font") else r.continue_())
                     pagina.goto(url, wait_until="domcontentloaded", timeout=timeout_ms)
                     try:
-                        pagina.wait_for_load_state("networkidle", timeout=espera_ms * 3)
+                        pagina.wait_for_load_state("networkidle", timeout=espera_ms * 2)
                     except PWError:
                         pass
                     for _ in range(desplazamientos):
                         pagina.mouse.wheel(0, 2_500)
                         pagina.wait_for_timeout(espera_ms // desplazamientos)
-                    return pagina.content()
+                    html = pagina.content()
+                    if len(_CACHE) > 40:
+                        _CACHE.clear()
+                    _CACHE[url] = (time.time(), html)
+                    return html
                 finally:
                     navegador.close()
         except PWError as e:
