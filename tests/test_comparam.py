@@ -82,6 +82,9 @@ def test_web(monkeypatch):
     assert "300 000 0002" in html and "Inmobiliaria Ejemplo" not in html
     html = c.get("/?modo=ciudad&fuente=ejemplo").get_data(as_text=True)
     assert "su barrio" in html and "Fontibón" in html
+    for escrito in ("toda bogotá", "Bogotá", "Toda Bogota"):
+        html = c.get(f"/?barrio={escrito}&fuente=ejemplo").get_data(as_text=True)
+        assert "Barrios comparables" in html
     j = c.get("/api/ciudad?fuente=ejemplo").get_json()
     assert j["anuncios"][0]["vs_zona_pct"] < 0 and "Cedritos" in j["zonas"]
     j = c.get("/api/buscar?barrio=Chapinero&fuente=ejemplo").get_json()
@@ -106,6 +109,7 @@ def test_api_valor_zona():
 def test_web_muestra_numero_de_anuncios():
     import app as webapp
     html = webapp.app.test_client().get("/?barrio=Cedritos&fuente=ejemplo").get_data(as_text=True)
+    assert "Anuncios leídos por portal" in html
     assert "Calculado con" in html and "4 anuncios" in html and "Ver los 4 anuncios usados" in html
     assert "Apto con balcón" in html  # el de inmobiliaria aparece en el cálculo, no en la lista
 
@@ -155,5 +159,6 @@ def test_buscar_ciudad_compara_con_su_barrio():
     difs = [o.diferencia for o in rc.oportunidades]
     assert difs == sorted(difs)
     # El más barato en pesos/m² de Fontibón queda primero frente a SU barrio
+    assert rc.por_fuente == {"ejemplo": 13}
     assert rc.oportunidades[0].zona == "Fontibón" and rc.oportunidades[0].diferencia < 0
     assert rc.zona_pequena == 2  # Teusaquillo y Chapinero Alto: 1 anuncio cada uno
