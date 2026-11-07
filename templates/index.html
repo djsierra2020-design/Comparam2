@@ -1,5 +1,4 @@
 <!doctype html>
-{% macro fuentes_leidas(pf) %}{% if pf %}<div class="meta" style="flex-basis:100%">Anuncios leídos por portal: {% for f, n in pf.items() %}<b>{{ f }}</b> {{ n }}{% if n == 0 %} ⚠{% endif %}{{ ' · ' if not loop.last }}{% endfor %}</div>{% endif %}{% endmacro %}
 <html lang="es">
 <head>
 <meta charset="utf-8">
@@ -80,7 +79,6 @@ document.getElementById('f').addEventListener('submit', function (e) {
   <div class="zona">
     <div><div class="meta">Anuncios revisados en toda Bogotá</div><b>{{ rc.total_encontrados }}</b></div>
     <div><div class="meta">Barrios comparables</div><b>{{ rc.zonas|length }}</b></div>
-    {{ fuentes_leidas(rc.por_fuente) }}
     <div class="meta" style="flex-basis:100%">Cada apartamento se compara con la mediana del precio de oferta del m² de <b>su propio barrio</b> (calculada con todos los anuncios de ese barrio, incluidas inmobiliarias). Solo se comparan barrios con al menos 3 anuncios{% if rc.zona_pequena %}; {{ rc.zona_pequena }} anuncios quedaron por fuera por estar en barrios con menos{% endif %}{% if rc.sin_zona %}, y {{ rc.sin_zona }} no indicaban su barrio{% endif %}.</div>
     {% if rc.zonas %}
     <details style="flex-basis:100%">
@@ -122,7 +120,6 @@ document.getElementById('f').addEventListener('submit', function (e) {
     <div><div class="meta">Precio de oferta del m² en {{ barrio }}</div><b>{{ r.zona.mediana|pesos }}</b></div>
     <div><div class="meta">Calculado con</div><b>{{ r.zona.anuncios }} anuncio{{ 's' if r.zona.anuncios != 1 }}</b></div>
     <div class="meta">Promedio <b>{{ r.zona.promedio|pesos }}</b><br>Rango {{ r.zona.minimo|pesos }} – {{ r.zona.maximo|pesos }}</div>
-    {{ fuentes_leidas(r.por_fuente) }}
     <div class="meta" style="flex-basis:100%">Mediana del precio pedido por m² en los anuncios encontrados en los portales ({% if p.solo_dueno %}incluye inmobiliarias{% else %}todos los anunciantes{% endif %}). No es el avalúo catastral.{% if r.zona.anuncios < 10 %} <b>Pocos anuncios: tómalo como referencia aproximada.</b>{% endif %}</div>
     <details style="flex-basis:100%">
       <summary class="meta" style="cursor:pointer">Ver los {{ r.zona.anuncios }} anuncios usados en el cálculo</summary>
