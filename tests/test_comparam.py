@@ -354,3 +354,16 @@ def test_descarta_precios_imposibles_y_casas():
     a = extraer_anuncios(html, "habi", "https://habi.co")
     assert len(a) == 1 and a[0].precio == 324_000_000
     assert zona_de(a[0]) == "San Cristóbal Norte"
+
+
+def test_metrocuadrado_usa_navegador(monkeypatch):
+    from comparam.sources import Metrocuadrado, navegador
+
+    urls = []
+    monkeypatch.setattr(navegador, "renderizar", lambda url, **kw: urls.append(url) or FIX.read_text())
+    m = Metrocuadrado(pausa=0, paginas=8, detalle=False)
+    assert m.paginas == 2
+    a = m.buscar("Cedritos")
+    assert urls[0].startswith("https://www.metrocuadrado.com/apartamentos/venta/bogota/cedritos")
+    assert len(a) == 3 and any(x.es_dueno_directo for x in a)  # no se marcan como empresa
+    assert m.diagnosticar("Cedritos")["estado"] == "navegador"
