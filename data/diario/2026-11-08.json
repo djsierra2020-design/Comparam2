@@ -1,22 +1,13 @@
 {
- "base": true,
- "errores": [
-  "venta Contador: habi: navegador no disponible en el servidor",
-  "venta Contador: houm: navegador no disponible en el servidor",
-  "venta Cedritos: habi: navegador no disponible en el servidor",
-  "venta Cedritos: houm: navegador no disponible en el servidor",
-  "venta Chicó: habi: navegador no disponible en el servidor",
-  "venta Chicó: houm: navegador no disponible en el servidor",
-  "venta Santa Bárbara: habi: navegador no disponible en el servidor",
-  "venta Santa Bárbara: houm: navegador no disponible en el servidor",
-  "arriendo Contador: houm: navegador no disponible en el servidor",
-  "arriendo Cedritos: houm: navegador no disponible en el servidor",
-  "arriendo Chicó: houm: navegador no disponible en el servidor",
-  "arriendo Santa Bárbara: houm: navegador no disponible en el servidor"
- ],
+ "base": false,
+ "errores": [],
  "fecha": "2026-11-08",
  "nuevos": [],
- "revisados": 835,
+ "nuevos_ciudad": {
+  "arriendo": 191,
+  "venta": 184
+ },
+ "revisados": 1282,
  "zonas": {
   "arriendo|Cedritos": {
    "anuncios": 214,
