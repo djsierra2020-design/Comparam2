@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-from .sources import PORTALES, ArchivoCSV, Source
+from .sources import PORTALES, ArchivoCSV, Source, navegador
 
 RAIZ = Path(__file__).resolve().parent.parent
 EJEMPLO = RAIZ / "data" / "ejemplo.csv"
@@ -18,6 +18,9 @@ def crear_fuentes(nombres: list[str] | None = None, csv: list[str] | None = None
         if n == "ejemplo":
             fuentes.append(ArchivoCSV(EJEMPLO))
         elif n in PORTALES:
+            # Los portales que necesitan navegador se omiten si está apagado (COMPARAM_NAVEGADOR).
+            if getattr(PORTALES[n], "usa_navegador", False) and not navegador.disponible():
+                continue
             fuentes.append(PORTALES[n](paginas=paginas, detalle=detalle))
         else:
             raise ValueError(f"Fuente desconocida: {n}")

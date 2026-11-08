@@ -21,8 +21,9 @@ from datetime import date, datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-from .busqueda import buscar
+from .busqueda import _recolectar, _sin_duplicados, buscar, zona_de
 from .config import RAIZ, crear_fuentes
+from .localidades import localidad_de
 from .models import Listing
 
 DATOS = RAIZ / "data"
@@ -53,7 +54,8 @@ def guardar_json(ruta: Path, datos) -> None:
     ruta.write_text(json.dumps(datos, ensure_ascii=False, indent=1, sort_keys=True) + "\n", encoding="utf-8")
 
 
-def registrar(historial: dict, a: Listing, operacion: str, zona: str, dia: str, base: bool) -> bool:
+def registrar(historial: dict, a: Listing, operacion: str, zona: str, dia: str, base: bool,
+              ciudad: bool = False) -> bool:
     """Agrega o actualiza un anuncio en el historial. Devuelve True si es nuevo."""
     k = clave(a, operacion)
     e = historial.get(k)
@@ -65,8 +67,12 @@ def registrar(historial: dict, a: Listing, operacion: str, zona: str, dia: str, 
             "publicado": a.publicado, "primera_vez": dia, "ultima_vez": dia, "base": base,
             "precios": [[dia, round(a.precio)]],
         }
+        if ciudad:  # visto en el recorrido de toda Bogotá, no en las zonas del cliente
+            historial[k]["ciudad"] = True
         return True
     e["ultima_vez"] = dia
+    if not ciudad:
+        e.pop("ciudad", None)  # también está en las zonas del cliente
     e["dueno_directo"] = e["dueno_directo"] or a.es_dueno_directo
     if a.publicado and not e.get("publicado"):
         e["publicado"] = a.publicado
@@ -95,6 +101,23 @@ def correr(config: dict | None = None, fuentes_por_operacion=None, dia: date | N
                 resumen["revisados"] += 1
                 if registrar(historial, a, operacion, zona, dia_txt, base) and not base:
                     resumen["nuevos"].append(clave(a, operacion))
+    # Toda Bogotá: guarda también los anuncios del resto de la ciudad para tener historial, días
+    # publicado y bajadas de precio en cualquier búsqueda (no se reportan como «nuevos» del cliente).
+    if config.get("toda_bogota", True):
+        for operacion in config.get("operaciones", ["venta", "arriendo"]):
+            fuentes = (fuentes_por_operacion(operacion) if fuentes_por_operacion
+                       else crear_fuentes(paginas=config.get("paginas_ciudad", 10), detalle=False))
+            todos, errores, _, _ = _recolectar(fuentes, "", operacion)
+            resumen["errores"] += [f"{operacion} toda Bogotá: {e}" for e in errores]
+            ciudad = 0
+            for a in _sin_duplicados(todos):
+                z = zona_de(a)
+                zona = z or localidad_de(a.titulo, a.barrio, a.ubicacion) or "Bogotá"
+                if clave(a, operacion) not in historial:
+                    ciudad += 1
+                registrar(historial, a, operacion, zona, dia_txt, base, ciudad=True)
+                resumen["revisados"] += 1
+            resumen.setdefault("nuevos_ciudad", {})[operacion] = ciudad
     guardar_json(HISTORIAL, historial)
     guardar_json(CARPETA_DIA / f"{dia_txt}.json", resumen)
     return resumen
@@ -106,8 +129,11 @@ def dias_publicado(e: dict, dia: date | None = None) -> tuple[int | None, str]:
     if e.get("publicado"):
         n = (dia - date.fromisoformat(e["publicado"])).days
         return n, f"publicado hace {n} día{'s' if n != 1 else ''}"
-    if e.get("base"):
-        return None, f"publicado antes del {e['primera_vez']}"
+    if e.get("base"):  # ya existía cuando empezó el historial: se sabe el mínimo
+        n = (dia - date.fromisoformat(e["primera_vez"])).days
+        if n <= 0:
+            return None, f"publicado antes del {e['primera_vez']}"
+        return n, f"publicado hace más de {n} día{'s' if n != 1 else ''}"
     n = (dia - date.fromisoformat(e["primera_vez"])).days
     return n, "publicado hoy" if n == 0 else f"publicado hace {n} día{'s' if n != 1 else ''}"
 
@@ -119,7 +145,7 @@ def nuevos(dias: int = 1, solo_dueno: bool = True, dia: date | None = None) -> l
     zonas = ultimo_resumen().get("zonas", {})
     salida = []
     for k, e in historial.items():
-        if e.get("base") or (solo_dueno and not e.get("dueno_directo")):
+        if e.get("base") or e.get("ciudad") or (solo_dueno and not e.get("dueno_directo")):
             continue
         if (dia - date.fromisoformat(e["primera_vez"])).days >= dias:
             continue
@@ -142,3 +168,29 @@ if __name__ == "__main__":
           f"{' (punto de partida)' if r['base'] else ''}")
     for e in r["errores"]:
         print("⚠", e)
+
+
+def info(e: dict, dia: date | None = None) -> dict:
+    """Datos de historial para mostrar en una tarjeta: días publicado y bajada de precio."""
+    dias, texto = dias_publicado(e, dia)
+    primero, actual = e["precios"][0][1], e["precios"][-1][1]
+    baja = round((1 - actual / primero) * 100) if primero and actual < primero else 0
+    return {"dias": dias, "texto": texto, "baja_pct": baja}
+
+
+_INDICE: dict = {"mtime": None, "por_url": {}}
+
+
+def por_url(url: str, operacion: str) -> dict | None:
+    """Busca un anuncio en el historial por su enlace (se recarga si el archivo cambió)."""
+    if not url:
+        return None
+    try:
+        mtime = HISTORIAL.stat().st_mtime
+    except FileNotFoundError:
+        return None
+    if _INDICE["mtime"] != mtime:
+        h = cargar_json(HISTORIAL, {})
+        _INDICE.update(mtime=mtime, por_url={(e["operacion"], e["url"]): e for e in h.values() if e.get("url")})
+    e = _INDICE["por_url"].get((operacion, url))
+    return info(e) if e else None

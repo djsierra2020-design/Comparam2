@@ -19,6 +19,18 @@ app.jinja_env.filters["portal"] = lambda f: NOMBRES_PORTAL.get(f, f)
 FUENTES = [*PORTALES, "ejemplo"]
 
 
+def historial_de(anuncio, operacion: str):
+    """Días publicado y bajada de precio de un anuncio, si está en el historial diario."""
+    from comparam import diario
+    try:
+        return diario.por_url(anuncio.url, operacion)
+    except Exception:  # noqa: BLE001 - el historial es opcional: nunca debe romper la página
+        return None
+
+
+app.jinja_env.globals["hist"] = historial_de
+
+
 def miles(n) -> str:
     return f"{n:,.0f}".replace(",", ".")
 

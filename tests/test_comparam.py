@@ -405,7 +405,7 @@ def test_diario_detecta_nuevos(tmp_path, monkeypatch):
         def buscar(self, barrio, operacion="venta"):
             return list(anuncios["hoy"])
 
-    cfg = {"barrios": ["Cedritos"], "operaciones": ["venta"]}
+    cfg = {"barrios": ["Cedritos"], "operaciones": ["venta"], "toda_bogota": False}
     r1 = diario.correr(cfg, lambda op: [Portal()], date(2026, 11, 8))
     assert r1["base"] and r1["nuevos"] == [] and r1["revisados"] == 1
     assert diario.nuevos(dia=date(2026, 11, 8)) == []  # el punto de partida no cuenta como nuevo
@@ -421,7 +421,8 @@ def test_diario_detecta_nuevos(tmp_path, monkeypatch):
     h = diario.cargar_json(diario.HISTORIAL, {})
     viejo = next(e for e in h.values() if e["url"] == "https://p.co/1")
     assert viejo["precios"] == [["2026-11-08", 400000000], ["2026-11-09", 380000000]]
-    assert diario.dias_publicado(viejo, date(2026, 11, 9))[1] == "publicado antes del 2026-11-08"
+    assert diario.dias_publicado(viejo, date(2026, 11, 8))[1] == "publicado antes del 2026-11-08"
+    assert diario.dias_publicado(viejo, date(2026, 11, 9)) == (1, "publicado hace más de 1 día")
     assert "telefonos" not in viejo and "publicado_por" not in viejo  # sin datos personales
 
     import app as webapp
@@ -438,3 +439,50 @@ def test_fecha_publicacion():
     assert _fecha({"fecha_publicacion": "5/9/2026"}) == "2026-09-05"
     assert _fecha({"createdAt": 1790000000000}) == "2026-09-21"
     assert _fecha({"otra": 1}) == ""
+
+
+def test_diario_toda_bogota_e_historial_en_tarjetas(tmp_path, monkeypatch):
+    from datetime import date
+    from comparam import diario
+
+    monkeypatch.setattr(diario, "HISTORIAL", tmp_path / "historial" / "anuncios.json")
+    monkeypatch.setattr(diario, "CARPETA_DIA", tmp_path / "diario")
+    dia = {"n": date(2026, 11, 8)}
+    monkeypatch.setattr(diario, "hoy", lambda: dia["n"])
+    norte = _l("Apartamento en Venta en Cedritos, Bogotá")
+    norte.url, norte.es_dueno_directo = "https://p.co/n", True
+    sur = _l("Apartamento en Venta en Bosa, Bogotá")
+    sur.url, sur.es_dueno_directo = "https://p.co/s", True
+
+    class Portal:
+        nombre = "fincaraiz"
+
+        def buscar(self, barrio, operacion="venta"):
+            return [norte] if barrio else [norte, sur]
+
+    cfg = {"barrios": ["Cedritos"], "operaciones": ["venta"]}
+    diario.correr(cfg, lambda op: [Portal()], date(2026, 11, 8))
+    sur2 = _l("Apartamento en Venta en Bosa, Bogotá")
+    sur2.url, sur2.precio = "https://p.co/s2", 380_000_000
+    sur.precio = 360_000_000  # bajó 10%
+    original = Portal.buscar
+    Portal.buscar = lambda self, barrio, operacion="venta": [norte] if barrio else [norte, sur, sur2]
+    r = diario.correr(cfg, lambda op: [Portal()], date(2026, 11, 20))
+    Portal.buscar = original
+    assert r["nuevos"] == [] and r["nuevos_ciudad"] == {"venta": 1}  # lo de Bosa no es del cliente
+    h = diario.cargar_json(diario.HISTORIAL, {})
+    assert {e["zona"] for e in h.values()} == {"Cedritos", "Bosa"}
+    assert not next(e for e in h.values() if e["url"] == "https://p.co/n").get("ciudad")
+    dia["n"] = date(2026, 11, 20)
+    i = diario.por_url("https://p.co/s", "venta")
+    assert i["baja_pct"] == 10 and i["texto"] == "publicado hace más de 12 días" and i["dias"] == 12
+    assert diario.por_url("https://p.co/s2", "venta")["texto"] == "publicado hoy"
+    assert diario.por_url("https://p.co/s", "arriendo") is None
+
+
+def test_sin_navegador_se_omiten_habi_y_houm(monkeypatch):
+    from comparam.config import crear_fuentes
+    monkeypatch.delenv("COMPARAM_NAVEGADOR", raising=False)
+    assert [f.nombre for f in crear_fuentes()] == ["fincaraiz", "ciencuadras"]
+    monkeypatch.setenv("COMPARAM_NAVEGADOR", "1")
+    assert [f.nombre for f in crear_fuentes()] == ["fincaraiz", "ciencuadras", "habi", "houm"]
