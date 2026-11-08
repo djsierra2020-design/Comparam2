@@ -388,3 +388,53 @@ def test_app_instalable():
     assert sw.status_code == 200 and "javascript" in sw.content_type and "offline.html" in sw.get_data(as_text=True)
     for f in ("icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png", "offline.html"):
         assert c.get(f"/static/{f}").status_code == 200, f
+
+
+def test_diario_detecta_nuevos(tmp_path, monkeypatch):
+    from datetime import date
+    from comparam import diario
+
+    monkeypatch.setattr(diario, "HISTORIAL", tmp_path / "historial" / "anuncios.json")
+    monkeypatch.setattr(diario, "CARPETA_DIA", tmp_path / "diario")
+    anuncios = {"hoy": [_l("Apartamento en Venta en Cedritos, Bogotá")]}
+    anuncios["hoy"][0].url, anuncios["hoy"][0].es_dueno_directo = "https://p.co/1", True
+
+    class Portal:
+        nombre = "fincaraiz"
+
+        def buscar(self, barrio, operacion="venta"):
+            return list(anuncios["hoy"])
+
+    cfg = {"barrios": ["Cedritos"], "operaciones": ["venta"]}
+    r1 = diario.correr(cfg, lambda op: [Portal()], date(2026, 11, 8))
+    assert r1["base"] and r1["nuevos"] == [] and r1["revisados"] == 1
+    assert diario.nuevos(dia=date(2026, 11, 8)) == []  # el punto de partida no cuenta como nuevo
+
+    nuevo = _l("Apartamento en Venta en Cedritos, Bogotá")
+    nuevo.url, nuevo.es_dueno_directo, nuevo.precio, nuevo.area_m2 = "https://p.co/2", True, 300_000_000, 60
+    anuncios["hoy"][0].precio = 380_000_000  # el anterior bajó de precio
+    anuncios["hoy"].append(nuevo)
+    r2 = diario.correr(cfg, lambda op: [Portal()], date(2026, 11, 9))
+    assert not r2["base"] and len(r2["nuevos"]) == 1
+    lista = diario.nuevos(dia=date(2026, 11, 9))
+    assert [e["url"] for e in lista] == ["https://p.co/2"] and lista[0]["dias_texto"] == "publicado hoy"
+    h = diario.cargar_json(diario.HISTORIAL, {})
+    viejo = next(e for e in h.values() if e["url"] == "https://p.co/1")
+    assert viejo["precios"] == [["2026-11-08", 400000000], ["2026-11-09", 380000000]]
+    assert diario.dias_publicado(viejo, date(2026, 11, 9))[1] == "publicado antes del 2026-11-08"
+    assert "telefonos" not in viejo and "publicado_por" not in viejo  # sin datos personales
+
+    import app as webapp
+    msg = webapp._mensaje_whatsapp(lista, "09/11/2026")
+    assert "*VENTA*" in msg and "https://p.co/2" in msg and "Cedritos" in msg
+    monkeypatch.setattr(diario, "hoy", lambda: date(2026, 11, 9))
+    html = webapp.app.test_client().get("/nuevos").get_data(as_text=True)
+    assert "https://p.co/2" in html and "Copiar mensaje" in html
+
+
+def test_fecha_publicacion():
+    from comparam.sources.extractor import _fecha
+    assert _fecha({"publicationDate": "2026-10-01T10:00:00Z"}) == "2026-10-01"
+    assert _fecha({"fecha_publicacion": "5/9/2026"}) == "2026-09-05"
+    assert _fecha({"createdAt": 1790000000000}) == "2026-09-21"
+    assert _fecha({"otra": 1}) == ""

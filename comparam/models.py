@@ -18,6 +18,7 @@ class Listing:
     banos: int | None = None
     descripcion: str = ""
     ubicacion: str = ""  # todo el texto de ubicación del anuncio (barrio, localidad, zona, ciudad)
+    publicado: str = ""  # fecha de publicación AAAA-MM-DD, si el portal la indica
 
     @property
     def precio_m2(self) -> float:

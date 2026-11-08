@@ -1,0 +1,7 @@
+{
+  "cliente": "Inmobiliaria zona norte",
+  "barrios": ["Contador", "Cedritos", "Chicó", "Santa Bárbara"],
+  "operaciones": ["venta", "arriendo"],
+  "solo_dueno": true,
+  "paginas": 3
+}

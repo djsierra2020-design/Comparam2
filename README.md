@@ -80,6 +80,15 @@ Estos portales cargan los anuncios con JavaScript, así que se abren con un nave
 `gunicorn app:app --bind 0.0.0.0:$PORT --timeout 300 --workers 1 --threads 4`. Está **apagado por
 defecto** (en Render daba error 502); se enciende con `COMPARAM_NAVEGADOR=1`.
 
+### Envío diario de anuncios nuevos
+Cada mañana (6:00 a.m. Bogotá) GitHub Actions corre `python -m comparam.diario`
+(`.github/workflows/diario.yml`): revisa los barrios de `data/diario_config.json`, guarda el
+historial en `data/historial/anuncios.json` (primera y última vez visto, cambios de precio, fecha de
+publicación si el portal la da) y el resumen del día en `data/diario/AAAA-MM-DD.json`. Luego
+actualiza Render. La página **/nuevos** muestra los dueños directos nuevos con el mensaje listo
+para WhatsApp. El primer día solo se guarda el punto de partida. No se guardan nombres ni
+teléfonos (el repositorio es público).
+
 ### Si un portal cambia su URL
 Las URL de búsqueda se pueden cambiar sin tocar código:
 ```bash
