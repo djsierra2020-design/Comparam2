@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Comparam · nuevos de hoy</title>
+<meta name="theme-color" content="#0d7466">
+<link rel="manifest" href="/static/manifest.webmanifest">
+<link rel="icon" type="image/png" href="/static/favicon.png">
+<link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+<style>
+  :root { --marca:#0d7466; --marca2:#08544a; --marca-suave:#e6f4f1; --bg:#f3f5f7; --card:#fff; --tx:#14181f; --mut:#667085;
+          --ln:#e4e7ec; --ok:#e8f8ef; --okt:#067647; --mal:#fdecea; --malt:#b42318; --sombra:0 1px 2px rgba(16,24,40,.06),0 4px 16px rgba(16,24,40,.06) }
+  @media (prefers-color-scheme: dark) { :root { --marca:#2dd4bf; --marca2:#0d7466; --marca-suave:#0f2f2b; --bg:#0c0f14; --card:#161b23;
+          --tx:#e8eaee; --mut:#98a2b3; --ln:#262d38; --ok:#0b2e22; --okt:#6ce9a6; --mal:#3a1512; --malt:#fda29b; --sombra:0 1px 2px rgba(0,0,0,.4) } }
+  * { box-sizing:border-box } body { margin:0; font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--tx) }
+  .barra { position:sticky; top:0; z-index:5; background:linear-gradient(180deg,var(--marca),var(--marca2)); color:#fff; padding:calc(env(safe-area-inset-top) + 12px) 16px 14px }
+  .barra .in { max-width:760px; margin:0 auto; display:flex; align-items:center; gap:12px }
+  .barra img { width:38px; height:38px; border-radius:10px } .barra b { display:block; font-size:19px } .barra small { opacity:.85; font-size:13px }
+  .barra a { margin-left:auto; color:#fff; font-size:14px }
+  main { max-width:760px; margin:0 auto; padding:16px 16px 40px }
+  .card { background:var(--card); border-radius:20px; padding:16px; box-shadow:var(--sombra); margin-bottom:12px }
+  .meta { color:var(--mut); font-size:13px } h2 { margin:0 0 4px; font-size:20px }
+  .kpis { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:12px }
+  .kpi { background:var(--bg); border-radius:14px; padding:10px } .kpi b { display:block; font-size:22px }
+  .kpi.d { background:var(--marca); color:#fff } .kpi.d .meta { color:rgba(255,255,255,.85) }
+  .botones { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px }
+  .btn { font:inherit; font-weight:700; padding:14px; border-radius:14px; border:0; cursor:pointer; text-align:center; text-decoration:none }
+  .pri { background:var(--marca); color:#fff } .wa { background:#25d366; color:#05301a }
+  textarea { width:100%; min-height:140px; margin-top:10px; font:13px/1.4 ui-monospace,monospace; border-radius:12px; border:1px solid var(--ln);
+             background:var(--bg); color:var(--tx); padding:10px }
+  .seg { display:flex; gap:8px; margin-top:12px } .seg a { padding:7px 14px; border-radius:999px; background:var(--card); box-shadow:var(--sombra);
+         color:var(--tx); text-decoration:none; font-size:14px } .seg a.on { background:var(--marca); color:#fff }
+  h3 { margin:20px 4px 8px }
+  .item { background:var(--card); border-radius:18px; padding:14px 16px; box-shadow:var(--sombra); margin-bottom:10px }
+  .tag { font-size:12px; padding:3px 9px; border-radius:999px; background:var(--marca-suave); color:var(--marca); font-weight:700 }
+  .tit { font-weight:700; margin:6px 0 2px } .tit a { color:inherit; text-decoration:none }
+  .m2 { font-size:22px; font-weight:800; color:var(--marca) } .vs { font-size:13px; font-weight:700; padding:4px 9px; border-radius:999px; margin-left:6px }
+  .bajo { background:var(--ok); color:var(--okt) } .alto { background:var(--mal); color:var(--malt) }
+  .vacio { text-align:center; color:var(--mut); padding:24px 8px }
+</style>
+</head>
+<body>
+<header class="barra"><div class="in">
+  <img src="/static/icon-192.png" alt="">
+  <div><b>Nuevos de hoy</b><small>{{ config.cliente or 'Envío diario' }}</small></div>
+  <a href="/">Buscar</a>
+</div></header>
+<main>
+  <section class="card">
+    <h2>{{ fecha }}</h2>
+    <div class="meta">Dueños directos nuevos en {{ (config.barrios or [])|join(', ') }} · {{ (config.operaciones or [])|join(' y ') }}</div>
+    <div class="seg">
+      {% for d, t in [(1, 'Hoy'), (7, '7 días'), (30, '30 días')] %}<a href="?dias={{ d }}" class="{{ 'on' if dias == d }}">{{ t }}</a>{% endfor %}
+    </div>
+    <div class="kpis">
+      <div class="kpi d"><div class="meta">Nuevos</div><b>{{ lista|length }}</b></div>
+      <div class="kpi"><div class="meta">Revisados hoy</div><b>{{ resumen.revisados or 0 }}</b></div>
+      <div class="kpi"><div class="meta">Última revisión</div><b style="font-size:16px">{{ resumen.fecha or '—' }}</b></div>
+    </div>
+    {% if resumen.base %}<p class="meta"><b>Hoy se guardó el punto de partida.</b> Desde mañana aparecen aquí los anuncios nuevos.</p>{% endif %}
+    {% if not resumen %}<p class="meta"><b>Todavía no se ha hecho la primera revisión diaria.</b></p>{% endif %}
+    <textarea id="msg" readonly>{{ mensaje }}</textarea>
+    <div class="botones">
+      <button class="btn pri" type="button" id="copiar">Copiar mensaje</button>
+      <a class="btn wa" href="https://wa.me/?text={{ mensaje|urlencode }}" target="_blank" rel="noopener">Enviar por WhatsApp</a>
+    </div>
+  </section>
+
+  {% for op in ['venta', 'arriendo'] %}{% set grupo = lista|selectattr('operacion', 'equalto', op)|list %}
+  {% if grupo %}
+  <h3>{{ 'Venta' if op == 'venta' else 'Arriendo' }} ({{ grupo|length }})</h3>
+  {% for e in grupo %}
+  <div class="item">
+    <span class="tag">{{ e.zona }}</span> <span class="meta">· {{ e.dias_texto }}</span>
+    <div class="tit"><a href="{{ e.url }}" target="_blank" rel="noopener">{{ e.titulo }}</a></div>
+    <div class="meta">{{ e.precio|pesos }} · {{ '%g'|format(e.area_m2) }} m²{% if e.habitaciones %} · {{ e.habitaciones }} hab{% endif %}{% if e.banos %} · {{ e.banos }} baños{% endif %}</div>
+    {% if e.precio_m2 %}<div style="margin-top:6px"><span class="m2">{{ e.precio_m2|pesos }}</span> <span class="meta">/m²</span>
+      {% if e.vs_zona is not none %}<span class="vs {{ 'bajo' if e.vs_zona < 0 else 'alto' }}">{{ e.vs_zona|abs }}% {{ 'bajo' if e.vs_zona < 0 else 'sobre' }} la zona</span>{% endif %}</div>{% endif %}
+  </div>
+  {% endfor %}
+  {% endif %}{% endfor %}
+  {% if not lista %}<div class="vacio">No hay anuncios nuevos en este periodo.</div>{% endif %}
+</main>
+<script>
+document.getElementById('copiar').addEventListener('click', function () {
+  var t = document.getElementById('msg'), b = this;
+  (navigator.clipboard ? navigator.clipboard.writeText(t.value) : Promise.reject()).catch(function () { t.select(); document.execCommand('copy'); })
+    .finally(function () { b.textContent = '¡Copiado!'; setTimeout(function () { b.textContent = 'Copiar mensaje'; }, 2000); });
+});
+</script>
+</body></html>

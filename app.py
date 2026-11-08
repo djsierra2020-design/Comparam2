@@ -74,6 +74,38 @@ def inicio():
                            elegidas=elegidas, p=params, r=resultado, args=request.args)
 
 
+def _mensaje_whatsapp(lista: list[dict], fecha: str) -> str:
+    """Texto listo para pegar en WhatsApp con los anuncios nuevos."""
+    if not lista:
+        return f"🏠 Nuevos dueños directos – {fecha}\nHoy no aparecieron anuncios nuevos en sus zonas."
+    lineas = [f"🏠 *Nuevos dueños directos – {fecha}*"]
+    for op in ("venta", "arriendo"):
+        grupo = [e for e in lista if e["operacion"] == op]
+        if not grupo:
+            continue
+        lineas.append(f"\n*{'VENTA' if op == 'venta' else 'ARRIENDO'}*")
+        for i, e in enumerate(grupo, 1):
+            partes = [e["zona"], f"{e['area_m2']:g} m²", pesos(e["precio"])]
+            if e.get("habitaciones"):
+                partes.append(f"{e['habitaciones']} hab")
+            if e.get("vs_zona") is not None:
+                partes.append(f"{abs(e['vs_zona'])}% {'bajo' if e['vs_zona'] < 0 else 'sobre'} la zona")
+            lineas.append(f"{i}. {' · '.join(partes)}\n{e['url']}")
+    return "\n".join(lineas)
+
+
+@app.get("/nuevos")
+def ver_nuevos():
+    from comparam import diario
+    dias = int(request.args.get("dias", "1")) if request.args.get("dias", "1").isdigit() else 1
+    lista = diario.nuevos(dias=max(1, min(dias, 30)))
+    resumen = diario.ultimo_resumen()
+    config = diario.cargar_json(diario.CONFIG, {})
+    fecha = diario.hoy().strftime("%d/%m/%Y")
+    return render_template("nuevos.html", lista=lista, resumen=resumen, config=config, dias=dias,
+                           mensaje=_mensaje_whatsapp(lista, fecha), fecha=fecha)
+
+
 @app.get("/sw.js")
 def service_worker():
     # Se sirve desde la raíz para que controle toda la app (no solo /static).

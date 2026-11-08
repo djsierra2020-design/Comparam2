@@ -30,6 +30,9 @@ K_URL = ("link", "url", "permalink", "slug", "path", "detailUrl", "linkDetalle")
 K_BARRIO = ("neighborhood", "neighbourhood", "barrio", "mbarrio", "sector", "commonNeighborhood")
 K_HAB = ("rooms", "bedrooms", "habitaciones", "mnrocuartos", "numberOfRooms")
 K_BANOS = ("bathrooms", "banos", "baños", "mnrobanos", "numberOfBathroomsTotal")
+K_FECHA = ("publicationDate", "publication_date", "publishedAt", "published_at", "datePublished", "createdAt",
+           "created_at", "creationDate", "fechaPublicacion", "fecha_publicacion", "fechaCreacion", "date_created",
+           "fecha", "mfechapublicacion", "activationDate")
 K_TEL = ("phone", "phones", "telephone", "telefono", "telefonos", "cellphone", "celular",
          "whatsapp", "contactPhone", "mobile")
 K_ANUNCIANTE = ("owner", "publisher", "advertiser", "client", "seller", "contact", "inmobiliaria",
@@ -128,6 +131,27 @@ def _ubicacion(d: dict) -> str:
             elif isinstance(x, str):
                 partes.append(x)
     return " | ".join(dict.fromkeys(p for p in partes if p))
+
+
+def _fecha(d: dict) -> str:
+    """Fecha de publicación en formato AAAA-MM-DD (acepta ISO, «DD/MM/AAAA» y marcas de tiempo)."""
+    from datetime import datetime, timezone
+
+    v = _primero(d, K_FECHA)
+    if v is None or isinstance(v, bool):
+        return ""
+    if isinstance(v, (int, float)):
+        seg = v / 1000 if v > 10**11 else v  # milisegundos o segundos
+        try:
+            return datetime.fromtimestamp(seg, tz=timezone.utc).date().isoformat() if seg > 10**9 else ""
+        except (OverflowError, OSError, ValueError):
+            return ""
+    t = str(v)
+    if m := re.match(r"(\d{4})-(\d{2})-(\d{2})", t):
+        return m.group(0)
+    if m := re.match(r"(\d{1,2})/(\d{1,2})/(\d{4})", t):
+        return f"{m.group(3)}-{int(m.group(2)):02d}-{int(m.group(1)):02d}"
+    return ""
 
 
 def _recorrer(nodo: Any) -> Iterator[dict]:
@@ -304,6 +328,7 @@ def extraer_de_json(bloques: list, fuente: str, base_url: str, operacion: str = 
                 habitaciones=int(h) if (h := _num(_primero(d, K_HAB))) else None,
                 banos=int(b) if (b := _num(_primero(d, K_BANOS))) else None,
                 descripcion=descripcion[:500],
+                publicado=_fecha(d),
             ))
     return anuncios
 
