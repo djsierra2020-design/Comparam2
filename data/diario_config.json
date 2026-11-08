@@ -1,7 +1,17 @@
 {
   "cliente": "Inmobiliaria zona norte",
-  "barrios": ["Contador", "Cedritos", "Chicó", "Santa Bárbara"],
-  "operaciones": ["venta", "arriendo"],
+  "barrios": [
+    "Contador",
+    "Cedritos",
+    "Chicó",
+    "Santa Bárbara"
+  ],
+  "operaciones": [
+    "venta",
+    "arriendo"
+  ],
   "solo_dueno": true,
-  "paginas": 3
+  "paginas": 3,
+  "toda_bogota": true,
+  "paginas_ciudad": 10
 }
