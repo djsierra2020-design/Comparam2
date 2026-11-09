@@ -608,3 +608,9 @@ def test_rentola_solo_arriendo_y_dominio_alterno():
     assert ses.urls[0] == "https://rentola.com.co/arriendo?location=348474&page=1"
     assert ses.urls[1] == "https://rentola.co.com/arriendo?location=348474&page=1"
     assert len(a) >= 2 and all(x.fuente == "rentola" for x in a)
+
+
+def test_diagnostico_portal_sin_la_operacion():
+    from comparam.sources import Habi, Rentola
+    assert "no tiene venta" in Rentola().diagnosticar("", "venta")["error"]
+    assert "no tiene arriendo" in Habi().diagnosticar("", "arriendo")["error"]

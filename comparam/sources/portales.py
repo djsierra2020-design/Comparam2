@@ -112,6 +112,8 @@ class PortalWeb(Source):
 
     def diagnosticar(self, barrio: str = "", operacion: str = "venta") -> dict:
         """Qué responde el portal a la primera página de búsqueda (para la página /diagnostico)."""
+        if operacion not in self.operaciones:
+            return {"portal": self.nombre, "url": "—", "error": f"este portal no tiene {operacion}"}
         url = self.url_busqueda(barrio, operacion, 1)
         info = {"portal": self.nombre, "url": url}
         if getattr(self, "usa_navegador", False):

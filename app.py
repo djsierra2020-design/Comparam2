@@ -144,7 +144,7 @@ def diagnostico():
     barrio = request.args.get("barrio", "").strip()
     operacion = "arriendo" if request.args.get("operacion") == "arriendo" else "venta"
     portales = [cls(paginas=1, detalle=False) for cls in PORTALES.values()]
-    return render_template("diagnostico.html", barrio=barrio,
+    return render_template("diagnostico.html", barrio=barrio, operacion=operacion,
                            filas=[p.diagnosticar(barrio, operacion) for p in portales])
 
 
