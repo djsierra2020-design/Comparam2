@@ -92,8 +92,8 @@ def _recolectar(fuentes: list[Source], barrio: str, operacion: str
     with ThreadPoolExecutor(max_workers=len(fuentes)) as ex:
         for f, (anuncios, error) in zip(fuentes, ex.map(una, fuentes)):
             todos += anuncios
-            nombre = getattr(f, "ruta", None)
-            nombre = nombre.stem if nombre else getattr(f, "nombre", "fuente")
+            ruta = getattr(f, "ruta", None)  # archivos CSV: el nombre del archivo
+            nombre = ruta.stem if hasattr(ruta, "stem") else getattr(f, "nombre", "fuente")
             por_fuente[nombre] = por_fuente.get(nombre, 0) + len(anuncios)
             # Total que el portal dice tener; si no lo indica, se cuentan los anuncios leídos.
             publicados += max(getattr(f, "total_publicados", None) or 0, len(anuncios))
