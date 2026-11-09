@@ -4,27 +4,55 @@
   "venta Contador: metrocuadrado: el portal respondió pero la app no encontró anuncios en la página «Apartamentos en Venta en Contador, Bogotá» — https://www.metrocuadrado.com/apartamentos/venta/bogota/contador/?page=1",
   "venta Cedritos: metrocuadrado: el portal respondió pero la app no encontró anuncios en la página «Apartamentos en Venta en Cedritos, Bogotá» — https://www.metrocuadrado.com/apartamentos/venta/bogota/cedritos/?page=1",
   "venta Chicó: metrocuadrado: el portal respondió pero la app no encontró anuncios en la página «Apartamentos en Venta en Chico, Bogotá - Vivienda Nueva y Usada» — https://www.metrocuadrado.com/apartamentos/venta/bogota/chico/?page=1",
-  "venta Santa Bárbara: metrocuadrado: el portal respondió pero la app no encontró anuncios en la página «Apartamentos en Venta en Santa Barbara, Bogotá» — https://www.metrocuadrado.com/apartamentos/venta/bogota/santa-barbara/?page=1"
+  "venta Santa Bárbara: metrocuadrado: el portal respondió pero la app no encontró anuncios en la página «Apartamentos en Venta en Santa Barbara, Bogotá» — https://www.metrocuadrado.com/apartamentos/venta/bogota/santa-barbara/?page=1",
+  "arriendo Contador: metrocuadrado: el portal respondió pero la app no encontró anuncios en la página «Apartamentos en Arriendo en Contador, Bogotá» — https://www.metrocuadrado.com/apartamentos/arriendo/bogota/contador/?page=1",
+  "arriendo Contador: houm: tardó más de 180 s y se omitió",
+  "arriendo Cedritos: metrocuadrado: tardó más de 180 s y se omitió",
+  "arriendo Cedritos: houm: tardó más de 180 s y se omitió",
+  "arriendo Chicó: metrocuadrado: tardó más de 180 s y se omitió",
+  "arriendo Chicó: houm: tardó más de 180 s y se omitió",
+  "arriendo Santa Bárbara: metrocuadrado: tardó más de 180 s y se omitió",
+  "arriendo Santa Bárbara: houm: tardó más de 180 s y se omitió",
+  "venta toda Bogotá: metrocuadrado: tardó más de 180 s y se omitió",
+  "arriendo toda Bogotá: metrocuadrado: tardó más de 180 s y se omitió",
+  "arriendo toda Bogotá: houm: tardó más de 180 s y se omitió"
  ],
  "fecha": "2026-11-09",
  "nuevos": [
-  "b9fcfc65e3d59ff1",
-  "18a31a5cd1e7cfc4",
-  "84cc55efc8af1951",
-  "a6e62ed13e260586",
-  "f038885dff43598e",
-  "b70ae47e311655fa",
-  "57bea955113227ea",
-  "8d3fbd859193567b",
-  "e6ba1c2aa2f0aabf",
-  "6d3d2d2b85ef87e2",
-  "d2e5e3272b50ce94",
-  "98f5398de2832276",
-  "8ae8b075ec4773f2",
-  "e141e2dcb1267b78"
+  "8c5a9769f9437c8d",
+  "a0fa1ad9101aabd9",
+  "5cfa281d137be136",
+  "b406606e494e6459",
+  "9f34171180fba456",
+  "18fff12a487da472",
+  "17601d8f83e7415c",
+  "42d5212a9fab11fd",
+  "98f8c8249163d112",
+  "5eed0021abb07221",
+  "b25fa5916e52d7ef"
  ],
- "revisados": 319,
+ "nuevos_ciudad": {
+  "arriendo": 166,
+  "venta": 147
+ },
+ "revisados": 1241,
  "zonas": {
+  "arriendo|Cedritos": {
+   "anuncios": 103,
+   "mediana_m2": 50000
+  },
+  "arriendo|Chicó": {
+   "anuncios": 84,
+   "mediana_m2": 69404
+  },
+  "arriendo|Contador": {
+   "anuncios": 29,
+   "mediana_m2": 53125
+  },
+  "arriendo|Santa Bárbara": {
+   "anuncios": 64,
+   "mediana_m2": 57288
+  },
   "venta|Cedritos": {
    "anuncios": 93,
    "mediana_m2": 6863941
