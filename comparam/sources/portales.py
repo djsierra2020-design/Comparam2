@@ -353,3 +353,12 @@ class Rentola(PortalCiudad):
                     raise
                 error = e
         raise error
+
+    def diagnosticar(self, barrio: str = "", operacion: str = "venta") -> dict:
+        info = {}
+        for dominio in self.dominios:  # igual que buscar: el primer dominio que conecte
+            self.base_url, self.plantilla_ciudad = dominio, dominio + self.ruta
+            info = super().diagnosticar(barrio, operacion)
+            if "no se pudo conectar" not in str(info.get("error", "")):
+                return info
+        return info
