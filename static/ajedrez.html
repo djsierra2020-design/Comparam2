@@ -38,12 +38,19 @@ label { display: flex; flex-direction: column; gap: 4px; font-size: .85rem; colo
 input, select { font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line);
   border-radius: 7px; padding: 7px 9px; min-width: 0; }
 input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
-button.btn { font: inherit; border-radius: 7px; padding: 8px 14px; cursor: pointer; border: 1px solid var(--line);
+.btn { font: inherit; border-radius: 7px; padding: 8px 14px; cursor: pointer; border: 1px solid var(--line);
   background: var(--panel); color: var(--ink); }
-button.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
-button.btn.danger { color: var(--warn); }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
+.btn.danger { color: var(--warn); }
 button.btn:disabled { opacity: .45; cursor: not-allowed; }
-label.btn { display: inline-block; color: var(--ink); font-size: inherit; }
+.modal-fondo { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: flex; align-items: center;
+  justify-content: center; padding: 16px; z-index: 10; }
+.modal { background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: 12px;
+  padding: 18px; max-width: 420px; width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+.modal p { margin: 0 0 14px; }
+.modal .row { justify-content: flex-end; }
+button.btn.danger-fill { background: var(--warn); border-color: var(--warn); color: #fff; font-weight: 600; }
+label.btn { display: inline-block; color: var(--ink); font-size: inherit; line-height: 1.45; }
 button.link { background: none; border: 0; color: var(--warn); cursor: pointer; font: inherit; padding: 2px 6px; }
 .choice { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; margin-top: 12px; }
 .choice button { text-align: left; background: var(--panel); border: 2px solid var(--line); border-radius: 12px;
@@ -128,6 +135,31 @@ function rondasReglamento(n) {
 function totalRondas() {
   return S.rondasJugadas.length ? S.rondas : rondasReglamento(S.participantes.length);
 }
+/* Ventanas de aviso y confirmación dentro de la página
+   (algunos visores bloquean alert() y confirm() del navegador). */
+function dialogo(msg, botones) {
+  return new Promise((resolve) => {
+    const fondo = document.createElement("div");
+    fondo.className = "modal-fondo";
+    fondo.innerHTML = `<div class="modal" role="dialog" aria-modal="true"><p>${esc(msg)}</p><div class="row"></div></div>`;
+    const fila = fondo.querySelector(".row");
+    const cerrar = (v) => { fondo.remove(); document.removeEventListener("keydown", tecla); resolve(v); };
+    const tecla = (e) => { if (e.key === "Escape") cerrar(false); };
+    botones.forEach(([texto, valor, clase]) => {
+      const b = document.createElement("button");
+      b.className = "btn " + (clase || ""); b.textContent = texto; b.onclick = () => cerrar(valor);
+      fila.appendChild(b);
+    });
+    fondo.addEventListener("click", (e) => { if (e.target === fondo) cerrar(false); });
+    document.addEventListener("keydown", tecla);
+    document.body.appendChild(fondo);
+    fila.lastChild.focus();
+  });
+}
+const avisar = (msg) => dialogo(msg, [["Entendido", true, "primary"]]);
+const preguntar = (msg, si = "Aceptar", peligro = false) =>
+  dialogo(msg, [["Cancelar", false], [si, true, peligro ? "danger-fill" : "primary"]]);
+
 function cargar() {
   try { const t = localStorage.getItem(KEY); if (t) return JSON.parse(t); } catch (e) {}
   return nuevo();
@@ -320,11 +352,13 @@ function elegirModo(modo) {
 // Se puede inscribir antes de la ronda 1 y, como tarde, para la ronda 2.
 const inscripcionAbierta = () => S.rondasJugadas.length <= 1;
 const inscritoTarde = (p) => (p.desde || 0) > 0;
-function agregar(form) {
-  if (!inscripcionAbierta()) return alert("La inscripción está cerrada: solo se puede inscribir hasta la ronda 2.");
-  const f = new FormData(form);
+function agregar() {
+  const form = document.getElementById("formAlta");
+  if (!inscripcionAbierta()) return avisar("La inscripción está cerrada: solo se puede inscribir hasta la ronda 2.");
+  // Se leen los campos directamente (no se envía un <form>: algunos visores bloquean el envío)
+  const f = { get: (k) => form.querySelector(`[name="${k}"]`)?.value };
   const nombre = String(f.get("nombre") || "").trim();
-  if (!nombre) { form.nombre.focus(); return; }
+  if (!nombre) { form.querySelector('[name="nombre"]').focus(); return; }
   const p = { id: S.sig++, nombre, retirado: false, desde: S.rondasJugadas.length };
   if (esEquipos()) {
     p.miembros = [];
@@ -346,25 +380,27 @@ function quitar(id) {
 function rondaCompleta(r) {
   return r.emparejamientos.every((m) => m.b == null || resultadoMatch(m));
 }
-function nuevaRonda() {
+async function nuevaRonda() {
   const activos = S.participantes.filter((p) => !p.retirado).length;
-  if (activos < 2) return alert("Se necesitan al menos 2 participantes.");
+  if (activos < 2) return avisar("Se necesitan al menos 2 participantes.");
   const ult = S.rondasJugadas[S.rondasJugadas.length - 1];
-  if (ult && !rondaCompleta(ult)) return alert("Primero anota todos los resultados de la ronda actual.");
-  if (!S.rondasJugadas.length) S.rondas = rondasReglamento(S.participantes.length);
-  // Si se inscribieron más para la ronda 2, el reglamento puede pedir más rondas
-  else if (S.rondasJugadas.length === 1) S.rondas = Math.max(S.rondas, rondasReglamento(S.participantes.length));
+  if (ult && !rondaCompleta(ult)) return avisar("Primero anota todos los resultados de la ronda actual.");
   if (S.rondasJugadas.length === 1 && S.participantes.some((p) => inscritoTarde(p))
-      && !confirm("Al generar la ronda 2 se cierra la inscripción. ¿Continuar?")) return;
-  if (S.rondasJugadas.length >= S.rondas) return alert("Ya se jugaron todas las rondas del torneo.");
+      && !(await preguntar("Al generar la ronda 2 se cierra la inscripción. ¿Continuar?", "Generar ronda 2"))) return;
+  let rondas = S.rondas;
+  if (!S.rondasJugadas.length) rondas = rondasReglamento(S.participantes.length);
+  // Si se inscribieron más para la ronda 2, el reglamento puede pedir más rondas
+  else if (S.rondasJugadas.length === 1) rondas = Math.max(S.rondas, rondasReglamento(S.participantes.length));
+  if (S.rondasJugadas.length >= rondas) return avisar("Ya se jugaron todas las rondas del torneo.");
   const emp = generarEmparejamientos();
-  if (!emp) return alert("No fue posible emparejar esta ronda.");
+  if (!emp) return avisar("No fue posible emparejar esta ronda.");
+  S.rondas = rondas;
   S.rondasJugadas.push({ emparejamientos: emp });
   guardar(); tab = "rondas"; render();
 }
-function borrarUltima() {
+async function borrarUltima() {
   if (!S.rondasJugadas.length) return;
-  if (!confirm(`¿Borrar la ronda ${S.rondasJugadas.length} y sus resultados?`)) return;
+  if (!(await preguntar(`¿Borrar la ronda ${S.rondasJugadas.length} y sus resultados?`, "Borrar ronda", true))) return;
   S.rondasJugadas.pop(); guardar(); render();
 }
 function ponerRes(ri, mi, valor, tablero) {
@@ -372,8 +408,8 @@ function ponerRes(ri, mi, valor, tablero) {
   if (tablero == null) m.res = valor || null; else m.tableros[tablero] = valor || null;
   guardar(); render();
 }
-function reiniciar() {
-  if (!confirm("¿Empezar un torneo nuevo? Se borrará el actual.")) return;
+async function reiniciar() {
+  if (!(await preguntar("¿Empezar un torneo nuevo? Se borrará el torneo actual con todos sus resultados.", "Sí, empezar uno nuevo", true))) return;
   S = nuevo(); guardar(); render();
 }
 function exportar() {
@@ -383,7 +419,7 @@ function exportar() {
 }
 function importar(input) {
   const f = input.files[0]; if (!f) return;
-  f.text().then((t) => { try { const d = JSON.parse(t); if (!d.modo) throw 0; S = d; guardar(); render(); } catch (e) { alert("Archivo no válido."); } });
+  f.text().then((t) => { try { const d = JSON.parse(t); if (!d.modo) throw 0; S = d; guardar(); render(); } catch (e) { avisar("Archivo no válido."); } });
 }
 
 /* ====================== Vistas ====================== */
@@ -430,21 +466,21 @@ function vistaInscritos() {
   const alta = !inscripcionAbierta()
     ? `<div class="card"><h2>Inscripción cerrada</h2><p class="note">Solo se podía inscribir hasta la ronda 2.</p></div>`
     : esEquipos()
-    ? `<form id="formAlta" class="card" onsubmit="event.preventDefault();agregar(this)">
+    ? `<div id="formAlta" class="card" onkeydown="if(event.key==='Enter'&&event.target.tagName==='INPUT'){event.preventDefault();agregar()}">
         <h2>Inscribir equipo${queRonda > 1 ? " para la ronda 2" : ""}</h2>${aviso}
         <div class="row"><label style="flex:1">Nombre del equipo<input name="nombre" required placeholder="Ej.: Club Alfil"></label></div>
         <div class="members">${Array.from({ length: TABLEROS }, (_, i) => `
           <div class="m"><label>Tablero ${i + 1}<input name="m${i}" placeholder="Jugador ${i + 1}"></label>
           <label>Elo<input name="e${i}" type="number" min="0" max="3500" inputmode="numeric"></label></div>`).join("")}</div>
-        <div class="row" style="margin-top:10px"><button class="btn primary">Añadir equipo</button></div>
-       </form>`
-    : `<form id="formAlta" class="card" onsubmit="event.preventDefault();agregar(this)">
+        <div class="row" style="margin-top:10px"><button type="button" class="btn primary" onclick="agregar()">Añadir equipo</button></div>
+       </div>`
+    : `<div id="formAlta" class="card" onkeydown="if(event.key==='Enter'&&event.target.tagName==='INPUT'){event.preventDefault();agregar()}">
         <h2>Inscribir jugador${queRonda > 1 ? " para la ronda 2" : ""}</h2>${aviso}
         <div class="row">
           <label style="flex:1;min-width:180px">Nombre<input name="nombre" required placeholder="Nombre y apellido"></label>
           <label style="width:110px">Elo (opcional)<input name="elo" type="number" min="0" max="3500" inputmode="numeric"></label>
-          <button class="btn primary">Añadir</button>
-        </div></form>`;
+          <button type="button" class="btn primary" onclick="agregar()">Añadir</button>
+        </div></div>`;
   const filas = ordenInicial().map((p, i) => `
     <tr${p.retirado ? ' class="muted"' : ""}><td class="num">${i + 1}</td>
       <td>${esc(p.nombre)}${p.retirado ? ' <span class="pill">retirado</span>' : ""}${inscritoTarde(p) ? ' <span class="pill">desde ronda 2</span>' : ""}
