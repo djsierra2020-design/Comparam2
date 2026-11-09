@@ -203,11 +203,16 @@ def ultimo_resumen() -> dict:
 
 
 if __name__ == "__main__":
+    import os
+    import sys
+
     r = correr()
     print(f"{r['fecha']}: {r['revisados']} anuncios revisados, {len(r['nuevos'])} nuevos"
           f"{' (punto de partida)' if r['base'] else ''}")
     for e in r["errores"]:
         print("⚠", e)
+    sys.stdout.flush()
+    os._exit(0)  # termina aunque haya quedado algún portal trabado en segundo plano
 
 
 def info(e: dict, dia: date | None = None) -> dict:

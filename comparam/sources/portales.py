@@ -64,9 +64,14 @@ class PortalWeb(Source):
             raise FuenteError(f"{self.nombre}: respuesta HTTP {r.status_code} en {url}")
         return r.text
 
+    tiempo_max = 120  # segundos por búsqueda: un portal lento no frena toda la revisión
+
     def buscar(self, barrio: str, operacion: str = "venta") -> list[Listing]:
         resultados: list[Listing] = []
+        inicio = time.time()
         for pagina in range(1, self.paginas + 1):
+            if pagina > 1 and time.time() - inicio > self.tiempo_max:
+                break
             url = self.url_busqueda(barrio, operacion, pagina)
             html = self._get(url)
             nuevos = extraer_anuncios(html, self.nombre, self.base_url, operacion) if html else []

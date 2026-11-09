@@ -4,6 +4,7 @@ import re
 import statistics
 import time
 from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import TimeoutError as FuturesTimeout
 from dataclasses import dataclass, field
 
 from .localidades import localidad_de
@@ -74,6 +75,9 @@ def _filtrar(anuncios, solo_dueno, con_telefono, area_min, precio_max) -> list[L
     ]
 
 
+TIEMPO_MAX_PORTAL = 180  # segundos
+
+
 def _recolectar(fuentes: list[Source], barrio: str, operacion: str
                 ) -> tuple[list[Listing], list[str], dict[str, int], int]:
     """Consulta todas las fuentes al mismo tiempo (cada una en su hilo)."""
@@ -89,16 +93,25 @@ def _recolectar(fuentes: list[Source], barrio: str, operacion: str
     if not fuentes:
         return todos, errores, por_fuente, 0
     publicados = 0
-    with ThreadPoolExecutor(max_workers=len(fuentes)) as ex:
-        for f, (anuncios, error) in zip(fuentes, ex.map(una, fuentes)):
-            todos += anuncios
-            ruta = getattr(f, "ruta", None)  # archivos CSV: el nombre del archivo
-            nombre = ruta.stem if hasattr(ruta, "stem") else getattr(f, "nombre", "fuente")
-            por_fuente[nombre] = por_fuente.get(nombre, 0) + len(anuncios)
-            # Total que el portal dice tener; si no lo indica, se cuentan los anuncios leídos.
-            publicados += max(getattr(f, "total_publicados", None) or 0, len(anuncios))
-            if error:
-                errores.append(error)
+    # Cada portal tiene un tiempo máximo: si uno se traba (página que no termina de llegar, navegador
+    # colgado…), se anota el error y se sigue con los demás en vez de esperar indefinidamente.
+    ex = ThreadPoolExecutor(max_workers=len(fuentes))
+    futuros = [(f, ex.submit(una, f)) for f in fuentes]
+    limite = time.time() + TIEMPO_MAX_PORTAL
+    for f, fut in futuros:
+        ruta = getattr(f, "ruta", None)  # archivos CSV: el nombre del archivo
+        nombre = ruta.stem if hasattr(ruta, "stem") else getattr(f, "nombre", "fuente")
+        try:
+            anuncios, error = fut.result(timeout=max(1, limite - time.time()))
+        except FuturesTimeout:
+            anuncios, error = [], f"{nombre}: tardó más de {TIEMPO_MAX_PORTAL} s y se omitió"
+        todos += anuncios
+        por_fuente[nombre] = por_fuente.get(nombre, 0) + len(anuncios)
+        # Total que el portal dice tener; si no lo indica, se cuentan los anuncios leídos.
+        publicados += max(getattr(f, "total_publicados", None) or 0, len(anuncios))
+        if error:
+            errores.append(error)
+    ex.shutdown(wait=False, cancel_futures=True)  # no esperar a un portal trabado
     return todos, errores, por_fuente, publicados
 
 
