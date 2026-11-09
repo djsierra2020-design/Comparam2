@@ -1,74 +1,46 @@
 {
  "base": false,
- "errores": [
-  "arriendo Contador: houm: el navegador se trabó con la página (más de 61 s)",
-  "arriendo Cedritos: houm: el navegador se trabó con la página (más de 61 s)",
-  "arriendo Chicó: houm: el navegador se trabó con la página (más de 61 s)",
-  "arriendo Santa Bárbara: houm: el navegador se trabó con la página (más de 61 s)",
-  "arriendo toda Bogotá: houm: el navegador se trabó con la página (más de 61 s)"
- ],
+ "errores": [],
  "fecha": "2026-11-09",
  "nuevos": [
-  "6ca0c701b1515e0a",
-  "b434960975c90642",
-  "24da924e2ee17e17",
-  "5bf3eb2282c08070",
-  "e6a77423c251ec7c",
-  "2e0e76396589ce00",
-  "7fb276bca2d8d514",
-  "3a1c97aa381210d2",
-  "ba3a9509e4864fa3",
-  "239d8b7bfc5ffa1f",
-  "03baa10cd3d4d01c",
-  "e0a5f4f3552cd134",
-  "d06c64fda7eb5ece",
-  "503d211571e1b1ad",
-  "b1fae809e9a1272d",
-  "d93c34f90b43c453",
-  "112116b40e7f12f9",
-  "ee18cbd794c3b000",
-  "6d788ae35530d8ab",
-  "57d0364f825795b6",
-  "7caacd421c2eeaad",
-  "f8434c8d6231b928",
-  "2fceb4e13a352181",
-  "91bd336ca36cb0cb",
-  "a9ed8fa0ace3d84f",
-  "d25a01fb7125711d",
-  "752f52b2510ca82f",
-  "74e7e147b5a3e6fc",
-  "1d340ce36dc96e91",
-  "93e9ddd457edcd06",
-  "3cbb8eb1e3406911",
-  "84d376ad85b70f46",
-  "74281ee414852da8",
-  "e697262d97fbe076"
+  "4b638778704a3039",
+  "fc5ee7823c07e836",
+  "86f304c86df83529",
+  "b497c85c38b1e915",
+  "7de7dd639a1136f2",
+  "f0305f82bc74d767",
+  "1bf306e1d4cdec64",
+  "1b64278b64698a94",
+  "e4247be5ed081475",
+  "9711d8e27a3999d9",
+  "3b476d58562a43ae",
+  "0bb24fda7a65c86e"
  ],
  "nuevos_ciudad": {
-  "arriendo": 1,
-  "venta": 24
+  "arriendo": 0,
+  "venta": 3
  },
- "revisados": 1383,
+ "revisados": 1244,
  "zonas": {
   "arriendo|Cedritos": {
    "anuncios": 103,
    "mediana_m2": 50000
   },
   "arriendo|Chicó": {
-   "anuncios": 217,
-   "mediana_m2": 63351
+   "anuncios": 84,
+   "mediana_m2": 69924
   },
   "arriendo|Contador": {
-   "anuncios": 29,
-   "mediana_m2": 53125
+   "anuncios": 30,
+   "mediana_m2": 52951
   },
   "arriendo|Santa Bárbara": {
    "anuncios": 64,
-   "mediana_m2": 57288
+   "mediana_m2": 56905
   },
   "venta|Cedritos": {
    "anuncios": 93,
-   "mediana_m2": 6863941
+   "mediana_m2": 6929825
   },
   "venta|Chicó": {
    "anuncios": 85,
@@ -76,11 +48,11 @@
   },
   "venta|Contador": {
    "anuncios": 68,
-   "mediana_m2": 7547426
+   "mediana_m2": 7560791
   },
   "venta|Santa Bárbara": {
    "anuncios": 73,
-   "mediana_m2": 7055882
+   "mediana_m2": 7222222
   }
  }
 }
