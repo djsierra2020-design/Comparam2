@@ -191,9 +191,12 @@ function resultadoMatch(m) {
     const r = RES[m.res];
     return [r[0], r[1], r[0], r[1]];
   }
-  if (m.tableros.some((t) => !t)) return null;
-  let a = 0, b = 0;
-  m.tableros.forEach((t) => { a += RES[t][0]; b += RES[t][1]; });
+  // Equipos: solo se anota el marcador del encuentro (p. ej. 3-1); m.marcador = puntos del equipo de la izquierda
+  let a, b;
+  if (m.marcador != null) { a = m.marcador; b = TABLEROS - a; }
+  else if (m.tableros && m.tableros.every((t) => t)) { // torneos guardados con resultado por tablero
+    a = 0; b = 0; m.tableros.forEach((t) => { a += RES[t][0]; b += RES[t][1]; });
+  } else return null;
   const mpA = a > b ? 1 : a < b ? 0 : 0.5;
   return [mpA, 1 - mpA, a, b];
 }
@@ -335,12 +338,12 @@ function generarEmparejamientos() {
     else if (pa.pref) blancoAlto = pa.pref === "B";
     else blancoAlto = pb.pref !== "B";
     const [A, B] = blancoAlto ? [alto, bajo] : [bajo, alto];
-    return { a: A.id, b: B.id, res: null, tableros: esEquipos() ? Array(TABLEROS).fill(null) : null,
+    return { a: A.id, b: B.id, res: null, marcador: null,
       _k: [Math.max(A.pts, B.pts), A.pts + B.pts, -Math.min(orden(A), orden(B))] };
   });
   emp.sort((x, y) => y._k[0] - x._k[0] || y._k[1] - x._k[1] || y._k[2] - x._k[2]);
   emp.forEach((m) => delete m._k);
-  if (res.bye) emp.push({ a: res.bye.id, b: null, res: null, tableros: null });
+  if (res.bye) emp.push({ a: res.bye.id, b: null, res: null, marcador: null });
   return emp;
 }
 
@@ -403,9 +406,15 @@ async function borrarUltima() {
   if (!(await preguntar(`¿Borrar la ronda ${S.rondasJugadas.length} y sus resultados?`, "Borrar ronda", true))) return;
   S.rondasJugadas.pop(); guardar(); render();
 }
-function ponerRes(ri, mi, valor, tablero) {
+function ponerRes(ri, mi, valor) {
   const m = S.rondasJugadas[ri].emparejamientos[mi];
-  if (tablero == null) m.res = valor || null; else m.tableros[tablero] = valor || null;
+  m.res = valor || null;
+  guardar(); render();
+}
+function ponerMarcador(ri, mi, valor) {
+  const m = S.rondasJugadas[ri].emparejamientos[mi];
+  m.marcador = valor === "" ? null : Number(valor);
+  delete m.tableros;
   guardar(); render();
 }
 async function reiniciar() {
@@ -557,27 +566,27 @@ function rondaIndividual(r, ri, st) {
   return `<div class="scroll"><table><thead><tr><th class="num">Mesa</th><th>Blancas</th><th class="c">Resultado</th><th>Negras</th></tr></thead><tbody>${filas}</tbody></table></div>`;
 }
 
+// Marcadores posibles de un encuentro a 4 tableros: 4-0, 3½-½, 3-1, ... 0-4
+function selectMarcador(valor, onchange) {
+  const ops = [];
+  for (let a = TABLEROS; a >= 0; a -= 0.5) ops.push(a);
+  return `<select onchange="${onchange}" aria-label="Marcador"><option value="">— marcador —</option>${ops
+    .map((a) => `<option value="${a}" ${valor === a ? "selected" : ""}>${fmt(a)} - ${fmt(TABLEROS - a)}</option>`).join("")}</select>`;
+}
+
 function rondaEquipos(r, ri) {
-  return r.emparejamientos.map((m, mi) => {
+  const filas = r.emparejamientos.map((m, mi) => {
     const a = P(m.a), b = m.b != null ? P(m.b) : null;
-    if (!b) return `<div class="match"><div class="head"><span class="muted">—</span><span class="tn">${esc(a.nombre)}</span>
-      <span class="score"><span class="pill">Descansa</span></span><span class="muted">1 punto · ${fmt(TABLEROS / 2)} de partidas</span></div></div>`;
+    if (!b) return `<tr><td class="num">—</td><td>${esc(a.nombre)}</td><td class="c"><span class="pill">Descansa · 1 punto, ${fmt(TABLEROS / 2)} de partidas</span></td><td class="muted">—</td></tr>`;
     const res = resultadoMatch(m);
-    let gA = 0, gB = 0; m.tableros.forEach((t) => { if (t) { gA += RES[t][0]; gB += RES[t][1]; } });
-    const filas = m.tableros.map((t, k) => {
-      // El equipo nombrado primero juega con blancas en los tableros 1 y 3
-      const aBlancas = k % 2 === 0;
-      return `<tr><td class="num">${k + 1}</td>
-        <td><span class="wk ${aBlancas ? "w" : "b"}"></span>${esc(a.miembros[k].nombre)}</td>
-        <td class="c">${selectRes(t, `ponerRes(${ri},${mi},this.value,${k})`)}</td>
-        <td><span class="wk ${aBlancas ? "b" : "w"}"></span>${esc(b.miembros[k].nombre)}</td></tr>`;
-    }).join("");
-    return `<div class="match"><div class="head"><span class="muted">${mi + 1}</span>
-        <span class="tn">${esc(a.nombre)}</span>
-        <span class="score">${fmt(gA)} - ${fmt(gB)}${res ? `<div class="note">${res[0] === 1 ? "gana " + esc(a.nombre) : res[1] === 1 ? "gana " + esc(b.nombre) : "empate"}</div>` : ""}</span>
-        <span class="tn r">${esc(b.nombre)}</span></div>
-      <div class="scroll"><table><thead><tr><th class="num">Tab.</th><th>${esc(a.nombre)}</th><th class="c">Resultado (izq. - der.)</th><th>${esc(b.nombre)}</th></tr></thead><tbody>${filas}</tbody></table></div></div>`;
+    const marc = m.marcador != null ? m.marcador : res ? res[2] : null;
+    const gana = res ? (res[0] === 1 ? "gana " + esc(a.nombre) : res[1] === 1 ? "gana " + esc(b.nombre) : "empate") : "";
+    return `<tr><td class="num">${mi + 1}</td>
+      <td><b>${esc(a.nombre)}</b></td>
+      <td class="c">${selectMarcador(marc, `ponerMarcador(${ri},${mi},this.value)`)}${gana ? `<div class="note">${gana}</div>` : ""}</td>
+      <td><b>${esc(b.nombre)}</b></td></tr>`;
   }).join("");
+  return `<div class="scroll"><table><thead><tr><th class="num">Mesa</th><th>Equipo (blancas en tab. 1 y 3)</th><th class="c">Marcador</th><th>Equipo (blancas en tab. 2 y 4)</th></tr></thead><tbody>${filas}</tbody></table></div>`;
 }
 
 function vistaClasificacion() {
@@ -614,7 +623,7 @@ function vistaClasificacion() {
   }
   const leyenda = esEquipos()
     ? `<b>Puntos</b>: 1 por encuentro ganado, ½ por empate, 0 por derrota. Orden de desempate:
-       <b>1) P. partidas</b> (suma de los resultados de cada partida de los 4 tableros), 2) Buchholz (suma de puntos de los rivales),
+       <b>1) P. partidas</b> (suma de los marcadores: ganar 3-1 suma 3, empatar 2-2 suma 2), 2) Buchholz (suma de puntos de los rivales),
        3) Sonneborn-Berger, 4) encuentros ganados, 5) Elo medio. En cada ronda: posición del rival, color en el tablero 1 (b/n) y puntos de partidas obtenidos.`
     : `<b>Puntos</b>: 1 por victoria, ½ por tablas. Orden de desempate: 1) Buchholz corte 1 (suma de puntos de los rivales sin el peor),
        2) Buchholz total, 3) Sonneborn-Berger, 4) partidas ganadas, 5) Elo. En cada ronda: posición del rival, color (b/n) y resultado.`;
@@ -622,29 +631,7 @@ function vistaClasificacion() {
     <div class="card"><h2>Clasificación ${nR ? `tras la ronda ${nR}` : ""}</h2>
       <div class="scroll"><table><thead><tr>${cab}</tr></thead><tbody>${filas}</tbody></table></div>
       <p class="note">${leyenda}</p></div>`;
-  if (esEquipos() && nR) html += clasificacionTableros();
   return html;
-}
-
-// Rendimiento individual de los jugadores de cada tablero (solo en equipos)
-function clasificacionTableros() {
-  const datos = {};
-  S.participantes.forEach((p) => p.miembros.forEach((m, k) => (datos[p.id + "-" + k] = { equipo: p.nombre, nombre: m.nombre, tab: k, pts: 0, jug: 0 })));
-  S.rondasJugadas.forEach((r) => r.emparejamientos.forEach((m) => {
-    if (m.b == null) return;
-    m.tableros.forEach((t, k) => {
-      if (!t) return;
-      const da = datos[m.a + "-" + k], db = datos[m.b + "-" + k];
-      if (t !== "-/-" && t !== "+/-" && t !== "-/+") { da.jug++; db.jug++; }
-      da.pts += RES[t][0]; db.pts += RES[t][1];
-    });
-  }));
-  let html = `<div class="card"><h2>Mejores por tablero</h2><div class="members">`;
-  for (let k = 0; k < TABLEROS; k++) {
-    const l = Object.values(datos).filter((d) => d.tab === k).sort((a, b) => b.pts - a.pts || a.jug - b.jug).slice(0, 5);
-    html += `<div><h3>Tablero ${k + 1}</h3><table><tbody>${l.map((d) => `<tr><td>${esc(d.nombre)}<div class="note">${esc(d.equipo)}</div></td><td class="num"><b>${fmt(d.pts)}</b>/${d.jug}</td></tr>`).join("")}</tbody></table></div>`;
-  }
-  return html + `</div></div>`;
 }
 
 render();

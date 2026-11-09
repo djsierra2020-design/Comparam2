@@ -28,8 +28,9 @@ jugadores/equipos, se generan las rondas por sistema suizo (sin repetir rivales 
 y se anotan los resultados. Pestañas: inscritos, **Programación** (rondas) y **Clasificación**.
 
 - Individual: 1 punto por victoria, ½ tablas. Desempates: Buchholz corte 1, Buchholz, Sonneborn-Berger.
-- Equipos: ganar el encuentro da **1 punto** (empate ½). El primer desempate es la **suma de los resultados
-  de cada partida** (puntos de partidas de los 4 tableros); después Buchholz y Sonneborn-Berger.
+- Equipos: solo se anota el marcador del encuentro (p. ej. 3-1). Ganar el encuentro da **1 punto** (empate ½).
+  El primer desempate es la **suma de los resultados de cada partida** (los puntos del marcador:
+  3-1 suma 3); después Buchholz y Sonneborn-Berger.
 
 El número de rondas no se pregunta: se calcula según el reglamento del sistema suizo
 (log₂ de los participantes redondeado hacia arriba, más una ronda para definir los puestos cuando hay más de 4;
