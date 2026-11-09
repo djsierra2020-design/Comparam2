@@ -649,3 +649,16 @@ def test_guardados_devuelve_portales_con_navegador(tmp_path, monkeypatch):
     assert a.fuente == "metrocuadrado" and a.es_dueno_directo and a.publicado_por == "dueño directo"
     r = buscar("Cedritos", [g])
     assert len(r.anuncios) == 1 and r.anuncios[0].fuente == "metrocuadrado"
+
+
+def test_diagnostico_no_se_cae_si_un_portal_falla(monkeypatch):
+    import app as webapp
+    from comparam.sources import Rentola
+
+    def explota(self, barrio="", operacion="venta"):
+        raise ValueError("dato raro")
+
+    monkeypatch.setattr(Rentola, "diagnosticar", explota)
+    r = webapp.app.test_client().get("/diagnostico?operacion=arriendo")
+    html = r.get_data(as_text=True)
+    assert r.status_code == 200 and "falla de la app: ValueError: dato raro" in html and "fincaraiz" in html
