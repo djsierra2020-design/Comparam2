@@ -2,9 +2,11 @@ from .base import Source, FuenteError
 from .portales import FincaRaiz, Metrocuadrado, Ciencuadras, Habi, Houm, MercadoLibre, Properati, Rentola
 from .archivo import ArchivoCSV
 
-# Metrocuadrado queda fuera: necesita navegador y con él la app daba error 502 en Render.
+# Metrocuadrado, Habi y Houm necesitan navegador: solo se abren donde está encendido (la revisión
+# diaria de GitHub). En Render se leen sus anuncios guardados (sources/guardados.py).
 PORTALES = {"fincaraiz": FincaRaiz, "ciencuadras": Ciencuadras, "mercadolibre": MercadoLibre,
-            "properati": Properati, "rentola": Rentola, "habi": Habi, "houm": Houm}
+            "properati": Properati, "rentola": Rentola, "metrocuadrado": Metrocuadrado, "habi": Habi,
+            "houm": Houm}
 
 __all__ = ["Source", "FuenteError", "FincaRaiz", "Metrocuadrado", "Ciencuadras", "Habi", "Houm",
            "MercadoLibre", "Properati", "Rentola", "ArchivoCSV", "PORTALES"]

@@ -33,6 +33,12 @@ CARPETA_DIA = DATOS / "diario"
 BOGOTA = ZoneInfo("America/Bogota")
 
 
+def _fuentes(paginas: int):
+    """Portales para la revisión diaria. Nunca los anuncios ya guardados (si el navegador falla,
+    volver a registrarlos los mantendría «vivos» aunque ya no estén publicados)."""
+    return [f for f in crear_fuentes(paginas=paginas, detalle=False) if f.nombre != "guardados"]
+
+
 def hoy() -> date:
     return datetime.now(BOGOTA).date()
 
@@ -54,6 +60,18 @@ def guardar_json(ruta: Path, datos) -> None:
     ruta.write_text(json.dumps(datos, ensure_ascii=False, indent=1, sort_keys=True) + "\n", encoding="utf-8")
 
 
+def categoria(a: Listing) -> str:
+    """Tipo de anunciante sin datos personales: dueño directo, verificar, inmobiliaria o empresa."""
+    if a.es_dueno_directo:
+        return "dueño directo"
+    if a.verificar:
+        return "verificar"
+    t = (a.publicado_por or "").lower()
+    if "(empresa)" in t:
+        return a.publicado_por  # «Habi (empresa)»: nombre de la empresa, no de una persona
+    return "inmobiliaria" if "inmobiliaria" in t else ""
+
+
 def registrar(historial: dict, a: Listing, operacion: str, zona: str, dia: str, base: bool,
               ciudad: bool = False) -> bool:
     """Agrega o actualiza un anuncio en el historial. Devuelve True si es nuevo."""
@@ -64,13 +82,14 @@ def registrar(historial: dict, a: Listing, operacion: str, zona: str, dia: str, 
             "operacion": operacion, "zona": zona, "fuente": a.fuente, "titulo": a.titulo[:120],
             "barrio": a.barrio[:60], "url": a.url, "precio": round(a.precio), "area_m2": a.area_m2,
             "habitaciones": a.habitaciones, "banos": a.banos, "dueno_directo": a.es_dueno_directo,
-            "verificar": a.verificar, "publicado": a.publicado, "primera_vez": dia, "ultima_vez": dia, "base": base,
+            "verificar": a.verificar, "anunciante": categoria(a), "publicado": a.publicado, "primera_vez": dia, "ultima_vez": dia, "base": base,
             "precios": [[dia, round(a.precio)]],
         }
         if ciudad:  # visto en el recorrido de toda Bogotá, no en las zonas del cliente
             historial[k]["ciudad"] = True
         return True
     e["ultima_vez"] = dia
+    e["anunciante"] = categoria(a) or e.get("anunciante", "")
     if not ciudad:
         e.pop("ciudad", None)  # también está en las zonas del cliente
     e["dueno_directo"] = e["dueno_directo"] or a.es_dueno_directo
@@ -92,7 +111,7 @@ def correr(config: dict | None = None, fuentes_por_operacion=None, dia: date | N
     for operacion in config.get("operaciones", ["venta", "arriendo"]):
         for zona in config.get("barrios", []):
             fuentes = (fuentes_por_operacion(operacion) if fuentes_por_operacion
-                       else crear_fuentes(paginas=config.get("paginas", 3), detalle=False))
+                       else _fuentes(config.get("paginas", 3)))
             r = buscar(zona, fuentes, operacion, solo_dueno=False)
             resumen["errores"] += [f"{operacion} {zona}: {e}" for e in r.errores]
             if r.zona:
@@ -107,7 +126,7 @@ def correr(config: dict | None = None, fuentes_por_operacion=None, dia: date | N
     if config.get("toda_bogota", True):
         for operacion in config.get("operaciones", ["venta", "arriendo"]):
             fuentes = (fuentes_por_operacion(operacion) if fuentes_por_operacion
-                       else crear_fuentes(paginas=config.get("paginas_ciudad", 10), detalle=False))
+                       else _fuentes(config.get("paginas_ciudad", 10)))
             todos, errores, _, _ = _recolectar(fuentes, "", operacion)
             resumen["errores"] += [f"{operacion} toda Bogotá: {e}" for e in errores]
             ciudad = 0
