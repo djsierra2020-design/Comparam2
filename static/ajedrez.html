@@ -172,6 +172,10 @@ function estadisticas() {
     st[p.id] = { id: p.id, pts: 0, gp: 0, ganadas: 0, rivales: [], hist: [], colores: [], byes: 0, porRonda: [] };
   });
   S.rondasJugadas.forEach((ronda, ri) => {
+    // Inscritos tarde (para la ronda 2): no jugaron la ronda 1 y suman 0
+    S.participantes.forEach((p) => {
+      if ((p.desde || 0) > ri) { st[p.id].hist.push({ ronda: ri, rival: null, puntos: 0, ausente: true }); st[p.id].colores.push(null); }
+    });
     ronda.emparejamientos.forEach((m) => {
       const A = st[m.a], B = m.b != null ? st[m.b] : null;
       if (!A) return;
@@ -313,11 +317,15 @@ function elegirModo(modo) {
   S = nuevo(); S.modo = modo; S.nombre = modo === "equipos" ? "Torneo por equipos" : "Torneo individual";
   guardar(); tab = "inscritos"; render();
 }
+// Se puede inscribir antes de la ronda 1 y, como tarde, para la ronda 2.
+const inscripcionAbierta = () => S.rondasJugadas.length <= 1;
+const inscritoTarde = (p) => (p.desde || 0) > 0;
 function agregar(form) {
+  if (!inscripcionAbierta()) return alert("La inscripción está cerrada: solo se puede inscribir hasta la ronda 2.");
   const f = new FormData(form);
   const nombre = String(f.get("nombre") || "").trim();
   if (!nombre) { form.nombre.focus(); return; }
-  const p = { id: S.sig++, nombre, retirado: false };
+  const p = { id: S.sig++, nombre, retirado: false, desde: S.rondasJugadas.length };
   if (esEquipos()) {
     p.miembros = [];
     for (let i = 0; i < TABLEROS; i++) {
@@ -329,7 +337,9 @@ function agregar(form) {
   document.querySelector("#formAlta input[name=nombre]")?.focus();
 }
 function quitar(id) {
-  if (S.rondasJugadas.length) { const p = P(id); p.retirado = !p.retirado; }
+  const p = P(id);
+  // Se puede borrar del todo si aún no ha jugado ninguna ronda
+  if (S.rondasJugadas.length && (p.desde || 0) < S.rondasJugadas.length) p.retirado = !p.retirado;
   else S.participantes = S.participantes.filter((p) => p.id !== id);
   guardar(); render();
 }
@@ -342,6 +352,10 @@ function nuevaRonda() {
   const ult = S.rondasJugadas[S.rondasJugadas.length - 1];
   if (ult && !rondaCompleta(ult)) return alert("Primero anota todos los resultados de la ronda actual.");
   if (!S.rondasJugadas.length) S.rondas = rondasReglamento(S.participantes.length);
+  // Si se inscribieron más para la ronda 2, el reglamento puede pedir más rondas
+  else if (S.rondasJugadas.length === 1) S.rondas = Math.max(S.rondas, rondasReglamento(S.participantes.length));
+  if (S.rondasJugadas.length === 1 && S.participantes.some((p) => inscritoTarde(p))
+      && !confirm("Al generar la ronda 2 se cierra la inscripción. ¿Continuar?")) return;
   if (S.rondasJugadas.length >= S.rondas) return alert("Ya se jugaron todas las rondas del torneo.");
   const emp = generarEmparejamientos();
   if (!emp) return alert("No fue posible emparejar esta ronda.");
@@ -409,9 +423,15 @@ function render() {
 function vistaInscritos() {
   const n = S.participantes.length, empezado = S.rondasJugadas.length > 0;
   const rondas = totalRondas(), minimo = n >= 2 ? Math.ceil(Math.log2(n)) : 0;
-  const alta = esEquipos()
+  const queRonda = S.rondasJugadas.length + 1;
+  const aviso = S.rondasJugadas.length === 1
+    ? `<p class="note">Inscripción para la <b>ronda 2</b>: quien entre ahora empieza con 0 puntos (no jugó la ronda 1).
+       Al generar la ronda 2 ya no se podrá inscribir a nadie más.</p>` : "";
+  const alta = !inscripcionAbierta()
+    ? `<div class="card"><h2>Inscripción cerrada</h2><p class="note">Solo se podía inscribir hasta la ronda 2.</p></div>`
+    : esEquipos()
     ? `<form id="formAlta" class="card" onsubmit="event.preventDefault();agregar(this)">
-        <h2>Inscribir equipo</h2>
+        <h2>Inscribir equipo${queRonda > 1 ? " para la ronda 2" : ""}</h2>${aviso}
         <div class="row"><label style="flex:1">Nombre del equipo<input name="nombre" required placeholder="Ej.: Club Alfil"></label></div>
         <div class="members">${Array.from({ length: TABLEROS }, (_, i) => `
           <div class="m"><label>Tablero ${i + 1}<input name="m${i}" placeholder="Jugador ${i + 1}"></label>
@@ -419,7 +439,7 @@ function vistaInscritos() {
         <div class="row" style="margin-top:10px"><button class="btn primary">Añadir equipo</button></div>
        </form>`
     : `<form id="formAlta" class="card" onsubmit="event.preventDefault();agregar(this)">
-        <h2>Inscribir jugador</h2>
+        <h2>Inscribir jugador${queRonda > 1 ? " para la ronda 2" : ""}</h2>${aviso}
         <div class="row">
           <label style="flex:1;min-width:180px">Nombre<input name="nombre" required placeholder="Nombre y apellido"></label>
           <label style="width:110px">Elo (opcional)<input name="elo" type="number" min="0" max="3500" inputmode="numeric"></label>
@@ -427,10 +447,10 @@ function vistaInscritos() {
         </div></form>`;
   const filas = ordenInicial().map((p, i) => `
     <tr${p.retirado ? ' class="muted"' : ""}><td class="num">${i + 1}</td>
-      <td>${esc(p.nombre)}${p.retirado ? ' <span class="pill">retirado</span>' : ""}
+      <td>${esc(p.nombre)}${p.retirado ? ' <span class="pill">retirado</span>' : ""}${inscritoTarde(p) ? ' <span class="pill">desde ronda 2</span>' : ""}
         ${esEquipos() ? `<div class="note">${p.miembros.map((m, k) => `${k + 1}. ${esc(m.nombre)}${m.elo ? ` (${m.elo})` : ""}`).join(" · ")}</div>` : ""}</td>
       <td class="num">${elo(p) || "—"}</td>
-      <td class="c no-print"><button class="link" onclick="quitar(${p.id})">${empezado ? (p.retirado ? "Reincorporar" : "Retirar") : "Quitar"}</button></td></tr>`).join("");
+      <td class="c no-print"><button class="link" onclick="quitar(${p.id})">${empezado && (p.desde || 0) < S.rondasJugadas.length ? (p.retirado ? "Reincorporar" : "Retirar") : "Quitar"}</button></td></tr>`).join("");
   return `
     <div class="card">
       <h2>Datos del torneo</h2>
@@ -440,7 +460,7 @@ function vistaInscritos() {
       </div>
       <p class="note">Modalidad: <b>${esEquipos() ? "por equipos de 4 tableros" : "individual"}</b>.
         ${n < 2 ? "El número de rondas se calcula según el reglamento al inscribir a los participantes."
-          : `Rondas según el reglamento: <b>${rondas}</b>${empezado ? " (fijadas al empezar el torneo)" : ""}.
+          : `Rondas según el reglamento: <b>${rondas}</b>${S.rondasJugadas.length > 1 ? " (fijadas)" : empezado ? " (se ajustan si se inscriben más antes de la ronda 2)" : ""}.
         Con ${n} ${esEquipos() ? "equipos" : "jugadores"} hacen falta al menos ${minimo} rondas para que haya un único ganador
         (log<sub>2</sub> de ${n} redondeado hacia arriba)${n > 4 ? " y se juega una más para definir los demás puestos" : ""};
         nunca más de ${Math.min(n - 1, MAX_RONDAS)} (${n - 1 < MAX_RONDAS ? "con más sería todos contra todos" : "máximo de los suizos FIDE"}).`}</p>
@@ -451,7 +471,8 @@ function vistaInscritos() {
       ${n ? `<div class="scroll"><table><thead><tr><th class="num">Nº</th><th>${esEquipos() ? "Equipo" : "Nombre"}</th><th class="num">${esEquipos() ? "Elo medio" : "Elo"}</th><th class="no-print"></th></tr></thead><tbody>${filas}</tbody></table></div>`
           : `<p class="empty">Aún no hay inscritos.</p>`}
       <div class="row" style="margin-top:12px">
-        <button class="btn primary" onclick="nuevaRonda()" ${n < 2 || S.rondasJugadas.length ? "disabled" : ""}>Generar ronda 1</button>
+        ${inscripcionAbierta() ? `<button class="btn primary" onclick="nuevaRonda()" ${n < 2 || (empezado && !rondaCompleta(S.rondasJugadas[0])) ? "disabled" : ""}>Generar ronda ${queRonda}</button>` : ""}
+        ${empezado && inscripcionAbierta() && !rondaCompleta(S.rondasJugadas[0]) ? `<span class="note">Anota los resultados de la ronda 1 para generar la ronda 2.</span>` : ""}
       </div>
     </div>
     <div class="toolbar no-print">
@@ -532,6 +553,7 @@ function vistaClasificacion() {
     const h = x.hist.find((k) => k.ronda === ri);
     if (!h) return `<td class="c hide-sm muted">·</td>`;
     if (h.bye) return `<td class="c hide-sm" title="Descanso">D</td>`;
+    if (h.ausente) return `<td class="c hide-sm muted" title="Inscrito para la ronda 2">–</td>`;
     const pos = lista.findIndex((y) => y.id === h.rival) + 1;
     const col = x.colores[ri] === "B" ? "b" : "n";
     const pts = h.puntos == null ? "?" : esEquipos() ? fmt(h.gp) : fmt(h.puntos);

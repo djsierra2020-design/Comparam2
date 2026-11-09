@@ -35,6 +35,9 @@ El número de rondas no se pregunta: se calcula según el reglamento del sistema
 (log₂ de los participantes redondeado hacia arriba, más una ronda para definir los puestos cuando hay más de 4;
 como máximo participantes − 1 y 11 rondas) y queda fijo al generar la ronda 1.
 
+Se puede inscribir jugadores/equipos antes de la ronda 1 y, como tarde, para la ronda 2
+(empiezan con 0 puntos por no jugar la ronda 1). Al generar la ronda 2 la inscripción se cierra.
+
 Los datos se guardan en el navegador y se pueden exportar/importar en `.json`.
 
 ## Instalación
