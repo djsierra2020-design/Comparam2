@@ -136,6 +136,57 @@ def diagnostico():
                            filas=[p.diagnosticar(barrio, operacion) for p in portales])
 
 
+# Portales que /api/sonda puede consultar (no es un proxy abierto).
+SONDA_DOMINIOS = ("fincaraiz.com.co", "metrocuadrado.com", "ciencuadras.com", "mercadolibre.com.co",
+                  "properati.com.co", "habi.co", "houm.com", "puntopropiedad.com", "trovit.com.co",
+                  "mitula.com.co", "lahaus.com", "nuroa.com.co", "olx.com.co")
+
+
+@app.get("/api/sonda")
+def sonda():
+    """Herramienta de desarrollo: qué encuentra la app en una página de un portal inmobiliario.
+    Parámetros: url (obligatorio), operacion, buscar (texto a ubicar en la página)."""
+    import json as _json
+    import re as _re
+    from urllib.parse import urlparse
+
+    import requests as _rq
+
+    from comparam.sources.extractor import _bloques_json, _recorrer, extraer_anuncios, total_publicados
+    from comparam.sources.portales import HEADERS, _pistas, _titulo
+
+    url = request.args.get("url", "")
+    host = (urlparse(url).hostname or "").lower()
+    if urlparse(url).scheme != "https" or not any(host == d or host.endswith("." + d) for d in SONDA_DOMINIOS):
+        return jsonify(error="Solo se permiten páginas https de portales inmobiliarios conocidos"), 400
+    operacion = "arriendo" if request.args.get("operacion") == "arriendo" else "venta"
+    try:
+        r = _rq.get(url, headers=HEADERS, timeout=25)
+    except _rq.RequestException as e:
+        return jsonify(error=f"no se pudo conectar: {e.__class__.__name__}")
+    html = r.text
+    anuncios = extraer_anuncios(html, host, f"https://{host}", operacion)
+    bloques = list(_bloques_json(html))
+    # Muestra de claves de los objetos con precio, para adaptar el extractor
+    muestras = []
+    for b in bloques:
+        for d in _recorrer(b):
+            if any(_re.search(r"price|precio|valor", k, _re.I) for k in d) and len(muestras) < 3:
+                muestras.append(_json.dumps(d, ensure_ascii=False, default=str)[:1500])
+    contexto = []
+    if q := request.args.get("buscar"):
+        for m in list(_re.finditer(_re.escape(q), html, _re.I))[:5]:
+            contexto.append(html[max(0, m.start() - 300):m.end() + 300])
+    scripts = _re.findall(r"<script[^>]*(?:id|type)=[\"']([^\"']+)[\"']", html)[:30]
+    return jsonify(
+        estado=r.status_code, url_final=r.url, bytes=len(html), titulo=_titulo(html), scripts=scripts,
+        bloques_json=len(bloques), anuncios=len(anuncios), total_publicado=total_publicados(html, len(anuncios)),
+        dueno_directo=sum(a.es_dueno_directo for a in anuncios),
+        ejemplos=[{k: v for k, v in a.to_dict().items() if k not in ("telefonos", "descripcion")} for a in anuncios[:4]],
+        muestras_json=muestras, contexto=contexto, pistas=_pistas(html) if not anuncios else [],
+    )
+
+
 @app.get("/api/ciudad")
 def api_ciudad():
     _, rc = _consulta_ciudad()
