@@ -217,6 +217,20 @@ def _datos_tarjeta(texto: str, operacion: str) -> tuple[float, float] | None:
     return (max(buenos), areas[0]) if buenos else None
 
 
+_RUIDO_TITULO = re.compile(r"\b(anterior|siguiente|previous|next|ver fotos|ver m[aá]s)\b", re.I)
+
+
+def _limpiar_titulo(t: str) -> str:
+    """Quita del título los botones del carrusel y los datos que ya se muestran aparte (precio,
+    área, números sueltos), p. ej. «Anterior Siguiente $ 250.000.000 30 m² 1 1 Apartamento…»."""
+    t = _RUIDO_TITULO.sub(" ", t)
+    t = _PRECIO_TXT.sub(" ", t)
+    t = re.sub(r"\$\s*", " ", t)
+    t = _AREA_TXT.sub(" ", t)
+    t = re.sub(r"(?<![\w-])\d(?![\w-])", " ", t)  # cifras sueltas (habitaciones, baños)
+    return re.sub(r"\s+", " ", t).strip(" ·-|")
+
+
 def extraer_de_tarjetas(html: str, fuente: str, base_url: str, operacion: str = "venta",
                         barrio_por_defecto: str = "") -> list[Listing]:
     """Lee los anuncios desde las tarjetas visibles de la página (precio, área y enlace), para
@@ -259,7 +273,8 @@ def extraer_de_tarjetas(html: str, fuente: str, base_url: str, operacion: str = 
             continue
         vistos.add(clave)
         titulo_el = el.find(["h1", "h2", "h3", "h4"]) or enlace
-        titulo = (titulo_el.get_text(" ", strip=True) if titulo_el is not None else "")[:120]
+        titulo = (titulo_el.get_text(" ", strip=True) if titulo_el is not None else "")[:200]
+        titulo = _limpiar_titulo(titulo)[:120]
         if _NO_APTO.search(titulo) or _NO_APTO.search(texto[:200]):
             continue
         etiqueta, dueno = clasificar_anunciante("", "", texto)
