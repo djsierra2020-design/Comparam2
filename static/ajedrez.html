@@ -111,7 +111,22 @@ let S = cargar();
 let tab = "inscritos";
 
 function nuevo() {
-  return { modo: null, nombre: "", rondas: 5, participantes: [], rondasJugadas: [], sig: 1 };
+  return { modo: null, nombre: "", rondas: 0, participantes: [], rondasJugadas: [], sig: 1 };
+}
+/* Número de rondas según el reglamento del sistema suizo:
+   - Mínimo: log2(N) redondeado hacia arriba, para que pueda haber un único ganador.
+   - Se juega una ronda más (con más de 4 participantes) para definir también los demás puestos.
+   - Máximo N−1 (con más rondas ya sería todos contra todos) y 11 rondas (máximo de los suizos FIDE,
+     como la Olimpiada). */
+const MAX_RONDAS = 11;
+function rondasReglamento(n) {
+  if (n < 2) return 0;
+  const minimo = Math.ceil(Math.log2(n));
+  return Math.max(1, Math.min(n - 1, MAX_RONDAS, minimo + (n > 4 ? 1 : 0)));
+}
+// Mientras no empieza el torneo depende de los inscritos; al generar la ronda 1 queda fija.
+function totalRondas() {
+  return S.rondasJugadas.length ? S.rondas : rondasReglamento(S.participantes.length);
 }
 function cargar() {
   try { const t = localStorage.getItem(KEY); if (t) return JSON.parse(t); } catch (e) {}
@@ -326,6 +341,7 @@ function nuevaRonda() {
   if (activos < 2) return alert("Se necesitan al menos 2 participantes.");
   const ult = S.rondasJugadas[S.rondasJugadas.length - 1];
   if (ult && !rondaCompleta(ult)) return alert("Primero anota todos los resultados de la ronda actual.");
+  if (!S.rondasJugadas.length) S.rondas = rondasReglamento(S.participantes.length);
   if (S.rondasJugadas.length >= S.rondas) return alert("Ya se jugaron todas las rondas del torneo.");
   const emp = generarEmparejamientos();
   if (!emp) return alert("No fue posible emparejar esta ronda.");
@@ -379,7 +395,7 @@ function render() {
   }
   const hechas = S.rondasJugadas.length;
   document.getElementById("subtitulo").textContent =
-    `${esEquipos() ? "Por equipos de 4" : "Individual"} · ${S.participantes.length} ${esEquipos() ? "equipos" : "jugadores"} · ronda ${hechas} de ${S.rondas}`;
+    `${esEquipos() ? "Por equipos de 4" : "Individual"} · ${S.participantes.length} ${esEquipos() ? "equipos" : "jugadores"} · ronda ${hechas} de ${totalRondas()}`;
   const tabs = [["inscritos", esEquipos() ? "Equipos" : "Jugadores"], ["rondas", "Programación"], ["clasificacion", "Clasificación"]];
   app.innerHTML = `
     <nav class="tabs" role="tablist">${tabs.map(([k, t]) => `<button role="tab" class="${tab === k ? "on" : ""}" onclick="tab='${k}';render()">${t}</button>`).join("")}</nav>
@@ -392,7 +408,7 @@ function render() {
 
 function vistaInscritos() {
   const n = S.participantes.length, empezado = S.rondasJugadas.length > 0;
-  const sugeridas = Math.max(1, Math.ceil(Math.log2(Math.max(n, 2))) + (n > 8 ? 1 : 0));
+  const rondas = totalRondas(), minimo = n >= 2 ? Math.ceil(Math.log2(n)) : 0;
   const alta = esEquipos()
     ? `<form id="formAlta" class="card" onsubmit="event.preventDefault();agregar(this)">
         <h2>Inscribir equipo</h2>
@@ -420,11 +436,14 @@ function vistaInscritos() {
       <h2>Datos del torneo</h2>
       <div class="row">
         <label style="flex:1;min-width:200px">Nombre del torneo<input value="${esc(S.nombre)}" onchange="S.nombre=this.value;guardar();render()"></label>
-        <label style="width:150px">Número de rondas<input type="number" min="${Math.max(1, S.rondasJugadas.length)}" max="20" value="${S.rondas}"
-          onchange="S.rondas=Math.max(${Math.max(1, S.rondasJugadas.length)},Number(this.value)||1);guardar();render()"></label>
+
       </div>
-      <p class="note">Recomendado para ${n} ${esEquipos() ? "equipos" : "jugadores"}: <b>${sugeridas}</b> rondas.
-        Modalidad: <b>${esEquipos() ? "por equipos de 4 tableros" : "individual"}</b>.</p>
+      <p class="note">Modalidad: <b>${esEquipos() ? "por equipos de 4 tableros" : "individual"}</b>.
+        ${n < 2 ? "El número de rondas se calcula según el reglamento al inscribir a los participantes."
+          : `Rondas según el reglamento: <b>${rondas}</b>${empezado ? " (fijadas al empezar el torneo)" : ""}.
+        Con ${n} ${esEquipos() ? "equipos" : "jugadores"} hacen falta al menos ${minimo} rondas para que haya un único ganador
+        (log<sub>2</sub> de ${n} redondeado hacia arriba)${n > 4 ? " y se juega una más para definir los demás puestos" : ""};
+        nunca más de ${Math.min(n - 1, MAX_RONDAS)} (${n - 1 < MAX_RONDAS ? "con más sería todos contra todos" : "máximo de los suizos FIDE"}).`}</p>
     </div>
     ${alta}
     <div class="card">
@@ -450,10 +469,10 @@ function selectRes(valor, onchange) {
 function vistaRondas() {
   const total = S.rondasJugadas.length;
   const ult = S.rondasJugadas[total - 1];
-  const puede = total < S.rondas && (!ult || rondaCompleta(ult)) && S.participantes.filter((p) => !p.retirado).length >= 2;
+  const puede = total < totalRondas() && (!ult || rondaCompleta(ult)) && S.participantes.filter((p) => !p.retirado).length >= 2;
   const st = estadisticas();
   let html = `<div class="toolbar">
-      ${total < S.rondas ? `<button class="btn primary" onclick="nuevaRonda()" ${puede ? "" : "disabled"}>Generar ronda ${total + 1}</button>` : ""}
+      ${total < totalRondas() ? `<button class="btn primary" onclick="nuevaRonda()" ${puede ? "" : "disabled"}>Generar ronda ${total + 1}</button>` : ""}
       <button class="btn" onclick="window.print()">Imprimir</button>
       ${total ? `<button class="btn danger" onclick="borrarUltima()">Borrar última ronda</button>` : ""}
     </div>`;

@@ -31,6 +31,10 @@ y se anotan los resultados. Pestañas: inscritos, **Programación** (rondas) y *
 - Equipos: ganar el encuentro da **1 punto** (empate ½). El primer desempate es la **suma de los resultados
   de cada partida** (puntos de partidas de los 4 tableros); después Buchholz y Sonneborn-Berger.
 
+El número de rondas no se pregunta: se calcula según el reglamento del sistema suizo
+(log₂ de los participantes redondeado hacia arriba, más una ronda para definir los puestos cuando hay más de 4;
+como máximo participantes − 1 y 11 rondas) y queda fijo al generar la ronda 1.
+
 Los datos se guardan en el navegador y se pueden exportar/importar en `.json`.
 
 ## Instalación
