@@ -22,6 +22,7 @@ class Resultado:
     otros_barrios: list[Listing] = field(default_factory=list)  # descartados: son de otro barrio
     por_fuente: dict[str, int] = field(default_factory=dict)  # anuncios leídos de cada portal
     publicados: int = 0  # anuncios que los portales dicen tener para la búsqueda
+    ocultos: int = 0  # anuncios de inmobiliarias que no se muestran porque se pidió solo dueño directo
 
 
 @dataclass
@@ -66,7 +67,7 @@ def _sin_duplicados(anuncios: list[Listing]) -> list[Listing]:
 def _filtrar(anuncios, solo_dueno, con_telefono, area_min, precio_max) -> list[Listing]:
     return [
         a for a in anuncios
-        if (not solo_dueno or a.es_dueno_directo)
+        if (not solo_dueno or a.es_dueno_directo or a.verificar)
         and (not con_telefono or a.telefonos)
         and (area_min is None or a.area_m2 >= area_min)
         and (precio_max is None or a.precio <= precio_max)
@@ -136,8 +137,9 @@ def buscar(barrio: str, fuentes: list[Source], operacion: str = "venta", solo_du
     unicos = _sin_duplicados(todos)
     filtrados = _filtrar(unicos, solo_dueno, con_telefono, area_min, precio_max)
     filtrados.sort(key=lambda a: a.precio_m2)
+    ocultos = sum(1 for a in unicos if not (a.es_dueno_directo or a.verificar)) if solo_dueno else 0
     return Resultado(filtrados[:limite] if limite else filtrados, errores, len(unicos), valor_zona(unicos),
-                     sorted(unicos, key=lambda a: a.precio_m2), otros, por_fuente, publicados)
+                     sorted(unicos, key=lambda a: a.precio_m2), otros, por_fuente, publicados, ocultos)
 
 
 # --------------------------------------------------------------------------- toda Bogotá
@@ -183,6 +185,7 @@ class ResultadoCiudad:
     zona_pequena: int = 0  # anuncios de barrios con muy pocos anuncios para comparar
     por_fuente: dict[str, int] = field(default_factory=dict)
     publicados: int = 0
+    ocultos: int = 0  # anuncios comparables de inmobiliarias no mostrados (se pidió solo dueño directo)
 
 
 _CACHE: dict[tuple, tuple] = {}
@@ -228,7 +231,7 @@ def buscar_ciudad(fuentes: list[Source], operacion: str = "venta", solo_dueno: b
     zonas_barrio = {k: v for k, g in grupos.items() if len(g) >= min_por_zona and (v := valor_zona(g))}
     zonas_loc = {loc: v for loc, g in por_localidad.items() if len(g) >= min_por_zona and (v := valor_zona(g))}
 
-    oportunidades, pequena = [], 0
+    oportunidades, pequena, ocultos = [], 0, 0
     usadas: dict[str, ValorZona] = {}
     filtrados = {id(a) for a in _filtrar(unicos, solo_dueno, con_telefono, area_min, precio_max)}
     for a in unicos:
@@ -243,6 +246,8 @@ def buscar_ciudad(fuentes: list[Source], operacion: str = "venta", solo_dueno: b
             pequena += 1
             continue
         usadas[zona] = valor
+        if solo_dueno and not (a.es_dueno_directo or a.verificar):
+            ocultos += 1
         if id(a) in filtrados:
             oportunidades.append(Oportunidad(a, zona, valor, nivel))
     oportunidades.sort(key=lambda o: o.diferencia)
@@ -257,4 +262,4 @@ def buscar_ciudad(fuentes: list[Source], operacion: str = "venta", solo_dueno: b
             f.completar_detalle(o.anuncio, operacion)
 
     return ResultadoCiudad(oportunidades, dict(sorted(usadas.items(), key=lambda kv: kv[1].mediana)),
-                           errores, len(unicos), sin_zona, pequena, por_fuente, publicados)
+                           errores, len(unicos), sin_zona, pequena, por_fuente, publicados, ocultos)

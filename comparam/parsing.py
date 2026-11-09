@@ -14,7 +14,7 @@ _DUENO = re.compile(
 # Palabras que indican inmobiliaria / agente.
 _INMOBILIARIA = re.compile(
     r"inmobiliaria|bienes\s+ra[ií]ces|real\s+estate|propiedad\s+ra[ií]z|agente|asesor\s+comercial"
-    r"|broker|corredor|s\.?a\.?s\b|ltda",
+    r"|broker|corredor|\bs\.?a\.?s\b|\bltda\b",
     re.I,
 )
 

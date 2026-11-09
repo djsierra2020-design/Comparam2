@@ -17,7 +17,7 @@ from urllib.parse import urljoin
 from bs4 import BeautifulSoup
 
 from ..models import Listing
-from ..parsing import clasificar_anunciante, extract_phones, parse_number
+from ..parsing import clasificar_anunciante, extract_phones, parece_persona, parse_number
 
 K_PRECIO_VENTA = ("salePrice", "sale_price", "precioVenta", "mvalorventa", "valorVenta")
 K_PRECIO_ARRIENDO = ("rentPrice", "rent_price", "precioArriendo", "mvalorarriendo", "valorArriendo", "canon")
@@ -313,6 +313,9 @@ def extraer_de_json(bloques: list, fuente: str, base_url: str, operacion: str = 
             vistos.add(clave)
             tipo, nombre = _anunciante(d)
             etiqueta, dueno = clasificar_anunciante(tipo, nombre, descripcion)
+            verificar = not dueno and etiqueta == "inmobiliaria" and parece_persona(nombre)
+            if verificar:
+                etiqueta = f"verificar · {nombre.strip()}"
             telefonos = list(dict.fromkeys(_telefonos(d) + extract_phones(descripcion)))
             anuncios.append(Listing(
                 fuente=fuente,
@@ -325,6 +328,7 @@ def extraer_de_json(bloques: list, fuente: str, base_url: str, operacion: str = 
                 telefonos=telefonos,
                 publicado_por=etiqueta or (nombre and f"{nombre}") or "",
                 es_dueno_directo=dueno,
+                verificar=verificar,
                 habitaciones=int(h) if (h := _num(_primero(d, K_HAB))) else None,
                 banos=int(b) if (b := _num(_primero(d, K_BANOS))) else None,
                 descripcion=descripcion[:500],

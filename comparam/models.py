@@ -14,6 +14,9 @@ class Listing:
     telefonos: list[str] = field(default_factory=list)
     publicado_por: str = ""  # "dueño directo", "inmobiliaria" o "" si se desconoce
     es_dueno_directo: bool = False
+    # Persona (no empresa) a la que el portal marca como cuenta profesional: puede ser el dueño con un
+    # plan pagado o un agente independiente. Se muestra junto a los dueños, con etiqueta «verificar».
+    verificar: bool = False
     habitaciones: int | None = None
     banos: int | None = None
     descripcion: str = ""

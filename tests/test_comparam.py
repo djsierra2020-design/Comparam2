@@ -494,3 +494,45 @@ def test_sonda_solo_portales():
     assert c.get("/api/sonda?url=https://evil.example.com/").status_code == 400
     assert c.get("/api/sonda?url=http://www.fincaraiz.com.co/").status_code == 400
     assert c.get("/api/sonda?url=https://fincaraiz.com.co.evil.com/").status_code == 400
+
+
+def test_persona_con_cuenta_profesional_es_verificar():
+    import json
+    datos = {"props": {"lista": [
+        {"title": "Apartamento en Venta en Cedritos, Bogotá", "price": 325000000, "area": 63, "link": "/a/1",
+         "owner": {"type": "Inmobiliaria", "name": "OLGA PATRICIA ROJAS QUINTERO"}},
+        {"title": "Apartamento en Venta en Cedritos, Bogotá", "price": 400000000, "area": 70, "link": "/a/2",
+         "owner": {"type": "Inmobiliaria", "name": "Inmobiliaria Norte SAS"}},
+        {"title": "Apartamento en Venta en Cedritos, Bogotá", "price": 300000000, "area": 60, "link": "/a/3",
+         "owner": {"name": "Andrea"}},
+    ]}}
+    html = f'<script id="__NEXT_DATA__" type="application/json">{json.dumps(datos)}</script>'
+    a = {x.url[-1]: x for x in extraer_anuncios(html, "fincaraiz", "https://f.co")}
+    assert a["1"].verificar and not a["1"].es_dueno_directo
+    assert a["1"].publicado_por == "verificar · OLGA PATRICIA ROJAS QUINTERO"
+    assert not a["2"].verificar and a["2"].publicado_por == "inmobiliaria"
+    assert a["3"].es_dueno_directo and not a["3"].verificar
+
+    class P:
+        nombre = "fincaraiz"
+
+        def buscar(self, barrio, operacion="venta"):
+            return list(a.values())
+
+    r = buscar("Cedritos", [P()])
+    assert {x.url[-1] for x in r.anuncios} == {"1", "3"} and r.ocultos == 1  # «verificar» se muestra
+    assert buscar("Cedritos", [P()], solo_dueno=False).ocultos == 0
+
+
+def test_casas_en_la_descripcion_no_es_inmobiliaria():
+    assert clasificar_anunciante("", "", "Conjunto con casas y zonas verdes")[0] != "inmobiliaria"
+    assert clasificar_anunciante("", "", "Vende Inmobiliaria Norte S.A.S.")[0] == "inmobiliaria"
+
+
+def test_aviso_de_ocultos_y_ver_todos():
+    import app as webapp
+    html = webapp.app.test_client().get("/?barrio=Cedritos&modo=barrio&fuente=ejemplo").get_data(as_text=True)
+    assert "de inmobiliarias ocultos" in html and "todos=1" in html and "Ver todos" in html
+    msg = webapp._mensaje_whatsapp([{"operacion": "venta", "zona": "Cedritos", "area_m2": 63, "precio": 325000000,
+                                     "url": "https://f.co/1", "verificar": True}], "09/11/2026")
+    assert "verificar" in msg

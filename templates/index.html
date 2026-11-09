@@ -106,6 +106,9 @@
          background:var(--marca-suave); color:var(--marca) }
   .item:first-child .pos { background:var(--marca); color:#fff }
   .tag { font-size:12px; padding:3px 9px; border-radius:999px; background:var(--bg); color:var(--mut) }
+  .tag.verificar { background:#fef3c7; color:#92400e; font-weight:700 }
+  @media (prefers-color-scheme: dark) { .tag.verificar { background:#3a2a06; color:#fcd34d } }
+  .ocultos { margin:-2px 4px 6px; font-size:13px; color:var(--mut) } .ocultos a { font-weight:700 }
   .tag.portal { background:var(--marca-suave); color:var(--marca); font-weight:700 }
   .tit { font-weight:700; font-size:16px; line-height:1.3 } .tit a { color:inherit; text-decoration:none }
   .precio { display:flex; align-items:flex-end; justify-content:space-between; gap:12px; margin-top:10px; flex-wrap:wrap }
@@ -255,13 +258,14 @@
   </section>
   {% if rc.oportunidades %}
   <div class="titulo-lista">Los {{ rc.oportunidades|length }} más baratos frente a su barrio{% if p.solo_dueno %} · dueño directo{% endif %}</div>
+  {% if rc.ocultos %}<div class="ocultos">{{ rc.ocultos|miles }} anuncios de inmobiliarias ocultos · <a href="{{ url_con_inmobiliarias() }}">Ver todos</a></div>{% endif %}
   <div class="barra-filtros"><button type="button" id="abrir-filtros">⚙ Filtros</button><span class="meta" id="conteo"></span></div>
   <ol class="lista" id="lista">
   {% for o in rc.oportunidades %}{% set a = o.anuncio %}{% set h = hist(a, p.operacion) %}
     <li class="item" data-pos="{{ loop.index }}" data-m2="{{ a.precio_m2|round|int }}" data-precio="{{ a.precio|int }}"
         data-area="{{ a.area_m2 }}" data-hab="{{ a.habitaciones or 0 }}" data-vs="{{ o.diferencia|round(1) }}"
-        data-dias="{{ h.dias if h and h.dias is not none else -1 }}" data-baja="{{ h.baja_pct if h else 0 }}">
-      <div class="top"><span class="pos">{{ loop.index }}</span><span class="tag portal">{{ a.fuente|portal }}</span><span class="tag">{{ a.publicado_por or 'anunciante desconocido' }}</span></div>
+        data-dias="{{ h.dias if h and h.dias is not none else -1 }}" data-baja="{{ h.baja_pct if h else 0 }}" data-verificar="{{ 1 if a.verificar else 0 }}">
+      <div class="top"><span class="pos">{{ loop.index }}</span><span class="tag portal">{{ a.fuente|portal }}</span><span class="tag {{ 'verificar' if a.verificar }}">{{ a.publicado_por or 'anunciante desconocido' }}</span></div>
       <div class="tit">{% if a.url %}<a href="{{ a.url }}" target="_blank" rel="noopener">{{ a.titulo }}</a>{% else %}{{ a.titulo }}{% endif %}</div>
       <div class="meta"><b>{{ o.zona }}</b> · {{ a.precio|pesos }} · {{ '%g'|format(a.area_m2) }} m²{% if a.habitaciones %} · {{ a.habitaciones }} hab{% endif %}{% if a.banos %} · {{ a.banos }} baños{% endif %}</div>
       <div class="precio">
@@ -315,14 +319,15 @@
   {% endif %}
   {% if r.anuncios %}
   <div class="titulo-lista">{{ r.anuncios|length }} resultado(s) en {{ barrio }} <span class="meta">· {{ r.total_encontrados }} anuncios revisados</span></div>
+  {% if r.ocultos %}<div class="ocultos">{% set nd = r.anuncios|selectattr('es_dueno_directo')|list|length %}{% set nv = r.anuncios|selectattr('verificar')|list|length %}{{ nd }} de dueño directo{% if nv %} · {{ nv }} por verificar{% endif %} · {{ r.ocultos }} de inmobiliarias ocultos · <a href="{{ url_con_inmobiliarias() }}">Ver todos</a></div>{% endif %}
   <div class="barra-filtros"><button type="button" id="abrir-filtros">⚙ Filtros</button><span class="meta" id="conteo"></span></div>
   <ol class="lista" id="lista">
   {% for a in r.anuncios %}{% set h = hist(a, p.operacion) %}
     <li class="item" data-pos="{{ loop.index }}" data-m2="{{ a.precio_m2|round|int }}" data-precio="{{ a.precio|int }}"
         data-area="{{ a.area_m2 }}" data-hab="{{ a.habitaciones or 0 }}"
         data-vs="{{ r.zona.diferencia(a.precio_m2)|round(1) if r.zona else 0 }}"
-        data-dias="{{ h.dias if h and h.dias is not none else -1 }}" data-baja="{{ h.baja_pct if h else 0 }}">
-      <div class="top"><span class="pos">{{ loop.index }}</span><span class="tag portal">{{ a.fuente|portal }}</span><span class="tag">{{ a.publicado_por or 'anunciante desconocido' }}</span></div>
+        data-dias="{{ h.dias if h and h.dias is not none else -1 }}" data-baja="{{ h.baja_pct if h else 0 }}" data-verificar="{{ 1 if a.verificar else 0 }}">
+      <div class="top"><span class="pos">{{ loop.index }}</span><span class="tag portal">{{ a.fuente|portal }}</span><span class="tag {{ 'verificar' if a.verificar }}">{{ a.publicado_por or 'anunciante desconocido' }}</span></div>
       <div class="tit">{% if a.url %}<a href="{{ a.url }}" target="_blank" rel="noopener">{{ a.titulo }}</a>{% else %}{{ a.titulo }}{% endif %}</div>
       <div class="meta">{{ a.precio|pesos }} · {{ '%g'|format(a.area_m2) }} m²{% if a.habitaciones %} · {{ a.habitaciones }} hab{% endif %}{% if a.banos %} · {{ a.banos }} baños{% endif %} · {{ a.barrio }}</div>
       <div class="precio">
@@ -335,7 +340,7 @@
   {% endfor %}
   </ol>
   {% else %}
-  <div class="aviso">No se encontraron apartamentos {% if p.solo_dueno %}de dueño directo {% endif %}en {{ barrio }} ({{ r.total_encontrados }} anuncios revisados).{% if p.solo_dueno %} Prueba marcando «Incluir inmobiliarias».{% endif %}</div>
+  <div class="aviso">No se encontraron apartamentos {% if p.solo_dueno %}de dueño directo {% endif %}en {{ barrio }} ({{ r.total_encontrados }} anuncios revisados).{% if p.solo_dueno %} <a href="{{ url_con_inmobiliarias() }}">Ver los de inmobiliarias</a>.{% endif %}</div>
   {% endif %}
 {% endif %}
 </main>
@@ -384,6 +389,7 @@
     <label><span>Bajo el precio de su zona<small>Oportunidades para clientes inversionistas</small></span><input type="checkbox" id="f-bajo"></label>
     <label><span>Más de 30 días publicado<small>Llevan tiempo sin venderse o arrendarse</small></span><input type="checkbox" id="f-30"></label>
     <label><span>Bajó de precio<small>El dueño ya está cediendo</small></span><input type="checkbox" id="f-baja"></label>
+    <label><span>Incluir «verificar»<small>Personas con cuenta profesional: puede ser el dueño o un agente</small></span><input type="checkbox" id="f-verif" checked></label>
   </div>
   <p class="meta">Los días publicado y las bajadas de precio salen del historial diario, que empezó el 8 de noviembre de 2026: se van completando con los días.</p>
 </section>
@@ -432,6 +438,7 @@ btn.addEventListener('click', function () { if (aviso) { aviso.prompt(); aviso =
     if ($('f-bajo').checked && !(Number(d.vs) < 0)) return false;
     if ($('f-30').checked && !(Number(d.dias) >= 30)) return false;
     if ($('f-baja').checked && !(Number(d.baja) > 0)) return false;
+    if (!$('f-verif').checked && d.verificar === '1') return false;
     return true;
   }
   var orden = {
@@ -446,7 +453,7 @@ btn.addEventListener('click', function () { if (aviso) { aviso.prompt(); aviso =
       var ok = pasa(it); it.classList.toggle('oculto', !ok); if (ok) n++; lista.appendChild(it);
     });
     var activos = [$('f-min').value, $('f-max').value, $('f-area').value].filter(Boolean).length + (hab ? 1 : 0) +
-      ['f-sobre', 'f-bajo', 'f-30', 'f-baja'].filter(function (id) { return $(id).checked; }).length +
+      ['f-sobre', 'f-bajo', 'f-30', 'f-baja'].filter(function (id) { return $(id).checked; }).length + ($('f-verif').checked ? 0 : 1) +
       ($('f-orden').value !== 'pos' ? 1 : 0);
     boton.textContent = '⚙ Filtros' + (activos ? ' (' + activos + ')' : ''); boton.classList.toggle('on', activos > 0);
     $('conteo').textContent = 'Mostrando ' + n + ' de ' + items.length;
@@ -454,7 +461,7 @@ btn.addEventListener('click', function () { if (aviso) { aviso.prompt(); aviso =
   }
   boton.addEventListener('click', function () { abrir(true); });
   [$('cerrar-filtros'), fondo, $('ver')].forEach(function (e) { e.addEventListener('click', function () { abrir(false); }); });
-  ['f-orden', 'f-sobre', 'f-bajo', 'f-30', 'f-baja'].forEach(function (id) { $(id).addEventListener('change', aplicar); });
+  ['f-orden', 'f-sobre', 'f-bajo', 'f-30', 'f-baja', 'f-verif'].forEach(function (id) { $(id).addEventListener('change', aplicar); });
   ['f-min', 'f-max', 'f-area'].forEach(function (id) { $(id).addEventListener('input', aplicar); });
   // Rango de precio: «Todos» (sin límite) o un rango. Escribir a mano marca el botón que coincida.
   function marcarRango() {
@@ -478,7 +485,7 @@ btn.addEventListener('click', function () { if (aviso) { aviso.prompt(); aviso =
   });
   $('limpiar').addEventListener('click', function () {
     ['f-min', 'f-max', 'f-area'].forEach(function (id) { $(id).value = ''; });
-    ['f-sobre', 'f-bajo', 'f-30', 'f-baja'].forEach(function (id) { $(id).checked = false; });
+    ['f-sobre', 'f-bajo', 'f-30', 'f-baja'].forEach(function (id) { $(id).checked = false; }); $('f-verif').checked = true;
     $('f-orden').value = 'pos'; hab = 0;
     document.querySelectorAll('#f-hab button').forEach(function (x) { x.classList.remove('on'); });
     document.querySelector('#f-hab button[data-v="0"]').classList.add('on'); marcarRango(); aplicar();

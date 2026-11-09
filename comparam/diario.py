@@ -64,7 +64,7 @@ def registrar(historial: dict, a: Listing, operacion: str, zona: str, dia: str, 
             "operacion": operacion, "zona": zona, "fuente": a.fuente, "titulo": a.titulo[:120],
             "barrio": a.barrio[:60], "url": a.url, "precio": round(a.precio), "area_m2": a.area_m2,
             "habitaciones": a.habitaciones, "banos": a.banos, "dueno_directo": a.es_dueno_directo,
-            "publicado": a.publicado, "primera_vez": dia, "ultima_vez": dia, "base": base,
+            "verificar": a.verificar, "publicado": a.publicado, "primera_vez": dia, "ultima_vez": dia, "base": base,
             "precios": [[dia, round(a.precio)]],
         }
         if ciudad:  # visto en el recorrido de toda Bogotá, no en las zonas del cliente
@@ -74,6 +74,7 @@ def registrar(historial: dict, a: Listing, operacion: str, zona: str, dia: str, 
     if not ciudad:
         e.pop("ciudad", None)  # también está en las zonas del cliente
     e["dueno_directo"] = e["dueno_directo"] or a.es_dueno_directo
+    e["verificar"] = a.verificar and not e["dueno_directo"]
     if a.publicado and not e.get("publicado"):
         e["publicado"] = a.publicado
     if round(a.precio) != e["precios"][-1][1]:  # cambió el precio
@@ -145,7 +146,7 @@ def nuevos(dias: int = 1, solo_dueno: bool = True, dia: date | None = None) -> l
     zonas = ultimo_resumen().get("zonas", {})
     salida = []
     for k, e in historial.items():
-        if e.get("base") or e.get("ciudad") or (solo_dueno and not e.get("dueno_directo")):
+        if e.get("base") or e.get("ciudad") or (solo_dueno and not (e.get("dueno_directo") or e.get("verificar"))):
             continue
         if (dia - date.fromisoformat(e["primera_vez"])).days >= dias:
             continue

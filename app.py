@@ -75,6 +75,16 @@ def _es_ciudad() -> bool:
     return request.args.get("modo") == "ciudad" or slugify(request.args.get("barrio", "")) in _CIUDAD
 
 
+def _url_con_inmobiliarias() -> str:
+    from urllib.parse import urlencode
+    args = request.args.to_dict(flat=False)
+    args["todos"] = ["1"]
+    return "/?" + urlencode(args, doseq=True)
+
+
+app.jinja_env.globals["url_con_inmobiliarias"] = _url_con_inmobiliarias
+
+
 @app.get("/")
 def inicio():
     if _es_ciudad():
@@ -102,7 +112,8 @@ def _mensaje_whatsapp(lista: list[dict], fecha: str) -> str:
                 partes.append(f"{e['habitaciones']} hab")
             if e.get("vs_zona") is not None:
                 partes.append(f"{abs(e['vs_zona'])}% {'bajo' if e['vs_zona'] < 0 else 'sobre'} la zona")
-            lineas.append(f"{i}. {' · '.join(partes)}\n{e['url']}")
+            nota = " _(verificar: puede ser agente)_" if e.get("verificar") else ""
+            lineas.append(f"{i}. {' · '.join(partes)}{nota}\n{e['url']}")
     return "\n".join(lineas)
 
 
