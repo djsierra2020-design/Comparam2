@@ -490,7 +490,7 @@ def test_sin_navegador_se_omiten_habi_y_houm(monkeypatch):
     assert [f.nombre for f in crear_fuentes(list(PORTALES))] == base + ["guardados"]
     assert [f.nombre for f in crear_fuentes(["fincaraiz"])] == ["fincaraiz"]
     monkeypatch.setenv("COMPARAM_NAVEGADOR", "1")  # revisión diaria de GitHub
-    assert [f.nombre for f in crear_fuentes()] == base + ["metrocuadrado", "habi", "houm"]
+    assert [f.nombre for f in crear_fuentes()] == base + ["habi", "houm"]
 
 
 def test_sonda_solo_portales():
@@ -628,13 +628,13 @@ def test_guardados_devuelve_portales_con_navegador(tmp_path, monkeypatch):
     monkeypatch.setattr(diario, "hoy", lambda: date(2026, 11, 10))
     base = {"area_m2": 70, "precios": [], "habitaciones": 2, "banos": 1, "verificar": False, "publicado": "2026-10-01"}
     diario.guardar_json(diario.HISTORIAL, {
-        "a": {**base, "fuente": "metrocuadrado", "operacion": "venta", "zona": "Cedritos", "barrio": "Cedritos",
+        "a": {**base, "fuente": "houm", "operacion": "venta", "zona": "Cedritos", "barrio": "Cedritos",
               "titulo": "Apartamento en Cedritos", "url": "https://m.co/1", "precio": 400000000,
               "dueno_directo": True, "anunciante": "dueño directo", "ultima_vez": "2026-11-10"},
-        "b": {**base, "fuente": "metrocuadrado", "operacion": "venta", "zona": "Bosa", "barrio": "Bosa",
+        "b": {**base, "fuente": "houm", "operacion": "venta", "zona": "Bosa", "barrio": "Bosa",
               "titulo": "Apartamento en Bosa", "url": "https://m.co/2", "precio": 200000000,
               "dueno_directo": False, "anunciante": "inmobiliaria", "ultima_vez": "2026-11-09"},
-        "c": {**base, "fuente": "metrocuadrado", "operacion": "venta", "zona": "Cedritos", "barrio": "Cedritos",
+        "c": {**base, "fuente": "houm", "operacion": "venta", "zona": "Cedritos", "barrio": "Cedritos",
               "titulo": "Viejo", "url": "https://m.co/3", "precio": 300000000,
               "dueno_directo": True, "anunciante": "dueño directo", "ultima_vez": "2026-11-01"},
         "d": {**base, "fuente": "fincaraiz", "operacion": "venta", "zona": "Cedritos", "barrio": "Cedritos",
@@ -646,9 +646,9 @@ def test_guardados_devuelve_portales_con_navegador(tmp_path, monkeypatch):
     assert {a.url for a in g.buscar("", "venta")} == {"https://m.co/1", "https://m.co/2"}
     assert g.buscar("Cedritos", "arriendo") == []
     a = g.buscar("Cedritos", "venta")[0]
-    assert a.fuente == "metrocuadrado" and a.es_dueno_directo and a.publicado_por == "dueño directo"
+    assert a.fuente == "houm" and a.es_dueno_directo and a.publicado_por == "dueño directo"
     r = buscar("Cedritos", [g])
-    assert len(r.anuncios) == 1 and r.anuncios[0].fuente == "metrocuadrado"
+    assert len(r.anuncios) == 1 and r.anuncios[0].fuente == "houm"
 
 
 def test_diagnostico_no_se_cae_si_un_portal_falla(monkeypatch):
@@ -726,3 +726,20 @@ def test_portal_trabado_no_frena_la_busqueda(monkeypatch):
     soltar.set()
     assert time.time() - t < 5
     assert len(r.anuncios) == 1 and any("rentola: tardó más de 1 s" in e for e in r.errores)
+
+
+def test_navegador_se_corta_si_la_pagina_se_traba(tmp_path, monkeypatch):
+    import pytest
+    from comparam.sources import navegador
+
+    monkeypatch.setenv("COMPARAM_NAVEGADOR", "1")
+    pagina = tmp_path / "trabada.html"
+    # La página bloquea el hilo de JavaScript para siempre: el navegador queda trabado.
+    pagina.write_text("<html><body><script>while (true) {}</script></body></html>")
+    import time
+    t = time.time()
+    with pytest.raises(navegador.FuenteError) as e:
+        navegador.renderizar(pagina.as_uri(), espera_ms=200, desplazamientos=1, timeout_ms=3_000)
+    if "no pudo abrir" in str(e.value) and "Executable" in str(e.value):
+        pytest.skip("navegador no instalado")
+    assert time.time() - t < 60

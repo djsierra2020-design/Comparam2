@@ -12,7 +12,7 @@ from ..models import Listing
 from ..parsing import slugify
 from .base import Source
 
-PORTALES_NAVEGADOR = ("metrocuadrado", "habi", "houm")
+PORTALES_NAVEGADOR = ("habi", "houm")
 
 
 class Guardados(Source):

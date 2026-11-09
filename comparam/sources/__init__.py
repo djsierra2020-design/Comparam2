@@ -6,8 +6,10 @@ from .archivo import ArchivoCSV
 # diaria de GitHub). En Render se leen sus anuncios guardados (sources/guardados.py).
 # MercadoLibre (captcha de «Seguridad») y Properati (HTTP 401) bloquean las consultas automáticas:
 # quedan fuera; no se intenta saltar esas protecciones.
-PORTALES = {"fincaraiz": FincaRaiz, "ciencuadras": Ciencuadras, "rentola": Rentola,
-            "metrocuadrado": Metrocuadrado, "habi": Habi, "houm": Houm}
+# Metrocuadrado tampoco muestra anuncios a un navegador automático (0 incluso con navegador en
+# GitHub): queda fuera; no se intenta evadir esa detección.
+PORTALES = {"fincaraiz": FincaRaiz, "ciencuadras": Ciencuadras, "rentola": Rentola, "habi": Habi,
+            "houm": Houm}
 
 __all__ = ["Source", "FuenteError", "FincaRaiz", "Metrocuadrado", "Ciencuadras", "Habi", "Houm",
            "MercadoLibre", "Properati", "Rentola", "ArchivoCSV", "PORTALES"]
