@@ -74,6 +74,12 @@ para buscar teléfonos. Los resultados se guardan 15 minutos para que cambiar fi
 Páginas por portal: variable `COMPARAM_PAGINAS_CIUDAD` (por defecto 5). Más páginas = más
 anuncios de dueño directo, pero la búsqueda tarda más.
 
+### Metrocuadrado, Habi y Houm (navegador en la revisión diaria)
+Estos portales cargan los anuncios con JavaScript y abrirlos con navegador en Render (512 MB) daba
+error 502. Por eso la revisión diaria de GitHub instala Chromium y los abre una vez al día
+(`COMPARAM_NAVEGADOR=1`, `COMPARAM_PAGINAS_NAVEGADOR=3`); sus anuncios quedan en el historial y la
+app los muestra desde ahí (`comparam/sources/guardados.py`, anuncios vistos en las últimas 48 h).
+
 ### Habi y Houm (navegador)
 Estos portales cargan los anuncios con JavaScript, así que se abren con un navegador sin ventana
 (Playwright + Chromium). En Render: **Build Command** `bash build.sh` y **Start Command**

@@ -482,12 +482,15 @@ def test_diario_toda_bogota_e_historial_en_tarjetas(tmp_path, monkeypatch):
 
 def test_sin_navegador_se_omiten_habi_y_houm(monkeypatch):
     from comparam.config import crear_fuentes
+    from comparam.sources import PORTALES
     monkeypatch.delenv("COMPARAM_NAVEGADOR", raising=False)
-    assert [f.nombre for f in crear_fuentes()] == ["fincaraiz", "ciencuadras", "mercadolibre", "properati",
-                                                  "rentola"]
-    monkeypatch.setenv("COMPARAM_NAVEGADOR", "1")
-    assert [f.nombre for f in crear_fuentes()] == ["fincaraiz", "ciencuadras", "mercadolibre", "properati",
-                                                   "rentola", "habi", "houm"]
+    base = ["fincaraiz", "ciencuadras", "mercadolibre", "properati", "rentola"]
+    # Sin navegador (Render): Metrocuadrado, Habi y Houm salen de los anuncios guardados
+    assert [f.nombre for f in crear_fuentes()] == base + ["guardados"]
+    assert [f.nombre for f in crear_fuentes(list(PORTALES))] == base + ["guardados"]
+    assert [f.nombre for f in crear_fuentes(["fincaraiz"])] == ["fincaraiz"]
+    monkeypatch.setenv("COMPARAM_NAVEGADOR", "1")  # revisión diaria de GitHub
+    assert [f.nombre for f in crear_fuentes()] == base + ["metrocuadrado", "habi", "houm"]
 
 
 def test_sonda_solo_portales():
@@ -614,3 +617,35 @@ def test_diagnostico_portal_sin_la_operacion():
     from comparam.sources import Habi, Rentola
     assert "no tiene venta" in Rentola().diagnosticar("", "venta")["error"]
     assert "no tiene arriendo" in Habi().diagnosticar("", "arriendo")["error"]
+
+
+def test_guardados_devuelve_portales_con_navegador(tmp_path, monkeypatch):
+    from datetime import date
+    from comparam import diario
+    from comparam.sources.guardados import Guardados
+
+    monkeypatch.setattr(diario, "HISTORIAL", tmp_path / "anuncios.json")
+    monkeypatch.setattr(diario, "hoy", lambda: date(2026, 11, 10))
+    base = {"area_m2": 70, "precios": [], "habitaciones": 2, "banos": 1, "verificar": False, "publicado": "2026-10-01"}
+    diario.guardar_json(diario.HISTORIAL, {
+        "a": {**base, "fuente": "metrocuadrado", "operacion": "venta", "zona": "Cedritos", "barrio": "Cedritos",
+              "titulo": "Apartamento en Cedritos", "url": "https://m.co/1", "precio": 400000000,
+              "dueno_directo": True, "anunciante": "dueño directo", "ultima_vez": "2026-11-10"},
+        "b": {**base, "fuente": "metrocuadrado", "operacion": "venta", "zona": "Bosa", "barrio": "Bosa",
+              "titulo": "Apartamento en Bosa", "url": "https://m.co/2", "precio": 200000000,
+              "dueno_directo": False, "anunciante": "inmobiliaria", "ultima_vez": "2026-11-09"},
+        "c": {**base, "fuente": "metrocuadrado", "operacion": "venta", "zona": "Cedritos", "barrio": "Cedritos",
+              "titulo": "Viejo", "url": "https://m.co/3", "precio": 300000000,
+              "dueno_directo": True, "anunciante": "dueño directo", "ultima_vez": "2026-11-01"},
+        "d": {**base, "fuente": "fincaraiz", "operacion": "venta", "zona": "Cedritos", "barrio": "Cedritos",
+              "titulo": "De Finca Raíz", "url": "https://f.co/4", "precio": 300000000,
+              "dueno_directo": True, "anunciante": "dueño directo", "ultima_vez": "2026-11-10"},
+    })
+    g = Guardados()
+    assert [a.url for a in g.buscar("Cedritos", "venta")] == ["https://m.co/1"]  # ni viejos ni Finca Raíz
+    assert {a.url for a in g.buscar("", "venta")} == {"https://m.co/1", "https://m.co/2"}
+    assert g.buscar("Cedritos", "arriendo") == []
+    a = g.buscar("Cedritos", "venta")[0]
+    assert a.fuente == "metrocuadrado" and a.es_dueno_directo and a.publicado_por == "dueño directo"
+    r = buscar("Cedritos", [g])
+    assert len(r.anuncios) == 1 and r.anuncios[0].fuente == "metrocuadrado"

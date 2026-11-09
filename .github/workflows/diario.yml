@@ -24,7 +24,13 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -r requirements.txt
+      - name: Instalar el navegador (Metrocuadrado, Habi y Houm)
+        run: python -m playwright install --with-deps --only-shell chromium
+        continue-on-error: true   # si falla, la revisión sigue con los demás portales
       - name: Revisar los portales
+        env:
+          COMPARAM_NAVEGADOR: "1"
+          COMPARAM_PAGINAS_NAVEGADOR: "3"
         run: python -m comparam.diario
       - name: Guardar el historial en el repositorio
         run: |
