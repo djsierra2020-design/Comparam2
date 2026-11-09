@@ -32,6 +32,7 @@ class PortalWeb(Source):
     base_url = ""
     plantilla = ""  # URL de búsqueda en un barrio
     plantilla_ciudad = ""  # URL de búsqueda en toda Bogotá
+    por_pagina = 48  # para {desde} en portales que paginan por posición
     operaciones = {"venta": "venta", "arriendo": "arriendo"}
 
     def __init__(self, paginas: int = 2, detalle: bool = True, timeout: float = 20,
@@ -49,13 +50,14 @@ class PortalWeb(Source):
     def url_busqueda(self, barrio: str, operacion: str, pagina: int) -> str:
         plantilla = self.plantilla if barrio.strip() else self.plantilla_ciudad
         return plantilla.format(operacion=self.operaciones[operacion], barrio=slugify(barrio),
-                                     pagina=pagina)
+                                pagina=pagina, desde=(pagina - 1) * self.por_pagina + 1)
 
     def _get(self, url: str) -> str:
         try:
             r = self.sesion.get(url, timeout=self.timeout)
         except requests.RequestException as e:
             raise FuenteError(f"{self.nombre}: no se pudo conectar ({e.__class__.__name__})") from e
+        self.ultima_respuesta = r
         if r.status_code == 404:
             return ""
         if r.status_code >= 400:
@@ -273,3 +275,49 @@ class Houm(PortalConNavegador):
     base_url = "https://houm.com"
     # Dirección confirmada por el usuario: https://houm.com/co/venta-apartamentos-bogota
     plantilla_ciudad = base_url + "/co/{operacion}-apartamentos-bogota?page={pagina}"
+
+
+class PortalCiudad(PortalWeb):
+    """Portal que se consulta por ciudad; si se busca un barrio, se filtra aquí por su nombre."""
+    paginas_ciudad = 3
+
+    def url_busqueda(self, barrio: str, operacion: str, pagina: int) -> str:
+        return super().url_busqueda("", operacion, pagina)
+
+    def buscar(self, barrio: str, operacion: str = "venta") -> list[Listing]:
+        objetivo = slugify(barrio)
+        if objetivo:  # más páginas para que el filtro por barrio encuentre algo
+            self.paginas = max(self.paginas, self.paginas_ciudad)
+        anuncios = super().buscar("", operacion)
+        if objetivo:
+            anuncios = [a for a in anuncios
+                        if objetivo in slugify(f"{a.barrio} {a.ubicacion} {a.titulo} {a.url}")]
+        return anuncios
+
+
+class MercadoLibre(PortalCiudad):
+    """MercadoLibre Inmuebles con su filtro propio «Dueño directo» (/directo/).
+
+    Como el portal ya filtra por dueño directo, sus anuncios se marcan como tales, pero solo si la
+    página que respondió conserva el filtro (si el portal lo ignora, no se marcan)."""
+    nombre = "mercadolibre"
+    base_url = "https://listado.mercadolibre.com.co"
+    plantilla_ciudad = base_url + "/apartamentos-{operacion}-en-bogota-dc/directo/_Desde_{desde}_NoIndex_True"
+    operaciones = {"venta": "venta", "arriendo": "arriendo"}
+
+    def buscar(self, barrio: str, operacion: str = "venta") -> list[Listing]:
+        self.detalle = False
+        anuncios = super().buscar(barrio, operacion)
+        respuesta = getattr(self, "ultima_respuesta", None)
+        con_filtro = respuesta is None or "/directo" in str(getattr(respuesta, "url", "/directo"))
+        for a in anuncios:
+            if con_filtro and not a.publicado_por.startswith("inmobiliaria"):
+                a.es_dueno_directo, a.verificar = True, False
+                a.publicado_por = a.publicado_por or "dueño directo (MercadoLibre)"
+        return anuncios
+
+
+class Properati(PortalCiudad):
+    nombre = "properati"
+    base_url = "https://www.properati.com.co"
+    plantilla_ciudad = base_url + "/s/bogota-d-c/apartamento/{operacion}?page={pagina}"
