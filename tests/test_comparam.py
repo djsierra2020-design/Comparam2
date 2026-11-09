@@ -483,10 +483,11 @@ def test_diario_toda_bogota_e_historial_en_tarjetas(tmp_path, monkeypatch):
 def test_sin_navegador_se_omiten_habi_y_houm(monkeypatch):
     from comparam.config import crear_fuentes
     monkeypatch.delenv("COMPARAM_NAVEGADOR", raising=False)
-    assert [f.nombre for f in crear_fuentes()] == ["fincaraiz", "ciencuadras", "mercadolibre", "properati"]
+    assert [f.nombre for f in crear_fuentes()] == ["fincaraiz", "ciencuadras", "mercadolibre", "properati",
+                                                  "rentola"]
     monkeypatch.setenv("COMPARAM_NAVEGADOR", "1")
     assert [f.nombre for f in crear_fuentes()] == ["fincaraiz", "ciencuadras", "mercadolibre", "properati",
-                                                   "habi", "houm"]
+                                                   "rentola", "habi", "houm"]
 
 
 def test_sonda_solo_portales():
@@ -575,3 +576,35 @@ def test_mercadolibre_dueno_directo_y_barrio():
     assert sum(x.es_dueno_directo for x in sin.buscar("")) == 2  # solo los que ya eran dueños por sus datos
     assert Properati().url_busqueda("Cedritos", "arriendo", 2) == \
         "https://www.properati.com.co/s/bogota-d-c/apartamento/arriendo?page=2"
+
+
+def test_rentola_solo_arriendo_y_dominio_alterno():
+    import requests
+    from comparam.sources import Rentola
+
+    class Resp:
+        status_code = 200
+
+        def __init__(self, url):
+            self.url = url
+            self.text = FIX.read_text().replace("400000000", "2000000").replace("500000000", "2500000") \
+                .replace("$ 300.000.000", "$ 1.800.000") if "page=1" in url else "<html></html>"
+
+    class Sesion:
+        headers = {}
+
+        def __init__(self):
+            self.urls = []
+
+        def get(self, url, timeout=None):
+            self.urls.append(url)
+            if url.startswith("https://rentola.com.co"):
+                raise requests.ConnectionError("no resuelve")
+            return Resp(url)
+
+    ses = Sesion()
+    assert Rentola(sesion=ses).buscar("", "venta") == [] and ses.urls == []
+    a = Rentola(sesion=ses, pausa=0, paginas=1).buscar("", "arriendo")
+    assert ses.urls[0] == "https://rentola.com.co/arriendo?location=348474&page=1"
+    assert ses.urls[1] == "https://rentola.co.com/arriendo?location=348474&page=1"
+    assert len(a) >= 2 and all(x.fuente == "rentola" for x in a)
