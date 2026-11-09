@@ -1,0 +1,576 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Torneo Suizo de Ajedrez</title>
+<style>
+:root {
+  --bg: #f6f5f1; --panel: #ffffff; --ink: #1d1d1b; --muted: #6b6a64; --line: #dedcd3;
+  --accent: #2f5d50; --accent-ink: #ffffff; --soft: #eaf1ee; --warn: #9a3b1f; --gold: #b8892b;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #161716; --panel: #202221; --ink: #ecebe6; --muted: #a09f98; --line: #363936;
+    --accent: #6fb39d; --accent-ink: #0d1a16; --soft: #233430; --warn: #e58a6b; --gold: #e0b75a;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #161716; --panel: #202221; --ink: #ecebe6; --muted: #a09f98; --line: #363936;
+  --accent: #6fb39d; --accent-ink: #0d1a16; --soft: #233430; --warn: #e58a6b; --gold: #e0b75a;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink);
+  font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+header { padding: 18px 16px 0; max-width: 1000px; margin: 0 auto; }
+header h1 { margin: 0; font-size: 1.35rem; display: flex; gap: 8px; align-items: center; }
+header .sub { color: var(--muted); font-size: .9rem; margin-top: 2px; }
+main { max-width: 1000px; margin: 0 auto; padding: 12px 16px 40px; }
+nav.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin: 14px 0 16px; overflow-x: auto; }
+nav.tabs button { background: none; border: 0; border-bottom: 3px solid transparent; padding: 10px 14px;
+  font: inherit; color: var(--muted); cursor: pointer; white-space: nowrap; }
+nav.tabs button.on { color: var(--ink); border-bottom-color: var(--accent); font-weight: 600; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; margin-bottom: 14px; }
+.card h2 { margin: 0 0 10px; font-size: 1.05rem; }
+.card h3 { margin: 0 0 8px; font-size: .95rem; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; }
+label { display: flex; flex-direction: column; gap: 4px; font-size: .85rem; color: var(--muted); }
+input, select { font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line);
+  border-radius: 7px; padding: 7px 9px; min-width: 0; }
+input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+button.btn { font: inherit; border-radius: 7px; padding: 8px 14px; cursor: pointer; border: 1px solid var(--line);
+  background: var(--panel); color: var(--ink); }
+button.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
+button.btn.danger { color: var(--warn); }
+button.btn:disabled { opacity: .45; cursor: not-allowed; }
+label.btn { display: inline-block; color: var(--ink); font-size: inherit; }
+button.link { background: none; border: 0; color: var(--warn); cursor: pointer; font: inherit; padding: 2px 6px; }
+.choice { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; margin-top: 12px; }
+.choice button { text-align: left; background: var(--panel); border: 2px solid var(--line); border-radius: 12px;
+  padding: 18px; cursor: pointer; font: inherit; color: var(--ink); }
+.choice button:hover { border-color: var(--accent); }
+.choice b { display: block; font-size: 1.1rem; margin-bottom: 4px; }
+.choice span { color: var(--muted); font-size: .9rem; }
+.big { font-size: 2rem; }
+table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+th, td { padding: 7px 6px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
+th { color: var(--muted); font-weight: 600; font-size: .8rem; text-transform: uppercase; letter-spacing: .02em; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+td.c, th.c { text-align: center; }
+.scroll { overflow-x: auto; }
+.pill { display: inline-block; padding: 1px 8px; border-radius: 99px; background: var(--soft); color: var(--accent);
+  font-size: .78rem; font-weight: 600; }
+.muted { color: var(--muted); }
+.wk { display: inline-block; width: 12px; height: 12px; border-radius: 3px; border: 1px solid var(--muted); vertical-align: -1px; margin-right: 4px; }
+.wk.w { background: #fff; } .wk.b { background: #222; }
+.match { border: 1px solid var(--line); border-radius: 9px; margin-bottom: 10px; overflow: hidden; }
+.match .head { display: grid; grid-template-columns: 34px 1fr auto 1fr; gap: 8px; align-items: center; padding: 9px 10px; background: var(--soft); }
+.match .head .tn { font-weight: 600; }
+.match .head .tn.r { text-align: right; }
+.match .score { font-weight: 700; font-variant-numeric: tabular-nums; min-width: 70px; text-align: center; }
+.match table td { font-size: .88rem; }
+.empty { color: var(--muted); padding: 10px 0; }
+.members { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; margin-top: 8px; }
+.members .m { display: grid; grid-template-columns: 1fr 74px; gap: 6px; }
+.note { font-size: .85rem; color: var(--muted); }
+.first td { font-weight: 600; }
+.medal { color: var(--gold); }
+.toolbar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+@media (max-width: 560px) {
+  .match .head { grid-template-columns: 26px 1fr auto 1fr; font-size: .88rem; }
+  th, td { padding: 6px 4px; }
+  .hide-sm { display: none; }
+}
+@media print {
+  nav.tabs, .toolbar, .no-print, button { display: none !important; }
+  body { background: #fff; color: #000; }
+  .card { border: 0; padding: 0; }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1><span aria-hidden="true">♞</span> <span id="titulo">Torneo Suizo de Ajedrez</span></h1>
+  <div class="sub" id="subtitulo"></div>
+</header>
+<main id="app"></main>
+
+<script>
+"use strict";
+/* ====================== Estado ====================== */
+const KEY = "torneo-suizo-v1";
+const TABLEROS = 4;
+// Puntos de cada resultado (desde el lado de Blancas / equipo local).
+const RES = {
+  "1-0": [1, 0], "½-½": [0.5, 0.5], "0-1": [0, 1],
+  "+/-": [1, 0], "-/+": [0, 1], "-/-": [0, 0],
+};
+const RES_TXT = { "1-0": "1 - 0", "½-½": "½ - ½", "0-1": "0 - 1", "+/-": "1 - 0 (incomp.)", "-/+": "0 - 1 (incomp.)", "-/-": "0 - 0 (ambos incomp.)" };
+
+let S = cargar();
+let tab = "inscritos";
+
+function nuevo() {
+  return { modo: null, nombre: "", rondas: 5, participantes: [], rondasJugadas: [], sig: 1 };
+}
+function cargar() {
+  try { const t = localStorage.getItem(KEY); if (t) return JSON.parse(t); } catch (e) {}
+  return nuevo();
+}
+function guardar() {
+  try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {}
+}
+const esEquipos = () => S.modo === "equipos";
+const P = (id) => S.participantes.find((p) => p.id === id);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const fmt = (n) => {
+  const e = Math.floor(n + 1e-9), h = Math.abs(n - e) > 1e-9;
+  return h ? (e === 0 ? "½" : e + "½") : String(e);
+};
+const fmtDec = (n) => (Math.round(n * 100) / 100).toString().replace(".", ",");
+
+function elo(p) {
+  if (!esEquipos()) return Number(p.elo) || 0;
+  const v = p.miembros.map((m) => Number(m.elo) || 0).filter((x) => x > 0);
+  return v.length ? Math.round(v.reduce((a, b) => a + b, 0) / v.length) : 0;
+}
+
+/* ====================== Cálculo de puntuaciones ====================== */
+// Resultado de un emparejamiento: [puntosA, puntosB, partidasA, partidasB] o null si falta.
+function resultadoMatch(m) {
+  if (m.b == null) return null;
+  if (!esEquipos()) {
+    if (!m.res) return null;
+    const r = RES[m.res];
+    return [r[0], r[1], r[0], r[1]];
+  }
+  if (m.tableros.some((t) => !t)) return null;
+  let a = 0, b = 0;
+  m.tableros.forEach((t) => { a += RES[t][0]; b += RES[t][1]; });
+  const mpA = a > b ? 1 : a < b ? 0 : 0.5;
+  return [mpA, 1 - mpA, a, b];
+}
+
+function estadisticas() {
+  const st = {};
+  S.participantes.forEach((p) => {
+    st[p.id] = { id: p.id, pts: 0, gp: 0, ganadas: 0, rivales: [], hist: [], colores: [], byes: 0, porRonda: [] };
+  });
+  S.rondasJugadas.forEach((ronda, ri) => {
+    ronda.emparejamientos.forEach((m) => {
+      const A = st[m.a], B = m.b != null ? st[m.b] : null;
+      if (!A) return;
+      if (B == null) { // descanso (bye)
+        A.byes++;
+        A.pts += 1;
+        A.gp += esEquipos() ? TABLEROS / 2 : 1;
+        A.rivales.push(null);
+        A.hist.push({ ronda: ri, rival: null, puntos: 1, bye: true });
+        A.colores.push(null);
+        return;
+      }
+      A.rivales.push(m.b); B.rivales.push(m.a);
+      A.colores.push("B"); B.colores.push("N");
+      const r = resultadoMatch(m);
+      if (!r) {
+        A.hist.push({ ronda: ri, rival: m.b, puntos: null }); B.hist.push({ ronda: ri, rival: m.a, puntos: null });
+        return;
+      }
+      A.pts += r[0]; B.pts += r[1]; A.gp += r[2]; B.gp += r[3];
+      if (r[0] === 1) A.ganadas++; if (r[1] === 1) B.ganadas++;
+      A.hist.push({ ronda: ri, rival: m.b, puntos: r[0], gp: r[2] });
+      B.hist.push({ ronda: ri, rival: m.a, puntos: r[1], gp: r[3] });
+    });
+  });
+  // Desempates basados en los rivales
+  Object.values(st).forEach((x) => {
+    const jugados = x.hist.filter((h) => h.rival != null);
+    const ptsRiv = jugados.map((h) => st[h.rival].pts);
+    x.buchholz = ptsRiv.reduce((a, b) => a + b, 0);
+    x.buchholzC1 = ptsRiv.length > 1 ? x.buchholz - Math.min(...ptsRiv) : x.buchholz;
+    x.sb = jugados.reduce((a, h) => a + (h.puntos || 0) * st[h.rival].pts, 0);
+    x.elo = elo(P(x.id));
+  });
+  return st;
+}
+
+function ordenClasificacion(st) {
+  const lista = S.participantes.map((p) => st[p.id]);
+  const cmp = esEquipos()
+    ? (a, b) => b.pts - a.pts || b.gp - a.gp || b.buchholz - a.buchholz || b.sb - a.sb || b.ganadas - a.ganadas || b.elo - a.elo || numero(a.id) - numero(b.id)
+    : (a, b) => b.pts - a.pts || b.buchholzC1 - a.buchholzC1 || b.buchholz - a.buchholz || b.sb - a.sb || b.ganadas - a.ganadas || b.elo - a.elo || numero(a.id) - numero(b.id);
+  return lista.sort(cmp);
+}
+// Número inicial (orden de sorteo por Elo)
+function ordenInicial() {
+  return [...S.participantes].sort((a, b) => elo(b) - elo(a) || a.id - b.id);
+}
+function numero(id) { return ordenInicial().findIndex((p) => p.id === id) + 1; }
+
+/* ====================== Emparejamiento suizo ====================== */
+function preferenciaColor(x) {
+  const c = x.colores.filter(Boolean);
+  if (!c.length) return { pref: null, fuerza: 0 };
+  const dif = c.filter((k) => k === "B").length - c.filter((k) => k === "N").length;
+  const ult = c[c.length - 1], penult = c[c.length - 2];
+  if (dif >= 2 || (ult === "B" && penult === "B")) return { pref: "N", fuerza: 3 };
+  if (dif <= -2 || (ult === "N" && penult === "N")) return { pref: "B", fuerza: 3 };
+  if (dif === 1) return { pref: "N", fuerza: 2 };
+  if (dif === -1) return { pref: "B", fuerza: 2 };
+  return { pref: ult === "B" ? "N" : "B", fuerza: 1 };
+}
+
+function generarEmparejamientos() {
+  const st = estadisticas();
+  const rank = ordenInicial().map((p) => p.id);
+  const activos = S.participantes.filter((p) => !p.retirado).map((p) => st[p.id]);
+  // Orden de emparejamiento: puntos, (equipos: puntos de partidas), número inicial
+  activos.sort((a, b) => b.pts - a.pts || (esEquipos() ? b.gp - a.gp : 0) || rank.indexOf(a.id) - rank.indexOf(b.id));
+  const jugo = (a, b) => a.rivales.includes(b.id);
+  const pc = {}; activos.forEach((x) => (pc[x.id] = preferenciaColor(x)));
+  let nodos = 0, permitirRepetir = false;
+  const LIMITE = 300000;
+
+  function emparejar(rest) {
+    if (!rest.length) return [];
+    if (++nodos > LIMITE) return null;
+    const p = rest[0];
+    const grupo = rest.filter((q) => q.pts === p.pts);
+    const mitad = Math.floor(grupo.length / 2);
+    const cands = rest.slice(1).filter((q) => permitirRepetir || !jugo(p, q));
+    const clave = (q) => {
+      const gi = grupo.indexOf(q);
+      const igual = pc[p.id].pref && pc[p.id].pref === pc[q.id].pref;
+      // Absoluto: ambos llevan 2 colores iguales seguidos o 2 de diferencia (no deben repetir color)
+      const absoluto = igual && pc[p.id].fuerza >= 3 && pc[q.id].fuerza >= 3 ? 1 : 0;
+      const fuerte = igual && pc[p.id].fuerza >= 2 && pc[q.id].fuerza >= 2 ? 1 : 0;
+      const repite = jugo(p, q) ? 1 : 0;
+      return [repite, absoluto, Math.abs(p.pts - q.pts), fuerte, gi >= 0 ? Math.abs(gi - mitad) : rest.indexOf(q)];
+    };
+    cands.sort((x, y) => { const a = clave(x), b = clave(y); for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return a[i] - b[i]; return 0; });
+    for (const q of cands) {
+      const sub = emparejar(rest.filter((r) => r !== p && r !== q));
+      if (sub) return [[p, q], ...sub];
+      if (nodos > LIMITE) return null;
+    }
+    return null;
+  }
+
+  function intentar() {
+    nodos = 0;
+    if (activos.length % 2 === 0) { const r = emparejar(activos); return r ? { pares: r, bye: null } : null; }
+    // Descanso: el peor clasificado que aún no haya descansado
+    const candidatos = [...activos].reverse().sort((a, b) => a.byes - b.byes);
+    for (const c of candidatos) {
+      nodos = 0;
+      const r = emparejar(activos.filter((x) => x !== c));
+      if (r) return { pares: r, bye: c };
+    }
+    return null;
+  }
+  let res = intentar();
+  if (!res) { permitirRepetir = true; res = intentar(); }
+  if (!res) return null;
+
+  // Colores y orden de mesas
+  const orden = (x) => activos.indexOf(x);
+  const emp = res.pares.map(([p, q], i) => {
+    const [alto, bajo] = orden(p) < orden(q) ? [p, q] : [q, p];
+    const pa = pc[alto.id], pb = pc[bajo.id];
+    let blancoAlto;
+    if (!pa.pref && !pb.pref) blancoAlto = i % 2 === 0;
+    else if (pa.pref && pb.pref && pa.pref !== pb.pref) blancoAlto = pa.pref === "B";
+    else if (pa.pref && pb.pref) blancoAlto = pa.fuerza > pb.fuerza ? pa.pref === "B" : pb.fuerza > pa.fuerza ? pb.pref !== "B" : pa.pref === "B";
+    else if (pa.pref) blancoAlto = pa.pref === "B";
+    else blancoAlto = pb.pref !== "B";
+    const [A, B] = blancoAlto ? [alto, bajo] : [bajo, alto];
+    return { a: A.id, b: B.id, res: null, tableros: esEquipos() ? Array(TABLEROS).fill(null) : null,
+      _k: [Math.max(A.pts, B.pts), A.pts + B.pts, -Math.min(orden(A), orden(B))] };
+  });
+  emp.sort((x, y) => y._k[0] - x._k[0] || y._k[1] - x._k[1] || y._k[2] - x._k[2]);
+  emp.forEach((m) => delete m._k);
+  if (res.bye) emp.push({ a: res.bye.id, b: null, res: null, tableros: null });
+  return emp;
+}
+
+/* ====================== Acciones ====================== */
+function elegirModo(modo) {
+  S = nuevo(); S.modo = modo; S.nombre = modo === "equipos" ? "Torneo por equipos" : "Torneo individual";
+  guardar(); tab = "inscritos"; render();
+}
+function agregar(form) {
+  const f = new FormData(form);
+  const nombre = String(f.get("nombre") || "").trim();
+  if (!nombre) { form.nombre.focus(); return; }
+  const p = { id: S.sig++, nombre, retirado: false };
+  if (esEquipos()) {
+    p.miembros = [];
+    for (let i = 0; i < TABLEROS; i++) {
+      p.miembros.push({ nombre: String(f.get("m" + i) || "").trim() || `Jugador ${i + 1}`, elo: Number(f.get("e" + i)) || 0 });
+    }
+  } else p.elo = Number(f.get("elo")) || 0;
+  S.participantes.push(p);
+  guardar(); render();
+  document.querySelector("#formAlta input[name=nombre]")?.focus();
+}
+function quitar(id) {
+  if (S.rondasJugadas.length) { const p = P(id); p.retirado = !p.retirado; }
+  else S.participantes = S.participantes.filter((p) => p.id !== id);
+  guardar(); render();
+}
+function rondaCompleta(r) {
+  return r.emparejamientos.every((m) => m.b == null || resultadoMatch(m));
+}
+function nuevaRonda() {
+  const activos = S.participantes.filter((p) => !p.retirado).length;
+  if (activos < 2) return alert("Se necesitan al menos 2 participantes.");
+  const ult = S.rondasJugadas[S.rondasJugadas.length - 1];
+  if (ult && !rondaCompleta(ult)) return alert("Primero anota todos los resultados de la ronda actual.");
+  if (S.rondasJugadas.length >= S.rondas) return alert("Ya se jugaron todas las rondas del torneo.");
+  const emp = generarEmparejamientos();
+  if (!emp) return alert("No fue posible emparejar esta ronda.");
+  S.rondasJugadas.push({ emparejamientos: emp });
+  guardar(); tab = "rondas"; render();
+}
+function borrarUltima() {
+  if (!S.rondasJugadas.length) return;
+  if (!confirm(`¿Borrar la ronda ${S.rondasJugadas.length} y sus resultados?`)) return;
+  S.rondasJugadas.pop(); guardar(); render();
+}
+function ponerRes(ri, mi, valor, tablero) {
+  const m = S.rondasJugadas[ri].emparejamientos[mi];
+  if (tablero == null) m.res = valor || null; else m.tableros[tablero] = valor || null;
+  guardar(); render();
+}
+function reiniciar() {
+  if (!confirm("¿Empezar un torneo nuevo? Se borrará el actual.")) return;
+  S = nuevo(); guardar(); render();
+}
+function exportar() {
+  const blob = new Blob([JSON.stringify(S, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = (S.nombre || "torneo").replace(/[^\w-]+/g, "_") + ".json"; a.click();
+}
+function importar(input) {
+  const f = input.files[0]; if (!f) return;
+  f.text().then((t) => { try { const d = JSON.parse(t); if (!d.modo) throw 0; S = d; guardar(); render(); } catch (e) { alert("Archivo no válido."); } });
+}
+
+/* ====================== Vistas ====================== */
+function render() {
+  const app = document.getElementById("app");
+  document.getElementById("titulo").textContent = S.modo ? S.nombre || "Torneo" : "Torneo Suizo de Ajedrez";
+  if (!S.modo) {
+    document.getElementById("subtitulo").textContent = "Sistema suizo · emparejamientos automáticos · clasificación con desempates";
+    app.innerHTML = `
+      <div class="card">
+        <h2>¿El torneo es individual o por equipos?</h2>
+        <div class="choice">
+          <button onclick="elegirModo('individual')"><div class="big">♟</div><b>Individual</b>
+            <span>Cada partida ganada suma 1 punto, tablas ½. Desempate: Buchholz, Sonneborn-Berger.</span></button>
+          <button onclick="elegirModo('equipos')"><div class="big">♟♟♟♟</div><b>Por equipos de 4</b>
+            <span>Ganar el encuentro da 1 punto (empate ½). Desempate: suma de los resultados de cada partida.</span></button>
+        </div>
+      </div>
+      <div class="card"><h3>¿Tienes un torneo guardado?</h3>
+        <label class="btn" style="display:inline-block;cursor:pointer">Importar archivo .json
+          <input type="file" accept=".json,application/json" hidden onchange="importar(this)"></label></div>`;
+    return;
+  }
+  const hechas = S.rondasJugadas.length;
+  document.getElementById("subtitulo").textContent =
+    `${esEquipos() ? "Por equipos de 4" : "Individual"} · ${S.participantes.length} ${esEquipos() ? "equipos" : "jugadores"} · ronda ${hechas} de ${S.rondas}`;
+  const tabs = [["inscritos", esEquipos() ? "Equipos" : "Jugadores"], ["rondas", "Programación"], ["clasificacion", "Clasificación"]];
+  app.innerHTML = `
+    <nav class="tabs" role="tablist">${tabs.map(([k, t]) => `<button role="tab" class="${tab === k ? "on" : ""}" onclick="tab='${k}';render()">${t}</button>`).join("")}</nav>
+    <section id="vista"></section>`;
+  const v = document.getElementById("vista");
+  if (tab === "inscritos") v.innerHTML = vistaInscritos();
+  else if (tab === "rondas") v.innerHTML = vistaRondas();
+  else v.innerHTML = vistaClasificacion();
+}
+
+function vistaInscritos() {
+  const n = S.participantes.length, empezado = S.rondasJugadas.length > 0;
+  const sugeridas = Math.max(1, Math.ceil(Math.log2(Math.max(n, 2))) + (n > 8 ? 1 : 0));
+  const alta = esEquipos()
+    ? `<form id="formAlta" class="card" onsubmit="event.preventDefault();agregar(this)">
+        <h2>Inscribir equipo</h2>
+        <div class="row"><label style="flex:1">Nombre del equipo<input name="nombre" required placeholder="Ej.: Club Alfil"></label></div>
+        <div class="members">${Array.from({ length: TABLEROS }, (_, i) => `
+          <div class="m"><label>Tablero ${i + 1}<input name="m${i}" placeholder="Jugador ${i + 1}"></label>
+          <label>Elo<input name="e${i}" type="number" min="0" max="3500" inputmode="numeric"></label></div>`).join("")}</div>
+        <div class="row" style="margin-top:10px"><button class="btn primary">Añadir equipo</button></div>
+       </form>`
+    : `<form id="formAlta" class="card" onsubmit="event.preventDefault();agregar(this)">
+        <h2>Inscribir jugador</h2>
+        <div class="row">
+          <label style="flex:1;min-width:180px">Nombre<input name="nombre" required placeholder="Nombre y apellido"></label>
+          <label style="width:110px">Elo (opcional)<input name="elo" type="number" min="0" max="3500" inputmode="numeric"></label>
+          <button class="btn primary">Añadir</button>
+        </div></form>`;
+  const filas = ordenInicial().map((p, i) => `
+    <tr${p.retirado ? ' class="muted"' : ""}><td class="num">${i + 1}</td>
+      <td>${esc(p.nombre)}${p.retirado ? ' <span class="pill">retirado</span>' : ""}
+        ${esEquipos() ? `<div class="note">${p.miembros.map((m, k) => `${k + 1}. ${esc(m.nombre)}${m.elo ? ` (${m.elo})` : ""}`).join(" · ")}</div>` : ""}</td>
+      <td class="num">${elo(p) || "—"}</td>
+      <td class="c no-print"><button class="link" onclick="quitar(${p.id})">${empezado ? (p.retirado ? "Reincorporar" : "Retirar") : "Quitar"}</button></td></tr>`).join("");
+  return `
+    <div class="card">
+      <h2>Datos del torneo</h2>
+      <div class="row">
+        <label style="flex:1;min-width:200px">Nombre del torneo<input value="${esc(S.nombre)}" onchange="S.nombre=this.value;guardar();render()"></label>
+        <label style="width:150px">Número de rondas<input type="number" min="${Math.max(1, S.rondasJugadas.length)}" max="20" value="${S.rondas}"
+          onchange="S.rondas=Math.max(${Math.max(1, S.rondasJugadas.length)},Number(this.value)||1);guardar();render()"></label>
+      </div>
+      <p class="note">Recomendado para ${n} ${esEquipos() ? "equipos" : "jugadores"}: <b>${sugeridas}</b> rondas.
+        Modalidad: <b>${esEquipos() ? "por equipos de 4 tableros" : "individual"}</b>.</p>
+    </div>
+    ${alta}
+    <div class="card">
+      <h2>${esEquipos() ? "Equipos" : "Jugadores"} inscritos (${n})</h2>
+      ${n ? `<div class="scroll"><table><thead><tr><th class="num">Nº</th><th>${esEquipos() ? "Equipo" : "Nombre"}</th><th class="num">${esEquipos() ? "Elo medio" : "Elo"}</th><th class="no-print"></th></tr></thead><tbody>${filas}</tbody></table></div>`
+          : `<p class="empty">Aún no hay inscritos.</p>`}
+      <div class="row" style="margin-top:12px">
+        <button class="btn primary" onclick="nuevaRonda()" ${n < 2 || S.rondasJugadas.length ? "disabled" : ""}>Generar ronda 1</button>
+      </div>
+    </div>
+    <div class="toolbar no-print">
+      <button class="btn" onclick="exportar()">Guardar copia (.json)</button>
+      <label class="btn" style="cursor:pointer">Importar .json<input type="file" accept=".json,application/json" hidden onchange="importar(this)"></label>
+      <button class="btn danger" onclick="reiniciar()">Nuevo torneo</button>
+    </div>`;
+}
+
+function selectRes(valor, onchange) {
+  return `<select onchange="${onchange}" aria-label="Resultado"><option value="">— resultado —</option>${Object.keys(RES)
+    .map((k) => `<option value="${k}" ${valor === k ? "selected" : ""}>${RES_TXT[k]}</option>`).join("")}</select>`;
+}
+
+function vistaRondas() {
+  const total = S.rondasJugadas.length;
+  const ult = S.rondasJugadas[total - 1];
+  const puede = total < S.rondas && (!ult || rondaCompleta(ult)) && S.participantes.filter((p) => !p.retirado).length >= 2;
+  const st = estadisticas();
+  let html = `<div class="toolbar">
+      ${total < S.rondas ? `<button class="btn primary" onclick="nuevaRonda()" ${puede ? "" : "disabled"}>Generar ronda ${total + 1}</button>` : ""}
+      <button class="btn" onclick="window.print()">Imprimir</button>
+      ${total ? `<button class="btn danger" onclick="borrarUltima()">Borrar última ronda</button>` : ""}
+    </div>`;
+  if (!total) return html + `<div class="card"><p class="empty">Inscribe ${esEquipos() ? "los equipos" : "a los jugadores"} y genera la primera ronda.</p></div>`;
+  if (total >= S.rondas && rondaCompleta(ult)) html += `<div class="card"><b>🏆 Torneo terminado.</b> Revisa la pestaña Clasificación.</div>`;
+  for (let ri = total - 1; ri >= 0; ri--) {
+    const r = S.rondasJugadas[ri];
+    const pend = r.emparejamientos.filter((m) => m.b != null && !resultadoMatch(m)).length;
+    html += `<div class="card"><h2>Ronda ${ri + 1} ${pend ? `<span class="pill">${pend} pendiente${pend > 1 ? "s" : ""}</span>` : `<span class="pill">completa</span>`}</h2>`;
+    html += esEquipos() ? rondaEquipos(r, ri) : rondaIndividual(r, ri, st);
+    html += `</div>`;
+  }
+  return html;
+}
+
+function rondaIndividual(r, ri, st) {
+  const filas = r.emparejamientos.map((m, mi) => {
+    const a = P(m.a), b = m.b != null ? P(m.b) : null;
+    if (!b) return `<tr><td class="num">—</td><td><span class="wk w"></span>${esc(a.nombre)}</td><td class="c"><span class="pill">Descansa · 1 punto</span></td><td class="muted">—</td></tr>`;
+    return `<tr><td class="num">${mi + 1}</td>
+      <td><span class="wk w"></span>${esc(a.nombre)}</td>
+      <td class="c">${selectRes(m.res, `ponerRes(${ri},${mi},this.value)`)}</td>
+      <td><span class="wk b"></span>${esc(b.nombre)}</td></tr>`;
+  }).join("");
+  return `<div class="scroll"><table><thead><tr><th class="num">Mesa</th><th>Blancas</th><th class="c">Resultado</th><th>Negras</th></tr></thead><tbody>${filas}</tbody></table></div>`;
+}
+
+function rondaEquipos(r, ri) {
+  return r.emparejamientos.map((m, mi) => {
+    const a = P(m.a), b = m.b != null ? P(m.b) : null;
+    if (!b) return `<div class="match"><div class="head"><span class="muted">—</span><span class="tn">${esc(a.nombre)}</span>
+      <span class="score"><span class="pill">Descansa</span></span><span class="muted">1 punto · ${fmt(TABLEROS / 2)} de partidas</span></div></div>`;
+    const res = resultadoMatch(m);
+    let gA = 0, gB = 0; m.tableros.forEach((t) => { if (t) { gA += RES[t][0]; gB += RES[t][1]; } });
+    const filas = m.tableros.map((t, k) => {
+      // El equipo nombrado primero juega con blancas en los tableros 1 y 3
+      const aBlancas = k % 2 === 0;
+      return `<tr><td class="num">${k + 1}</td>
+        <td><span class="wk ${aBlancas ? "w" : "b"}"></span>${esc(a.miembros[k].nombre)}</td>
+        <td class="c">${selectRes(t, `ponerRes(${ri},${mi},this.value,${k})`)}</td>
+        <td><span class="wk ${aBlancas ? "b" : "w"}"></span>${esc(b.miembros[k].nombre)}</td></tr>`;
+    }).join("");
+    return `<div class="match"><div class="head"><span class="muted">${mi + 1}</span>
+        <span class="tn">${esc(a.nombre)}</span>
+        <span class="score">${fmt(gA)} - ${fmt(gB)}${res ? `<div class="note">${res[0] === 1 ? "gana " + esc(a.nombre) : res[1] === 1 ? "gana " + esc(b.nombre) : "empate"}</div>` : ""}</span>
+        <span class="tn r">${esc(b.nombre)}</span></div>
+      <div class="scroll"><table><thead><tr><th class="num">Tab.</th><th>${esc(a.nombre)}</th><th class="c">Resultado (izq. - der.)</th><th>${esc(b.nombre)}</th></tr></thead><tbody>${filas}</tbody></table></div></div>`;
+  }).join("");
+}
+
+function vistaClasificacion() {
+  const st = estadisticas();
+  const lista = ordenClasificacion(st);
+  const nR = S.rondasJugadas.length;
+  if (!S.participantes.length) return `<div class="card"><p class="empty">Aún no hay inscritos.</p></div>`;
+  const celdaRonda = (x, ri) => {
+    const h = x.hist.find((k) => k.ronda === ri);
+    if (!h) return `<td class="c hide-sm muted">·</td>`;
+    if (h.bye) return `<td class="c hide-sm" title="Descanso">D</td>`;
+    const pos = lista.findIndex((y) => y.id === h.rival) + 1;
+    const col = x.colores[ri] === "B" ? "b" : "n";
+    const pts = h.puntos == null ? "?" : esEquipos() ? fmt(h.gp) : fmt(h.puntos);
+    return `<td class="c hide-sm" title="vs ${esc(P(h.rival).nombre)}">${pos}${col}&nbsp;${pts}</td>`;
+  };
+  const ths = Array.from({ length: nR }, (_, i) => `<th class="c hide-sm">R${i + 1}</th>`).join("");
+  let filas;
+  let cab;
+  if (esEquipos()) {
+    cab = `<th class="num">Pos</th><th>Equipo</th>${ths}<th class="num">Puntos</th><th class="num">P. partidas</th><th class="num">Buchholz</th><th class="num hide-sm">S-B</th><th class="num hide-sm">Ganados</th>`;
+    filas = lista.map((x, i) => `<tr class="${i === 0 && x.pts > 0 ? "first" : ""}"><td class="num">${i < 3 && nR ? `<span class="medal">${i + 1}</span>` : i + 1}</td>
+      <td>${esc(P(x.id).nombre)}${P(x.id).retirado ? ' <span class="pill">retirado</span>' : ""}</td>${Array.from({ length: nR }, (_, r) => celdaRonda(x, r)).join("")}
+      <td class="num"><b>${fmt(x.pts)}</b></td><td class="num">${fmt(x.gp)}</td><td class="num">${fmt(x.buchholz)}</td>
+      <td class="num hide-sm">${fmtDec(x.sb)}</td><td class="num hide-sm">${x.ganadas}</td></tr>`).join("");
+  } else {
+    cab = `<th class="num">Pos</th><th>Jugador</th><th class="num hide-sm">Elo</th>${ths}<th class="num">Puntos</th><th class="num">Bch-1</th><th class="num">Bch</th><th class="num hide-sm">S-B</th><th class="num hide-sm">Gan.</th>`;
+    filas = lista.map((x, i) => `<tr class="${i === 0 && x.pts > 0 ? "first" : ""}"><td class="num">${i < 3 && nR ? `<span class="medal">${i + 1}</span>` : i + 1}</td>
+      <td>${esc(P(x.id).nombre)}${P(x.id).retirado ? ' <span class="pill">retirado</span>' : ""}</td><td class="num hide-sm">${x.elo || "—"}</td>
+      ${Array.from({ length: nR }, (_, r) => celdaRonda(x, r)).join("")}
+      <td class="num"><b>${fmt(x.pts)}</b></td><td class="num">${fmt(x.buchholzC1)}</td><td class="num">${fmt(x.buchholz)}</td>
+      <td class="num hide-sm">${fmtDec(x.sb)}</td><td class="num hide-sm">${x.ganadas}</td></tr>`).join("");
+  }
+  const leyenda = esEquipos()
+    ? `<b>Puntos</b>: 1 por encuentro ganado, ½ por empate, 0 por derrota. Orden de desempate:
+       <b>1) P. partidas</b> (suma de los resultados de cada partida de los 4 tableros), 2) Buchholz (suma de puntos de los rivales),
+       3) Sonneborn-Berger, 4) encuentros ganados, 5) Elo medio. En cada ronda: posición del rival, color en el tablero 1 (b/n) y puntos de partidas obtenidos.`
+    : `<b>Puntos</b>: 1 por victoria, ½ por tablas. Orden de desempate: 1) Buchholz corte 1 (suma de puntos de los rivales sin el peor),
+       2) Buchholz total, 3) Sonneborn-Berger, 4) partidas ganadas, 5) Elo. En cada ronda: posición del rival, color (b/n) y resultado.`;
+  let html = `<div class="toolbar"><button class="btn" onclick="window.print()">Imprimir</button></div>
+    <div class="card"><h2>Clasificación ${nR ? `tras la ronda ${nR}` : ""}</h2>
+      <div class="scroll"><table><thead><tr>${cab}</tr></thead><tbody>${filas}</tbody></table></div>
+      <p class="note">${leyenda}</p></div>`;
+  if (esEquipos() && nR) html += clasificacionTableros();
+  return html;
+}
+
+// Rendimiento individual de los jugadores de cada tablero (solo en equipos)
+function clasificacionTableros() {
+  const datos = {};
+  S.participantes.forEach((p) => p.miembros.forEach((m, k) => (datos[p.id + "-" + k] = { equipo: p.nombre, nombre: m.nombre, tab: k, pts: 0, jug: 0 })));
+  S.rondasJugadas.forEach((r) => r.emparejamientos.forEach((m) => {
+    if (m.b == null) return;
+    m.tableros.forEach((t, k) => {
+      if (!t) return;
+      const da = datos[m.a + "-" + k], db = datos[m.b + "-" + k];
+      if (t !== "-/-" && t !== "+/-" && t !== "-/+") { da.jug++; db.jug++; }
+      da.pts += RES[t][0]; db.pts += RES[t][1];
+    });
+  }));
+  let html = `<div class="card"><h2>Mejores por tablero</h2><div class="members">`;
+  for (let k = 0; k < TABLEROS; k++) {
+    const l = Object.values(datos).filter((d) => d.tab === k).sort((a, b) => b.pts - a.pts || a.jug - b.jug).slice(0, 5);
+    html += `<div><h3>Tablero ${k + 1}</h3><table><tbody>${l.map((d) => `<tr><td>${esc(d.nombre)}<div class="note">${esc(d.equipo)}</div></td><td class="num"><b>${fmt(d.pts)}</b>/${d.jug}</td></tr>`).join("")}</tbody></table></div>`;
+  }
+  return html + `</div></div>`;
+}
+
+render();
+</script>
+</body>
+</html>

@@ -486,3 +486,12 @@ def test_sin_navegador_se_omiten_habi_y_houm(monkeypatch):
     assert [f.nombre for f in crear_fuentes()] == ["fincaraiz", "ciencuadras"]
     monkeypatch.setenv("COMPARAM_NAVEGADOR", "1")
     assert [f.nombre for f in crear_fuentes()] == ["fincaraiz", "ciencuadras", "habi", "houm"]
+
+
+def test_pagina_ajedrez():
+    from app import app
+    r = app.test_client().get("/ajedrez")
+    assert r.status_code == 200
+    html = r.get_data(as_text=True)
+    assert "individual o por equipos" in html
+    r.close()

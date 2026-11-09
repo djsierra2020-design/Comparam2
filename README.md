@@ -20,6 +20,19 @@ y avisa a Render cada vez que cambia `main`. Requiere guardar el *Deploy Hook* d
 
 El plan gratis se «duerme» si nadie lo usa; la primera búsqueda después puede tardar ~1 minuto.
 
+## Torneo de ajedrez (sistema suizo)
+
+Abre `/ajedrez` (o directamente `static/ajedrez.html` en el navegador, sin servidor).
+Al empezar pregunta si el torneo es **individual** o **por equipos de 4**; luego se inscriben
+jugadores/equipos, se generan las rondas por sistema suizo (sin repetir rivales y alternando colores)
+y se anotan los resultados. Pestañas: inscritos, **Programación** (rondas) y **Clasificación**.
+
+- Individual: 1 punto por victoria, ½ tablas. Desempates: Buchholz corte 1, Buchholz, Sonneborn-Berger.
+- Equipos: ganar el encuentro da **1 punto** (empate ½). El primer desempate es la **suma de los resultados
+  de cada partida** (puntos de partidas de los 4 tableros); después Buchholz y Sonneborn-Berger.
+
+Los datos se guardan en el navegador y se pueden exportar/importar en `.json`.
+
 ## Instalación
 
 ```bash

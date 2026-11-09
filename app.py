@@ -126,6 +126,12 @@ def service_worker():
     return r
 
 
+@app.get("/ajedrez")
+def ajedrez():
+    """Torneo de ajedrez por sistema suizo (individual o por equipos de 4). Funciona en el navegador."""
+    return send_from_directory(app.static_folder, "ajedrez.html")
+
+
 @app.get("/diagnostico")
 def diagnostico():
     """Muestra qué responde cada portal a la primera página de búsqueda."""
