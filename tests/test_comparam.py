@@ -684,3 +684,17 @@ def test_rentola_diagnostico_prueba_el_segundo_dominio(monkeypatch):
 
     d = Rentola(sesion=Sesion()).diagnosticar("", "arriendo")
     assert d["url"].startswith("https://rentola.co.com/") and d["estado"] == 200
+
+
+def test_busqueda_con_todos_los_portales_no_falla(monkeypatch):
+    """Rentola tiene un atributo «ruta» (texto) que rompía el conteo por portal: error 500 en la app."""
+    import requests
+    import app as webapp
+
+    def sin_red(self, url, **kw):
+        raise requests.ConnectionError("sin red")
+
+    monkeypatch.setattr(requests.Session, "get", sin_red)
+    for q in ("/?barrio=Cedritos&modo=barrio", "/?barrio=Cedritos&modo=barrio&operacion=arriendo",
+              "/?modo=ciudad", "/api/buscar?barrio=Cedritos"):
+        assert webapp.app.test_client().get(q).status_code == 200, q
