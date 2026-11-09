@@ -121,6 +121,7 @@ def correr(config: dict | None = None, fuentes_por_operacion=None, dia: date | N
                 resumen["revisados"] += 1
                 if registrar(historial, a, operacion, zona, dia_txt, base) and not base:
                     resumen["nuevos"].append(clave(a, operacion))
+            _guardar(historial, resumen, dia_txt)  # si la revisión se corta, no se pierde lo avanzado
     # Toda Bogotá: guarda también los anuncios del resto de la ciudad para tener historial, días
     # publicado y bajadas de precio en cualquier búsqueda (no se reportan como «nuevos» del cliente).
     if config.get("toda_bogota", True):
@@ -138,9 +139,14 @@ def correr(config: dict | None = None, fuentes_por_operacion=None, dia: date | N
                 registrar(historial, a, operacion, zona, dia_txt, base, ciudad=True)
                 resumen["revisados"] += 1
             resumen.setdefault("nuevos_ciudad", {})[operacion] = ciudad
+            _guardar(historial, resumen, dia_txt)
+    _guardar(historial, resumen, dia_txt)
+    return resumen
+
+
+def _guardar(historial: dict, resumen: dict, dia_txt: str) -> None:
     guardar_json(HISTORIAL, historial)
     guardar_json(CARPETA_DIA / f"{dia_txt}.json", resumen)
-    return resumen
 
 
 def dias_publicado(e: dict, dia: date | None = None) -> tuple[int | None, str]:

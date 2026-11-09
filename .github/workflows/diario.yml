@@ -17,7 +17,7 @@ concurrency:
 jobs:
   diario:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -28,11 +28,14 @@ jobs:
         run: python -m playwright install --with-deps --only-shell chromium
         continue-on-error: true   # si falla, la revisión sigue con los demás portales
       - name: Revisar los portales
+        timeout-minutes: 45
+        continue-on-error: true   # aunque se corte, se guarda lo avanzado (el historial se escribe por barrio)
         env:
           COMPARAM_NAVEGADOR: "1"
-          COMPARAM_PAGINAS_NAVEGADOR: "3"
+          COMPARAM_PAGINAS_NAVEGADOR: "2"
         run: python -m comparam.diario
       - name: Guardar el historial en el repositorio
+        if: always()
         run: |
           git config user.name "comparam-diario"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
