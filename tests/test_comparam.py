@@ -486,3 +486,11 @@ def test_sin_navegador_se_omiten_habi_y_houm(monkeypatch):
     assert [f.nombre for f in crear_fuentes()] == ["fincaraiz", "ciencuadras"]
     monkeypatch.setenv("COMPARAM_NAVEGADOR", "1")
     assert [f.nombre for f in crear_fuentes()] == ["fincaraiz", "ciencuadras", "habi", "houm"]
+
+
+def test_sonda_solo_portales():
+    import app as webapp
+    c = webapp.app.test_client()
+    assert c.get("/api/sonda?url=https://evil.example.com/").status_code == 400
+    assert c.get("/api/sonda?url=http://www.fincaraiz.com.co/").status_code == 400
+    assert c.get("/api/sonda?url=https://fincaraiz.com.co.evil.com/").status_code == 400
