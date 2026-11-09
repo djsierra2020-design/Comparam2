@@ -225,18 +225,30 @@ def extraer_de_tarjetas(html: str, fuente: str, base_url: str, operacion: str = 
     soup = BeautifulSoup(html or "", "html.parser")
     for basura in soup(["script", "style", "noscript", "svg"]):
         basura.decompose()
-    candidatos = []
-    for el in soup.find_all(["article", "li", "div", "a", "section"]):
-        texto = el.get_text(" ", strip=True)
-        if len(texto) > 2_000 or not (datos := _datos_tarjeta(texto, operacion)):
-            continue
-        candidatos.append((el, texto, datos))
-    ids = {id(el) for el, _, _ in candidatos}
+    # Se parte de cada texto con un precio y se sube por sus contenedores hasta el primero que tenga
+    # también un área: esa es la tarjeta. Así el costo crece con el número de precios y no con el
+    # tamaño de la página (antes, en páginas grandes como Rentola, tardaba decenas de minutos).
+    bloques = {"article", "li", "div", "a", "section"}
+    tarjetas: dict[int, tuple] = {}
+    for nodo in soup.find_all(string=_PRECIO_TXT):
+        el = nodo.parent
+        for _ in range(10):
+            if el is None or el.name in ("body", "html", "[document]"):
+                break
+            if el.name in bloques:
+                texto = el.get_text(" ", strip=True)
+                if len(texto) > 2_000:
+                    break
+                if datos := _datos_tarjeta(texto, operacion):
+                    tarjetas.setdefault(id(el), (el, texto, datos))
+                    break
+            el = el.parent
+    elegidas = {id(el) for el, _, _ in tarjetas.values()}
     anuncios: list[Listing] = []
     vistos: set = set()
-    for el, texto, (precio, area) in candidatos:
-        # Si un elemento hijo ya es una tarjeta completa, este es un contenedor: se omite.
-        if any(id(h) in ids for h in el.find_all(["article", "li", "div", "a", "section"])):
+    for el, texto, (precio, area) in tarjetas.values():
+        # Si una tarjeta contiene otra tarjeta elegida, es un contenedor: se omite.
+        if any(id(p) in elegidas for p in el.find_all(list(bloques)) if p is not el):
             continue
         enlace = el if el.name == "a" and el.get("href") else el.find("a", href=True)
         if enlace is None:

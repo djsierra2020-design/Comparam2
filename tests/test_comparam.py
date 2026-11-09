@@ -698,3 +698,31 @@ def test_busqueda_con_todos_los_portales_no_falla(monkeypatch):
     for q in ("/?barrio=Cedritos&modo=barrio", "/?barrio=Cedritos&modo=barrio&operacion=arriendo",
               "/?modo=ciudad", "/api/buscar?barrio=Cedritos"):
         assert webapp.app.test_client().get(q).status_code == 200, q
+
+
+def test_portal_trabado_no_frena_la_busqueda(monkeypatch):
+    import threading
+    from comparam import busqueda
+
+    monkeypatch.setattr(busqueda, "TIEMPO_MAX_PORTAL", 1)
+    soltar = threading.Event()
+
+    class Trabado:
+        nombre = "rentola"
+
+        def buscar(self, barrio, operacion="venta"):
+            soltar.wait(30)
+            return []
+
+    class Bueno:
+        nombre = "fincaraiz"
+
+        def buscar(self, barrio, operacion="venta"):
+            return [_l("Apartamento en Venta en Cedritos, Bogotá")]
+
+    import time
+    t = time.time()
+    r = buscar("Cedritos", [Trabado(), Bueno()], solo_dueno=False)
+    soltar.set()
+    assert time.time() - t < 5
+    assert len(r.anuncios) == 1 and any("rentola: tardó más de 1 s" in e for e in r.errores)
