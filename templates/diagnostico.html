@@ -11,7 +11,9 @@
 </style></head><body><main>
 <h1>Diagnóstico de portales</h1>
 <p>Primera página de búsqueda de cada portal{% if barrio %} para <b>{{ barrio }}</b>{% else %} para toda Bogotá{% endif %}. Toma una captura de esta página.</p>
-<form><input name="barrio" value="{{ barrio }}" placeholder="barrio (opcional)"> <button>Probar</button> · <a href="/">volver</a></form>
+<form><input name="barrio" value="{{ barrio }}" placeholder="barrio (opcional)">
+<select name="operacion"><option value="venta">Venta</option><option value="arriendo" {% if operacion == 'arriendo' %}selected{% endif %}>Arriendo</option></select>
+<button>Probar</button> · <a href="/">volver</a></form>
 {% for f in filas %}
 <div class="card">
   <h2 style="margin:0 0 8px">{{ f.portal }}
