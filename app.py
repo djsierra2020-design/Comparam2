@@ -14,7 +14,7 @@ from comparam.sources import PORTALES
 app = Flask(__name__)
 app.jinja_env.filters["pesos"] = pesos
 NOMBRES_PORTAL = {"fincaraiz": "Finca Raíz", "metrocuadrado": "Metrocuadrado", "ciencuadras": "Ciencuadras",
-                  "habi": "Habi", "houm": "Houm", "mercadolibre": "MercadoLibre", "properati": "Properati",
+                  "habi": "Habi", "houm": "Houm", "mercadolibre": "MercadoLibre", "properati": "Properati", "rentola": "Rentola",
                   "ejemplo": "Ejemplo"}
 app.jinja_env.filters["portal"] = lambda f: NOMBRES_PORTAL.get(f, f)
 FUENTES = [*PORTALES, "ejemplo"]
@@ -151,7 +151,7 @@ def diagnostico():
 # Portales que /api/sonda puede consultar (no es un proxy abierto).
 SONDA_DOMINIOS = ("fincaraiz.com.co", "metrocuadrado.com", "ciencuadras.com", "mercadolibre.com.co",
                   "properati.com.co", "habi.co", "houm.com", "puntopropiedad.com", "trovit.com.co",
-                  "mitula.com.co", "lahaus.com", "nuroa.com.co", "olx.com.co")
+                  "mitula.com.co", "lahaus.com", "nuroa.com.co", "olx.com.co", "rentola.com.co", "rentola.co.com")
 
 
 @app.get("/api/sonda")

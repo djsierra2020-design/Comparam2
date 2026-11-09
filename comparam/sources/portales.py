@@ -321,3 +321,31 @@ class Properati(PortalCiudad):
     nombre = "properati"
     base_url = "https://www.properati.com.co"
     plantilla_ciudad = base_url + "/s/bogota-d-c/apartamento/{operacion}?page={pagina}"
+
+
+class Rentola(PortalCiudad):
+    """Rentola: agregador de arriendos (junta anuncios de muchos sitios). Solo arriendo.
+
+    Dirección enviada por el usuario: /arriendo?location=348474 (código de Bogotá). Se escribió
+    como rentola.co.com y antes como rentola.com.co: se prueba el primero que conecte."""
+    nombre = "rentola"
+    dominios = ("https://rentola.com.co", "https://rentola.co.com")
+    base_url = dominios[0]
+    operaciones = {"arriendo": "arriendo"}
+    ruta = "/{operacion}?location=348474&page={pagina}"
+    plantilla_ciudad = base_url + ruta
+
+    def buscar(self, barrio: str, operacion: str = "venta") -> list[Listing]:
+        if operacion not in self.operaciones:
+            return []  # Rentola no tiene venta
+        self.detalle = False
+        error = None
+        for dominio in self.dominios:
+            self.base_url, self.plantilla_ciudad = dominio, dominio + self.ruta
+            try:
+                return super().buscar(barrio, operacion)
+            except FuenteError as e:
+                if "no se pudo conectar" not in str(e):
+                    raise
+                error = e
+        raise error
