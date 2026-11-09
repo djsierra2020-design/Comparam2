@@ -14,7 +14,8 @@ from comparam.sources import PORTALES
 app = Flask(__name__)
 app.jinja_env.filters["pesos"] = pesos
 NOMBRES_PORTAL = {"fincaraiz": "Finca Raíz", "metrocuadrado": "Metrocuadrado", "ciencuadras": "Ciencuadras",
-                  "habi": "Habi", "houm": "Houm", "ejemplo": "Ejemplo"}
+                  "habi": "Habi", "houm": "Houm", "mercadolibre": "MercadoLibre", "properati": "Properati",
+                  "ejemplo": "Ejemplo"}
 app.jinja_env.filters["portal"] = lambda f: NOMBRES_PORTAL.get(f, f)
 FUENTES = [*PORTALES, "ejemplo"]
 

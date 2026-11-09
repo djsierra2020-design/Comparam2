@@ -483,9 +483,10 @@ def test_diario_toda_bogota_e_historial_en_tarjetas(tmp_path, monkeypatch):
 def test_sin_navegador_se_omiten_habi_y_houm(monkeypatch):
     from comparam.config import crear_fuentes
     monkeypatch.delenv("COMPARAM_NAVEGADOR", raising=False)
-    assert [f.nombre for f in crear_fuentes()] == ["fincaraiz", "ciencuadras"]
+    assert [f.nombre for f in crear_fuentes()] == ["fincaraiz", "ciencuadras", "mercadolibre", "properati"]
     monkeypatch.setenv("COMPARAM_NAVEGADOR", "1")
-    assert [f.nombre for f in crear_fuentes()] == ["fincaraiz", "ciencuadras", "habi", "houm"]
+    assert [f.nombre for f in crear_fuentes()] == ["fincaraiz", "ciencuadras", "mercadolibre", "properati",
+                                                   "habi", "houm"]
 
 
 def test_sonda_solo_portales():
@@ -539,3 +540,38 @@ def test_aviso_de_ocultos_y_ver_todos():
     msg = webapp._mensaje_whatsapp([{"operacion": "venta", "zona": "Cedritos", "area_m2": 63, "precio": 325000000,
                                      "url": "https://f.co/1", "verificar": True}], "09/11/2026")
     assert "verificar" in msg
+
+
+def test_mercadolibre_dueno_directo_y_barrio():
+    from comparam.sources import MercadoLibre, Properati
+
+    class Resp:
+        status_code = 200
+
+        def __init__(self, text, url):
+            self.text, self.url = text, url
+
+    class Sesion:
+        headers = {}
+
+        def __init__(self, final=None):
+            self.urls, self.final = [], final
+
+        def get(self, url, timeout=None):
+            self.urls.append(url)
+            return Resp(FIX.read_text() if len(self.urls) == 1 else "<html></html>", self.final or url)
+
+    ses = Sesion()
+    ml = MercadoLibre(sesion=ses, pausa=0, paginas=2)
+    a = ml.buscar("")
+    assert ses.urls[0] == "https://listado.mercadolibre.com.co/apartamentos-venta-en-bogota-dc/directo/_Desde_1_NoIndex_True"
+    assert "_Desde_49_" in ses.urls[1]
+    assert len(a) == 3
+    # el anuncio que el portal marca como inmobiliaria no se vuelve dueño; los demás sí (filtro /directo/)
+    assert sorted(x.es_dueno_directo for x in a) == [False, True, True]
+    assert [x.barrio for x in MercadoLibre(sesion=Sesion(), pausa=0).buscar("Cedritos")] == ["Cedritos"]
+    # si el portal ignora el filtro (redirige sin /directo/), no se marcan como dueños
+    sin = MercadoLibre(sesion=Sesion(final="https://listado.mercadolibre.com.co/apartamentos"), pausa=0, paginas=1)
+    assert sum(x.es_dueno_directo for x in sin.buscar("")) == 2  # solo los que ya eran dueños por sus datos
+    assert Properati().url_busqueda("Cedritos", "arriendo", 2) == \
+        "https://www.properati.com.co/s/bogota-d-c/apartamento/arriendo?page=2"
