@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import time
 from datetime import date, datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -112,7 +113,9 @@ def correr(config: dict | None = None, fuentes_por_operacion=None, dia: date | N
         for zona in config.get("barrios", []):
             fuentes = (fuentes_por_operacion(operacion) if fuentes_por_operacion
                        else _fuentes(config.get("paginas", 3)))
+            t0 = time.time()
             r = buscar(zona, fuentes, operacion, solo_dueno=False)
+            _avance(f"{operacion} {zona}", t0, r.por_fuente, r.errores)
             resumen["errores"] += [f"{operacion} {zona}: {e}" for e in r.errores]
             if r.zona:
                 resumen["zonas"][f"{operacion}|{zona}"] = {"mediana_m2": round(r.zona.mediana),
@@ -128,7 +131,9 @@ def correr(config: dict | None = None, fuentes_por_operacion=None, dia: date | N
         for operacion in config.get("operaciones", ["venta", "arriendo"]):
             fuentes = (fuentes_por_operacion(operacion) if fuentes_por_operacion
                        else _fuentes(config.get("paginas_ciudad", 10)))
-            todos, errores, _, _ = _recolectar(fuentes, "", operacion)
+            t0 = time.time()
+            todos, errores, por_fuente, _ = _recolectar(fuentes, "", operacion)
+            _avance(f"{operacion} toda Bogotá", t0, por_fuente, errores)
             resumen["errores"] += [f"{operacion} toda Bogotá: {e}" for e in errores]
             ciudad = 0
             for a in _sin_duplicados(todos):
@@ -142,6 +147,15 @@ def correr(config: dict | None = None, fuentes_por_operacion=None, dia: date | N
             _guardar(historial, resumen, dia_txt)
     _guardar(historial, resumen, dia_txt)
     return resumen
+
+
+def _avance(que: str, t0: float, por_fuente: dict, errores: list) -> None:
+    """Línea de avance en el registro de GitHub (para ver qué portal tarda o falla)."""
+    portales = ", ".join(f"{k} {v}" for k, v in por_fuente.items())
+    print(f"[{time.strftime('%H:%M:%S')}] {que}: {time.time() - t0:.0f} s · {portales}"
+          f"{' · ' + str(len(errores)) + ' errores' if errores else ''}", flush=True)
+    for e in errores:
+        print(f"    ⚠ {e[:160]}", flush=True)
 
 
 def _guardar(historial: dict, resumen: dict, dia_txt: str) -> None:
