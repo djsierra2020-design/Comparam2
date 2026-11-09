@@ -505,6 +505,8 @@ def test_persona_con_cuenta_profesional_es_verificar():
          "owner": {"type": "Inmobiliaria", "name": "Inmobiliaria Norte SAS"}},
         {"title": "Apartamento en Venta en Cedritos, Bogotá", "price": 300000000, "area": 60, "link": "/a/3",
          "owner": {"name": "Andrea"}},
+        {"title": "Apartamento en Venta en Cedritos, Bogotá", "price": 410000000, "area": 71, "link": "/a/4",
+         "owner": {"type": "Inmobiliaria", "name": "PROVIVENDA"}},
     ]}}
     html = f'<script id="__NEXT_DATA__" type="application/json">{json.dumps(datos)}</script>'
     a = {x.url[-1]: x for x in extraer_anuncios(html, "fincaraiz", "https://f.co")}
@@ -512,6 +514,7 @@ def test_persona_con_cuenta_profesional_es_verificar():
     assert a["1"].publicado_por == "verificar · OLGA PATRICIA ROJAS QUINTERO"
     assert not a["2"].verificar and a["2"].publicado_por == "inmobiliaria"
     assert a["3"].es_dueno_directo and not a["3"].verificar
+    assert not a["4"].verificar and a["4"].publicado_por == "inmobiliaria"  # marca de una palabra
 
     class P:
         nombre = "fincaraiz"
@@ -520,7 +523,7 @@ def test_persona_con_cuenta_profesional_es_verificar():
             return list(a.values())
 
     r = buscar("Cedritos", [P()])
-    assert {x.url[-1] for x in r.anuncios} == {"1", "3"} and r.ocultos == 1  # «verificar» se muestra
+    assert {x.url[-1] for x in r.anuncios} == {"1", "3"} and r.ocultos == 2  # «verificar» se muestra
     assert buscar("Cedritos", [P()], solo_dueno=False).ocultos == 0
 
 

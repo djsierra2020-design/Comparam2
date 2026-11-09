@@ -313,7 +313,9 @@ def extraer_de_json(bloques: list, fuente: str, base_url: str, operacion: str = 
             vistos.add(clave)
             tipo, nombre = _anunciante(d)
             etiqueta, dueno = clasificar_anunciante(tipo, nombre, descripcion)
-            verificar = not dueno and etiqueta == "inmobiliaria" and parece_persona(nombre)
+            # Nombre y apellido (2+ palabras): una sola palabra suele ser una marca («PROVIVENDA»).
+            verificar = (not dueno and etiqueta == "inmobiliaria" and parece_persona(nombre)
+                         and len(nombre.split()) >= 2)
             if verificar:
                 etiqueta = f"verificar · {nombre.strip()}"
             telefonos = list(dict.fromkeys(_telefonos(d) + extract_phones(descripcion)))
