@@ -283,6 +283,9 @@ class Houm(PortalConNavegador):
     empresa = "Houm"
     base_url = "https://houm.com"
     # Dirección confirmada por el usuario: https://houm.com/co/venta-apartamentos-bogota
+    # En arriendo («arriendo-apartamentos-bogota», supuesta) el navegador se traba siempre: solo
+    # venta hasta tener la dirección real de arriendo.
+    operaciones = {"venta": "venta"}
     plantilla_ciudad = base_url + "/co/{operacion}-apartamentos-bogota?page={pagina}"
 
 

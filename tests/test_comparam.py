@@ -235,7 +235,7 @@ def test_portales_empresa_no_son_dueno_directo(monkeypatch):
     assert Habi().buscar("", "arriendo") == []  # Habi no arrienda
     assert len(Houm(pausa=0, paginas=1).buscar("", "venta")) == 3
     assert urls[-1].startswith("https://houm.com/co/venta-apartamentos-bogota")
-    assert "arriendo-apartamentos-bogota" in Houm().url_busqueda("", "arriendo", 1)
+    assert Houm().buscar("", "arriendo") == []  # solo venta por ahora
     assert Houm(paginas=8).paginas == 1  # con navegador se lee una página
 
 
