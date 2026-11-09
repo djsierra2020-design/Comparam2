@@ -1,49 +1,62 @@
 {
  "base": false,
  "errores": [
-  "venta Contador: metrocuadrado: el portal respondió pero la app no encontró anuncios en la página «Apartamentos en Venta en Contador, Bogotá» — https://www.metrocuadrado.com/apartamentos/venta/bogota/contador/?page=1",
-  "venta Cedritos: metrocuadrado: el portal respondió pero la app no encontró anuncios en la página «Apartamentos en Venta en Cedritos, Bogotá» — https://www.metrocuadrado.com/apartamentos/venta/bogota/cedritos/?page=1",
-  "venta Chicó: metrocuadrado: el portal respondió pero la app no encontró anuncios en la página «Apartamentos en Venta en Chico, Bogotá - Vivienda Nueva y Usada» — https://www.metrocuadrado.com/apartamentos/venta/bogota/chico/?page=1",
-  "venta Santa Bárbara: metrocuadrado: el portal respondió pero la app no encontró anuncios en la página «Apartamentos en Venta en Santa Barbara, Bogotá» — https://www.metrocuadrado.com/apartamentos/venta/bogota/santa-barbara/?page=1",
-  "arriendo Contador: metrocuadrado: el portal respondió pero la app no encontró anuncios en la página «Apartamentos en Arriendo en Contador, Bogotá» — https://www.metrocuadrado.com/apartamentos/arriendo/bogota/contador/?page=1",
-  "arriendo Contador: houm: tardó más de 180 s y se omitió",
-  "arriendo Cedritos: metrocuadrado: tardó más de 180 s y se omitió",
-  "arriendo Cedritos: houm: tardó más de 180 s y se omitió",
-  "arriendo Chicó: metrocuadrado: tardó más de 180 s y se omitió",
-  "arriendo Chicó: houm: tardó más de 180 s y se omitió",
-  "arriendo Santa Bárbara: metrocuadrado: tardó más de 180 s y se omitió",
-  "arriendo Santa Bárbara: houm: tardó más de 180 s y se omitió",
-  "venta toda Bogotá: metrocuadrado: tardó más de 180 s y se omitió",
-  "arriendo toda Bogotá: metrocuadrado: tardó más de 180 s y se omitió",
-  "arriendo toda Bogotá: houm: tardó más de 180 s y se omitió"
+  "arriendo Contador: houm: el navegador se trabó con la página (más de 61 s)",
+  "arriendo Cedritos: houm: el navegador se trabó con la página (más de 61 s)",
+  "arriendo Chicó: houm: el navegador se trabó con la página (más de 61 s)",
+  "arriendo Santa Bárbara: houm: el navegador se trabó con la página (más de 61 s)",
+  "arriendo toda Bogotá: houm: el navegador se trabó con la página (más de 61 s)"
  ],
  "fecha": "2026-11-09",
  "nuevos": [
-  "8c5a9769f9437c8d",
-  "a0fa1ad9101aabd9",
-  "5cfa281d137be136",
-  "b406606e494e6459",
-  "9f34171180fba456",
-  "18fff12a487da472",
-  "17601d8f83e7415c",
-  "42d5212a9fab11fd",
-  "98f8c8249163d112",
-  "5eed0021abb07221",
-  "b25fa5916e52d7ef"
+  "6ca0c701b1515e0a",
+  "b434960975c90642",
+  "24da924e2ee17e17",
+  "5bf3eb2282c08070",
+  "e6a77423c251ec7c",
+  "2e0e76396589ce00",
+  "7fb276bca2d8d514",
+  "3a1c97aa381210d2",
+  "ba3a9509e4864fa3",
+  "239d8b7bfc5ffa1f",
+  "03baa10cd3d4d01c",
+  "e0a5f4f3552cd134",
+  "d06c64fda7eb5ece",
+  "503d211571e1b1ad",
+  "b1fae809e9a1272d",
+  "d93c34f90b43c453",
+  "112116b40e7f12f9",
+  "ee18cbd794c3b000",
+  "6d788ae35530d8ab",
+  "57d0364f825795b6",
+  "7caacd421c2eeaad",
+  "f8434c8d6231b928",
+  "2fceb4e13a352181",
+  "91bd336ca36cb0cb",
+  "a9ed8fa0ace3d84f",
+  "d25a01fb7125711d",
+  "752f52b2510ca82f",
+  "74e7e147b5a3e6fc",
+  "1d340ce36dc96e91",
+  "93e9ddd457edcd06",
+  "3cbb8eb1e3406911",
+  "84d376ad85b70f46",
+  "74281ee414852da8",
+  "e697262d97fbe076"
  ],
  "nuevos_ciudad": {
-  "arriendo": 166,
-  "venta": 147
+  "arriendo": 1,
+  "venta": 24
  },
- "revisados": 1241,
+ "revisados": 1383,
  "zonas": {
   "arriendo|Cedritos": {
    "anuncios": 103,
    "mediana_m2": 50000
   },
   "arriendo|Chicó": {
-   "anuncios": 84,
-   "mediana_m2": 69404
+   "anuncios": 217,
+   "mediana_m2": 63351
   },
   "arriendo|Contador": {
    "anuncios": 29,

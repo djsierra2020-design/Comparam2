@@ -49,6 +49,7 @@
   "zona": "Bogotá"
  },
  "00af3ed4669c2dbe": {
+  "anunciante": "",
   "area_m2": 400.0,
   "banos": null,
   "barrio": "Emaus",
@@ -67,8 +68,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-07-23",
   "titulo": "Apartamento en Emaus",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-o-venta-en-emaus-bogota-3812019",
+  "verificar": false,
   "zona": "Chicó"
  },
  "00b42a74c3a0a975": {
@@ -415,6 +417,7 @@
   "zona": "Cedritos"
  },
  "020d505128a00358": {
+  "anunciante": "",
   "area_m2": 32.0,
   "banos": null,
   "barrio": "Chapinero Central",
@@ -433,8 +436,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-11-05",
   "titulo": "Apartamento en Chapinero Central",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chapinero-central-bogota-3937463",
+  "verificar": false,
   "zona": "Chicó"
  },
  "026567e19f636a2e": {
@@ -639,6 +643,31 @@
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-ub-sabana-de-tibabuyes-bogota/193672269",
   "verificar": false,
   "zona": "Ub. sabana de tibabuyes"
+ },
+ "03baa10cd3d4d01c": {
+  "anunciante": "",
+  "area_m2": 40.0,
+  "banos": null,
+  "barrio": "Chapinero Central",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "ciencuadras",
+  "habitaciones": 1,
+  "operacion": "arriendo",
+  "precio": 2500000,
+  "precios": [
+   [
+    "2026-11-09",
+    2500000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-10-07",
+  "titulo": "Apartamento en Chapinero Central",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chapinero-central-bogota-3904918",
+  "verificar": false,
+  "zona": "Chicó"
  },
  "03c52f86ca3943b5": {
   "anunciante": "",
@@ -863,6 +892,7 @@
   "zona": "Bogotá"
  },
  "04e146cf008bdac4": {
+  "anunciante": "",
   "area_m2": 50.0,
   "banos": null,
   "barrio": "Pardo Rubio",
@@ -881,8 +911,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-08-27",
   "titulo": "Apartamento en Pardo Rubio",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-pardo-rubio-bogota-3854311",
+  "verificar": false,
   "zona": "Chicó"
  },
  "051839ff26ac91ff": {
@@ -1084,6 +1115,7 @@
   "zona": "Cedritos"
  },
  "059e410852fe8b2f": {
+  "anunciante": "",
   "area_m2": 32.0,
   "banos": null,
   "barrio": "Chapinero Central",
@@ -1102,8 +1134,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-10-06",
   "titulo": "Apartamento en Chapinero Central",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chapinero-central-bogota-3903106",
+  "verificar": false,
   "zona": "Chicó"
  },
  "05b55776fe1ec72d": {
@@ -1239,6 +1272,7 @@
   "zona": "Chapinero"
  },
  "064a10335eb6723b": {
+  "anunciante": "",
   "area_m2": 140.0,
   "banos": null,
   "barrio": "Rincon Del Chicó",
@@ -1257,8 +1291,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-09-04",
   "titulo": "Apartamento en Rincon Del Chicó",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-rincon-del-chico-bogota-3864261",
+  "verificar": false,
   "zona": "Chicó"
  },
  "064bd5c096af3135": {
@@ -1540,6 +1575,7 @@
   "zona": "Rincon del chico"
  },
  "08336e2e0fb4edee": {
+  "anunciante": "verificar",
   "area_m2": 67.0,
   "banos": 2,
   "barrio": "Maria cristina",
@@ -1559,8 +1595,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-09-21",
   "titulo": "Apartamento en Venta en Chapinero Alto, Bogotá",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-chapinero-alto-bogota/194289694",
+  "verificar": true,
   "zona": "Chapinero Alto"
  },
  "084aa5abd58b7ec9": {
@@ -1686,6 +1723,7 @@
   "zona": "Tintala"
  },
  "08dabad3e9769b72": {
+  "anunciante": "",
   "area_m2": 20.0,
   "banos": null,
   "barrio": "Chapinero Central",
@@ -1704,8 +1742,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-07-31",
   "titulo": "Apartamento en Chapinero Central",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chapinero-central-bogota-3824183",
+  "verificar": false,
   "zona": "Chicó"
  },
  "09290b29b52914df": {
@@ -3472,6 +3511,7 @@
   "zona": "Los Mártires"
  },
  "10ad725380515a3e": {
+  "anunciante": "",
   "area_m2": 52.0,
   "banos": null,
   "barrio": "Chapinero Norte",
@@ -3490,8 +3530,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-10-02",
   "titulo": "Apartamento en Chapinero Norte",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chapinero-norte-bogota-3899485",
+  "verificar": false,
   "zona": "Chicó"
  },
  "10d791715fb7eb88": {
@@ -3619,6 +3660,31 @@
   "verificar": false,
   "zona": "Chicó"
  },
+ "112116b40e7f12f9": {
+  "anunciante": "",
+  "area_m2": 66.02,
+  "banos": null,
+  "barrio": "La Salle",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "ciencuadras",
+  "habitaciones": 2,
+  "operacion": "arriendo",
+  "precio": 4410000,
+  "precios": [
+   [
+    "2026-11-09",
+    4410000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-07-01",
+  "titulo": "Apartamento en La Salle",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-la-salle-bogota-3786466",
+  "verificar": false,
+  "zona": "Chicó"
+ },
  "112d162b903b0154": {
   "anunciante": "inmobiliaria",
   "area_m2": 152.0,
@@ -3698,6 +3764,7 @@
   "zona": "Bogotá"
  },
  "11c7be2d4231c358": {
+  "anunciante": "",
   "area_m2": 47.0,
   "banos": null,
   "barrio": "Marly",
@@ -3716,8 +3783,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-10-22",
   "titulo": "Apartamento en Marly",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-marly-bogota-3921049",
+  "verificar": false,
   "zona": "Chicó"
  },
  "11dadad2085c8311": {
@@ -3970,6 +4038,7 @@
   "zona": "Chicó"
  },
  "146bb313b52b0fe6": {
+  "anunciante": "",
   "area_m2": 55.0,
   "banos": null,
   "barrio": "María Cristina",
@@ -3988,8 +4057,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-09-21",
   "titulo": "Apartamento en María Cristina",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-maria-cristina-bogota-3884914",
+  "verificar": false,
   "zona": "Chicó"
  },
  "1485fa1786efe388": {
@@ -4856,6 +4926,7 @@
   "zona": "San miguel"
  },
  "19e0c7484b05a760": {
+  "anunciante": "",
   "area_m2": 27.0,
   "banos": null,
   "barrio": "Chapinero Norte",
@@ -4874,8 +4945,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2023-08-10",
   "titulo": "Apartamento en Chapinero Norte",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chapinero-norte-bogota-2762098",
+  "verificar": false,
   "zona": "Chicó"
  },
  "19f77cc4b8c73283": {
@@ -4903,6 +4975,32 @@
   "url": "https://www.fincaraiz.com.co/apartamento-en-arriendo-en-chico-norte-bogota/194479687",
   "verificar": false,
   "zona": "Chico norte"
+ },
+ "19fcaee1b45b56fb": {
+  "anunciante": "inmobiliaria",
+  "area_m2": 23.0,
+  "banos": 1,
+  "barrio": "Normandia",
+  "base": false,
+  "ciudad": true,
+  "dueno_directo": false,
+  "fuente": "fincaraiz",
+  "habitaciones": null,
+  "operacion": "venta",
+  "precio": 261000000,
+  "precios": [
+   [
+    "2026-11-09",
+    261000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-02-06",
+  "titulo": "Apartamento en Venta en Normandia, Bogotá",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-normandia-bogota/193366936",
+  "verificar": false,
+  "zona": "Normandia"
  },
  "1a6d5578f8fffe5b": {
   "area_m2": 90.0,
@@ -5128,6 +5226,7 @@
   "zona": "Bogotá"
  },
  "1b6eef68798009de": {
+  "anunciante": "",
   "area_m2": 52.0,
   "banos": null,
   "barrio": "Bosque Calderón",
@@ -5146,8 +5245,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-10-13",
   "titulo": "Apartamento en Bosque Calderón",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-bosque-calderon-bogota-3910293",
+  "verificar": false,
   "zona": "Chicó"
  },
  "1b96cffd87884b9e": {
@@ -5477,6 +5577,31 @@
   "verificar": false,
   "zona": "Chicó"
  },
+ "1d340ce36dc96e91": {
+  "anunciante": "",
+  "area_m2": 189.0,
+  "banos": null,
+  "barrio": "La Cabrera",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "ciencuadras",
+  "habitaciones": 2,
+  "operacion": "arriendo",
+  "precio": 17000000,
+  "precios": [
+   [
+    "2026-11-09",
+    17000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-08-25",
+  "titulo": "Apartamento en La Cabrera",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-la-cabrera-bogota-3849611",
+  "verificar": false,
+  "zona": "Chicó"
+ },
  "1d44a31b047ee71d": {
   "anunciante": "dueño directo",
   "area_m2": 220.0,
@@ -5605,6 +5730,7 @@
   "zona": "El chico"
  },
  "1db20808c743bacd": {
+  "anunciante": "",
   "area_m2": 134.73,
   "banos": null,
   "barrio": "Bellavista",
@@ -5623,8 +5749,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-10-19",
   "titulo": "Apartamento en Bellavista",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-bellavista-bogota-3827282",
+  "verificar": false,
   "zona": "Chicó"
  },
  "1db9b66ea3a56fdf": {
@@ -5844,6 +5971,7 @@
   "zona": "Chicó"
  },
  "1edf068c60c9b97e": {
+  "anunciante": "",
   "area_m2": 46.0,
   "banos": null,
   "barrio": "Bosque Calderón",
@@ -5862,8 +5990,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-08-03",
   "titulo": "Apartamento en Bosque Calderón",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-bosque-calderon-bogota-3827226",
+  "verificar": false,
   "zona": "Chicó"
  },
  "1f1f99b7b720d9ce": {
@@ -6332,6 +6461,7 @@
   "zona": "Barrios Unidos"
  },
  "215a697c349edf68": {
+  "anunciante": "",
   "area_m2": 52.0,
   "banos": null,
   "barrio": "CHICO NORTE ET. III",
@@ -6352,6 +6482,7 @@
   "titulo": "Apartamento en CHICO NORTE ET. III",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chico-norte-et-iii-bogota-3788519",
+  "verificar": false,
   "zona": "Chicó"
  },
  "2164eb315e290126": {
@@ -6624,6 +6755,7 @@
   "zona": "Cedritos"
  },
  "2388796df060b32a": {
+  "anunciante": "",
   "area_m2": 72.0,
   "banos": null,
   "barrio": "Bosque Calderón",
@@ -6642,8 +6774,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-08-27",
   "titulo": "Apartamento en Bosque Calderón",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-bosque-calderon-bogota-3854066",
+  "verificar": false,
   "zona": "Chicó"
  },
  "238e52dbadb1213a": {
@@ -6670,6 +6803,31 @@
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-los-cedros-bogota-3646253",
   "verificar": false,
   "zona": "Cedritos"
+ },
+ "239d8b7bfc5ffa1f": {
+  "anunciante": "",
+  "area_m2": 50.0,
+  "banos": null,
+  "barrio": "Bellavista",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "ciencuadras",
+  "habitaciones": 2,
+  "operacion": "arriendo",
+  "precio": 3000000,
+  "precios": [
+   [
+    "2026-11-09",
+    3000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-08-21",
+  "titulo": "Apartamento en Bellavista",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-bellavista-bogota-3847290",
+  "verificar": false,
+  "zona": "Chicó"
  },
  "23a247c5ca8bd1bc": {
   "anunciante": "",
@@ -7011,6 +7169,31 @@
   "url": "https://www.fincaraiz.com.co/apartamento-en-arriendo-en-santa-barbara-bogota/194497114",
   "zona": "Santa Bárbara"
  },
+ "24da924e2ee17e17": {
+  "anunciante": "",
+  "area_m2": 152.0,
+  "banos": null,
+  "barrio": "Escuela De Infantería",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "ciencuadras",
+  "habitaciones": 3,
+  "operacion": "arriendo",
+  "precio": 7000000,
+  "precios": [
+   [
+    "2026-11-09",
+    7000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-09-02",
+  "titulo": "Apartamento en Escuela De Infantería",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-escuela-de-infanteria-bogota-3861901",
+  "verificar": false,
+  "zona": "Chicó"
+ },
  "24dc0d079fea2e8e": {
   "anunciante": "",
   "area_m2": 45.0,
@@ -7145,6 +7328,7 @@
   "zona": "Bogotá"
  },
  "255185de47feed99": {
+  "anunciante": "",
   "area_m2": 35.0,
   "banos": null,
   "barrio": "Bosque Calderón",
@@ -7163,8 +7347,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2021-03-04",
   "titulo": "Apartamento en Bosque Calderón",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-bosque-calderon-bogota-1888209",
+  "verificar": false,
   "zona": "Chicó"
  },
  "25bfa1cd3d3d2f4e": {
@@ -7192,6 +7377,7 @@
   "zona": "SAN IGNACIO"
  },
  "25d36f67c341fb4b": {
+  "anunciante": "",
   "area_m2": 36.0,
   "banos": null,
   "barrio": "Juan XXIII",
@@ -7210,8 +7396,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-10-15",
   "titulo": "Apartamento en Juan XXIII",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-juan-xxiii-bogota-3913517",
+  "verificar": false,
   "zona": "Chicó"
  },
  "2600c63920fcf95d": {
@@ -7609,6 +7796,32 @@
   "verificar": false,
   "zona": "Cerros de Suba"
  },
+ "27b2d277c2d428ff": {
+  "anunciante": "verificar",
+  "area_m2": 195.0,
+  "banos": 4,
+  "barrio": "Lisboa Usaquén",
+  "base": false,
+  "ciudad": true,
+  "dueno_directo": false,
+  "fuente": "fincaraiz",
+  "habitaciones": null,
+  "operacion": "venta",
+  "precio": 1500000000,
+  "precios": [
+   [
+    "2026-11-09",
+    1500000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-10-17",
+  "titulo": "Apartamento en Venta en Lisboa Usaquén, Bogotá",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-lisboa-usaquen-bogota/194419245",
+  "verificar": true,
+  "zona": "Lisboa Usaquén"
+ },
  "27d716b137c62ffe": {
   "anunciante": "inmobiliaria",
   "area_m2": 45.0,
@@ -7952,6 +8165,32 @@
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-la-cabrera-bogota/193734714",
   "verificar": true,
   "zona": "Chicó"
+ },
+ "29d45d21ce178b9e": {
+  "anunciante": "inmobiliaria",
+  "area_m2": 106.0,
+  "banos": 2,
+  "barrio": "La esperanza",
+  "base": false,
+  "ciudad": true,
+  "dueno_directo": false,
+  "fuente": "fincaraiz",
+  "habitaciones": null,
+  "operacion": "venta",
+  "precio": 440000000,
+  "precios": [
+   [
+    "2026-11-09",
+    440000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-10-14",
+  "titulo": "Apartamento en Venta en Chapinero, Bogotá",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-chapinero-bogota/194403299",
+  "verificar": false,
+  "zona": "Chapinero"
  },
  "2a438b0521c2fa5c": {
   "area_m2": 39.0,
@@ -8408,6 +8647,7 @@
   "zona": "Contador"
  },
  "2c72433bf9acab24": {
+  "anunciante": "",
   "area_m2": 60.0,
   "banos": null,
   "barrio": "Chapinero Central",
@@ -8426,8 +8666,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-10-28",
   "titulo": "Apartamento en Chapinero Central",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chapinero-central-bogota-3310207",
+  "verificar": false,
   "zona": "Chicó"
  },
  "2c7685dc7d7683f2": {
@@ -8480,6 +8721,7 @@
   "zona": "Bogotá"
  },
  "2cec6e67110f1650": {
+  "anunciante": "inmobiliaria",
   "area_m2": 85.0,
   "banos": 2,
   "barrio": "Ciudad salitre",
@@ -8501,6 +8743,7 @@
   "titulo": "Apartamento en Venta en Ciudad salitre, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-ciudad-salitre-bogota/193505723",
+  "verificar": false,
   "zona": "Ciudad salitre"
  },
  "2cf01ad0ee28400c": {
@@ -8577,6 +8820,32 @@
   "url": "",
   "verificar": false,
   "zona": "Bogotá"
+ },
+ "2d5be99a0189e3f5": {
+  "anunciante": "inmobiliaria",
+  "area_m2": 133.0,
+  "banos": 3,
+  "barrio": "Rincon del chico",
+  "base": false,
+  "ciudad": true,
+  "dueno_directo": false,
+  "fuente": "fincaraiz",
+  "habitaciones": null,
+  "operacion": "venta",
+  "precio": 1100000000,
+  "precios": [
+   [
+    "2026-11-09",
+    1100000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-07-20",
+  "titulo": "Apartamento en Venta en Rincon del chico, Bogotá",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-rincon-del-chico-bogota/194010114",
+  "verificar": false,
+  "zona": "Rincon del chico"
  },
  "2d9b1d528fb6f3dd": {
   "anunciante": "inmobiliaria",
@@ -8680,6 +8949,7 @@
   "zona": "Bosque izquierdo"
  },
  "2dd9889f164ce9c3": {
+  "anunciante": "",
   "area_m2": 39.0,
   "banos": null,
   "barrio": "Chapinero Central",
@@ -8698,8 +8968,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-10-23",
   "titulo": "Apartamento en Chapinero Central",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chapinero-central-bogota-3922416",
+  "verificar": false,
   "zona": "Chicó"
  },
  "2dde9b90ebeca441": {
@@ -8748,6 +9019,31 @@
   "ultima_vez": "2026-11-08",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-santa-teresa-bogota-3922986",
   "zona": "Cedritos"
+ },
+ "2e0e76396589ce00": {
+  "anunciante": "",
+  "area_m2": 45.0,
+  "banos": null,
+  "barrio": "LA PORCIUNCULA",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "ciencuadras",
+  "habitaciones": 1,
+  "operacion": "arriendo",
+  "precio": 2500000,
+  "precios": [
+   [
+    "2026-11-09",
+    2500000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-04-10",
+  "titulo": "Apartamento en LA PORCIUNCULA",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-la-porciuncula-bogota-3689205",
+  "verificar": false,
+  "zona": "Chicó"
  },
  "2e1511f626c21d38": {
   "anunciante": "verificar",
@@ -9123,6 +9419,31 @@
   "verificar": false,
   "zona": "Mazuren"
  },
+ "2fceb4e13a352181": {
+  "anunciante": "",
+  "area_m2": 216.0,
+  "banos": null,
+  "barrio": "CHICO",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "ciencuadras",
+  "habitaciones": 3,
+  "operacion": "arriendo",
+  "precio": 16300000,
+  "precios": [
+   [
+    "2026-11-09",
+    16300000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-10-03",
+  "titulo": "Apartamento en CHICO",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chico-bogota-3900736",
+  "verificar": false,
+  "zona": "Chicó"
+ },
  "2fe207d2a5f2f49e": {
   "anunciante": "",
   "area_m2": 45.95,
@@ -9299,6 +9620,32 @@
   "verificar": false,
   "zona": "Lagos de Cordoba"
  },
+ "313fe702fd7ae9c2": {
+  "anunciante": "inmobiliaria",
+  "area_m2": 150.0,
+  "banos": 4,
+  "barrio": "Centro Comercial Paseo San Rafael",
+  "base": false,
+  "ciudad": true,
+  "dueno_directo": false,
+  "fuente": "fincaraiz",
+  "habitaciones": null,
+  "operacion": "venta",
+  "precio": 890000000,
+  "precios": [
+   [
+    "2026-11-09",
+    890000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-07-26",
+  "titulo": "Apartamento en Venta en Colina Campestre, Bogotá",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-colina-campestre-bogota/194035324",
+  "verificar": false,
+  "zona": "Colina Campestre"
+ },
  "315f2c782e90f492": {
   "anunciante": "verificar",
   "area_m2": 596.0,
@@ -9446,6 +9793,7 @@
   "zona": "Chico norte"
  },
  "31d32c2d2d7f386c": {
+  "anunciante": "",
   "area_m2": 80.57,
   "banos": null,
   "barrio": "Bellavista",
@@ -9466,6 +9814,7 @@
   "titulo": "Apartamento en Bellavista",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-bellavista-bogota-3918896",
+  "verificar": false,
   "zona": "Chicó"
  },
  "31ed9ebe9919f7f6": {
@@ -9544,6 +9893,7 @@
   "zona": "Chicó"
  },
  "329db3d60633a02a": {
+  "anunciante": "",
   "area_m2": 35.0,
   "banos": null,
   "barrio": "Chapinero Norte",
@@ -9562,8 +9912,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-10-08",
   "titulo": "Apartamento en Chapinero Norte",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chapinero-norte-bogota-3906084",
+  "verificar": false,
   "zona": "Chicó"
  },
  "32b01c20b76232ea": {
@@ -10620,6 +10971,32 @@
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-las-acasias-bogota-3800992",
   "zona": "Cedritos"
  },
+ "38d554e367a42c78": {
+  "anunciante": "verificar",
+  "area_m2": 106.0,
+  "banos": 3,
+  "barrio": "Navarra",
+  "base": false,
+  "ciudad": true,
+  "dueno_directo": false,
+  "fuente": "fincaraiz",
+  "habitaciones": null,
+  "operacion": "venta",
+  "precio": 850000000,
+  "precios": [
+   [
+    "2026-11-09",
+    850000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-06-16",
+  "titulo": "Apartamento en Venta en Chicó Navarra, Bogotá",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-chico-navarra-bogota/193882664",
+  "verificar": true,
+  "zona": "Chicó Navarra"
+ },
  "38e707665a46ffcd": {
   "anunciante": "",
   "area_m2": 42.0,
@@ -10647,6 +11024,7 @@
   "zona": "Marco Fidel Suarez"
  },
  "38eea2c19c9ef017": {
+  "anunciante": "",
   "area_m2": 40.0,
   "banos": null,
   "barrio": "El Redil",
@@ -10665,8 +11043,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-08-19",
   "titulo": "Apartamento en El Redil",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-el-redil-bogota-3844286",
+  "verificar": false,
   "zona": "Chicó"
  },
  "39018f3fec10123a": {
@@ -10971,6 +11350,31 @@
   "verificar": false,
   "zona": "Villa gladys"
  },
+ "3a1c97aa381210d2": {
+  "anunciante": "",
+  "area_m2": 30.0,
+  "banos": null,
+  "barrio": "Chapinero Central",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "ciencuadras",
+  "habitaciones": 1,
+  "operacion": "arriendo",
+  "precio": 1790407,
+  "precios": [
+   [
+    "2026-11-09",
+    1790407
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-10-07",
+  "titulo": "Apartamento en Chapinero Central",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chapinero-central-bogota-3905080",
+  "verificar": false,
+  "zona": "Chicó"
+ },
  "3a607fe661e5e89d": {
   "anunciante": "inmobiliaria",
   "area_m2": 143.0,
@@ -10995,6 +11399,32 @@
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-lisboa-bogota/194273118",
   "verificar": false,
   "zona": "Cedritos"
+ },
+ "3a85118eb2fac64a": {
+  "anunciante": "inmobiliaria",
+  "area_m2": 141.0,
+  "banos": 3,
+  "barrio": "Cerros de Niza",
+  "base": false,
+  "ciudad": true,
+  "dueno_directo": false,
+  "fuente": "fincaraiz",
+  "habitaciones": null,
+  "operacion": "venta",
+  "precio": 840000000,
+  "precios": [
+   [
+    "2026-11-09",
+    840000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-07-01",
+  "titulo": "Apartamento en Venta en Gratamira, Bogotá",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-gratamira-bogota/193942426",
+  "verificar": false,
+  "zona": "Gratamira"
  },
  "3adcbd97efac049f": {
   "anunciante": "dueño directo",
@@ -11023,6 +11453,7 @@
   "zona": "Gran granada"
  },
  "3aebb05df77ad72b": {
+  "anunciante": "",
   "area_m2": 41.0,
   "banos": null,
   "barrio": "Chapinero Central",
@@ -11041,8 +11472,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-08-10",
   "titulo": "Apartamento en Chapinero Central",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chapinero-central-bogota-3834342",
+  "verificar": false,
   "zona": "Chicó"
  },
  "3b62f2b415720ff6": {
@@ -11250,6 +11682,31 @@
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-usaquen-bogota/194280480",
   "zona": "Usaquen"
  },
+ "3cbb8eb1e3406911": {
+  "anunciante": "",
+  "area_m2": 26.0,
+  "banos": null,
+  "barrio": "Quinta Camacho",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "ciencuadras",
+  "habitaciones": 1,
+  "operacion": "arriendo",
+  "precio": 2770000,
+  "precios": [
+   [
+    "2026-11-09",
+    2770000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-08-28",
+  "titulo": "Apartamento en Quinta Camacho",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-quinta-camacho-bogota-3856645",
+  "verificar": false,
+  "zona": "Chicó"
+ },
  "3ccf9985b4444e5f": {
   "area_m2": 80.0,
   "banos": 2,
@@ -11299,6 +11756,7 @@
   "zona": "LA CABAÑA"
  },
  "3d3b9c2bb510ceb9": {
+  "anunciante": "",
   "area_m2": 64.0,
   "banos": null,
   "barrio": "Quinta Camacho",
@@ -11317,8 +11775,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-10-06",
   "titulo": "Apartamento en Quinta Camacho",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-quinta-camacho-bogota-3902955",
+  "verificar": false,
   "zona": "Chicó"
  },
  "3d3d62f4c2a0968d": {
@@ -11399,6 +11858,7 @@
   "zona": "El refugio"
  },
  "3d8130113b556e15": {
+  "anunciante": "",
   "area_m2": 52.0,
   "banos": null,
   "barrio": "Sucre",
@@ -11417,8 +11877,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2024-12-05",
   "titulo": "Apartamento en Sucre",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-sucre-bogota-3189347",
+  "verificar": false,
   "zona": "Chicó"
  },
  "3d9dfaaa880bb61b": {
@@ -11764,6 +12225,32 @@
   "verificar": false,
   "zona": "Chicó"
  },
+ "40261941a35e435a": {
+  "anunciante": "inmobiliaria",
+  "area_m2": 92.0,
+  "banos": 2,
+  "barrio": "Barrios Unidos",
+  "base": false,
+  "ciudad": true,
+  "dueno_directo": false,
+  "fuente": "fincaraiz",
+  "habitaciones": null,
+  "operacion": "venta",
+  "precio": 490000000,
+  "precios": [
+   [
+    "2026-11-09",
+    490000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-09-28",
+  "titulo": "Apartamento en Venta en Quinta camacho, Bogotá",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-quinta-camacho-bogota/194328792",
+  "verificar": false,
+  "zona": "Quinta camacho"
+ },
  "404d52396a6ac6b5": {
   "anunciante": "Habi (empresa)",
   "area_m2": 58.0,
@@ -12064,6 +12551,7 @@
   "zona": "Marly"
  },
  "41fb2aca41c3c8c0": {
+  "anunciante": "inmobiliaria",
   "area_m2": 65.0,
   "banos": 2,
   "barrio": "El redil",
@@ -12083,8 +12571,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-07-22",
   "titulo": "Apartamento en Venta en El redil, Bogotá",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-el-redil-bogota/194021812",
+  "verificar": false,
   "zona": "El redil"
  },
  "421525b53d63f009": {
@@ -12511,6 +13000,7 @@
   "zona": "Barrios Unidos"
  },
  "437d9bcb72bd57b6": {
+  "anunciante": "",
   "area_m2": 135.0,
   "banos": null,
   "barrio": "Bellavista",
@@ -12529,8 +13019,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-03-20",
   "titulo": "Apartamento en Bellavista",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-bellavista-bogota-3669036",
+  "verificar": false,
   "zona": "Chicó"
  },
  "438b3ed65e873579": {
@@ -12807,6 +13298,32 @@
   "url": "https://www.fincaraiz.com.co/apartamento-en-arriendo-en-chapinero-bogota/194351921",
   "verificar": false,
   "zona": "Chapinero"
+ },
+ "4544f5dcdad9693d": {
+  "anunciante": "inmobiliaria",
+  "area_m2": 70.0,
+  "banos": 1,
+  "barrio": "El cortijo",
+  "base": false,
+  "ciudad": true,
+  "dueno_directo": false,
+  "fuente": "fincaraiz",
+  "habitaciones": null,
+  "operacion": "venta",
+  "precio": 340000000,
+  "precios": [
+   [
+    "2026-11-09",
+    340000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-06-11",
+  "titulo": "Apartamento en Venta en El cortijo, Bogotá",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-el-cortijo-bogota/193867146",
+  "verificar": false,
+  "zona": "El cortijo"
  },
  "45528e2329c02c13": {
   "area_m2": 132.0,
@@ -13254,6 +13771,7 @@
   "zona": "Barrios Unidos"
  },
  "485f5a584ec2b8e5": {
+  "anunciante": "",
   "area_m2": 216.0,
   "banos": null,
   "barrio": "Chicó Norte",
@@ -13272,8 +13790,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2025-08-29",
   "titulo": "Apartamento en Chicó Norte",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chico-norte-bogota-3112725",
+  "verificar": false,
   "zona": "Chicó"
  },
  "4881206c1c7c85d1": {
@@ -13403,6 +13922,7 @@
   "zona": "GRAN RESERVA DE TOSCANA"
  },
  "49849a46d0ab2765": {
+  "anunciante": "",
   "area_m2": 61.5,
   "banos": null,
   "barrio": "María Cristina",
@@ -13421,8 +13941,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-10-15",
   "titulo": "Apartamento en María Cristina",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-maria-cristina-bogota-3912721",
+  "verificar": false,
   "zona": "Chicó"
  },
  "49987ef5294f47a4": {
@@ -13794,6 +14315,7 @@
   "zona": "Cedritos"
  },
  "4bd56e3357568ac0": {
+  "anunciante": "",
   "area_m2": 28.0,
   "banos": null,
   "barrio": "Sucre",
@@ -13812,8 +14334,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-06-09",
   "titulo": "Apartamento en Sucre",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-sucre-bogota-3760923",
+  "verificar": false,
   "zona": "Chicó"
  },
  "4c01f4c16f1063ac": {
@@ -14542,6 +15065,31 @@
   "verificar": false,
   "zona": "Pinar de Suba"
  },
+ "503d211571e1b1ad": {
+  "anunciante": "",
+  "area_m2": 382.79,
+  "banos": null,
+  "barrio": "CHICO",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "ciencuadras",
+  "habitaciones": 5,
+  "operacion": "arriendo",
+  "precio": 24600000,
+  "precios": [
+   [
+    "2026-11-09",
+    24600000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2025-10-23",
+  "titulo": "Apartamento en CHICO",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chico-bogota-3522740",
+  "verificar": false,
+  "zona": "Chicó"
+ },
  "5066fb2fa6dd1452": {
   "anunciante": "inmobiliaria",
   "area_m2": 50.0,
@@ -14566,6 +15114,32 @@
   "url": "https://www.fincaraiz.com.co/apartamento-en-arriendo-en-pasadena-bogota/194485191",
   "verificar": false,
   "zona": "Cedritos"
+ },
+ "50bb65cc4b3983cb": {
+  "anunciante": "verificar",
+  "area_m2": 40.0,
+  "banos": 1,
+  "barrio": "Bello Horizonte",
+  "base": false,
+  "ciudad": true,
+  "dueno_directo": false,
+  "fuente": "fincaraiz",
+  "habitaciones": null,
+  "operacion": "venta",
+  "precio": 270000000,
+  "precios": [
+   [
+    "2026-11-09",
+    270000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-08-22",
+  "titulo": "Apartamento en Venta en Bello Horizonte, Bogotá",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bello-horizonte-bogota/194149589",
+  "verificar": true,
+  "zona": "Bello Horizonte"
  },
  "50c0ca145b54237d": {
   "anunciante": "inmobiliaria",
@@ -15044,7 +15618,34 @@
   "verificar": false,
   "zona": "Chapinero central"
  },
+ "52faab294a64ae24": {
+  "anunciante": "inmobiliaria",
+  "area_m2": 39.0,
+  "banos": 2,
+  "barrio": "Engativá",
+  "base": false,
+  "ciudad": true,
+  "dueno_directo": false,
+  "fuente": "fincaraiz",
+  "habitaciones": null,
+  "operacion": "venta",
+  "precio": 235000000,
+  "precios": [
+   [
+    "2026-11-09",
+    235000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-07-08",
+  "titulo": "Apartamento en Venta en Engativá, Bogotá",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-engativa-bogota/193970459",
+  "verificar": false,
+  "zona": "Engativá"
+ },
  "5306dd0e6152dd3c": {
+  "anunciante": "",
   "area_m2": 31.0,
   "banos": null,
   "barrio": "Chapinero Central",
@@ -15063,8 +15664,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-10-03",
   "titulo": "Apartamento en Chapinero Central",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chapinero-central-bogota-3900466",
+  "verificar": false,
   "zona": "Chicó"
  },
  "5319f274725a837d": {
@@ -15091,6 +15693,7 @@
   "zona": "Santa Bárbara"
  },
  "5325db74599f4e76": {
+  "anunciante": "",
   "area_m2": 87.0,
   "banos": null,
   "barrio": "CHICO NORTE ET. II",
@@ -15109,8 +15712,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-10-02",
   "titulo": "Apartamento en CHICO NORTE ET. II",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chico-norte-et-ii-bogota-3898841",
+  "verificar": false,
   "zona": "Chicó"
  },
  "5338f9fd267cbc54": {
@@ -15189,6 +15793,7 @@
   "zona": "Cedritos"
  },
  "538d73af42859ca2": {
+  "anunciante": "",
   "area_m2": 34.0,
   "banos": null,
   "barrio": "Chapinero Central",
@@ -15207,8 +15812,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-11-04",
   "titulo": "Apartamento en Chapinero Central",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chapinero-central-bogota-3934760",
+  "verificar": false,
   "zona": "Chicó"
  },
  "53bd8634ad2aacd5": {
@@ -15289,6 +15895,32 @@
   "verificar": false,
   "zona": "Cerros de Suba"
  },
+ "5404c90ad0a67fbb": {
+  "anunciante": "verificar",
+  "area_m2": 53.0,
+  "banos": 2,
+  "barrio": "San pablo jerico",
+  "base": false,
+  "ciudad": true,
+  "dueno_directo": false,
+  "fuente": "fincaraiz",
+  "habitaciones": 2,
+  "operacion": "venta",
+  "precio": 283000000,
+  "precios": [
+   [
+    "2026-11-09",
+    283000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-09-27",
+  "titulo": "Apartamento en Venta en Fontibon, Bogotá",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-fontibon-bogota/194323030",
+  "verificar": true,
+  "zona": "Fontibon"
+ },
  "54843d773867e1d1": {
   "anunciante": "",
   "area_m2": 216.0,
@@ -15316,6 +15948,7 @@
   "zona": "Bogotá"
  },
  "54b6ae2281c924c0": {
+  "anunciante": "",
   "area_m2": 295.0,
   "banos": null,
   "barrio": "CHICO NORTE ET. II",
@@ -15334,8 +15967,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-04-22",
   "titulo": "Apartamento en CHICO NORTE ET. II",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chico-norte-et-ii-bogota-3703459",
+  "verificar": false,
   "zona": "Chicó"
  },
  "54d8120405d46e7e": {
@@ -15460,6 +16094,7 @@
   "zona": "Chicó Navarra"
  },
  "5536162e8fbf8e49": {
+  "anunciante": "",
   "area_m2": 26.0,
   "banos": null,
   "barrio": "Quesada",
@@ -15478,8 +16113,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-09-16",
   "titulo": "Apartamento en Quesada",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-quesada-bogota-3879420",
+  "verificar": false,
   "zona": "Chicó"
  },
  "554b4826c1ef4718": {
@@ -15852,6 +16488,7 @@
   "zona": "Cedritos"
  },
  "570db5ebe84f412a": {
+  "anunciante": "",
   "area_m2": 123.0,
   "banos": null,
   "barrio": "CHICO NORTE ET. III",
@@ -15870,8 +16507,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-10-19",
   "titulo": "Apartamento en CHICO NORTE ET. III",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chico-norte-et-iii-bogota-3917368",
+  "verificar": false,
   "zona": "Chicó"
  },
  "5712adb4f9562af1": {
@@ -15947,6 +16585,31 @@
   "ultima_vez": "2026-11-08",
   "url": "https://www.fincaraiz.com.co/apartamento-en-arriendo-en-el-redil-bogota/194511441",
   "zona": "El redil"
+ },
+ "57d0364f825795b6": {
+  "anunciante": "",
+  "area_m2": 90.0,
+  "banos": null,
+  "barrio": "Chicó Norte",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "ciencuadras",
+  "habitaciones": 2,
+  "operacion": "arriendo",
+  "precio": 6200000,
+  "precios": [
+   [
+    "2026-11-09",
+    6200000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-10-22",
+  "titulo": "Apartamento en Chicó Norte",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chico-norte-bogota-3921022",
+  "verificar": false,
+  "zona": "Chicó"
  },
  "57d9cd85895bf308": {
   "anunciante": "inmobiliaria",
@@ -16175,6 +16838,7 @@
   "zona": "Bogotá"
  },
  "5943c1b53278eb2f": {
+  "anunciante": "",
   "area_m2": 18.0,
   "banos": null,
   "barrio": "CHICO NORTE ET. III",
@@ -16193,8 +16857,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-02-07",
   "titulo": "Apartamento en CHICO NORTE ET. III",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chico-norte-et-iii-bogota-3620229",
+  "verificar": false,
   "zona": "Chicó"
  },
  "59569258319200a7": {
@@ -16444,6 +17109,7 @@
   "zona": "Santa Bárbara"
  },
  "59c39516d3813289": {
+  "anunciante": "",
   "area_m2": 147.0,
   "banos": null,
   "barrio": "CHICO NORTE ET. III",
@@ -16462,8 +17128,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-10-06",
   "titulo": "Apartamento en CHICO NORTE ET. III",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chico-norte-et-iii-bogota-3903742",
+  "verificar": false,
   "zona": "Chicó"
  },
  "5a2b15f9a6bf3497": {
@@ -16616,6 +17283,7 @@
   "zona": "Santa Bárbara"
  },
  "5b1eab5b5e1e6cf0": {
+  "anunciante": "",
   "area_m2": 104.0,
   "banos": null,
   "barrio": "CHICO NORTE ET. III",
@@ -16634,8 +17302,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-11-01",
   "titulo": "Apartamento en CHICO NORTE ET. III",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chico-norte-et-iii-bogota-3932861",
+  "verificar": false,
   "zona": "Chicó"
  },
  "5ba8b9663f680d85": {
@@ -16688,6 +17357,7 @@
   "zona": "El plan"
  },
  "5beecdd1980670fa": {
+  "anunciante": "",
   "area_m2": 50.0,
   "banos": null,
   "barrio": "Sucre",
@@ -16706,8 +17376,34 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-10-13",
   "titulo": "Apartamento en Sucre",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-sucre-bogota-3910003",
+  "verificar": false,
+  "zona": "Chicó"
+ },
+ "5bf3eb2282c08070": {
+  "anunciante": "",
+  "area_m2": 74.0,
+  "banos": null,
+  "barrio": "Pardo Rubio",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "ciencuadras",
+  "habitaciones": 2,
+  "operacion": "arriendo",
+  "precio": 3500000,
+  "precios": [
+   [
+    "2026-11-09",
+    3500000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-09-21",
+  "titulo": "Apartamento en Pardo Rubio",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-pardo-rubio-bogota-3884927",
+  "verificar": false,
   "zona": "Chicó"
  },
  "5bf9d39a563c73f3": {
@@ -16887,6 +17583,7 @@
   "zona": "Chicó"
  },
  "5d1462492dd0e37d": {
+  "anunciante": "",
   "area_m2": 55.0,
   "banos": null,
   "barrio": "EL ESPARTILLAL",
@@ -16907,6 +17604,7 @@
   "titulo": "Apartamento en EL ESPARTILLAL",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-el-espartillal-bogota-3850620",
+  "verificar": false,
   "zona": "Chicó"
  },
  "5d33be1f72b4bf28": {
@@ -17313,6 +18011,7 @@
   "zona": "Santa Bárbara"
  },
  "5ef1eac95fe1649f": {
+  "anunciante": "dueño directo",
   "area_m2": 115.0,
   "banos": 4,
   "barrio": "Escuela de infanteria",
@@ -17334,6 +18033,7 @@
   "titulo": "Apartamento en Venta en Santa Paula, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-paula-bogota/194519966",
+  "verificar": false,
   "zona": "Santa Paula"
  },
  "5f145fa7edd0e433": {
@@ -17806,6 +18506,7 @@
   "zona": "Contador"
  },
  "61e0ae6b0d7952b4": {
+  "anunciante": "",
   "area_m2": 62.0,
   "banos": null,
   "barrio": "EL ESPARTILLAL",
@@ -17824,8 +18525,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-01-16",
   "titulo": "Apartamento en EL ESPARTILLAL",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-el-espartillal-bogota-3597704",
+  "verificar": false,
   "zona": "Chicó"
  },
  "620253e320224dfe": {
@@ -18048,6 +18750,32 @@
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-oriental-bogota/194440113",
   "verificar": false,
   "zona": "Santa Bárbara"
+ },
+ "637418dc13dc693d": {
+  "anunciante": "inmobiliaria",
+  "area_m2": 32.0,
+  "banos": 1,
+  "barrio": "Fontibon",
+  "base": false,
+  "ciudad": true,
+  "dueno_directo": false,
+  "fuente": "fincaraiz",
+  "habitaciones": null,
+  "operacion": "venta",
+  "precio": 310000000,
+  "precios": [
+   [
+    "2026-11-09",
+    310000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-11-04",
+  "titulo": "Apartamento en Venta en Aeropuerto el dorado, Bogotá",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-aeropuerto-el-dorado-bogota/194506171",
+  "verificar": false,
+  "zona": "Aeropuerto el dorado"
  },
  "6400d5ef40a48e3e": {
   "anunciante": "inmobiliaria",
@@ -18662,6 +19390,7 @@
   "zona": "Chicó"
  },
  "6696d3f9adbd9a0b": {
+  "anunciante": "verificar",
   "area_m2": 94.0,
   "banos": 3,
   "barrio": "La Floresta",
@@ -18683,6 +19412,7 @@
   "titulo": "Apartamento en Venta en Andes norte, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-andes-norte-bogota/194313707",
+  "verificar": true,
   "zona": "Andes norte"
  },
  "66ec9dae638da893": {
@@ -19010,6 +19740,7 @@
   "zona": "Cedritos"
  },
  "69f0994fd6e63544": {
+  "anunciante": "",
   "area_m2": 150.0,
   "banos": null,
   "barrio": "El Nogal",
@@ -19028,8 +19759,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-07-03",
   "titulo": "Apartamento en El Nogal",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-el-nogal-bogota-3788942",
+  "verificar": false,
   "zona": "Chicó"
  },
  "6a18865a6cb6d03f": {
@@ -19207,6 +19939,7 @@
   "zona": "Cedritos"
  },
  "6ae23358a4a5f02d": {
+  "anunciante": "",
   "area_m2": 253.0,
   "banos": null,
   "barrio": "Los Rosales",
@@ -19227,6 +19960,7 @@
   "titulo": "Apartamento en Los Rosales",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-los-rosales-bogota-3565202",
+  "verificar": false,
   "zona": "Chicó"
  },
  "6affeef5e9ced38a": {
@@ -19281,6 +20015,7 @@
   "zona": "Cedritos"
  },
  "6b4ab7a17440f32e": {
+  "anunciante": "",
   "area_m2": 45.5,
   "banos": null,
   "barrio": "Chapinero Norte",
@@ -19299,8 +20034,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-10-15",
   "titulo": "Apartamento en Chapinero Norte",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chapinero-norte-bogota-3912561",
+  "verificar": false,
   "zona": "Chicó"
  },
  "6b7b5ec1b2e9de56": {
@@ -19479,6 +20215,31 @@
   "url": "https://www.fincaraiz.com.co/apartamento-en-arriendo-en-cedritos-bogota/194511289",
   "verificar": false,
   "zona": "Cedritos"
+ },
+ "6ca0c701b1515e0a": {
+  "anunciante": "",
+  "area_m2": 225.0,
+  "banos": null,
+  "barrio": "El Refugio",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "ciencuadras",
+  "habitaciones": 3,
+  "operacion": "arriendo",
+  "precio": 7500000,
+  "precios": [
+   [
+    "2026-11-09",
+    7500000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-08-12",
+  "titulo": "Apartamento en El Refugio",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-el-refugio-bogota-3837719",
+  "verificar": false,
+  "zona": "Chicó"
  },
  "6ca4b3e6eb315477": {
   "area_m2": 41.0,
@@ -19719,6 +20480,31 @@
   "ultima_vez": "2026-11-08",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-los-cedros-bogota-3705335",
   "zona": "Cedritos"
+ },
+ "6d788ae35530d8ab": {
+  "anunciante": "",
+  "area_m2": 175.0,
+  "banos": null,
+  "barrio": "El Refugio",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "ciencuadras",
+  "habitaciones": 3,
+  "operacion": "arriendo",
+  "precio": 12000000,
+  "precios": [
+   [
+    "2026-11-09",
+    12000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-05-12",
+  "titulo": "Apartamento en El Refugio",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-el-refugio-bogota-3726400",
+  "verificar": false,
+  "zona": "Chicó"
  },
  "6dbc29a4e214a996": {
   "area_m2": 88.0,
@@ -20361,6 +21147,7 @@
   "zona": "Contador"
  },
  "728ddd3469624207": {
+  "anunciante": "",
   "area_m2": 110.0,
   "banos": null,
   "barrio": "Chicó Norte",
@@ -20379,8 +21166,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-09-08",
   "titulo": "Apartamento en Chicó Norte",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chico-norte-bogota-3868124",
+  "verificar": false,
   "zona": "Chicó"
  },
  "729a5c8618716cec": {
@@ -20408,6 +21196,7 @@
   "zona": "Chicó Navarra"
  },
  "72a3e26925ded57e": {
+  "anunciante": "",
   "area_m2": 46.0,
   "banos": null,
   "barrio": "María Cristina",
@@ -20428,6 +21217,7 @@
   "titulo": "Apartamento en María Cristina",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-maria-cristina-bogota-3920468",
+  "verificar": false,
   "zona": "Chicó"
  },
  "72bfa10b6f55f137": {
@@ -20606,6 +21396,7 @@
   "zona": "Niza Suba"
  },
  "736f9930e73b2122": {
+  "anunciante": "",
   "area_m2": 80.0,
   "banos": null,
   "barrio": "Chapinero Central",
@@ -20624,8 +21415,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-10-13",
   "titulo": "Apartamento en Chapinero Central",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chapinero-central-bogota-3869204",
+  "verificar": false,
   "zona": "Chicó"
  },
  "738b8cf1d0856271": {
@@ -20702,6 +21494,31 @@
   "ultima_vez": "2026-11-08",
   "url": "https://www.fincaraiz.com.co/apartamento-en-arriendo-en-la-granja-bogota/192464851",
   "zona": "La granja"
+ },
+ "74281ee414852da8": {
+  "anunciante": "",
+  "area_m2": 66.0,
+  "banos": null,
+  "barrio": "CHICO NORTE ET. II",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "ciencuadras",
+  "habitaciones": 1,
+  "operacion": "arriendo",
+  "precio": 7714000,
+  "precios": [
+   [
+    "2026-11-09",
+    7714000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-10-01",
+  "titulo": "Apartamento en CHICO NORTE ET. II",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chico-norte-et-ii-bogota-3898068",
+  "verificar": false,
+  "zona": "Chicó"
  },
  "743f17ccb89f2408": {
   "anunciante": "verificar",
@@ -20877,6 +21694,31 @@
   "verificar": false,
   "zona": "Santa Bárbara"
  },
+ "74e7e147b5a3e6fc": {
+  "anunciante": "",
+  "area_m2": 47.0,
+  "banos": null,
+  "barrio": "CHICO NORTE ET. III",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "ciencuadras",
+  "habitaciones": 1,
+  "operacion": "arriendo",
+  "precio": 3850000,
+  "precios": [
+   [
+    "2026-11-09",
+    3850000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-11-09",
+  "titulo": "Apartamento en CHICO NORTE ET. III",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chico-norte-et-iii-bogota-3940931",
+  "verificar": false,
+  "zona": "Chicó"
+ },
  "74f81101ad5418ff": {
   "anunciante": "inmobiliaria",
   "area_m2": 155.0,
@@ -20901,6 +21743,31 @@
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-bogota/193764838",
   "verificar": false,
   "zona": "Santa Bárbara"
+ },
+ "752f52b2510ca82f": {
+  "anunciante": "",
+  "area_m2": 50.0,
+  "banos": null,
+  "barrio": "Rincon Del Chicó",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "ciencuadras",
+  "habitaciones": 1,
+  "operacion": "arriendo",
+  "precio": 4000000,
+  "precios": [
+   [
+    "2026-11-09",
+    4000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-10-01",
+  "titulo": "Apartamento en Rincon Del Chicó",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-rincon-del-chico-bogota-3897940",
+  "verificar": false,
+  "zona": "Chicó"
  },
  "7550f953f961a9f5": {
   "anunciante": "",
@@ -20955,6 +21822,7 @@
   "zona": "Bochica"
  },
  "75ada02ee0ae91dc": {
+  "anunciante": "",
   "area_m2": 23.0,
   "banos": null,
   "barrio": "Chapinero Central",
@@ -20975,6 +21843,7 @@
   "titulo": "Apartamento en Chapinero Central",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chapinero-central-bogota-3874130",
+  "verificar": false,
   "zona": "Chicó"
  },
  "75af123150d88a16": {
@@ -21668,6 +22537,7 @@
   "zona": "Santa Bárbara"
  },
  "79164ff79fec2e86": {
+  "anunciante": "",
   "area_m2": 44.0,
   "banos": null,
   "barrio": "Chapinero Central",
@@ -21688,6 +22558,7 @@
   "titulo": "Apartamento en Chapinero Central",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chapinero-central-bogota-3859211",
+  "verificar": false,
   "zona": "Chicó"
  },
  "79200133d0f1918b": {
@@ -21789,6 +22660,7 @@
   "zona": "Contador"
  },
  "797956752c82311a": {
+  "anunciante": "verificar",
   "area_m2": 42.0,
   "banos": 1,
   "barrio": "Casa blanca",
@@ -21810,6 +22682,7 @@
   "titulo": "Apartamento en Venta en Lagos de Torca, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-lagos-de-torca-bogota/194437728",
+  "verificar": true,
   "zona": "Lagos de Torca"
  },
  "798a8b2911c15362": {
@@ -22030,6 +22903,32 @@
   "verificar": false,
   "zona": "Santa Bárbara"
  },
+ "7aff0e273286bd3a": {
+  "anunciante": "",
+  "area_m2": 35.0,
+  "banos": null,
+  "barrio": "",
+  "base": false,
+  "ciudad": true,
+  "dueno_directo": false,
+  "fuente": "rentola",
+  "habitaciones": 2,
+  "operacion": "arriendo",
+  "precio": 1330000,
+  "precios": [
+   [
+    "2026-11-09",
+    1330000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "",
+  "titulo": "Apartamento",
+  "ultima_vez": "2026-11-09",
+  "url": "",
+  "verificar": false,
+  "zona": "Bogotá"
+ },
  "7b2fe42471f29c00": {
   "area_m2": 112.0,
   "banos": 3,
@@ -22248,6 +23147,31 @@
   "verificar": false,
   "zona": "Contador"
  },
+ "7caacd421c2eeaad": {
+  "anunciante": "",
+  "area_m2": 65.0,
+  "banos": null,
+  "barrio": "Chicó Norte",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "ciencuadras",
+  "habitaciones": 1,
+  "operacion": "arriendo",
+  "precio": 4600000,
+  "precios": [
+   [
+    "2026-11-09",
+    4600000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-01-30",
+  "titulo": "Apartamento en Chicó Norte",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chico-norte-bogota-3611982",
+  "verificar": false,
+  "zona": "Chicó"
+ },
  "7cbf4dfbedf27301": {
   "area_m2": 83.0,
   "banos": 2,
@@ -22394,6 +23318,7 @@
   "zona": "Cedritos"
  },
  "7e1cd48d9707b546": {
+  "anunciante": "",
   "area_m2": 60.0,
   "banos": null,
   "barrio": "María Cristina",
@@ -22412,8 +23337,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-10-12",
   "titulo": "Apartamento en María Cristina",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-maria-cristina-bogota-3909214",
+  "verificar": false,
   "zona": "Chicó"
  },
  "7e293bf7c34ac798": {
@@ -22636,6 +23562,31 @@
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-bogota/194441778",
   "zona": "Santa Bárbara"
  },
+ "7fb276bca2d8d514": {
+  "anunciante": "",
+  "area_m2": 77.0,
+  "banos": null,
+  "barrio": "LA PORCIUNCULA",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "ciencuadras",
+  "habitaciones": 2,
+  "operacion": "arriendo",
+  "precio": 4285000,
+  "precios": [
+   [
+    "2026-11-09",
+    4285000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-10-16",
+  "titulo": "Apartamento en LA PORCIUNCULA",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-la-porciuncula-bogota-3326460",
+  "verificar": false,
+  "zona": "Chicó"
+ },
  "7fb6401e1e4a74be": {
   "anunciante": "inmobiliaria",
   "area_m2": 75.0,
@@ -22687,6 +23638,7 @@
   "zona": "Cedritos"
  },
  "800498006bf0ac55": {
+  "anunciante": "",
   "area_m2": 55.0,
   "banos": null,
   "barrio": "CHICO NORTE ET. III",
@@ -22705,8 +23657,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-09-22",
   "titulo": "Apartamento en CHICO NORTE ET. III",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chico-norte-et-iii-bogota-3886337",
+  "verificar": false,
   "zona": "Chicó"
  },
  "802292520afbf90f": {
@@ -23479,6 +24432,31 @@
   "verificar": false,
   "zona": "Contador"
  },
+ "84d376ad85b70f46": {
+  "anunciante": "",
+  "area_m2": 190.0,
+  "banos": null,
+  "barrio": "CHICO NORTE ET. II",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "ciencuadras",
+  "habitaciones": 3,
+  "operacion": "arriendo",
+  "precio": 21500000,
+  "precios": [
+   [
+    "2026-11-09",
+    21500000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-07-10",
+  "titulo": "Apartamento en CHICO NORTE ET. II",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chico-norte-et-ii-bogota-3799972",
+  "verificar": false,
+  "zona": "Chicó"
+ },
  "84e8bd7b1bee20d2": {
   "anunciante": "",
   "area_m2": 151.0,
@@ -23529,6 +24507,7 @@
   "zona": "La cabrera"
  },
  "84f259467b3a8a2e": {
+  "anunciante": "",
   "area_m2": 205.0,
   "banos": null,
   "barrio": "Antiguo Country",
@@ -23547,8 +24526,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-10-08",
   "titulo": "Apartamento en Antiguo Country",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-antiguo-country-bogota-3874478",
+  "verificar": false,
   "zona": "Chicó"
  },
  "855bc6004758bf65": {
@@ -24101,6 +25081,32 @@
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-pinar-de-suba-bogota/194421386",
   "verificar": true,
   "zona": "Pinar de Suba"
+ },
+ "879c3d5be46dbe02": {
+  "anunciante": "inmobiliaria",
+  "area_m2": 98.0,
+  "banos": 3,
+  "barrio": "Modelia",
+  "base": false,
+  "ciudad": true,
+  "dueno_directo": false,
+  "fuente": "fincaraiz",
+  "habitaciones": null,
+  "operacion": "venta",
+  "precio": 518000000,
+  "precios": [
+   [
+    "2026-11-09",
+    518000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-09-07",
+  "titulo": "Apartamento en Venta en Modelia, Bogotá",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-modelia-bogota/194222225",
+  "verificar": false,
+  "zona": "Modelia"
  },
  "87a09f15e7ec2dcc": {
   "area_m2": 60.0,
@@ -25160,6 +26166,7 @@
   "zona": "Cedritos"
  },
  "8d7228ae7f893236": {
+  "anunciante": "inmobiliaria",
   "area_m2": 148.0,
   "banos": 3,
   "barrio": "Emaus",
@@ -25179,8 +26186,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-10-20",
   "titulo": "Apartamento en Venta en Chapinero, Bogotá",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-chapinero-bogota/194430686",
+  "verificar": false,
   "zona": "Chapinero"
  },
  "8d7edd6c0d5f50d4": {
@@ -25210,6 +26218,7 @@
   "zona": "Fontibon"
  },
  "8dcde5bd947b5d5d": {
+  "anunciante": "",
   "area_m2": 28.0,
   "banos": null,
   "barrio": "CHICO NORTE ET. II",
@@ -25228,8 +26237,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-04-29",
   "titulo": "Apartamento en CHICO NORTE ET. II",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chico-norte-et-ii-bogota-3712211",
+  "verificar": false,
   "zona": "Chicó"
  },
  "8dd84e8d39682bd6": {
@@ -25357,6 +26367,7 @@
   "zona": "Chicó"
  },
  "8ede34eef25ca12d": {
+  "anunciante": "",
   "area_m2": 60.0,
   "banos": null,
   "barrio": "BOSQUE CALDERON - EDIF EMILIA II",
@@ -25375,8 +26386,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-10-29",
   "titulo": "Apartamento en BOSQUE CALDERON - EDIF EMILIA II",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-bosque-calderon-edif-emilia-ii-bogota-3930132",
+  "verificar": false,
   "zona": "Chicó"
  },
  "8ee23de2fd5c5f8f": {
@@ -25431,6 +26443,7 @@
   "zona": "Bogotá"
  },
  "8eedc348cf11927b": {
+  "anunciante": "",
   "area_m2": 105.0,
   "banos": null,
   "barrio": "Chicó Norte",
@@ -25449,11 +26462,13 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-10-10",
   "titulo": "Apartamento en Chicó Norte",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chico-norte-bogota-3908679",
+  "verificar": false,
   "zona": "Chicó"
  },
  "8f087817fecc0f0b": {
+  "anunciante": "",
   "area_m2": 500.0,
   "banos": null,
   "barrio": "Bellavista",
@@ -25472,8 +26487,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2023-08-16",
   "titulo": "Apartamento en Bellavista",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-o-venta-en-bellavista-bogota-2769002",
+  "verificar": false,
   "zona": "Chicó"
  },
  "8f308821e7517a63": {
@@ -25757,6 +26773,32 @@
   "verificar": false,
   "zona": "Contador"
  },
+ "903c89208e2bcb9e": {
+  "anunciante": "verificar",
+  "area_m2": 78.0,
+  "banos": 2,
+  "barrio": "Los naranjos",
+  "base": false,
+  "ciudad": true,
+  "dueno_directo": false,
+  "fuente": "fincaraiz",
+  "habitaciones": 3,
+  "operacion": "venta",
+  "precio": 350000000,
+  "precios": [
+   [
+    "2026-11-09",
+    350000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-10-12",
+  "titulo": "Apartamento en Venta en Suba urbano, Bogotá",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-suba-urbano-bogota/194392098",
+  "verificar": true,
+  "zona": "Suba urbano"
+ },
  "90546a8c740fa122": {
   "anunciante": "inmobiliaria",
   "area_m2": 129.0,
@@ -25832,6 +26874,7 @@
   "zona": "Cedritos"
  },
  "90b6ca20f70978a5": {
+  "anunciante": "",
   "area_m2": 168.0,
   "banos": null,
   "barrio": "Los Rosales",
@@ -25850,8 +26893,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-10-09",
   "titulo": "Apartamento en Los Rosales",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-los-rosales-bogota-3908088",
+  "verificar": false,
   "zona": "Chicó"
  },
  "90c352d074124d27": {
@@ -26045,6 +27089,31 @@
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-arriendo-en-santa-ana-bogota/193918970",
   "zona": "Santa Ana"
+ },
+ "91bd336ca36cb0cb": {
+  "anunciante": "",
+  "area_m2": 160.0,
+  "banos": null,
+  "barrio": "El Nogal",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "ciencuadras",
+  "habitaciones": 3,
+  "operacion": "arriendo",
+  "precio": 12250000,
+  "precios": [
+   [
+    "2026-11-09",
+    12250000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-09-23",
+  "titulo": "Apartamento en El Nogal",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-el-nogal-bogota-3888679",
+  "verificar": false,
+  "zona": "Chicó"
  },
  "91fc0a8a9873e286": {
   "area_m2": 56.0,
@@ -26341,6 +27410,31 @@
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-rincon-del-norte-bogota-3826853",
   "zona": "Cedritos"
  },
+ "93e9ddd457edcd06": {
+  "anunciante": "",
+  "area_m2": 19.0,
+  "banos": null,
+  "barrio": "LA PORCIUNCULA",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "ciencuadras",
+  "habitaciones": 1,
+  "operacion": "arriendo",
+  "precio": 1800000,
+  "precios": [
+   [
+    "2026-11-09",
+    1800000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2025-08-25",
+  "titulo": "Apartamento en LA PORCIUNCULA",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-la-porciuncula-bogota-3451481",
+  "verificar": false,
+  "zona": "Chicó"
+ },
  "93ee23711ec08a55": {
   "area_m2": 95.0,
   "banos": 3,
@@ -26489,6 +27583,7 @@
   "zona": "Contador"
  },
  "94e7851b3a440e36": {
+  "anunciante": "",
   "area_m2": 45.0,
   "banos": null,
   "barrio": "Chapinero Central",
@@ -26507,8 +27602,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-09-27",
   "titulo": "Apartamento en Chapinero Central",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chapinero-central-bogota-3892413",
+  "verificar": false,
   "zona": "Chicó"
  },
  "951fc8bcc49e9112": {
@@ -27328,6 +28424,7 @@
   "zona": "Ricaurte"
  },
  "996a73d889ca0021": {
+  "anunciante": "",
   "area_m2": 30.0,
   "banos": null,
   "barrio": "Chapinero Central",
@@ -27346,8 +28443,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-09-21",
   "titulo": "Apartamento en Chapinero Central",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chapinero-central-bogota-3884955",
+  "verificar": false,
   "zona": "Chicó"
  },
  "9997302aed616fb3": {
@@ -27967,6 +29065,7 @@
   "zona": "El nogal"
  },
  "9cb4ff3ceaeb7b0b": {
+  "anunciante": "",
   "area_m2": 51.0,
   "banos": null,
   "barrio": "CHAPINERO SUR OCCIDENTAL",
@@ -27985,8 +29084,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-10-21",
   "titulo": "Apartamento en CHAPINERO SUR OCCIDENTAL",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chapinero-sur-occidental-bogota-3920001",
+  "verificar": false,
   "zona": "Chicó"
  },
  "9d24bc410a9e9438": {
@@ -28218,6 +29318,7 @@
   "zona": "Bogotá"
  },
  "9e394bc38f8937e7": {
+  "anunciante": "",
   "area_m2": 17.0,
   "banos": null,
   "barrio": "Chapinero Central",
@@ -28236,8 +29337,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-10-09",
   "titulo": "Apartamento en Chapinero Central",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chapinero-central-bogota-3908302",
+  "verificar": false,
   "zona": "Chicó"
  },
  "9e5d4282fe4f5e99": {
@@ -28783,6 +29885,7 @@
   "zona": "Chicó"
  },
  "a1588298a4e1956f": {
+  "anunciante": "",
   "area_m2": 55.0,
   "banos": null,
   "barrio": "María Cristina",
@@ -28801,8 +29904,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-09-18",
   "titulo": "Apartamento en María Cristina",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-maria-cristina-bogota-3882841",
+  "verificar": false,
   "zona": "Chicó"
  },
  "a17ce5889f374d60": {
@@ -29055,6 +30159,7 @@
   "zona": "Cedritos"
  },
  "a2dbfc10b0efd2d5": {
+  "anunciante": "",
   "area_m2": 60.23,
   "banos": null,
   "barrio": "Bellavista",
@@ -29075,6 +30180,7 @@
   "titulo": "Apartamento en Bellavista",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-bellavista-bogota-3850852",
+  "verificar": false,
   "zona": "Chicó"
  },
  "a2e577b833c086e9": {
@@ -29248,6 +30354,7 @@
   "zona": "La castellana"
  },
  "a418c5899b503197": {
+  "anunciante": "inmobiliaria",
   "area_m2": 70.0,
   "banos": 2,
   "barrio": "Las Villas",
@@ -29269,6 +30376,7 @@
   "titulo": "Apartamento en Venta en Prado veraniego, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-prado-veraniego-bogota/193972193",
+  "verificar": false,
   "zona": "Prado veraniego"
  },
  "a42f8faadb25f78a": {
@@ -29944,6 +31052,7 @@
   "zona": "Bogotá"
  },
  "a786eb6e97a377de": {
+  "anunciante": "",
   "area_m2": 40.0,
   "banos": null,
   "barrio": "Quesada",
@@ -29962,8 +31071,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2025-09-24",
   "titulo": "Apartamento en Quesada",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-quesada-bogota-3484531",
+  "verificar": false,
   "zona": "Chicó"
  },
  "a788d41814e22e41": {
@@ -30310,6 +31420,32 @@
   "verificar": false,
   "zona": "Bogotá"
  },
+ "a9c7eda099413ec6": {
+  "anunciante": "inmobiliaria",
+  "area_m2": 430.0,
+  "banos": 5,
+  "barrio": "Multicentro",
+  "base": false,
+  "ciudad": true,
+  "dueno_directo": false,
+  "fuente": "fincaraiz",
+  "habitaciones": null,
+  "operacion": "venta",
+  "precio": 2100000000,
+  "precios": [
+   [
+    "2026-11-09",
+    2100000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-08-15",
+  "titulo": "Apartamento en Venta en Santa Barbara, Bogotá",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-bogota/194122412",
+  "verificar": false,
+  "zona": "Santa Barbara"
+ },
  "a9dc9cc60fd6c426": {
   "anunciante": "inmobiliaria",
   "area_m2": 340.0,
@@ -30358,6 +31494,31 @@
   "ultima_vez": "2026-11-08",
   "url": "https://www.fincaraiz.com.co/apartamento-en-arriendo-en-suba-bogota/194132816",
   "zona": "Suba"
+ },
+ "a9ed8fa0ace3d84f": {
+  "anunciante": "",
+  "area_m2": 50.0,
+  "banos": null,
+  "barrio": "Emaus",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "ciencuadras",
+  "habitaciones": 1,
+  "operacion": "arriendo",
+  "precio": 3900000,
+  "precios": [
+   [
+    "2026-11-09",
+    3900000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-09-30",
+  "titulo": "Apartamento en Emaus",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-emaus-bogota-3895843",
+  "verificar": false,
+  "zona": "Chicó"
  },
  "a9eed3deed71295f": {
   "anunciante": "inmobiliaria",
@@ -31051,6 +32212,7 @@
   "zona": "Atlanta"
  },
  "adedd6500f064e31": {
+  "anunciante": "",
   "area_m2": 62.0,
   "banos": null,
   "barrio": "CHICO NORTE ET. III",
@@ -31069,8 +32231,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-09-04",
   "titulo": "Apartamento en CHICO NORTE ET. III",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chico-norte-et-iii-bogota-3863912",
+  "verificar": false,
   "zona": "Chicó"
  },
  "ae5ef80180b3ba35": {
@@ -31198,6 +32361,7 @@
   "zona": "Chapinero Alto"
  },
  "aee2c3173ecf9903": {
+  "anunciante": "inmobiliaria",
   "area_m2": 98.0,
   "banos": 2,
   "barrio": "Chapinero Alto",
@@ -31219,6 +32383,7 @@
   "titulo": "Apartamento en Venta en Chapinero Alto, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-chapinero-alto-bogota/194210710",
+  "verificar": false,
   "zona": "Chapinero Alto"
  },
  "aeea9cf944cb7af3": {
@@ -31345,6 +32510,7 @@
   "zona": "Chapinero central"
  },
  "af97f2c548320334": {
+  "anunciante": "",
   "area_m2": 40.0,
   "banos": null,
   "barrio": "Sucre",
@@ -31363,8 +32529,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-08-31",
   "titulo": "Apartamento en Sucre",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-sucre-bogota-3858319",
+  "verificar": false,
   "zona": "Chicó"
  },
  "afb21ea0c6b66ed7": {
@@ -31514,6 +32681,7 @@
   "zona": "Santa Bárbara"
  },
  "b0000fe997951ff2": {
+  "anunciante": "",
   "area_m2": 57.0,
   "banos": null,
   "barrio": "Pardo Rubio",
@@ -31532,8 +32700,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-09-30",
   "titulo": "Apartamento en Pardo Rubio",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-pardo-rubio-bogota-3896473",
+  "verificar": false,
   "zona": "Chicó"
  },
  "b02b0f70c1009951": {
@@ -31880,6 +33049,31 @@
   "verificar": false,
   "zona": "Cedritos"
  },
+ "b1fae809e9a1272d": {
+  "anunciante": "",
+  "area_m2": 45.0,
+  "banos": null,
+  "barrio": "LA PORCIUNCULA",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "ciencuadras",
+  "habitaciones": 1,
+  "operacion": "arriendo",
+  "precio": 2970000,
+  "precios": [
+   [
+    "2026-11-09",
+    2970000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-05-21",
+  "titulo": "Apartamento en LA PORCIUNCULA",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-la-porciuncula-bogota-3738103",
+  "verificar": false,
+  "zona": "Chicó"
+ },
  "b20d4a1798098b08": {
   "area_m2": 81.0,
   "banos": 2,
@@ -32125,6 +33319,32 @@
   "url": "https://www.fincaraiz.com.co/apartamento-en-arriendo-en-santa-barbara-central-bogota/194520801",
   "verificar": false,
   "zona": "Santa Bárbara"
+ },
+ "b2c43c890b3ff38b": {
+  "anunciante": "verificar",
+  "area_m2": 76.0,
+  "banos": 2,
+  "barrio": "La Calleja",
+  "base": false,
+  "ciudad": true,
+  "dueno_directo": false,
+  "fuente": "fincaraiz",
+  "habitaciones": null,
+  "operacion": "venta",
+  "precio": 480000000,
+  "precios": [
+   [
+    "2026-11-09",
+    480000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-05-19",
+  "titulo": "Apartamento en Venta en La Calleja, Bogotá",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-la-calleja-bogota/193767620",
+  "verificar": true,
+  "zona": "La Calleja"
  },
  "b2e7331cb98bbad8": {
   "area_m2": 220.0,
@@ -32376,6 +33596,7 @@
   "zona": "Chicó"
  },
  "b4164ddb1aa40230": {
+  "anunciante": "",
   "area_m2": 51.0,
   "banos": null,
   "barrio": "EL ESPARTILLAL",
@@ -32396,6 +33617,7 @@
   "titulo": "Apartamento en EL ESPARTILLAL",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-el-espartillal-bogota-3850663",
+  "verificar": false,
   "zona": "Chicó"
  },
  "b41d5dd1da37b2a5": {
@@ -32423,6 +33645,31 @@
   "url": "https://www.fincaraiz.com.co/apartamento-en-arriendo-en-los-andes-bogota/194501172",
   "verificar": false,
   "zona": "Los andes"
+ },
+ "b434960975c90642": {
+  "anunciante": "",
+  "area_m2": 115.0,
+  "banos": null,
+  "barrio": "Bosque Calderón",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "ciencuadras",
+  "habitaciones": 3,
+  "operacion": "arriendo",
+  "precio": 4200000,
+  "precios": [
+   [
+    "2026-11-09",
+    4200000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-02-03",
+  "titulo": "Apartamento en Bosque Calderón",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-bosque-calderon-bogota-3615450",
+  "verificar": false,
+  "zona": "Chicó"
  },
  "b46d68c0e4dcaf57": {
   "area_m2": 73.0,
@@ -32592,6 +33839,32 @@
   "ultima_vez": "2026-11-08",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-molinos-norte-bogota-3847307",
   "zona": "Cedritos"
+ },
+ "b5e91c3707a0e78a": {
+  "anunciante": "verificar",
+  "area_m2": 64.0,
+  "banos": 2,
+  "barrio": "Engativá",
+  "base": false,
+  "ciudad": true,
+  "dueno_directo": false,
+  "fuente": "fincaraiz",
+  "habitaciones": null,
+  "operacion": "venta",
+  "precio": 430000000,
+  "precios": [
+   [
+    "2026-11-09",
+    430000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-10-02",
+  "titulo": "Apartamento en Venta en Santa Maria del Lago, Bogotá",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-maria-del-lago-bogota/194349995",
+  "verificar": true,
+  "zona": "Santa Maria del Lago"
  },
  "b5f6f5cd5b03b2cb": {
   "area_m2": 58.9,
@@ -33137,6 +34410,7 @@
   "zona": "Cedritos"
  },
  "b9f5f194c71ae1cc": {
+  "anunciante": "",
   "area_m2": 170.0,
   "banos": null,
   "barrio": "Sucre",
@@ -33155,8 +34429,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-08-19",
   "titulo": "Apartamento en Sucre",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-sucre-bogota-3844448",
+  "verificar": false,
   "zona": "Chicó"
  },
  "b9fcfc65e3d59ff1": {
@@ -33232,6 +34507,31 @@
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-las-aguas-bogota-3908532",
   "verificar": false,
   "zona": "Las Aguas"
+ },
+ "ba3a9509e4864fa3": {
+  "anunciante": "",
+  "area_m2": 30.0,
+  "banos": null,
+  "barrio": "Chapinero Central",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "ciencuadras",
+  "habitaciones": 1,
+  "operacion": "arriendo",
+  "precio": 1800000,
+  "precios": [
+   [
+    "2026-11-09",
+    1800000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-06-12",
+  "titulo": "Apartamento en Chapinero Central",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chapinero-central-bogota-3765547",
+  "verificar": false,
+  "zona": "Chicó"
  },
  "ba808d302a34b976": {
   "anunciante": "inmobiliaria",
@@ -33906,6 +35206,7 @@
   "zona": "Cedritos"
  },
  "bdc87a34297de679": {
+  "anunciante": "",
   "area_m2": 40.0,
   "banos": null,
   "barrio": "CHICO NORTE ET. III",
@@ -33926,6 +35227,7 @@
   "titulo": "Apartamento en CHICO NORTE ET. III",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chico-norte-et-iii-bogota-3862583",
+  "verificar": false,
   "zona": "Chicó"
  },
  "bde4fa93870324ef": {
@@ -34429,6 +35731,7 @@
   "zona": "Cedritos"
  },
  "c0d22378289e9ef3": {
+  "anunciante": "",
   "area_m2": 95.0,
   "banos": null,
   "barrio": "Antiguo Country",
@@ -34447,8 +35750,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-07-30",
   "titulo": "Apartamento en Antiguo Country",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-antiguo-country-bogota-3821795",
+  "verificar": false,
   "zona": "Chicó"
  },
  "c13843e761b9c16c": {
@@ -34628,6 +35932,7 @@
   "zona": "La felicidad"
  },
  "c1e4d3b7bb6c6c2e": {
+  "anunciante": "",
   "area_m2": 32.0,
   "banos": null,
   "barrio": "Pardo Rubio",
@@ -34648,6 +35953,7 @@
   "titulo": "Apartamento en Pardo Rubio",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-pardo-rubio-bogota-3921029",
+  "verificar": false,
   "zona": "Chicó"
  },
  "c20a27a56d2edf80": {
@@ -34905,6 +36211,7 @@
   "zona": "A.S.D"
  },
  "c306bedf056fdd93": {
+  "anunciante": "",
   "area_m2": 40.0,
   "banos": null,
   "barrio": "El Redil",
@@ -34923,8 +36230,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-09-18",
   "titulo": "Apartamento en El Redil",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-el-redil-bogota-3882967",
+  "verificar": false,
   "zona": "Chicó"
  },
  "c30e6bf874ebcd01": {
@@ -34953,6 +36261,7 @@
   "zona": "Cedritos"
  },
  "c31984a9c2dd6c27": {
+  "anunciante": "",
   "area_m2": 20.0,
   "banos": null,
   "barrio": "Chapinero Central",
@@ -34971,8 +36280,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2024-06-07",
   "titulo": "Apartamento en Chapinero Central",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chapinero-central-bogota-3010877",
+  "verificar": false,
   "zona": "Chicó"
  },
  "c36dc75ae38d0215": {
@@ -36659,6 +37969,32 @@
   "verificar": false,
   "zona": "Cedritos"
  },
+ "cc72534a218ba78e": {
+  "anunciante": "inmobiliaria",
+  "area_m2": 200.0,
+  "banos": 4,
+  "barrio": "Los rosales",
+  "base": false,
+  "ciudad": true,
+  "dueno_directo": false,
+  "fuente": "fincaraiz",
+  "habitaciones": 3,
+  "operacion": "venta",
+  "precio": 2800000000,
+  "precios": [
+   [
+    "2026-11-09",
+    2800000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-10-02",
+  "titulo": "Apartamento en Venta en Los rosales, Bogotá",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-los-rosales-bogota/194347152",
+  "verificar": false,
+  "zona": "Los rosales"
+ },
  "cc82312fdff8f195": {
   "anunciante": "inmobiliaria",
   "area_m2": 165.0,
@@ -36812,6 +38148,7 @@
   "zona": "Bogotá"
  },
  "cd8debeec68623f3": {
+  "anunciante": "",
   "area_m2": 84.0,
   "banos": null,
   "barrio": "Los Rosales",
@@ -36830,8 +38167,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-09-16",
   "titulo": "Apartamento en Los Rosales",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-los-rosales-bogota-3879345",
+  "verificar": false,
   "zona": "Chicó"
  },
  "cdd14a04c6e8ccdc": {
@@ -37256,6 +38594,7 @@
   "zona": "Suba"
  },
  "d05b581ca95d811e": {
+  "anunciante": "",
   "area_m2": 32.07,
   "banos": null,
   "barrio": "CHICO NORTE ET. III",
@@ -37276,6 +38615,7 @@
   "titulo": "Apartamento en CHICO NORTE ET. III",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chico-norte-et-iii-bogota-3918248",
+  "verificar": false,
   "zona": "Chicó"
  },
  "d06a8230f5885fcc": {
@@ -37301,6 +38641,31 @@
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-chico-bogota/193884590",
   "verificar": true,
+  "zona": "Chicó"
+ },
+ "d06c64fda7eb5ece": {
+  "anunciante": "",
+  "area_m2": 86.0,
+  "banos": null,
+  "barrio": "CHICO NORTE ET. III",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "ciencuadras",
+  "habitaciones": 2,
+  "operacion": "arriendo",
+  "precio": 5500000,
+  "precios": [
+   [
+    "2026-11-09",
+    5500000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2025-11-11",
+  "titulo": "Apartamento en CHICO NORTE ET. III",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chico-norte-et-iii-bogota-3541443",
+  "verificar": false,
   "zona": "Chicó"
  },
  "d070dde1193d92cd": {
@@ -37376,6 +38741,7 @@
   "zona": "Santa Bárbara"
  },
  "d0b34fd99379e30f": {
+  "anunciante": "inmobiliaria",
   "area_m2": 140.0,
   "banos": 3,
   "barrio": "El virrey",
@@ -37397,6 +38763,7 @@
   "titulo": "Apartamento en Venta en El virrey, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-el-virrey-bogota/194498950",
+  "verificar": false,
   "zona": "El virrey"
  },
  "d0b5215f0d30ea35": {
@@ -37500,6 +38867,7 @@
   "zona": "Cedritos"
  },
  "d0ee8cacaac5518c": {
+  "anunciante": "",
   "area_m2": 20.0,
   "banos": null,
   "barrio": "CHICO NORTE ET. III",
@@ -37518,8 +38886,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-10-20",
   "titulo": "Apartamento en CHICO NORTE ET. III",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chico-norte-et-iii-bogota-3919173",
+  "verificar": false,
   "zona": "Chicó"
  },
  "d0ef3b024ee306cb": {
@@ -37597,6 +38966,32 @@
   "verificar": false,
   "zona": "Santa Bárbara"
  },
+ "d135dc3cab496e31": {
+  "anunciante": "inmobiliaria",
+  "area_m2": 122.0,
+  "banos": 2,
+  "barrio": "Villemar",
+  "base": false,
+  "ciudad": true,
+  "dueno_directo": false,
+  "fuente": "fincaraiz",
+  "habitaciones": 4,
+  "operacion": "venta",
+  "precio": 765000000,
+  "precios": [
+   [
+    "2026-11-09",
+    765000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-10-26",
+  "titulo": "Apartamento en Venta en Villemar fontibon, Bogotá",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-villemar-fontibon-bogota/194460790",
+  "verificar": false,
+  "zona": "Villemar fontibon"
+ },
  "d1841272c2e9d6b3": {
   "anunciante": "verificar",
   "area_m2": 117.0,
@@ -37669,6 +39064,31 @@
   "titulo": "Apartamento en Chicó Norte",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chico-norte-bogota-3688668",
+  "verificar": false,
+  "zona": "Chicó"
+ },
+ "d25a01fb7125711d": {
+  "anunciante": "",
+  "area_m2": 29.0,
+  "banos": null,
+  "barrio": "Chapinero Central",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "ciencuadras",
+  "habitaciones": 1,
+  "operacion": "arriendo",
+  "precio": 2280000,
+  "precios": [
+   [
+    "2026-11-09",
+    2280000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-06-30",
+  "titulo": "Apartamento en Chapinero Central",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chapinero-central-bogota-3785286",
   "verificar": false,
   "zona": "Chicó"
  },
@@ -37821,6 +39241,7 @@
   "zona": "Cedritos"
  },
  "d2f529b1c59e8f10": {
+  "anunciante": "",
   "area_m2": 55.68,
   "banos": null,
   "barrio": "Chicó Norte",
@@ -37839,8 +39260,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-09-17",
   "titulo": "Apartamento en Chicó Norte",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chico-norte-bogota-3881005",
+  "verificar": false,
   "zona": "Chicó"
  },
  "d2f63e0f9253c61b": {
@@ -38187,6 +39609,32 @@
   "ultima_vez": "2026-11-08",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-torca-bogota-3922169",
   "zona": "Cedritos"
+ },
+ "d4743152b6bdf7df": {
+  "anunciante": "verificar",
+  "area_m2": 123.0,
+  "banos": 3,
+  "barrio": "Chico norte",
+  "base": false,
+  "ciudad": true,
+  "dueno_directo": false,
+  "fuente": "fincaraiz",
+  "habitaciones": null,
+  "operacion": "venta",
+  "precio": 1200000000,
+  "precios": [
+   [
+    "2026-11-09",
+    1200000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-07-23",
+  "titulo": "Apartamento en Venta en Chico norte, Bogotá",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-chico-norte-bogota/194024116",
+  "verificar": true,
+  "zona": "Chico norte"
  },
  "d4ab6adcfc1c65c7": {
   "anunciante": "inmobiliaria",
@@ -38642,6 +40090,7 @@
   "zona": "Chicó"
  },
  "d6fe627bcfdd5d19": {
+  "anunciante": "",
   "area_m2": 25.0,
   "banos": null,
   "barrio": "Chapinero Central",
@@ -38660,11 +40109,13 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-07-30",
   "titulo": "Apartamento en Chapinero Central",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chapinero-central-bogota-3821543",
+  "verificar": false,
   "zona": "Chicó"
  },
  "d73568b634b8f106": {
+  "anunciante": "",
   "area_m2": 80.0,
   "banos": null,
   "barrio": "El Redil",
@@ -38683,8 +40134,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-08-12",
   "titulo": "Apartamento en El Redil",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-el-redil-bogota-3836836",
+  "verificar": false,
   "zona": "Chicó"
  },
  "d736e9b043c5afee": {
@@ -38787,6 +40239,7 @@
   "zona": "Cedritos"
  },
  "d7e3bf343259547d": {
+  "anunciante": "",
   "area_m2": 30.0,
   "banos": null,
   "barrio": "Chapinero Central",
@@ -38805,8 +40258,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-09-22",
   "titulo": "Apartamento en Chapinero Central",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chapinero-central-bogota-3886496",
+  "verificar": false,
   "zona": "Chicó"
  },
  "d81ea63cc914e3b1": {
@@ -39076,6 +40530,31 @@
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bosa-atalayas-bogota/194461648",
   "verificar": false,
   "zona": "Bosa Atalayas"
+ },
+ "d93c34f90b43c453": {
+  "anunciante": "",
+  "area_m2": 150.0,
+  "banos": null,
+  "barrio": "Emaus",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "ciencuadras",
+  "habitaciones": 3,
+  "operacion": "arriendo",
+  "precio": 9945600,
+  "precios": [
+   [
+    "2026-11-09",
+    9945600
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-10-02",
+  "titulo": "Apartamento en Emaus",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-emaus-bogota-3899712",
+  "verificar": false,
+  "zona": "Chicó"
  },
  "d94bfdb75fea480c": {
   "anunciante": "inmobiliaria",
@@ -40063,6 +41542,7 @@
   "zona": "Navarra"
  },
  "de66985f0b1da38f": {
+  "anunciante": "",
   "area_m2": 157.0,
   "banos": null,
   "barrio": "Antiguo Country",
@@ -40081,8 +41561,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-10-16",
   "titulo": "Apartamento en Antiguo Country",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-antiguo-country-bogota-3914577",
+  "verificar": false,
   "zona": "Chicó"
  },
  "de75c56002bda71b": {
@@ -40333,6 +41814,7 @@
   "zona": "Cedritos"
  },
  "e0249505420bbfbf": {
+  "anunciante": "inmobiliaria",
   "area_m2": 123.0,
   "banos": 3,
   "barrio": "El Batán",
@@ -40352,9 +41834,35 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-10-25",
   "titulo": "Apartamento en Venta en El Batán, Bogotá",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-el-batan-bogota/194454902",
+  "verificar": false,
   "zona": "El Batán"
+ },
+ "e0a5f4f3552cd134": {
+  "anunciante": "",
+  "area_m2": 144.0,
+  "banos": null,
+  "barrio": "El Nogal",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "ciencuadras",
+  "habitaciones": 2,
+  "operacion": "arriendo",
+  "precio": 9200000,
+  "precios": [
+   [
+    "2026-11-09",
+    9200000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-10-01",
+  "titulo": "Apartamento en El Nogal",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-el-nogal-bogota-3897649",
+  "verificar": false,
+  "zona": "Chicó"
  },
  "e0b1b71ff3312b1e": {
   "area_m2": 129.0,
@@ -41202,6 +42710,14 @@
    [
     "2026-11-09",
     650000000
+   ],
+   [
+    "2026-11-09",
+    620000000
+   ],
+   [
+    "2026-11-09",
+    650000000
    ]
   ],
   "primera_vez": "2026-11-08",
@@ -41344,6 +42860,7 @@
   "zona": "Cedritos"
  },
  "e4287f7f52f06664": {
+  "anunciante": "",
   "area_m2": 62.0,
   "banos": null,
   "barrio": "Los Olivos",
@@ -41362,8 +42879,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-06-16",
   "titulo": "Apartamento en Los Olivos",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-los-olivos-bogota-3767106",
+  "verificar": false,
   "zona": "Chicó"
  },
  "e429d826e1886709": {
@@ -41520,6 +43038,7 @@
   "zona": "Cedritos"
  },
  "e4b5a509fca0da7c": {
+  "anunciante": "",
   "area_m2": 40.0,
   "banos": null,
   "barrio": "Quinta Camacho",
@@ -41540,6 +43059,7 @@
   "titulo": "Apartamento en Quinta Camacho",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-quinta-camacho-bogota-3821215",
+  "verificar": false,
   "zona": "Chicó"
  },
  "e4e357b682f2003e": {
@@ -41817,6 +43337,56 @@
   "verificar": false,
   "zona": "Cedritos"
  },
+ "e697262d97fbe076": {
+  "anunciante": "",
+  "area_m2": 270.0,
+  "banos": null,
+  "barrio": "Chicó Norte",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "ciencuadras",
+  "habitaciones": 3,
+  "operacion": "arriendo",
+  "precio": 37000000,
+  "precios": [
+   [
+    "2026-11-09",
+    37000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-03-19",
+  "titulo": "Apartamento en Chicó Norte",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chico-norte-bogota-3667230",
+  "verificar": false,
+  "zona": "Chicó"
+ },
+ "e6a77423c251ec7c": {
+  "anunciante": "",
+  "area_m2": 135.0,
+  "banos": null,
+  "barrio": "Los Rosales",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "ciencuadras",
+  "habitaciones": 2,
+  "operacion": "arriendo",
+  "precio": 6800000,
+  "precios": [
+   [
+    "2026-11-09",
+    6800000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-10-15",
+  "titulo": "Apartamento en Los Rosales",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-los-rosales-bogota-3912446",
+  "verificar": false,
+  "zona": "Chicó"
+ },
  "e6b0f5df3736ac21": {
   "anunciante": "inmobiliaria",
   "area_m2": 180.0,
@@ -41868,6 +43438,7 @@
   "zona": "Cedritos"
  },
  "e6c9a15cf4e1583a": {
+  "anunciante": "",
   "area_m2": 405.0,
   "banos": null,
   "barrio": "El Refugio",
@@ -41888,6 +43459,7 @@
   "titulo": "Apartamento en El Refugio",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-el-refugio-bogota-3932619",
+  "verificar": false,
   "zona": "Chicó"
  },
  "e6d467a287695686": {
@@ -42317,6 +43889,7 @@
   "zona": "Fontibón"
  },
  "e88bc68dd1763062": {
+  "anunciante": "",
   "area_m2": 65.0,
   "banos": null,
   "barrio": "Antiguo Country",
@@ -42337,6 +43910,7 @@
   "titulo": "Apartamento en Antiguo Country",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-antiguo-country-bogota-3911484",
+  "verificar": false,
   "zona": "Chicó"
  },
  "e899db35ed5baf16": {
@@ -43230,6 +44804,32 @@
   "verificar": false,
   "zona": "Chicó"
  },
+ "ece564e71d982207": {
+  "anunciante": "inmobiliaria",
+  "area_m2": 106.0,
+  "banos": 2,
+  "barrio": "La esperanza",
+  "base": false,
+  "ciudad": true,
+  "dueno_directo": false,
+  "fuente": "fincaraiz",
+  "habitaciones": null,
+  "operacion": "venta",
+  "precio": 440000000,
+  "precios": [
+   [
+    "2026-11-09",
+    440000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-10-14",
+  "titulo": "Apartamento en Venta en Barrios Unidos, Bogotá",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-barrios-unidos-bogota/194403318",
+  "verificar": false,
+  "zona": "Barrios Unidos"
+ },
  "ecea3c23cb73625e": {
   "anunciante": "inmobiliaria",
   "area_m2": 200.0,
@@ -43256,6 +44856,7 @@
   "zona": "Chicó"
  },
  "ed1dce1d9649fd99": {
+  "anunciante": "",
   "area_m2": 243.0,
   "banos": null,
   "barrio": "Los Rosales",
@@ -43276,6 +44877,7 @@
   "titulo": "Apartamento en Los Rosales",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-los-rosales-bogota-3903384",
+  "verificar": false,
   "zona": "Chicó"
  },
  "eddc8566b505aa15": {
@@ -43302,6 +44904,31 @@
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-bogota/192413676",
   "verificar": false,
   "zona": "Santa Bárbara"
+ },
+ "ee18cbd794c3b000": {
+  "anunciante": "",
+  "area_m2": 365.0,
+  "banos": null,
+  "barrio": "Chicó Norte",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "ciencuadras",
+  "habitaciones": 3,
+  "operacion": "arriendo",
+  "precio": 25000000,
+  "precios": [
+   [
+    "2026-11-09",
+    25000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2023-11-27",
+  "titulo": "Apartamento en Chicó Norte",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chico-norte-bogota-2860830",
+  "verificar": false,
+  "zona": "Chicó"
  },
  "ee3d2b6e811f5f74": {
   "anunciante": "",
@@ -43572,6 +45199,7 @@
   "zona": "Pontevedra"
  },
  "f0126fd147480383": {
+  "anunciante": "",
   "area_m2": 112.0,
   "banos": null,
   "barrio": "CHICO NORTE ET. III",
@@ -43590,8 +45218,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-09-27",
   "titulo": "Apartamento en CHICO NORTE ET. III",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chico-norte-et-iii-bogota-3892610",
+  "verificar": false,
   "zona": "Chicó"
  },
  "f038885dff43598e": {
@@ -43671,6 +45300,7 @@
   "zona": "El redil"
  },
  "f07f229bd4ad5eb5": {
+  "anunciante": "",
   "area_m2": 100.0,
   "banos": null,
   "barrio": "Antiguo Country",
@@ -43689,8 +45319,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2025-07-10",
   "titulo": "Apartamento en Antiguo Country",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-antiguo-country-bogota-3406254",
+  "verificar": false,
   "zona": "Chicó"
  },
  "f0af14433f734612": {
@@ -43950,6 +45581,7 @@
   "zona": "Chapinero"
  },
  "f239f9cc62e5381b": {
+  "anunciante": "",
   "area_m2": 185.0,
   "banos": null,
   "barrio": "Quinta Camacho",
@@ -43968,8 +45600,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-08-15",
   "titulo": "Apartamento en Quinta Camacho",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-quinta-camacho-bogota-3841455",
+  "verificar": false,
   "zona": "Chicó"
  },
  "f26e7a372842f6d0": {
@@ -44245,6 +45878,7 @@
   "zona": "Chapinero"
  },
  "f4536ba739ad8efa": {
+  "anunciante": "",
   "area_m2": 60.0,
   "banos": null,
   "barrio": "Antiguo Country",
@@ -44263,8 +45897,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-08-31",
   "titulo": "Apartamento en Antiguo Country",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-antiguo-country-bogota-3857721",
+  "verificar": false,
   "zona": "Chicó"
  },
  "f45f45a2e8b24498": {
@@ -44390,6 +46025,7 @@
   "zona": "Cedritos"
  },
  "f51b17fccbc59cd7": {
+  "anunciante": "",
   "area_m2": 60.0,
   "banos": null,
   "barrio": "CHICO NORTE ET. II",
@@ -44408,8 +46044,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-11-04",
   "titulo": "Apartamento en CHICO NORTE ET. II",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chico-norte-et-ii-bogota-3889530",
+  "verificar": false,
   "zona": "Chicó"
  },
  "f53ec1c6ed47b2cf": {
@@ -44488,6 +46125,7 @@
   "zona": "Santa Bárbara"
  },
  "f5624a8c32cb719d": {
+  "anunciante": "",
   "area_m2": 130.0,
   "banos": null,
   "barrio": "Antiguo Country",
@@ -44506,8 +46144,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-10-16",
   "titulo": "Apartamento en Antiguo Country",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-antiguo-country-bogota-3913974",
+  "verificar": false,
   "zona": "Chicó"
  },
  "f586a621805902bd": {
@@ -44609,6 +46248,7 @@
   "zona": "Chapinero Alto"
  },
  "f61b0a5c0338a00b": {
+  "anunciante": "",
   "area_m2": 68.0,
   "banos": null,
   "barrio": "Pardo Rubio",
@@ -44627,8 +46267,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-10-13",
   "titulo": "Apartamento en Pardo Rubio",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-pardo-rubio-bogota-3910173",
+  "verificar": false,
   "zona": "Chicó"
  },
  "f65edb7a48603b7b": {
@@ -44682,6 +46323,7 @@
   "zona": "Unicentro Bogotá"
  },
  "f6cfb9ac1b268c00": {
+  "anunciante": "",
   "area_m2": 58.45,
   "banos": null,
   "barrio": "Chapinero Norte",
@@ -44700,8 +46342,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-10-13",
   "titulo": "Apartamento en Chapinero Norte",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chapinero-norte-bogota-3910456",
+  "verificar": false,
   "zona": "Chicó"
  },
  "f6e0c5cb2d396c6c": {
@@ -44761,6 +46404,7 @@
   "zona": "Chico norte"
  },
  "f7226034555106ff": {
+  "anunciante": "",
   "area_m2": 71.71,
   "banos": null,
   "barrio": "Bosque Calderón",
@@ -44779,8 +46423,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-11-03",
   "titulo": "Apartamento en Bosque Calderón",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-bosque-calderon-bogota-3751914",
+  "verificar": false,
   "zona": "Chicó"
  },
  "f73189966e461a7a": {
@@ -44860,6 +46505,32 @@
   "url": "",
   "verificar": false,
   "zona": "Bogotá"
+ },
+ "f796329564602400": {
+  "anunciante": "inmobiliaria",
+  "area_m2": 37.0,
+  "banos": 1,
+  "barrio": "Rincon de calamar",
+  "base": false,
+  "ciudad": true,
+  "dueno_directo": false,
+  "fuente": "fincaraiz",
+  "habitaciones": 1,
+  "operacion": "venta",
+  "precio": 168000000,
+  "precios": [
+   [
+    "2026-11-09",
+    168000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-09-04",
+  "titulo": "Apartamento en Venta en Barrancas Norte, Bogotá",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-barrancas-norte-bogota/194208851",
+  "verificar": false,
+  "zona": "Barrancas Norte"
  },
  "f7c33c9f6c19d149": {
   "area_m2": 43.0,
@@ -45028,6 +46699,31 @@
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/194239502",
   "zona": "Cedritos"
  },
+ "f8434c8d6231b928": {
+  "anunciante": "",
+  "area_m2": 28.0,
+  "banos": null,
+  "barrio": "Cataluña",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "ciencuadras",
+  "habitaciones": 1,
+  "operacion": "arriendo",
+  "precio": 2003000,
+  "precios": [
+   [
+    "2026-11-09",
+    2003000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-07-09",
+  "titulo": "Apartamento en Cataluña",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-cataluna-bogota-3798943",
+  "verificar": false,
+  "zona": "Chicó"
+ },
  "f86e1cb4b8260e26": {
   "anunciante": "inmobiliaria",
   "area_m2": 120.0,
@@ -45176,6 +46872,7 @@
   "zona": "Cedritos"
  },
  "f9c8152d2e913aac": {
+  "anunciante": "",
   "area_m2": 30.0,
   "banos": null,
   "barrio": "Chapinero Central",
@@ -45194,8 +46891,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-10-06",
   "titulo": "Apartamento en Chapinero Central",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chapinero-central-bogota-3903145",
+  "verificar": false,
   "zona": "Chicó"
  },
  "f9e51fb01e12796a": {
@@ -46179,6 +47877,7 @@
   "zona": "Usaquén"
  },
  "fe358fbfb00db306": {
+  "anunciante": "",
   "area_m2": 120.0,
   "banos": null,
   "barrio": "Antiguo Country",
@@ -46197,8 +47896,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2025-11-12",
   "titulo": "Apartamento en Antiguo Country",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-o-venta-en-antiguo-country-bogota-3543214",
+  "verificar": false,
   "zona": "Chicó"
  },
  "fe4bb69107d1b3e5": {
@@ -46250,6 +47950,32 @@
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-el-contador-bogota/193985131",
   "verificar": true,
   "zona": "Cedritos"
+ },
+ "fe90186b2e07ba30": {
+  "anunciante": "verificar",
+  "area_m2": 156.0,
+  "banos": 5,
+  "barrio": "Santa Paula",
+  "base": false,
+  "ciudad": true,
+  "dueno_directo": false,
+  "fuente": "fincaraiz",
+  "habitaciones": 3,
+  "operacion": "venta",
+  "precio": 1580000000,
+  "precios": [
+   [
+    "2026-11-09",
+    1580000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-09-18",
+  "titulo": "Apartamento en Venta en San patricio, Bogotá",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-san-patricio-bogota/194279159",
+  "verificar": true,
+  "zona": "San patricio"
  },
  "fec0c96f0a217ded": {
   "area_m2": 77.0,
@@ -46401,6 +48127,7 @@
   "zona": "Santa Fe"
  },
  "ff9efcb39c0b6457": {
+  "anunciante": "",
   "area_m2": 30.0,
   "banos": null,
   "barrio": "Tunjuelito",
@@ -46419,8 +48146,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2025-11-13",
   "titulo": "Apartamento en Tunjuelito",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-tunjuelito-bogota-3544468",
+  "verificar": false,
   "zona": "Chicó"
  },
  "ffaaa226fdc5a477": {
