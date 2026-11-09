@@ -139,6 +139,7 @@
   "zona": "Chicó"
  },
  "016fc1e9168b215e": {
+  "anunciante": "inmobiliaria",
   "area_m2": 70.0,
   "banos": 2,
   "barrio": "Acacias usaquen",
@@ -159,6 +160,7 @@
   "titulo": "Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/194316310",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "017442533fdfe199": {
@@ -326,6 +328,7 @@
   "zona": "Chicó"
  },
  "026567e19f636a2e": {
+  "anunciante": "inmobiliaria",
   "area_m2": 114.0,
   "banos": 3,
   "barrio": "Multicentro",
@@ -346,6 +349,7 @@
   "titulo": "Apartamento en Venta en Santa Barbara, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-bogota/193774326",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "0269665d16b25e55": {
@@ -419,6 +423,7 @@
   "zona": "Contador"
  },
  "0327721b1abd6eb2": {
+  "anunciante": "verificar",
   "area_m2": 63.0,
   "banos": 2,
   "barrio": "Cedro salazar",
@@ -439,9 +444,11 @@
   "titulo": "Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/194333824",
+  "verificar": true,
   "zona": "Cedritos"
  },
  "039b7bb541cfd490": {
+  "anunciante": "",
   "area_m2": 337.0,
   "banos": null,
   "barrio": "CHICO",
@@ -462,6 +469,7 @@
   "titulo": "Apartamento en CHICO",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-chico-bogota-3588938",
+  "verificar": false,
   "zona": "Chicó"
  },
  "03ab5e3ea8a421b4": {
@@ -489,6 +497,7 @@
   "zona": "Ub. sabana de tibabuyes"
  },
  "03c52f86ca3943b5": {
+  "anunciante": "",
   "area_m2": 102.0,
   "banos": null,
   "barrio": "PELODO DEL CONTRY",
@@ -509,6 +518,7 @@
   "titulo": "Apartamento en PELODO DEL CONTRY",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-pelodo-del-contry-bogota-3934690",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "042a37d9bbb50ecb": {
@@ -744,6 +754,7 @@
   "zona": "Contador"
  },
  "054774a48b3fc3be": {
+  "anunciante": "verificar",
   "area_m2": 63.0,
   "banos": 2,
   "barrio": "Santa barbara occidental",
@@ -764,9 +775,11 @@
   "titulo": "Apartamento en Venta en La Calleja, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-la-calleja-bogota/194452660",
+  "verificar": true,
   "zona": "Santa Bárbara"
  },
  "0558a3fbf39ea27f": {
+  "anunciante": "verificar",
   "area_m2": 115.0,
   "banos": 3,
   "barrio": "Multicentro",
@@ -787,9 +800,11 @@
   "titulo": "Apartamento en Venta en Santa Barbara, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-bogota/194438721",
+  "verificar": true,
   "zona": "Santa Bárbara"
  },
  "056e0cfc6b09b9d1": {
+  "anunciante": "verificar",
   "area_m2": 242.0,
   "banos": 4,
   "barrio": "Belmira",
@@ -810,9 +825,11 @@
   "titulo": "Apartamento en Venta en Montearroyo, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-montearroyo-bogota/194515269",
+  "verificar": true,
   "zona": "Cedritos"
  },
  "05789177c60c94f4": {
+  "anunciante": "inmobiliaria",
   "area_m2": 102.0,
   "banos": 3,
   "barrio": "Acacias usaquen",
@@ -833,6 +850,7 @@
   "titulo": "Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/194460009",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "059e410852fe8b2f": {
@@ -1047,6 +1065,7 @@
   "zona": "Chicó"
  },
  "06c43299a83bdac0": {
+  "anunciante": "inmobiliaria",
   "area_m2": 44.0,
   "banos": 2,
   "barrio": "Chico",
@@ -1067,6 +1086,7 @@
   "titulo": "Apartamento en Venta en Chico, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-chico-bogota/194415968",
+  "verificar": false,
   "zona": "Chicó"
  },
  "06c57be026144ec7": {
@@ -1118,6 +1138,7 @@
   "zona": "San patricio"
  },
  "071c7cde2b485c96": {
+  "anunciante": "inmobiliaria",
   "area_m2": 102.0,
   "banos": 2,
   "barrio": "Multicentro",
@@ -1138,9 +1159,11 @@
   "titulo": "Apartamento en Venta en Santa Barbara, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-bogota/193437725",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "07773e4972e778e9": {
+  "anunciante": "inmobiliaria",
   "area_m2": 109.0,
   "banos": 2,
   "barrio": "Foledo",
@@ -1161,6 +1184,7 @@
   "titulo": "Apartamento en Venta en Lisboa Usaquén, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-lisboa-usaquen-bogota/194220436",
+  "verificar": false,
   "zona": "Contador"
  },
  "07f16edf81e07882": {
@@ -1259,6 +1283,7 @@
   "zona": "Cedritos"
  },
  "086695d7e32223d9": {
+  "anunciante": "dueño directo",
   "area_m2": 76.0,
   "banos": 3,
   "barrio": "Bella suiza",
@@ -1279,6 +1304,7 @@
   "titulo": "Apartamento en Venta en Bella suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/194399323",
+  "verificar": false,
   "zona": "Contador"
  },
  "087831ebc71c6365": {
@@ -1423,6 +1449,7 @@
   "zona": "Cedritos"
  },
  "09b4a8129afeedad": {
+  "anunciante": "",
   "area_m2": 122.36,
   "banos": null,
   "barrio": "El Contador",
@@ -1443,9 +1470,11 @@
   "titulo": "Apartamento en El Contador",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/casa-en-venta-en-el-contador-bogota-3868108",
+  "verificar": false,
   "zona": "Contador"
  },
  "09c25938038f8f9a": {
+  "anunciante": "inmobiliaria",
   "area_m2": 215.0,
   "banos": 5,
   "barrio": "Bella suiza",
@@ -1466,6 +1495,7 @@
   "titulo": "Apartamento en Venta en Bella suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/193905224",
+  "verificar": false,
   "zona": "Contador"
  },
  "09e8476179dfd743": {
@@ -1492,6 +1522,7 @@
   "zona": "Santa Bárbara"
  },
  "09ee43bd89ee46d8": {
+  "anunciante": "inmobiliaria",
   "area_m2": 84.17,
   "banos": 3,
   "barrio": "Cedritos",
@@ -1512,6 +1543,7 @@
   "titulo": "ELEMENT 142, Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/element-142-apartamento-en-venta-en-cedritos-bogota/192608749",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "09f2b3bdc7e245df": {
@@ -1608,6 +1640,7 @@
   "zona": "Bosque Medina"
  },
  "0a3b9f1d685884b9": {
+  "anunciante": "inmobiliaria",
   "area_m2": 82.0,
   "banos": 3,
   "barrio": "Portales del Country",
@@ -1628,6 +1661,7 @@
   "titulo": "Apartamento en Venta en Bella suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/194232859",
+  "verificar": false,
   "zona": "Contador"
  },
  "0a81a8c830ce2d21": {
@@ -1726,6 +1760,7 @@
   "zona": "Nueva Castilla"
  },
  "0adae58fd3f7ac2d": {
+  "anunciante": "inmobiliaria",
   "area_m2": 64.0,
   "banos": 2,
   "barrio": "Acacias usaquen",
@@ -1746,6 +1781,7 @@
   "titulo": "Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/194516533",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "0b18c5ca4bcd5a98": {
@@ -1773,6 +1809,7 @@
   "zona": "Cerros de los alpes"
  },
  "0b2072596bbc660b": {
+  "anunciante": "inmobiliaria",
   "area_m2": 73.0,
   "banos": 3,
   "barrio": "Paramo",
@@ -1793,6 +1830,7 @@
   "titulo": "Apartamento en Venta en Bella suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/193908710",
+  "verificar": false,
   "zona": "Contador"
  },
  "0b29ce345e8937ba": {
@@ -1819,6 +1857,7 @@
   "zona": "Chicó"
  },
  "0b32a76afe1cc7a3": {
+  "anunciante": "verificar",
   "area_m2": 300.0,
   "banos": 5,
   "barrio": "Chico",
@@ -1839,9 +1878,11 @@
   "titulo": "Apartamento en  Venta en El chico, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-el-chico-bogota/192233250",
+  "verificar": true,
   "zona": "Chicó"
  },
  "0b4613b5daa09d4a": {
+  "anunciante": "verificar",
   "area_m2": 71.0,
   "banos": 2,
   "barrio": "Acacias usaquen",
@@ -1862,9 +1903,11 @@
   "titulo": "Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/194211697",
+  "verificar": true,
   "zona": "Cedritos"
  },
  "0b88293c031551e0": {
+  "anunciante": "inmobiliaria",
   "area_m2": 160.0,
   "banos": 3,
   "barrio": "Chico",
@@ -1885,6 +1928,7 @@
   "titulo": "Apartamento en Venta en Chico, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-chico-bogota/192646770",
+  "verificar": false,
   "zona": "Chicó"
  },
  "0bd68e7df435bc46": {
@@ -1959,6 +2003,7 @@
   "zona": "Calleja Baja"
  },
  "0c5e812ad8bc11d9": {
+  "anunciante": "",
   "area_m2": 60.0,
   "banos": null,
   "barrio": "Santa Barbara",
@@ -1979,6 +2024,7 @@
   "titulo": "Apartamento en Santa Barbara",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-santa-barbara-bogota-3923834",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "0c8709abb83c6064": {
@@ -2005,6 +2051,7 @@
   "zona": "Cedritos"
  },
  "0cb79ed13fe825bc": {
+  "anunciante": "",
   "area_m2": 270.0,
   "banos": null,
   "barrio": "CHICO",
@@ -2025,6 +2072,7 @@
   "titulo": "Apartamento en CHICO",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-chico-bogota-3868462",
+  "verificar": false,
   "zona": "Chicó"
  },
  "0cbb9058d6da0cf2": {
@@ -2218,6 +2266,7 @@
   "zona": "Lagos de Torca"
  },
  "0db1a06f99fd124e": {
+  "anunciante": "inmobiliaria",
   "area_m2": 250.0,
   "banos": 3,
   "barrio": "Cedro salazar",
@@ -2238,6 +2287,7 @@
   "titulo": "Apartamento en Venta en Cedro Golf, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedro-golf-bogota/194503707",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "0dfc45cfee9bf8a1": {
@@ -2311,6 +2361,7 @@
   "zona": "Chicó"
  },
  "0e3c0e9fd1d012b4": {
+  "anunciante": "",
   "area_m2": 72.23,
   "banos": 2,
   "barrio": "Cedritos",
@@ -2331,6 +2382,7 @@
   "titulo": "Apartamento en Venta",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta/192608744",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "0e4c6981f061eac7": {
@@ -2569,6 +2621,7 @@
   "zona": "Santa Bárbara"
  },
  "0fae8a8c298b4cc8": {
+  "anunciante": "",
   "area_m2": 87.0,
   "banos": null,
   "barrio": "ACACIAS USAQUEN",
@@ -2589,6 +2642,7 @@
   "titulo": "Apartamento en ACACIAS USAQUEN",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-acacias-usaquen-bogota-3782793",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "0faebd000777f2c3": {
@@ -2781,6 +2835,7 @@
   "zona": "Chicó"
  },
  "10d791715fb7eb88": {
+  "anunciante": "",
   "area_m2": 43.0,
   "banos": null,
   "barrio": "Cedritos",
@@ -2801,6 +2856,7 @@
   "titulo": "Apartamento en Cedritos",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-cedritos-bogota-3923441",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "10da83f521e680bf": {
@@ -2828,6 +2884,7 @@
   "zona": "Chicó Alto"
  },
  "10dfb1cb13e2db27": {
+  "anunciante": "",
   "area_m2": 69.0,
   "banos": null,
   "barrio": "Caobos Salazar",
@@ -2848,6 +2905,7 @@
   "titulo": "Apartamento en Caobos Salazar",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-caobos-salazar-bogota-3798004",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "1119acd4c2120f48": {
@@ -2921,6 +2979,7 @@
   "zona": "Chicó"
  },
  "11dadad2085c8311": {
+  "anunciante": "verificar",
   "area_m2": 35.0,
   "banos": 1,
   "barrio": "Belmira",
@@ -2941,6 +3000,7 @@
   "titulo": "Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/194060959",
+  "verificar": true,
   "zona": "Cedritos"
  },
  "1231f2365fe8299e": {
@@ -2968,6 +3028,7 @@
   "zona": "Britalia"
  },
  "124d18d43242d4c3": {
+  "anunciante": "inmobiliaria",
   "area_m2": 151.0,
   "banos": 3,
   "barrio": "San gabriel norte ii",
@@ -2988,6 +3049,7 @@
   "titulo": "Apartamento en Venta en Santa Barbara, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-bogota/194370652",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "12aa63a99ca6a36a": {
@@ -3039,6 +3101,7 @@
   "zona": "Chapinero central"
  },
  "132688bdc5135a79": {
+  "anunciante": "",
   "area_m2": 79.0,
   "banos": null,
   "barrio": "Cedro Salazar",
@@ -3059,6 +3122,7 @@
   "titulo": "Apartamento en Cedro Salazar",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-cedro-salazar-bogota-3700222",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "134c740aa7d17f1e": {
@@ -3274,6 +3338,7 @@
   "zona": "Chicó"
  },
  "150ac618bc2e384e": {
+  "anunciante": "",
   "area_m2": 72.0,
   "banos": null,
   "barrio": "LOS CEDRITOS",
@@ -3294,6 +3359,7 @@
   "titulo": "Apartamento en LOS CEDRITOS",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-los-cedritos-bogota-3901944",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "152b086d0ba822cc": {
@@ -3344,6 +3410,7 @@
   "zona": "Barrios Unidos"
  },
  "15e1183b62dbf0cc": {
+  "anunciante": "inmobiliaria",
   "area_m2": 220.0,
   "banos": 5,
   "barrio": "Plenitud",
@@ -3364,6 +3431,7 @@
   "titulo": "Apartamento en Venta en Unicentro Bogotá, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-unicentro-bogota-bogota/194452442",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "15e4f9e581c60af3": {
@@ -3415,6 +3483,7 @@
   "zona": "El Virrey"
  },
  "17323c3368ba14a0": {
+  "anunciante": "inmobiliaria",
   "area_m2": 52.0,
   "banos": 2,
   "barrio": "Multicentro",
@@ -3435,6 +3504,7 @@
   "titulo": "Apartamento en Venta en Santa Barbara, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-bogota/194194320",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "175b1a930d20a094": {
@@ -3484,7 +3554,33 @@
   "url": "https://www.fincaraiz.com.co/austral-apartamentos-apartamento-en-venta-en-las-margaritas-bogota/194511122",
   "zona": "Cedritos"
  },
+ "18a31a5cd1e7cfc4": {
+  "anunciante": "inmobiliaria",
+  "area_m2": 104.0,
+  "banos": 2,
+  "barrio": "Bella suiza",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "fincaraiz",
+  "habitaciones": 3,
+  "operacion": "venta",
+  "precio": 760000000,
+  "precios": [
+   [
+    "2026-11-09",
+    760000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-07-06",
+  "titulo": "Apartamento en Venta en Bella suiza, Bogotá",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/193960140",
+  "verificar": false,
+  "zona": "Contador"
+ },
  "18b477b0ad641abf": {
+  "anunciante": "inmobiliaria",
   "area_m2": 118.0,
   "banos": 3,
   "barrio": "Contador",
@@ -3505,6 +3601,7 @@
   "titulo": "Apartamento en Venta en Bella suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/193676323",
+  "verificar": false,
   "zona": "Contador"
  },
  "191378099ed16239": {
@@ -3532,6 +3629,7 @@
   "zona": "Cantalejo"
  },
  "192d72eaf49847ba": {
+  "anunciante": "inmobiliaria",
   "area_m2": 66.0,
   "banos": 3,
   "barrio": "Bella suiza",
@@ -3552,6 +3650,7 @@
   "titulo": "Apartamento en Venta en Bella suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/194430369",
+  "verificar": false,
   "zona": "Contador"
  },
  "19437ab35cdf9919": {
@@ -3792,6 +3891,7 @@
   "zona": "Chicó"
  },
  "1a910a7e4912d100": {
+  "anunciante": "inmobiliaria",
   "area_m2": 88.0,
   "banos": 3,
   "barrio": "Los cedros",
@@ -3812,6 +3912,7 @@
   "titulo": "Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/194359850",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "1aa4c76782d07946": {
@@ -3977,6 +4078,7 @@
   "zona": "Chicó"
  },
  "1bd7f896a0398076": {
+  "anunciante": "inmobiliaria",
   "area_m2": 387.0,
   "banos": 5,
   "barrio": "La cabrera",
@@ -3997,6 +4099,7 @@
   "titulo": "Apartamento en Venta en La cabrera, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-la-cabrera-bogota/194333703",
+  "verificar": false,
   "zona": "Chicó"
  },
  "1bed5df0d3ac0237": {
@@ -4024,6 +4127,7 @@
   "zona": "La cabrera"
  },
  "1bfa32a0e7371d0f": {
+  "anunciante": "verificar",
   "area_m2": 116.0,
   "banos": 3,
   "barrio": "Contador",
@@ -4044,9 +4148,11 @@
   "titulo": "Apartamento en Venta en Bella suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/192374044",
+  "verificar": true,
   "zona": "Contador"
  },
  "1c8a28c743f156c7": {
+  "anunciante": "",
   "area_m2": 400.0,
   "banos": null,
   "barrio": "Chicó Norte",
@@ -4067,6 +4173,7 @@
   "titulo": "Apartamento en Chicó Norte",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-chico-norte-bogota-3902754",
+  "verificar": false,
   "zona": "Chicó"
  },
  "1cd711f5160ef0d2": {
@@ -4468,6 +4575,7 @@
   "zona": "Alhambra"
  },
  "1e313e87342cea71": {
+  "anunciante": "verificar",
   "area_m2": 120.0,
   "banos": 3,
   "barrio": "Bella suiza",
@@ -4486,8 +4594,9 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-08-16",
   "titulo": "Apartamento en Venta en Bella suiza, Bogotá",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/194124595",
+  "verificar": true,
   "zona": "Santa Bárbara"
  },
  "1e9de10d42402c94": {
@@ -4583,6 +4692,7 @@
   "zona": "Contador"
  },
  "1f2c805d6b697789": {
+  "anunciante": "inmobiliaria",
   "area_m2": 213.0,
   "banos": 5,
   "barrio": "Multicentro",
@@ -4603,6 +4713,7 @@
   "titulo": "Apartamento en  Venta en Santa Barbara, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-bogota/191940776",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "1f6b4feeba722375": {
@@ -4653,6 +4764,7 @@
   "zona": "Fontibon"
  },
  "1f73f68969139482": {
+  "anunciante": "inmobiliaria",
   "area_m2": 93.0,
   "banos": 2,
   "barrio": "Lisboa Usaquén",
@@ -4673,6 +4785,7 @@
   "titulo": "Apartamento en Venta en Lisboa Usaquén, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-lisboa-usaquen-bogota/194239347",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "1ffe72e1aaa42f35": {
@@ -4769,6 +4882,7 @@
   "zona": "Chicó"
  },
  "20b420e5c627688d": {
+  "anunciante": "",
   "area_m2": 80.0,
   "banos": null,
   "barrio": "Cedro Narvaez",
@@ -4789,9 +4903,11 @@
   "titulo": "Apartamento en Cedro Narvaez",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-cedro-narvaez-bogota-3765142",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "20c2e442256a9b02": {
+  "anunciante": "inmobiliaria",
   "area_m2": 176.0,
   "banos": 4,
   "barrio": "Multicentro",
@@ -4812,9 +4928,11 @@
   "titulo": "Apartamento en Venta en Santa Barbara, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-bogota/194415894",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "20d35d2eed61f2ac": {
+  "anunciante": "",
   "area_m2": 62.0,
   "banos": 2,
   "barrio": "Belmira",
@@ -4835,6 +4953,7 @@
   "titulo": "TEI 146, Apartamento en Venta en Belmira, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/tei-146-apartamento-en-venta-en-belmira-bogota/191945124",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "20deacb5dbe0d405": {
@@ -5094,6 +5213,7 @@
   "zona": "San antonio norte"
  },
  "22d5e833f548d93f": {
+  "anunciante": "inmobiliaria",
   "area_m2": 77.0,
   "banos": 2,
   "barrio": "Bella suiza",
@@ -5114,6 +5234,7 @@
   "titulo": "Apartamento en Venta en Bella suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/194399512",
+  "verificar": false,
   "zona": "Contador"
  },
  "22e898fdc410be00": {
@@ -5164,6 +5285,7 @@
   "zona": "Santa Bárbara"
  },
  "2377a6c7bec5df21": {
+  "anunciante": "verificar",
   "area_m2": 98.0,
   "banos": 3,
   "barrio": "Bella suiza",
@@ -5184,6 +5306,7 @@
   "titulo": "Apartamento en Venta en Bella suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/194502016",
+  "verificar": true,
   "zona": "Contador"
  },
  "237969b56c1432c5": {
@@ -5470,6 +5593,7 @@
   "zona": "La Floresta"
  },
  "244a07b87d1850ae": {
+  "anunciante": "inmobiliaria",
   "area_m2": 230.0,
   "banos": 4,
   "barrio": "Santa barbara occidental",
@@ -5490,6 +5614,7 @@
   "titulo": "Apartamento en Venta en Santa Barbara, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-bogota/194370190",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "245553869cf19565": {
@@ -5516,6 +5641,7 @@
   "zona": "Contador"
  },
  "24827ef11f0a83a0": {
+  "anunciante": "",
   "area_m2": 150.0,
   "banos": null,
   "barrio": "El Contador",
@@ -5536,6 +5662,7 @@
   "titulo": "Apartamento en El Contador",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/casa-en-venta-en-el-contador-bogota-3598012",
+  "verificar": false,
   "zona": "Contador"
  },
  "24a79765a565b0a2": {
@@ -5586,6 +5713,7 @@
   "zona": "Santa Barbara Central"
  },
  "2502ed896d4f17e0": {
+  "anunciante": "",
   "area_m2": 50.8,
   "banos": null,
   "barrio": "ACACIAS USAQUEN",
@@ -5606,6 +5734,7 @@
   "titulo": "Apartamento en ACACIAS USAQUEN",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-acacias-usaquen-bogota-3844545",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "255185de47feed99": {
@@ -5726,6 +5855,7 @@
   "zona": "Chico norte"
  },
  "2694291f8bc86a9c": {
+  "anunciante": "inmobiliaria",
   "area_m2": 53.0,
   "banos": 2,
   "barrio": "Acacias",
@@ -5746,6 +5876,7 @@
   "titulo": "Apartamento en Venta en Acacias, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-acacias-bogota/194388076",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "269a80d79efdedd7": {
@@ -6031,6 +6162,7 @@
   "zona": "San patricio"
  },
  "2877edb908abd8bf": {
+  "anunciante": "inmobiliaria",
   "area_m2": 136.0,
   "banos": 2,
   "barrio": "Chico",
@@ -6051,6 +6183,7 @@
   "titulo": "Apartamento en Venta en La cabrera, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-la-cabrera-bogota/194328741",
+  "verificar": false,
   "zona": "Chicó"
  },
  "288760a1e34e7e76": {
@@ -6101,6 +6234,7 @@
   "zona": "Colina Campestre"
  },
  "28b40ea8647048e0": {
+  "anunciante": "",
   "area_m2": 62.89,
   "banos": 2,
   "barrio": "Cedritos",
@@ -6121,6 +6255,7 @@
   "titulo": "Apartamento en Venta",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta/192608747",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "28cdd7b514489e54": {
@@ -6171,6 +6306,7 @@
   "zona": "Colina Campestre"
  },
  "2942595dc3e1a939": {
+  "anunciante": "inmobiliaria",
   "area_m2": 95.0,
   "banos": 2,
   "barrio": "Cedritos",
@@ -6191,6 +6327,7 @@
   "titulo": "Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/193993725",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "29a377a4e0d8b56f": {
@@ -6217,6 +6354,7 @@
   "zona": "Chicó"
  },
  "29cc8f5fd5cc845d": {
+  "anunciante": "verificar",
   "area_m2": 294.0,
   "banos": 4,
   "barrio": "Chico",
@@ -6237,6 +6375,7 @@
   "titulo": "Apartamento en Venta en La cabrera, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-la-cabrera-bogota/193734714",
+  "verificar": true,
   "zona": "Chicó"
  },
  "2a438b0521c2fa5c": {
@@ -6264,6 +6403,7 @@
   "zona": "El Paraíso"
  },
  "2a54a2bfda15d16b": {
+  "anunciante": "inmobiliaria",
   "area_m2": 195.0,
   "banos": 4,
   "barrio": "San gabriel norte",
@@ -6284,9 +6424,11 @@
   "titulo": "Apartamento en  Venta en Bella suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/191338309",
+  "verificar": false,
   "zona": "Contador"
  },
  "2a7ead12319b0284": {
+  "anunciante": "inmobiliaria",
   "area_m2": 110.0,
   "banos": 3,
   "barrio": "Portales del Country",
@@ -6311,6 +6453,7 @@
   "titulo": "Apartamento en Venta en Recodo Del Country, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-recodo-del-country-bogota/194138616",
+  "verificar": false,
   "zona": "Contador"
  },
  "2a97e4221de23187": {
@@ -6338,6 +6481,7 @@
   "zona": "La granja"
  },
  "2aa105644d92e08e": {
+  "anunciante": "verificar",
   "area_m2": 96.0,
   "banos": 3,
   "barrio": "Santa barbara oriental",
@@ -6358,6 +6502,7 @@
   "titulo": "Apartamento en Venta en Santa barbara oriental, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-oriental-bogota/193318652",
+  "verificar": true,
   "zona": "Santa Bárbara"
  },
  "2ac46728a9a385b4": {
@@ -6385,6 +6530,7 @@
   "zona": "Samper mendoza"
  },
  "2aec76467ca9a54e": {
+  "anunciante": "verificar",
   "area_m2": 166.0,
   "banos": 3,
   "barrio": "Altos de Bella Suiza",
@@ -6405,6 +6551,7 @@
   "titulo": "Apartamento en  Venta en Bella suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/191737166",
+  "verificar": true,
   "zona": "Contador"
  },
  "2b1ce6c8d4df0174": {
@@ -6478,6 +6625,7 @@
   "zona": "Chapinero"
  },
  "2c38b8ef50335445": {
+  "anunciante": "",
   "area_m2": 261.9,
   "banos": null,
   "barrio": "Chicó Norte",
@@ -6498,6 +6646,7 @@
   "titulo": "Apartamento en Chicó Norte",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-chico-norte-bogota-3541488",
+  "verificar": false,
   "zona": "Chicó"
  },
  "2c721aac92f74934": {
@@ -6852,6 +7001,7 @@
   "zona": "El plan"
  },
  "2e64cd607acc9ac3": {
+  "anunciante": "inmobiliaria",
   "area_m2": 180.0,
   "banos": 5,
   "barrio": "Chico",
@@ -6872,6 +7022,7 @@
   "titulo": "Apartamento en Venta en Chico norte, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-chico-norte-bogota/193893755",
+  "verificar": false,
   "zona": "Chicó"
  },
  "2e98f1579c125b9f": {
@@ -6898,6 +7049,7 @@
   "zona": "Santa Bárbara"
  },
  "2e9a61ed314f30cd": {
+  "anunciante": "inmobiliaria",
   "area_m2": 134.0,
   "banos": 2,
   "barrio": "Molinos norte",
@@ -6918,6 +7070,7 @@
   "titulo": "Apartamento en Venta en Santa Barbara, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-bogota/194361407",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "2ec10a3d0ed2c25c": {
@@ -7206,6 +7359,7 @@
   "zona": "Lagos de Cordoba"
  },
  "315f2c782e90f492": {
+  "anunciante": "verificar",
   "area_m2": 596.0,
   "banos": 7,
   "barrio": "La cabrera",
@@ -7226,6 +7380,7 @@
   "titulo": "Apartamento en Venta en La cabrera, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-la-cabrera-bogota/193262192",
+  "verificar": true,
   "zona": "Chicó"
  },
  "3193e6a425145483": {
@@ -7462,6 +7617,7 @@
   "zona": "Chicó"
  },
  "32c766414de3987a": {
+  "anunciante": "inmobiliaria",
   "area_m2": 350.0,
   "banos": 5,
   "barrio": "Chico",
@@ -7482,6 +7638,7 @@
   "titulo": "Apartamento en Venta en El refugio, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-el-refugio-bogota/193802777",
+  "verificar": false,
   "zona": "Chicó"
  },
  "33788a5de310b2fe": {
@@ -7625,6 +7782,7 @@
   "zona": "Santa Barbara"
  },
  "340577ac8debc949": {
+  "anunciante": "inmobiliaria",
   "area_m2": 235.0,
   "banos": 5,
   "barrio": "Contador",
@@ -7645,6 +7803,7 @@
   "titulo": "Apartamento en Venta en Altos de Bella Suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-altos-de-bella-suiza-bogota/194118324",
+  "verificar": false,
   "zona": "Contador"
  },
  "3429cc3586e0d244": {
@@ -7837,6 +7996,7 @@
   "zona": "Verbenal san antonio"
  },
  "356e2f6581399d66": {
+  "anunciante": "inmobiliaria",
   "area_m2": 74.0,
   "banos": 2,
   "barrio": "Bosque Medina",
@@ -7857,9 +8017,11 @@
   "titulo": "Apartamento en Venta en Bella suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/194424719",
+  "verificar": false,
   "zona": "Contador"
  },
  "357eab26453c7e38": {
+  "anunciante": "",
   "area_m2": 87.0,
   "banos": null,
   "barrio": "Cedro Salazar",
@@ -7880,6 +8042,7 @@
   "titulo": "Apartamento en Cedro Salazar",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-cedro-salazar-bogota-3526486",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "35aaa89cfe9c13f0": {
@@ -7930,6 +8093,7 @@
   "zona": "Santa bibiana"
  },
  "3616bde1ea4f63c4": {
+  "anunciante": "",
   "area_m2": 170.0,
   "banos": null,
   "barrio": "MOLINOS NORTE",
@@ -7950,6 +8114,7 @@
   "titulo": "Apartamento en MOLINOS NORTE",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-molinos-norte-bogota-3683262",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "361af5a59c03647d": {
@@ -8187,6 +8352,7 @@
   "zona": "Contador"
  },
  "37a743398b0882a9": {
+  "anunciante": "dueño directo",
   "area_m2": 86.0,
   "banos": 3,
   "barrio": "Bella suiza",
@@ -8207,6 +8373,7 @@
   "titulo": "Apartamento en Venta en Altos de Bella Suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-altos-de-bella-suiza-bogota/194453763",
+  "verificar": false,
   "zona": "Contador"
  },
  "37de00b84fb97410": {
@@ -8257,6 +8424,7 @@
   "zona": "Cedritos"
  },
  "3880fe4d1aaf1513": {
+  "anunciante": "inmobiliaria",
   "area_m2": 235.0,
   "banos": 5,
   "barrio": "Ub. bosques de medina",
@@ -8277,6 +8445,7 @@
   "titulo": "Apartamento en Venta en Iraka, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-iraka-bogota/193842965",
+  "verificar": false,
   "zona": "Contador"
  },
  "3881c569392ec466": {
@@ -8538,6 +8707,7 @@
   "zona": "Chicó"
  },
  "3a607fe661e5e89d": {
+  "anunciante": "inmobiliaria",
   "area_m2": 143.0,
   "banos": 2,
   "barrio": "Lisboa",
@@ -8558,6 +8728,7 @@
   "titulo": "Apartamento en Venta en Lisboa, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-lisboa-bogota/194273118",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "3aebb05df77ad72b": {
@@ -8584,6 +8755,7 @@
   "zona": "Chicó"
  },
  "3b62f2b415720ff6": {
+  "anunciante": "inmobiliaria",
   "area_m2": 75.0,
   "banos": 2,
   "barrio": "Cedritos",
@@ -8604,6 +8776,7 @@
   "titulo": "Apartamento en Venta en Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bogota/194496073",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "3b7558da22dbfd74": {
@@ -8726,6 +8899,7 @@
   "zona": "Chicó"
  },
  "3d3d62f4c2a0968d": {
+  "anunciante": "inmobiliaria",
   "area_m2": 74.0,
   "banos": 1,
   "barrio": "Santa barbara occidental",
@@ -8746,6 +8920,7 @@
   "titulo": "Apartamento en Venta en Santa Barbara, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-bogota/194139087",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "3d63f4112565f91f": {
@@ -8913,6 +9088,7 @@
   "zona": "Alameda"
  },
  "3e72099d2d809936": {
+  "anunciante": "inmobiliaria",
   "area_m2": 206.0,
   "banos": 4,
   "barrio": "Bella suiza",
@@ -8933,6 +9109,7 @@
   "titulo": "Apartamento en venta en Bella suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/10831338",
+  "verificar": false,
   "zona": "Contador"
  },
  "3f30b0338ddcf7c6": {
@@ -9240,6 +9417,7 @@
   "zona": "Prados del salitre"
  },
  "414ec991ddcf3d48": {
+  "anunciante": "verificar",
   "area_m2": 86.0,
   "banos": 2,
   "barrio": "Belmira",
@@ -9258,11 +9436,13 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-08-19",
   "titulo": "Apartamento en Venta en Belmira, Bogotá",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-belmira-bogota/194136687",
+  "verificar": true,
   "zona": "Cedritos"
  },
  "41737059f7a8f647": {
+  "anunciante": "",
   "area_m2": 40.0,
   "banos": null,
   "barrio": "Santa Barbara",
@@ -9283,6 +9463,7 @@
   "titulo": "Apartamento en Santa Barbara",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-santa-barbara-bogota-3939016",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "41bca2d7661a408a": {
@@ -9475,6 +9656,7 @@
   "zona": "Chico norte"
  },
  "42b61773032330c2": {
+  "anunciante": "inmobiliaria",
   "area_m2": 145.0,
   "banos": 3,
   "barrio": "Los cedros",
@@ -9495,6 +9677,7 @@
   "titulo": "Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/194520942",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "42bd3dc445f8818d": {
@@ -9545,6 +9728,7 @@
   "zona": "Villas del mediterraneo"
  },
  "42da8e23cd8645ed": {
+  "anunciante": "verificar",
   "area_m2": 68.0,
   "banos": 2,
   "barrio": "Caobos salazar",
@@ -9565,9 +9749,11 @@
   "titulo": "Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/194220312",
+  "verificar": true,
   "zona": "Cedritos"
  },
  "42e891bd6e5bfcc2": {
+  "anunciante": "inmobiliaria",
   "area_m2": 337.0,
   "banos": 3,
   "barrio": "Chico norte",
@@ -9588,9 +9774,11 @@
   "titulo": "Apartamento en Venta en Chico norte, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-chico-norte-bogota/193508375",
+  "verificar": false,
   "zona": "Chicó"
  },
  "42fcd7648446e7d7": {
+  "anunciante": "inmobiliaria",
   "area_m2": 80.0,
   "banos": 3,
   "barrio": "Contador",
@@ -9611,6 +9799,7 @@
   "titulo": "Apartamento en Venta en Bella suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/194228131",
+  "verificar": false,
   "zona": "Contador"
  },
  "4328992e47d8be2a": {
@@ -9638,6 +9827,7 @@
   "zona": "Chico norte"
  },
  "433152e7fcc9017c": {
+  "anunciante": "inmobiliaria",
   "area_m2": 150.0,
   "banos": 4,
   "barrio": "Bella suiza",
@@ -9658,9 +9848,11 @@
   "titulo": "Apartamento en Venta en Lisboa Usaquén, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-lisboa-usaquen-bogota/193730506",
+  "verificar": false,
   "zona": "Contador"
  },
  "433e11e54beaafbc": {
+  "anunciante": "verificar",
   "area_m2": 107.0,
   "banos": 3,
   "barrio": "Santa barbara occidental",
@@ -9681,6 +9873,7 @@
   "titulo": "Apartamento en Venta en Santa Barbara, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-bogota/194514454",
+  "verificar": true,
   "zona": "Santa Bárbara"
  },
  "437d9bcb72bd57b6": {
@@ -9731,6 +9924,7 @@
   "zona": "Cerros de Suba"
  },
  "43bebe9e42c75578": {
+  "anunciante": "inmobiliaria",
   "area_m2": 94.0,
   "banos": 3,
   "barrio": "Bella suiza",
@@ -9751,6 +9945,7 @@
   "titulo": "Apartamento en Venta en Bella suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/194483040",
+  "verificar": false,
   "zona": "Contador"
  },
  "444f2f3c33f70054": {
@@ -9941,6 +10136,7 @@
   "zona": "Cedritos"
  },
  "455d82bf6adeae60": {
+  "anunciante": "",
   "area_m2": 79.18,
   "banos": 3,
   "barrio": "Cedritos",
@@ -9961,6 +10157,7 @@
   "titulo": "ELEMENT 142, Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/element-142-apartamento-en-venta-en-cedritos-bogota/192608745",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "46027c3bb6a145c8": {
@@ -9987,6 +10184,7 @@
   "zona": "Cedritos"
  },
  "4616a5e38e366377": {
+  "anunciante": "verificar",
   "area_m2": 43.0,
   "banos": 2,
   "barrio": "Chico",
@@ -10007,6 +10205,7 @@
   "titulo": "Apartamento en Venta en Chico, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-chico-bogota/194452960",
+  "verificar": true,
   "zona": "Chicó"
  },
  "463582b1cb3253b2": {
@@ -10150,6 +10349,7 @@
   "zona": "Colina Campestre"
  },
  "47eac638359703c7": {
+  "anunciante": "verificar",
   "area_m2": 133.0,
   "banos": 3,
   "barrio": "Capri",
@@ -10170,6 +10370,7 @@
   "titulo": "Apartamento en  Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/191944307",
+  "verificar": true,
   "zona": "Cedritos"
  },
  "4833fc134c7b9f56": {
@@ -10220,6 +10421,7 @@
   "zona": "Chicó"
  },
  "489cb4200ce8285c": {
+  "anunciante": "",
   "area_m2": 71.0,
   "banos": null,
   "barrio": "LOS CEDRITOS",
@@ -10240,6 +10442,7 @@
   "titulo": "Apartamento en LOS CEDRITOS",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-los-cedritos-bogota-2377353",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "4900e80eedc64cc2": {
@@ -10267,6 +10470,7 @@
   "zona": "Chicó Navarra"
  },
  "4907134449fcf7ac": {
+  "anunciante": "inmobiliaria",
   "area_m2": 110.0,
   "banos": 3,
   "barrio": "Multicentro",
@@ -10287,6 +10491,7 @@
   "titulo": "Apartamento en Venta en Santa Barbara, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-bogota/193665224",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "4967dcce22c48a2b": {
@@ -10549,6 +10754,7 @@
   "zona": "Centro Internacional"
  },
  "4b48e636b2cf7b29": {
+  "anunciante": "inmobiliaria",
   "area_m2": 101.0,
   "banos": 3,
   "barrio": "Santa barbara central",
@@ -10569,6 +10775,7 @@
   "titulo": "Apartamento en Venta en Santa barbara central, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-central-bogota/192915835",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "4b508b19265e858c": {
@@ -10711,6 +10918,7 @@
   "zona": "Contador"
  },
  "4c3b64c62204489b": {
+  "anunciante": "verificar",
   "area_m2": 126.0,
   "banos": 3,
   "barrio": "Chico",
@@ -10731,9 +10939,11 @@
   "titulo": "Apartamento en Venta en El refugio, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-el-refugio-bogota/194326010",
+  "verificar": true,
   "zona": "Chicó"
  },
  "4c42c07fbea3419e": {
+  "anunciante": "inmobiliaria",
   "area_m2": 100.0,
   "banos": 3,
   "barrio": "Santa barbara occidental",
@@ -10754,6 +10964,7 @@
   "titulo": "Apartamento en Venta en Santa Barbara, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-bogota/194095581",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "4c7ba5e3bd3b07de": {
@@ -10781,6 +10992,7 @@
   "zona": "Polo club"
  },
  "4c8866ccc58f7b1c": {
+  "anunciante": "",
   "area_m2": 87.62,
   "banos": null,
   "barrio": "Los Cedros Oriental",
@@ -10801,9 +11013,11 @@
   "titulo": "Apartamento en Los Cedros Oriental",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-los-cedros-oriental-bogota-3858075",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "4c88c7218c14b83b": {
+  "anunciante": "inmobiliaria",
   "area_m2": 140.0,
   "banos": 3,
   "barrio": "Portales del Country",
@@ -10824,6 +11038,7 @@
   "titulo": "Apartamento en Venta en Recodo Del Country, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-recodo-del-country-bogota/194000717",
+  "verificar": false,
   "zona": "Contador"
  },
  "4cbb1930817c47ac": {
@@ -10898,6 +11113,7 @@
   "zona": "Santa Bárbara"
  },
  "4dca64476ea011bf": {
+  "anunciante": "inmobiliaria",
   "area_m2": 172.0,
   "banos": 3,
   "barrio": "Chico",
@@ -10918,6 +11134,7 @@
   "titulo": "Apartamento en Venta en La cabrera, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-la-cabrera-bogota/192569781",
+  "verificar": false,
   "zona": "Chicó"
  },
  "4dd7524df8015b42": {
@@ -11367,6 +11584,7 @@
   "zona": "Chicó"
  },
  "523f4b7096cec2a7": {
+  "anunciante": "inmobiliaria",
   "area_m2": 100.0,
   "banos": 3,
   "barrio": "Caobos salazar",
@@ -11387,6 +11605,7 @@
   "titulo": "Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/194042087",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "5261708c90f671a2": {
@@ -11553,6 +11772,7 @@
   "zona": "CR VERSALLES REAL ET. III"
  },
  "536ec2f1c98f23ea": {
+  "anunciante": "verificar",
   "area_m2": 95.0,
   "banos": 3,
   "barrio": "Nuevo Country",
@@ -11573,6 +11793,7 @@
   "titulo": "Apartamento en Venta en El contador, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-el-contador-bogota/193650969",
+  "verificar": true,
   "zona": "Cedritos"
  },
  "538d73af42859ca2": {
@@ -11973,6 +12194,7 @@
   "zona": "Contador"
  },
  "5696c3926b77cdd5": {
+  "anunciante": "inmobiliaria",
   "area_m2": 66.0,
   "banos": 2,
   "barrio": "Acacias usaquen",
@@ -11993,6 +12215,7 @@
   "titulo": "Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/194510684",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "569e59893bb03aa3": {
@@ -12111,6 +12334,31 @@
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-arriendo-en-la-cabrera-bogota/194295115",
   "zona": "Chicó"
+ },
+ "57bea955113227ea": {
+  "anunciante": "inmobiliaria",
+  "area_m2": 125.0,
+  "banos": 2,
+  "barrio": "La Sonora",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "fincaraiz",
+  "habitaciones": null,
+  "operacion": "venta",
+  "precio": 910000000,
+  "precios": [
+   [
+    "2026-11-09",
+    910000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-09-12",
+  "titulo": "Apartamento en Venta en Cedritos, Bogotá",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/194246306",
+  "verificar": false,
+  "zona": "Cedritos"
  },
  "57bfe5aa694d4514": {
   "area_m2": 37.0,
@@ -12515,6 +12763,7 @@
   "zona": "Chicó"
  },
  "59baca073f81e96a": {
+  "anunciante": "",
   "area_m2": 33.0,
   "banos": null,
   "barrio": "Santa Barbara",
@@ -12535,6 +12784,7 @@
   "titulo": "Apartamento en Santa Barbara",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-santa-barbara-bogota-3555200",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "59c39516d3813289": {
@@ -12561,6 +12811,7 @@
   "zona": "Chicó"
  },
  "5a2b15f9a6bf3497": {
+  "anunciante": "inmobiliaria",
   "area_m2": 46.0,
   "banos": 2,
   "barrio": "Santa barbara oriental",
@@ -12581,6 +12832,7 @@
   "titulo": "Apartamento en Venta en Santa Barbara, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-bogota/194192911",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "5a5931a030fe49eb": {
@@ -12631,6 +12883,7 @@
   "zona": "Cedritos"
  },
  "5b005b0fcbb195e8": {
+  "anunciante": "verificar",
   "area_m2": 84.0,
   "banos": 2,
   "barrio": "Santa barbara central",
@@ -12651,6 +12904,7 @@
   "titulo": "Apartamento en Venta en Santa Barbara, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-bogota/193378879",
+  "verificar": true,
   "zona": "Santa Bárbara"
  },
  "5b1eab5b5e1e6cf0": {
@@ -12747,6 +13001,7 @@
   "zona": "Chicó"
  },
  "5bf9d39a563c73f3": {
+  "anunciante": "inmobiliaria",
   "area_m2": 101.0,
   "banos": 2,
   "barrio": "Lisboa Usaquén",
@@ -12767,6 +13022,7 @@
   "titulo": "Apartamento en Venta en Lisboa Usaquén, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-lisboa-usaquen-bogota/194296314",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "5c1d170b8790febe": {
@@ -12934,6 +13190,7 @@
   "zona": "Cedritos"
  },
  "5d6dcb6e2fee51ef": {
+  "anunciante": "",
   "area_m2": 126.0,
   "banos": null,
   "barrio": "CHICO",
@@ -12954,6 +13211,7 @@
   "titulo": "Apartamento en CHICO",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-o-venta-en-chico-bogota-3260516",
+  "verificar": false,
   "zona": "Chicó"
  },
  "5d7d77cd3c924259": {
@@ -13125,6 +13383,7 @@
   "zona": "Cedritos"
  },
  "5e8eaf68b8be3e49": {
+  "anunciante": "verificar",
   "area_m2": 230.0,
   "banos": 4,
   "barrio": "La cabrera",
@@ -13145,9 +13404,11 @@
   "titulo": "Apartamento en Venta en La cabrera, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-la-cabrera-bogota/193596788",
+  "verificar": true,
   "zona": "Chicó"
  },
  "5ec2b08ffe84ee03": {
+  "anunciante": "dueño directo",
   "area_m2": 98.0,
   "banos": 3,
   "barrio": "Bella suiza",
@@ -13168,6 +13429,7 @@
   "titulo": "Apartamento en Venta en Bella suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/194272640",
+  "verificar": false,
   "zona": "Contador"
  },
  "5ec3f7810a119d71": {
@@ -13266,6 +13528,7 @@
   "zona": "Chicó"
  },
  "5f1f147847c55125": {
+  "anunciante": "inmobiliaria",
   "area_m2": 61.0,
   "banos": 2,
   "barrio": "Suba Centro",
@@ -13286,6 +13549,7 @@
   "titulo": "Apartamento en Venta en Suba Centro, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-suba-centro-bogota/194403168",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "5f20800fce8f9dbb": {
@@ -13313,6 +13577,7 @@
   "zona": "Bosa Islandia"
  },
  "5f6e7760236a95bc": {
+  "anunciante": "verificar",
   "area_m2": 123.0,
   "banos": 2,
   "barrio": "Bella suiza",
@@ -13333,6 +13598,7 @@
   "titulo": "Apartamento en Venta en Bella suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/194376530",
+  "verificar": true,
   "zona": "Contador"
  },
  "5f9ea9b8a8331747": {
@@ -13359,6 +13625,7 @@
   "zona": "Cedritos"
  },
  "6006ec7e394e75a2": {
+  "anunciante": "inmobiliaria",
   "area_m2": 185.0,
   "banos": 3,
   "barrio": "Santa barbara occidental",
@@ -13379,6 +13646,7 @@
   "titulo": "Apartamento en Venta en Santa barbara occidental, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-occidental-bogota/193949770",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "6014e80239dd0593": {
@@ -13428,6 +13696,7 @@
   "zona": "Santa Bárbara"
  },
  "60424c85efd085af": {
+  "anunciante": "",
   "area_m2": 57.0,
   "banos": 2,
   "barrio": "Los cedros",
@@ -13448,9 +13717,11 @@
   "titulo": "ELEMENT 142, Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/element-142-apartamento-en-venta-en-cedritos-bogota/192050240",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "6052358566759814": {
+  "anunciante": "",
   "area_m2": 125.74,
   "banos": null,
   "barrio": "CHICO NORTE ET. III",
@@ -13471,6 +13742,7 @@
   "titulo": "Apartamento en CHICO NORTE ET. III",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-chico-norte-et-iii-bogota-3396167",
+  "verificar": false,
   "zona": "Chicó"
  },
  "607384a08f9afb8b": {
@@ -13520,6 +13792,7 @@
   "zona": "Cedritos"
  },
  "60cb6f00f14470d2": {
+  "anunciante": "inmobiliaria",
   "area_m2": 259.0,
   "banos": 4,
   "barrio": "La cabrera",
@@ -13540,6 +13813,7 @@
   "titulo": "Apartamento en Venta en La cabrera, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-la-cabrera-bogota/194409889",
+  "verificar": false,
   "zona": "Chicó"
  },
  "60f0c605fb6ba0c9": {
@@ -13775,6 +14049,7 @@
   "zona": "Sagrado corazon"
  },
  "63524377059bfe28": {
+  "anunciante": "inmobiliaria",
   "area_m2": 181.0,
   "banos": 5,
   "barrio": "Santa barbara oriental",
@@ -13795,6 +14070,7 @@
   "titulo": "Apartamento en Venta en Santa barbara oriental, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-oriental-bogota/194440113",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "6400d5ef40a48e3e": {
@@ -13845,6 +14121,7 @@
   "zona": "Fontibon"
  },
  "64ffc0d83339ca8a": {
+  "anunciante": "inmobiliaria",
   "area_m2": 50.0,
   "banos": 1,
   "barrio": "Bella suiza",
@@ -13865,6 +14142,7 @@
   "titulo": "Apartamento en Venta en Bella suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/194362123",
+  "verificar": false,
   "zona": "Contador"
  },
  "65051cbf3d1e7396": {
@@ -14042,6 +14320,7 @@
   "zona": "Victoria norte"
  },
  "66185bc3df7abe29": {
+  "anunciante": "inmobiliaria",
   "area_m2": 224.0,
   "banos": 4,
   "barrio": "Ginebra",
@@ -14062,9 +14341,11 @@
   "titulo": "Apartamento en Venta en Bella suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/194427683",
+  "verificar": false,
   "zona": "Contador"
  },
  "6620e670d3ef1239": {
+  "anunciante": "dueño directo",
   "area_m2": 67.0,
   "banos": 2,
   "barrio": "Cedro salazar",
@@ -14085,6 +14366,7 @@
   "titulo": "Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/194189086",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "6633281c5c495e49": {
@@ -14159,6 +14441,7 @@
   "zona": "Chapinero"
  },
  "668798117e1631b5": {
+  "anunciante": "",
   "area_m2": 154.0,
   "banos": null,
   "barrio": "Chicó Norte",
@@ -14179,6 +14462,7 @@
   "titulo": "Apartamento en Chicó Norte",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-chico-norte-bogota-3903729",
+  "verificar": false,
   "zona": "Chicó"
  },
  "6696d3f9adbd9a0b": {
@@ -14206,6 +14490,7 @@
   "zona": "Andes norte"
  },
  "67271e53a721ef96": {
+  "anunciante": "inmobiliaria",
   "area_m2": 340.0,
   "banos": 6,
   "barrio": "Santa barbara occidental",
@@ -14226,6 +14511,7 @@
   "titulo": "Apartamento en Venta en Santa Barbara, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-bogota/193861541",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "67a7aae2768c0c5c": {
@@ -14324,6 +14610,7 @@
   "zona": "Santa Bárbara"
  },
  "68d56e0b0170dc06": {
+  "anunciante": "verificar",
   "area_m2": 180.0,
   "banos": 4,
   "barrio": "Santa barbara occidental",
@@ -14344,6 +14631,7 @@
   "titulo": "Apartamento en Venta en Santa Barbara, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-bogota/194392587",
+  "verificar": true,
   "zona": "Santa Bárbara"
  },
  "69285568f8b69860": {
@@ -14463,6 +14751,7 @@
   "zona": "Chicó"
  },
  "6a18865a6cb6d03f": {
+  "anunciante": "inmobiliaria",
   "area_m2": 154.0,
   "banos": 3,
   "barrio": "Lisboa Usaquén",
@@ -14483,9 +14772,11 @@
   "titulo": "Apartamento en Venta en Usaquen, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-usaquen-bogota/194460305",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "6a290bbf9513770f": {
+  "anunciante": "verificar",
   "area_m2": 255.0,
   "banos": 5,
   "barrio": "Santa barbara occidental",
@@ -14506,6 +14797,7 @@
   "titulo": "Apartamento en Venta en Santa Barbara, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-bogota/194406115",
+  "verificar": true,
   "zona": "Santa Bárbara"
  },
  "6a380295c4889f6b": {
@@ -14579,6 +14871,7 @@
   "zona": "La Candelaria"
  },
  "6a999dd0cd5d3679": {
+  "anunciante": "inmobiliaria",
   "area_m2": 317.0,
   "banos": 5,
   "barrio": "Ub. bosques de medina",
@@ -14599,6 +14892,7 @@
   "titulo": "Apartamento en Venta en Bosques del Marques, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bosques-del-marques-bogota/194025782",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "6aca5e8c23c4efdb": {
@@ -14672,6 +14966,7 @@
   "zona": "Modelia"
  },
  "6b0c4b1d7b4b5c0e": {
+  "anunciante": "inmobiliaria",
   "area_m2": 66.0,
   "banos": 2,
   "barrio": "Los cedros",
@@ -14692,6 +14987,7 @@
   "titulo": "Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/194351751",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "6b4ab7a17440f32e": {
@@ -14765,6 +15061,7 @@
   "zona": "Chicó"
  },
  "6c2aaef46b08c1dc": {
+  "anunciante": "inmobiliaria",
   "area_m2": 100.0,
   "banos": 2,
   "barrio": "Centro Comercial Hacienda Santa Bárbara",
@@ -14785,6 +15082,7 @@
   "titulo": "Apartamento en Venta en Usaquen, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-usaquen-bogota/193962618",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "6c6cb91f8802e6f5": {
@@ -14835,6 +15133,7 @@
   "zona": "San antonio norte"
  },
  "6cb84c21ee414f60": {
+  "anunciante": "inmobiliaria",
   "area_m2": 75.0,
   "banos": 2,
   "barrio": "La cabrera",
@@ -14855,6 +15154,7 @@
   "titulo": "Apartamento en Venta en El chico, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-el-chico-bogota/194164336",
+  "verificar": false,
   "zona": "Chicó"
  },
  "6d0aa72512f27f06": {
@@ -14924,6 +15224,31 @@
   "titulo": "Apartamento en Venta en Cedro Golf, Bogotá",
   "ultima_vez": "2026-11-08",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedro-golf-bogota/193019052",
+  "zona": "Cedritos"
+ },
+ "6d3d2d2b85ef87e2": {
+  "anunciante": "Habi (empresa)",
+  "area_m2": 73.0,
+  "banos": 2,
+  "barrio": "Cedritos",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "habi",
+  "habitaciones": 2,
+  "operacion": "venta",
+  "precio": 656000000,
+  "precios": [
+   [
+    "2026-11-09",
+    656000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "",
+  "titulo": "Edificio segovia - Apartamento en Venta en Los Cedritos, Usaquén",
+  "ultima_vez": "2026-11-09",
+  "url": "https://habi.co/venta-apartamentos/59438737186/edificio-segovia-apartamento-venta-cedritos-usaquen",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "6d4529677cade03a": {
@@ -15229,6 +15554,7 @@
   "zona": "Cedritos"
  },
  "701899cf43cb08a1": {
+  "anunciante": "inmobiliaria",
   "area_m2": 70.0,
   "banos": 3,
   "barrio": "Portales del Country",
@@ -15249,6 +15575,7 @@
   "titulo": "Apartamento en Venta en Bella suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/194231691",
+  "verificar": false,
   "zona": "Contador"
  },
  "7055c49e600452c4": {
@@ -15276,6 +15603,7 @@
   "zona": "La patria"
  },
  "70748f18259504dd": {
+  "anunciante": "inmobiliaria",
   "area_m2": 286.0,
   "banos": 4,
   "barrio": "Multicentro",
@@ -15296,6 +15624,7 @@
   "titulo": "Apartamento en Venta en Santa Barbara, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-bogota/193721870",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "7077a0be30b53868": {
@@ -15416,6 +15745,7 @@
   "zona": "Chico norte"
  },
  "71c75adfc9cc989e": {
+  "anunciante": "",
   "area_m2": 45.0,
   "banos": null,
   "barrio": "Santa Barbara",
@@ -15436,6 +15766,7 @@
   "titulo": "Apartamento en Santa Barbara",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-santa-barbara-bogota-3104541",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "71cbebe4f6f7cd66": {
@@ -15580,6 +15911,7 @@
   "zona": "Chicó"
  },
  "72bfa10b6f55f137": {
+  "anunciante": "verificar",
   "area_m2": 115.0,
   "banos": 3,
   "barrio": "Santa barbara occidental",
@@ -15600,6 +15932,7 @@
   "titulo": "Apartamento en Venta en Santa Barbara, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-bogota/194083182",
+  "verificar": true,
   "zona": "Santa Bárbara"
  },
  "72d461bc62a033ad": {
@@ -15675,6 +16008,7 @@
   "zona": "Lagos de Torca"
  },
  "73615d2b98c92d43": {
+  "anunciante": "inmobiliaria",
   "area_m2": 104.0,
   "banos": 2,
   "barrio": "Portales del Country",
@@ -15695,6 +16029,7 @@
   "titulo": "Apartamento en Venta en Bella suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/194316386",
+  "verificar": false,
   "zona": "Contador"
  },
  "736778cde33de0c2": {
@@ -15768,6 +16103,7 @@
   "zona": "Chicó"
  },
  "738b8cf1d0856271": {
+  "anunciante": "",
   "area_m2": 70.0,
   "banos": null,
   "barrio": "Chicó Norte",
@@ -15788,6 +16124,7 @@
   "titulo": "Apartamento en Chicó Norte",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-chico-norte-bogota-3885882",
+  "verificar": false,
   "zona": "Chicó"
  },
  "73dabacd357b56aa": {
@@ -15861,6 +16198,7 @@
   "zona": "Cedritos"
  },
  "745ac08239ee358f": {
+  "anunciante": "inmobiliaria",
   "area_m2": 255.0,
   "banos": 4,
   "barrio": "Santa barbara oriental",
@@ -15881,6 +16219,7 @@
   "titulo": "Apartamento en Venta en Santa Barbara, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-bogota/194341701",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "747cb5dbb12886ef": {
@@ -15907,6 +16246,7 @@
   "zona": "Chicó"
  },
  "74cef150dd86b217": {
+  "anunciante": "inmobiliaria",
   "area_m2": 81.0,
   "banos": 2,
   "barrio": "Los cedros",
@@ -15927,9 +16267,11 @@
   "titulo": "Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/194425902",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "74e5595b3b3b06fa": {
+  "anunciante": "inmobiliaria",
   "area_m2": 137.0,
   "banos": 3,
   "barrio": "Santa barbara occidental",
@@ -15950,9 +16292,11 @@
   "titulo": "Apartamento en Venta en La Calleja, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-la-calleja-bogota/194448141",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "74f81101ad5418ff": {
+  "anunciante": "inmobiliaria",
   "area_m2": 155.0,
   "banos": 2,
   "barrio": "Santa barbara occidental",
@@ -15973,6 +16317,7 @@
   "titulo": "Apartamento en Venta en Santa Barbara, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-bogota/193764838",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "75ada02ee0ae91dc": {
@@ -15999,6 +16344,7 @@
   "zona": "Chicó"
  },
  "75b9080d943e2b0d": {
+  "anunciante": "",
   "area_m2": 75.0,
   "banos": null,
   "barrio": "Cedro Bolívar",
@@ -16019,6 +16365,7 @@
   "titulo": "Apartamento en Cedro Bolívar",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-cedro-bolivar-bogota-3850500",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "75e19643f1540f37": {
@@ -16045,6 +16392,7 @@
   "zona": "Chicó"
  },
  "75e5feb4cba511b3": {
+  "anunciante": "inmobiliaria",
   "area_m2": 104.0,
   "banos": 3,
   "barrio": "Contador",
@@ -16065,6 +16413,7 @@
   "titulo": "Apartamento en Venta en Bella suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/193376133",
+  "verificar": false,
   "zona": "Contador"
  },
  "75f57eff3a7bc986": {
@@ -16116,6 +16465,7 @@
   "zona": "Alameda"
  },
  "7615f40cf52c3e83": {
+  "anunciante": "verificar",
   "area_m2": 315.0,
   "banos": 5,
   "barrio": "La cabrera",
@@ -16136,9 +16486,11 @@
   "titulo": "Apartamento en Venta en La cabrera, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-la-cabrera-bogota/193148041",
+  "verificar": true,
   "zona": "Chicó"
  },
  "7653d324dadb3d32": {
+  "anunciante": "",
   "area_m2": 67.0,
   "banos": null,
   "barrio": "CHICO NORTE ET. III",
@@ -16159,6 +16511,7 @@
   "titulo": "Apartamento en CHICO NORTE ET. III",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-chico-norte-et-iii-bogota-3357625",
+  "verificar": false,
   "zona": "Chicó"
  },
  "768af413966ab250": {
@@ -16324,6 +16677,7 @@
   "zona": "Chicó Reservado"
  },
  "772e4db49f7980c5": {
+  "anunciante": "",
   "area_m2": 75.0,
   "banos": null,
   "barrio": "PELODO DEL CONTRY",
@@ -16344,9 +16698,11 @@
   "titulo": "Apartamento en PELODO DEL CONTRY",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-pelodo-del-contry-bogota-3602620",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "77b4fdabca3d72d6": {
+  "anunciante": "inmobiliaria",
   "area_m2": 73.0,
   "banos": 2,
   "barrio": "Portales del Country",
@@ -16367,6 +16723,7 @@
   "titulo": "Apartamento en Venta en Bella suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/194386699",
+  "verificar": false,
   "zona": "Contador"
  },
  "77ca2e7008d723bc": {
@@ -16838,6 +17195,7 @@
   "zona": "Chicó"
  },
  "7aae091577e25bdf": {
+  "anunciante": "",
   "area_m2": 191.08,
   "banos": null,
   "barrio": "Santa Bibiana",
@@ -16858,6 +17216,7 @@
   "titulo": "Apartamento en Santa Bibiana",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-santa-bibiana-bogota-3541209",
+  "verificar": false,
   "zona": "Chicó"
  },
  "7ad2f965a2978a0c": {
@@ -16930,6 +17289,7 @@
   "zona": "Cedritos"
  },
  "7b5ddc32a1873af5": {
+  "anunciante": "inmobiliaria",
   "area_m2": 127.0,
   "banos": 3,
   "barrio": "Contador",
@@ -16950,6 +17310,7 @@
   "titulo": "Apartamento en Venta en Bella suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/194110701",
+  "verificar": false,
   "zona": "Contador"
  },
  "7b81229777827fa4": {
@@ -17000,6 +17361,7 @@
   "zona": "Cedritos"
  },
  "7bca25f022fab44b": {
+  "anunciante": "inmobiliaria",
   "area_m2": 65.0,
   "banos": 1,
   "barrio": "El retiro",
@@ -17020,6 +17382,7 @@
   "titulo": "Apartamento en Venta en El retiro, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-el-retiro-bogota/194261364",
+  "verificar": false,
   "zona": "Chicó"
  },
  "7c0b14bc7d856963": {
@@ -17139,6 +17502,7 @@
   "zona": "C.C. Paseo Villa Del Rio"
  },
  "7d0ae814b3640c9f": {
+  "anunciante": "inmobiliaria",
   "area_m2": 347.0,
   "banos": 6,
   "barrio": "Chico",
@@ -17159,6 +17523,7 @@
   "titulo": "Apartamento en Venta en El Virrey, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-el-virrey-bogota/192560660",
+  "verificar": false,
   "zona": "Chicó"
  },
  "7d4fd62e021d6bc2": {
@@ -17185,6 +17550,7 @@
   "zona": "Cedritos"
  },
  "7d5bba30c4d9a143": {
+  "anunciante": "verificar",
   "area_m2": 134.0,
   "banos": 3,
   "barrio": "Santa barbara oriental",
@@ -17205,6 +17571,7 @@
   "titulo": "Apartamento en Venta en Usaquen, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-usaquen-bogota/194500714",
+  "verificar": true,
   "zona": "Santa Bárbara"
  },
  "7e1cd0a9616d48f4": {
@@ -17300,6 +17667,7 @@
   "zona": "Cedritos"
  },
  "7edd6ce4df728662": {
+  "anunciante": "dueño directo",
   "area_m2": 43.0,
   "banos": 1,
   "barrio": "Cedritos",
@@ -17320,6 +17688,7 @@
   "titulo": "Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/194353868",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "7ee131eda61d1e0c": {
@@ -17765,6 +18134,7 @@
   "zona": "Chicó"
  },
  "81ef59b2cfcc2e13": {
+  "anunciante": "inmobiliaria",
   "area_m2": 58.0,
   "banos": 2,
   "barrio": "Contador",
@@ -17785,9 +18155,11 @@
   "titulo": "Apartamento en Venta en Altos de Bella Suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-altos-de-bella-suiza-bogota/193412197",
+  "verificar": false,
   "zona": "Contador"
  },
  "8205abf2fa968d51": {
+  "anunciante": "inmobiliaria",
   "area_m2": 51.0,
   "banos": 1,
   "barrio": "Altos de Bella Suiza",
@@ -17808,9 +18180,11 @@
   "titulo": "Apartamento en Venta en Altos de Bella Suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-altos-de-bella-suiza-bogota/194394807",
+  "verificar": false,
   "zona": "Contador"
  },
  "823dc754e4f0ea0a": {
+  "anunciante": "inmobiliaria",
   "area_m2": 106.0,
   "banos": 3,
   "barrio": "Acacias usaquen",
@@ -17831,6 +18205,7 @@
   "titulo": "Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/194283627",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "824bb23af1ef3302": {
@@ -17881,6 +18256,7 @@
   "zona": "Santa Bárbara"
  },
  "8313ac7d4d471a76": {
+  "anunciante": "inmobiliaria",
   "area_m2": 62.0,
   "banos": 1,
   "barrio": "Multicentro",
@@ -17901,6 +18277,7 @@
   "titulo": "Apartamento en Venta en Santa barbara central, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-central-bogota/194328883",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "832bf8e56717182c": {
@@ -17998,6 +18375,7 @@
   "zona": "La pradera"
  },
  "83f3dff561b80d49": {
+  "anunciante": "",
   "area_m2": 55.0,
   "banos": null,
   "barrio": "LOS CEDRITOS",
@@ -18018,6 +18396,7 @@
   "titulo": "Apartamento en LOS CEDRITOS",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-los-cedritos-bogota-3931368",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "843d36d5f0510766": {
@@ -18115,7 +18494,33 @@
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-el-redil-bogota-3497261",
   "zona": "Cedritos"
  },
+ "84cc55efc8af1951": {
+  "anunciante": "inmobiliaria",
+  "area_m2": 77.0,
+  "banos": 2,
+  "barrio": "Bella suiza",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "fincaraiz",
+  "habitaciones": 3,
+  "operacion": "venta",
+  "precio": 570000000,
+  "precios": [
+   [
+    "2026-11-09",
+    570000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-09-11",
+  "titulo": "Apartamento en Venta en Altos de Bella Suiza, Bogotá",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-altos-de-bella-suiza-bogota/194240876",
+  "verificar": false,
+  "zona": "Contador"
+ },
  "84e8bd7b1bee20d2": {
+  "anunciante": "",
   "area_m2": 151.0,
   "banos": null,
   "barrio": "El Contador",
@@ -18136,6 +18541,7 @@
   "titulo": "Apartamento en El Contador",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/casa-en-venta-en-el-contador-bogota-3913589",
+  "verificar": false,
   "zona": "Contador"
  },
  "84eeccb315167a53": {
@@ -18209,6 +18615,7 @@
   "zona": "Santa Bárbara"
  },
  "85a91cf8efad26c3": {
+  "anunciante": "inmobiliaria",
   "area_m2": 142.0,
   "banos": 3,
   "barrio": "Santa barbara occidental",
@@ -18229,6 +18636,7 @@
   "titulo": "Apartamento en  Venta en Santa Barbara, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-bogota/192010799",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "85bbea30dd5d2eb2": {
@@ -18395,6 +18803,7 @@
   "zona": "Chicó"
  },
  "86b24ccb1e6768ed": {
+  "anunciante": "verificar",
   "area_m2": 62.0,
   "banos": 1,
   "barrio": "Acacias usaquen",
@@ -18415,6 +18824,7 @@
   "titulo": "Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/194516712",
+  "verificar": true,
   "zona": "Cedritos"
  },
  "86dbdacc7f00d978": {
@@ -18564,6 +18974,7 @@
   "zona": "Cedritos"
  },
  "878bbfc13babb10f": {
+  "anunciante": "inmobiliaria",
   "area_m2": 177.0,
   "banos": 3,
   "barrio": "Chico",
@@ -18584,6 +18995,7 @@
   "titulo": "Apartamento en Venta en El chico, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-el-chico-bogota/194430330",
+  "verificar": false,
   "zona": "Chicó"
  },
  "87979a1233d2680c": {
@@ -18680,6 +19092,7 @@
   "zona": "Cedritos"
  },
  "87fdd7c722ae4e29": {
+  "anunciante": "inmobiliaria",
   "area_m2": 108.0,
   "banos": 2,
   "barrio": "Bella suiza",
@@ -18700,9 +19113,11 @@
   "titulo": "Apartamento en Venta en Bella suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/194432837",
+  "verificar": false,
   "zona": "Contador"
  },
  "882a37751bf9f21b": {
+  "anunciante": "",
   "area_m2": 434.0,
   "banos": null,
   "barrio": "PELODO DEL CONTRY",
@@ -18723,6 +19138,7 @@
   "titulo": "Apartamento en PELODO DEL CONTRY",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/casa-en-venta-en-pelodo-del-contry-bogota-3488168",
+  "verificar": false,
   "zona": "Contador"
  },
  "8897d51f7365da78": {
@@ -19003,6 +19419,31 @@
   "url": "https://www.fincaraiz.com.co/apartamento-en-arriendo-en-la-carolina-bogota/194215087",
   "zona": "Santa Bárbara"
  },
+ "8ae8b075ec4773f2": {
+  "anunciante": "inmobiliaria",
+  "area_m2": 135.0,
+  "banos": 3,
+  "barrio": "Multicentro",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "fincaraiz",
+  "habitaciones": null,
+  "operacion": "venta",
+  "precio": 920000000,
+  "precios": [
+   [
+    "2026-11-09",
+    920000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-11-09",
+  "titulo": "Apartamento en Venta en Multicentro, Bogotá",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-multicentro-bogota/194524896",
+  "verificar": false,
+  "zona": "Santa Bárbara"
+ },
  "8aebf95bc42941a8": {
   "area_m2": 45.0,
   "banos": 1,
@@ -19075,6 +19516,7 @@
   "zona": "Santa bibiana"
  },
  "8b636c4e3692a120": {
+  "anunciante": "inmobiliaria",
   "area_m2": 129.0,
   "banos": 5,
   "barrio": "Bella suiza",
@@ -19095,6 +19537,7 @@
   "titulo": "Apartamento en Venta en Bella suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/194485928",
+  "verificar": false,
   "zona": "Contador"
  },
  "8b72f22add75702f": {
@@ -19193,6 +19636,7 @@
   "zona": "Castilla"
  },
  "8bbdfd4a9e6b2b69": {
+  "anunciante": "verificar",
   "area_m2": 58.0,
   "banos": 2,
   "barrio": "Santa barbara oriental",
@@ -19213,6 +19657,7 @@
   "titulo": "Apartamento en Venta en Santa Barbara, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-bogota/10272721",
+  "verificar": true,
   "zona": "Santa Bárbara"
  },
  "8c09d0249553e654": {
@@ -19309,6 +19754,7 @@
   "zona": "Contador"
  },
  "8c7e08b58949c2f8": {
+  "anunciante": "verificar",
   "area_m2": 84.0,
   "banos": 3,
   "barrio": "Santa barbara occidental",
@@ -19329,6 +19775,7 @@
   "titulo": "Apartamento en Venta en Santa barbara occidental, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-occidental-bogota/194258091",
+  "verificar": true,
   "zona": "Santa Bárbara"
  },
  "8d04a2c5c986992c": {
@@ -19377,6 +19824,31 @@
   "ultima_vez": "2026-11-08",
   "url": "https://www.fincaraiz.com.co/apartamento-en-arriendo-en-colina-campestre-bogota/194407940",
   "zona": "Colina Campestre"
+ },
+ "8d3fbd859193567b": {
+  "anunciante": "inmobiliaria",
+  "area_m2": 103.0,
+  "banos": 3,
+  "barrio": "Acacias usaquen",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "fincaraiz",
+  "habitaciones": 3,
+  "operacion": "venta",
+  "precio": 830000000,
+  "precios": [
+   [
+    "2026-11-09",
+    830000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-11-04",
+  "titulo": "Apartamento en Venta en Usaquen, Bogotá",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-usaquen-bogota/194506458",
+  "verificar": false,
+  "zona": "Cedritos"
  },
  "8d7228ae7f893236": {
   "area_m2": 148.0,
@@ -19450,6 +19922,7 @@
   "zona": "Chicó"
  },
  "8deb27d6b749cf3f": {
+  "anunciante": "inmobiliaria",
   "area_m2": 200.0,
   "banos": 5,
   "barrio": "San gabriel norte ii",
@@ -19470,6 +19943,7 @@
   "titulo": "Apartamento en Venta en Reserva de la Sierra, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-reserva-de-la-sierra-bogota/194230594",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "8df3f8e10040e1ee": {
@@ -19521,6 +19995,7 @@
   "zona": "El Batán"
  },
  "8e19c5eb00edabde": {
+  "anunciante": "inmobiliaria",
   "area_m2": 310.0,
   "banos": 5,
   "barrio": "Chicó Reservado",
@@ -19541,6 +20016,7 @@
   "titulo": "Apartamento en Venta en Chicó Reservado, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-chico-reservado-bogota/192806318",
+  "verificar": false,
   "zona": "Chicó"
  },
  "8ede34eef25ca12d": {
@@ -19636,6 +20112,7 @@
   "zona": "Chicó"
  },
  "8f756277ed9c31e5": {
+  "anunciante": "verificar",
   "area_m2": 294.0,
   "banos": 4,
   "barrio": "Belmira",
@@ -19656,6 +20133,7 @@
   "titulo": "Apartamento en Venta en Belmira, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-belmira-bogota/194466835",
+  "verificar": true,
   "zona": "Contador"
  },
  "8f86c20ec10788aa": {
@@ -19683,6 +20161,7 @@
   "zona": "Los rosales"
  },
  "8f9f5ae323000417": {
+  "anunciante": "inmobiliaria",
   "area_m2": 106.0,
   "banos": 3,
   "barrio": "Santa barbara oriental",
@@ -19703,6 +20182,7 @@
   "titulo": "Apartamento en Venta en Santa barbara oriental, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-oriental-bogota/194336386",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "8faecab4d7616cb4": {
@@ -19827,6 +20307,7 @@
   "zona": "Contador"
  },
  "90546a8c740fa122": {
+  "anunciante": "inmobiliaria",
   "area_m2": 129.0,
   "banos": 3,
   "barrio": "Ginebra norte",
@@ -19847,6 +20328,7 @@
   "titulo": "Apartamento en Venta en Bella suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/193975161",
+  "verificar": false,
   "zona": "Contador"
  },
  "908713e251aea8d7": {
@@ -19943,6 +20425,7 @@
   "zona": "Cedritos"
  },
  "90dec4664966d6ce": {
+  "anunciante": "inmobiliaria",
   "area_m2": 250.0,
   "banos": 3,
   "barrio": "Chico norte",
@@ -19963,6 +20446,7 @@
   "titulo": "Apartamento en Venta en El chico, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-el-chico-bogota/194013782",
+  "verificar": false,
   "zona": "Chicó"
  },
  "9127b45b170a253e": {
@@ -20012,6 +20496,7 @@
   "zona": "Cedritos"
  },
  "916be09d8e286e17": {
+  "anunciante": "",
   "area_m2": 82.0,
   "banos": null,
   "barrio": "LOS CEDRITOS",
@@ -20032,6 +20517,7 @@
   "titulo": "Apartamento en LOS CEDRITOS",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-los-cedritos-bogota-3890775",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "9197c0fe1a069de7": {
@@ -20153,6 +20639,7 @@
   "zona": "Chico norte"
  },
  "928d9ac6a1b78906": {
+  "anunciante": "inmobiliaria",
   "area_m2": 583.0,
   "banos": 6,
   "barrio": "Chico",
@@ -20173,6 +20660,7 @@
   "titulo": "Apartamento en Venta en El chico, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-el-chico-bogota/193945064",
+  "verificar": false,
   "zona": "Chicó"
  },
  "92e8847e059ddb67": {
@@ -20247,6 +20735,7 @@
   "zona": "Cedritos"
  },
  "934c1830522af8e3": {
+  "anunciante": "",
   "area_m2": 51.0,
   "banos": null,
   "barrio": "LOS CEDRITOS",
@@ -20267,6 +20756,7 @@
   "titulo": "Apartamento en LOS CEDRITOS",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-los-cedritos-bogota-3904583",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "935ef03f73deff12": {
@@ -20501,6 +20991,7 @@
   "zona": "Chicó"
  },
  "951fc8bcc49e9112": {
+  "anunciante": "verificar",
   "area_m2": 158.0,
   "banos": 4,
   "barrio": "Chico",
@@ -20521,6 +21012,7 @@
   "titulo": "Apartamento en Venta en Chico norte, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-chico-norte-bogota/194206464",
+  "verificar": true,
   "zona": "Chicó"
  },
  "9559745905ee0ee7": {
@@ -20780,6 +21272,7 @@
   "zona": "Las aguas"
  },
  "96d4733231e7a4c4": {
+  "anunciante": "verificar",
   "area_m2": 64.0,
   "banos": 2,
   "barrio": "Chico",
@@ -20800,6 +21293,7 @@
   "titulo": "Apartamento en Venta en El Virrey, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-el-virrey-bogota/194339826",
+  "verificar": true,
   "zona": "Chicó"
  },
  "972112c131e78b60": {
@@ -20943,6 +21437,7 @@
   "zona": "Cedritos"
  },
  "98e86e2ed75b056b": {
+  "anunciante": "inmobiliaria",
   "area_m2": 182.0,
   "banos": 5,
   "barrio": "San gabriel norte ii",
@@ -20963,9 +21458,36 @@
   "titulo": "Apartamento en Venta en Reserva de la Sierra, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-reserva-de-la-sierra-bogota/194432099",
+  "verificar": false,
+  "zona": "Santa Bárbara"
+ },
+ "98f5398de2832276": {
+  "anunciante": "Habi (empresa)",
+  "area_m2": 267.0,
+  "banos": 4,
+  "barrio": "Santa Bárbara",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "habi",
+  "habitaciones": 3,
+  "operacion": "venta",
+  "precio": 1762200000,
+  "precios": [
+   [
+    "2026-11-09",
+    1762200000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "",
+  "titulo": "Casa de Barrio en Venta en Santa Barbara, Usaquen",
+  "ultima_vez": "2026-11-09",
+  "url": "https://habi.co/venta-apartamentos/57955372436/habi-inmobiliaria-bogota",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "98faa48955f3e6aa": {
+  "anunciante": "",
   "area_m2": 75.0,
   "banos": null,
   "barrio": "CHICO",
@@ -20986,6 +21508,7 @@
   "titulo": "Apartamento en CHICO",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-chico-bogota-3639612",
+  "verificar": false,
   "zona": "Chicó"
  },
  "993a13c955c21ada": {
@@ -21060,6 +21583,7 @@
   "zona": "Montevideo"
  },
  "99d8e434908f55a2": {
+  "anunciante": "inmobiliaria",
   "area_m2": 195.0,
   "banos": 3,
   "barrio": "Ginebra norte",
@@ -21080,6 +21604,7 @@
   "titulo": "Apartamento en Venta en Bella suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/193912513",
+  "verificar": false,
   "zona": "Contador"
  },
  "99ed52c961785d2d": {
@@ -21106,6 +21631,7 @@
   "zona": "Santa Bárbara"
  },
  "99fef3d0e35d6c50": {
+  "anunciante": "inmobiliaria",
   "area_m2": 420.0,
   "banos": 3,
   "barrio": "La cabrera",
@@ -21126,6 +21652,7 @@
   "titulo": "Apartamento en Venta en El refugio, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-el-refugio-bogota/193958610",
+  "verificar": false,
   "zona": "Chicó"
  },
  "9a3ae0da76e0d335": {
@@ -21270,6 +21797,7 @@
   "zona": "Teusaquillo"
  },
  "9ae89bd5d51fb067": {
+  "anunciante": "verificar",
   "area_m2": 61.0,
   "banos": 2,
   "barrio": "Bella suiza",
@@ -21290,6 +21818,7 @@
   "titulo": "Apartamento en Venta en Usaquen, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-usaquen-bogota/193588303",
+  "verificar": true,
   "zona": "Contador"
  },
  "9b219b138c15fe0c": {
@@ -21479,6 +22008,7 @@
   "zona": "Zona norte"
  },
  "9c6ffe79e38cbc83": {
+  "anunciante": "verificar",
   "area_m2": 83.0,
   "banos": 2,
   "barrio": "Multicentro",
@@ -21499,6 +22029,7 @@
   "titulo": "Apartamento en Venta en Santa barbara central, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-central-bogota/194207854",
+  "verificar": true,
   "zona": "Santa Bárbara"
  },
  "9c94c585663cf5b4": {
@@ -21549,6 +22080,7 @@
   "zona": "Chicó"
  },
  "9d24bc410a9e9438": {
+  "anunciante": "inmobiliaria",
   "area_m2": 40.0,
   "banos": 1,
   "barrio": "Bella suiza",
@@ -21569,6 +22101,7 @@
   "titulo": "Apartamento en Venta en Bella suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/194243968",
+  "verificar": false,
   "zona": "Contador"
  },
  "9d2acfa9e014abc2": {
@@ -21759,6 +22292,7 @@
   "zona": "Chicó"
  },
  "9eb9ab0c577ff3b7": {
+  "anunciante": "",
   "area_m2": 304.0,
   "banos": null,
   "barrio": "CHICO",
@@ -21779,6 +22313,7 @@
   "titulo": "Apartamento en CHICO",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-chico-bogota-3912734",
+  "verificar": false,
   "zona": "Chicó"
  },
  "9edd3b24b40a11b5": {
@@ -21992,6 +22527,7 @@
   "zona": "Cedritos"
  },
  "a0a066f6c24f874c": {
+  "anunciante": "inmobiliaria",
   "area_m2": 82.0,
   "banos": 2,
   "barrio": "Contador",
@@ -22012,6 +22548,7 @@
   "titulo": "Apartamento en Venta en Contador, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-contador-bogota/193350971",
+  "verificar": false,
   "zona": "Contador"
  },
  "a0a3e27a8545cdec": {
@@ -22043,6 +22580,7 @@
   "zona": "Mazurén"
  },
  "a115afb6f3e78be9": {
+  "anunciante": "inmobiliaria",
   "area_m2": 187.0,
   "banos": 4,
   "barrio": "Los cedros",
@@ -22063,6 +22601,7 @@
   "titulo": "Apartamento en Venta en Nueva Autopista, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-nueva-autopista-bogota/194325541",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "a1273a51d759cad1": {
@@ -22182,6 +22721,7 @@
   "zona": "Hayuelos"
  },
  "a21d12cebdc8ea60": {
+  "anunciante": "inmobiliaria",
   "area_m2": 80.0,
   "banos": 2,
   "barrio": "Belmira",
@@ -22202,6 +22742,7 @@
   "titulo": "Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/194383612",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "a2513207da8b8954": {
@@ -22392,6 +22933,7 @@
   "zona": "Cedritos"
  },
  "a38da721de599bd8": {
+  "anunciante": "",
   "area_m2": 250.0,
   "banos": null,
   "barrio": "Chicó Norte",
@@ -22412,9 +22954,11 @@
   "titulo": "Apartamento en Chicó Norte",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-chico-norte-bogota-3869119",
+  "verificar": false,
   "zona": "Chicó"
  },
  "a396db3227a90733": {
+  "anunciante": "inmobiliaria",
   "area_m2": 83.0,
   "banos": 2,
   "barrio": "Contador",
@@ -22435,6 +22979,7 @@
   "titulo": "Apartamento en Venta en Bella suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/194156343",
+  "verificar": false,
   "zona": "Contador"
  },
  "a3b490a3538eaa49": {
@@ -22720,6 +23265,7 @@
   "zona": "Cedritos"
  },
  "a60ecf76d9149253": {
+  "anunciante": "verificar",
   "area_m2": 204.0,
   "banos": 5,
   "barrio": "Chico",
@@ -22740,6 +23286,7 @@
   "titulo": "Apartamento en Venta en El Virrey, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-el-virrey-bogota/194331925",
+  "verificar": true,
   "zona": "Chicó"
  },
  "a648245a77058007": {
@@ -22857,6 +23404,31 @@
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-arriendo-en-porvenir-bogota/194095644",
   "zona": "Porvenir"
+ },
+ "a6e62ed13e260586": {
+  "anunciante": "dueño directo",
+  "area_m2": 80.0,
+  "banos": 1,
+  "barrio": "Los cedros",
+  "base": false,
+  "dueno_directo": true,
+  "fuente": "fincaraiz",
+  "habitaciones": null,
+  "operacion": "venta",
+  "precio": 380000000,
+  "precios": [
+   [
+    "2026-11-09",
+    380000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-10-27",
+  "titulo": "Apartamento en Venta en Los cedros, Bogotá",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-los-cedros-bogota/194466720",
+  "verificar": false,
+  "zona": "Cedritos"
  },
  "a6f8070dba219ff3": {
   "area_m2": 33.0,
@@ -22977,6 +23549,7 @@
   "zona": "Colina Campestre"
  },
  "a764f5470db37e0c": {
+  "anunciante": "inmobiliaria",
   "area_m2": 78.0,
   "banos": 2,
   "barrio": "Caobos salazar",
@@ -22997,6 +23570,7 @@
   "titulo": "Apartamento en Venta en Parques de lorena, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-parques-de-lorena-bogota/193913727",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "a786eb6e97a377de": {
@@ -23279,6 +23853,7 @@
   "zona": "Santa Bárbara"
  },
  "a9dc9cc60fd6c426": {
+  "anunciante": "inmobiliaria",
   "area_m2": 340.0,
   "banos": 4,
   "barrio": "Chico",
@@ -23299,6 +23874,7 @@
   "titulo": "Apartamento en Venta en El chico, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-el-chico-bogota/194165038",
+  "verificar": false,
   "zona": "Chicó"
  },
  "a9e0aa969239f4c4": {
@@ -23326,6 +23902,7 @@
   "zona": "Suba"
  },
  "a9eed3deed71295f": {
+  "anunciante": "inmobiliaria",
   "area_m2": 18.0,
   "banos": 1,
   "barrio": "Chico",
@@ -23346,6 +23923,7 @@
   "titulo": "Apartamento en Venta en Chico norte, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-chico-norte-bogota/194148821",
+  "verificar": false,
   "zona": "Chicó"
  },
  "aa2f5e2664ec7b39": {
@@ -23396,6 +23974,7 @@
   "zona": "Ingemar"
  },
  "aa5e577b089e8da1": {
+  "anunciante": "inmobiliaria",
   "area_m2": 252.0,
   "banos": 4,
   "barrio": "Chico",
@@ -23416,6 +23995,7 @@
   "titulo": "Apartamento en Venta en Chico, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-chico-bogota/194486461",
+  "verificar": false,
   "zona": "Chicó"
  },
  "aa966551692caaf2": {
@@ -23629,6 +24209,7 @@
   "zona": "Altos de Bella Suiza"
  },
  "ac0856f2e8510182": {
+  "anunciante": "inmobiliaria",
   "area_m2": 73.0,
   "banos": 3,
   "barrio": "Bella suiza",
@@ -23647,11 +24228,13 @@
   "primera_vez": "2026-11-08",
   "publicado": "2026-07-15",
   "titulo": "Apartamento en Venta en Bella suiza, Bogotá",
-  "ultima_vez": "2026-11-08",
+  "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/193995800",
+  "verificar": false,
   "zona": "Contador"
  },
  "ac2c00f256d85ce0": {
+  "anunciante": "inmobiliaria",
   "area_m2": 185.0,
   "banos": 3,
   "barrio": "Santa barbara occidental",
@@ -23672,6 +24255,7 @@
   "titulo": "Apartamento en Venta en Santa Barbara, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-bogota/192506588",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "ac5ec053f0274da7": {
@@ -23699,6 +24283,7 @@
   "zona": "Libertador"
  },
  "aca50a41e18dcc70": {
+  "anunciante": "inmobiliaria",
   "area_m2": 187.0,
   "banos": 4,
   "barrio": "Chico",
@@ -23719,6 +24304,7 @@
   "titulo": "Apartamento en Venta en El Virrey, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-el-virrey-bogota/194333617",
+  "verificar": false,
   "zona": "Chicó"
  },
  "accd9f702fff637c": {
@@ -23768,6 +24354,7 @@
   "zona": "Santa Bárbara"
  },
  "acdf08545c41b5f8": {
+  "anunciante": "inmobiliaria",
   "area_m2": 100.0,
   "banos": 2,
   "barrio": "Portales del Country",
@@ -23788,6 +24375,7 @@
   "titulo": "Apartamento en Venta en Bella suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/194511610",
+  "verificar": false,
   "zona": "Contador"
  },
  "acfbac58090fe950": {
@@ -24447,6 +25035,7 @@
   "zona": "Alejandria"
  },
  "b0a199d21ccba59b": {
+  "anunciante": "inmobiliaria",
   "area_m2": 135.0,
   "banos": 3,
   "barrio": "Belmira",
@@ -24467,9 +25056,11 @@
   "titulo": "Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/194302443",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "b0eb6ccd57747202": {
+  "anunciante": "",
   "area_m2": 105.7,
   "banos": null,
   "barrio": "CHICO NORTE ET. II",
@@ -24490,6 +25081,7 @@
   "titulo": "Apartamento en CHICO NORTE ET. II",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-chico-norte-et-ii-bogota-3487603",
+  "verificar": false,
   "zona": "Chicó"
  },
  "b0fb0d06a1776c10": {
@@ -24516,6 +25108,7 @@
   "zona": "Santa Bárbara"
  },
  "b1395f6c8fe98470": {
+  "anunciante": "inmobiliaria",
   "area_m2": 91.0,
   "banos": 2,
   "barrio": "Multicentro",
@@ -24536,6 +25129,7 @@
   "titulo": "Apartamento en Venta en Santa barbara central, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-central-bogota/194174108",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "b142e708e6c3530a": {
@@ -25239,6 +25833,31 @@
   "url": "https://www.fincaraiz.com.co/apartamento-en-arriendo-en-cedritos-bogota/194411942",
   "zona": "Cedritos"
  },
+ "b70ae47e311655fa": {
+  "anunciante": "inmobiliaria",
+  "area_m2": 61.0,
+  "banos": 2,
+  "barrio": "Cedro salazar",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "fincaraiz",
+  "habitaciones": 3,
+  "operacion": "venta",
+  "precio": 350000000,
+  "precios": [
+   [
+    "2026-11-09",
+    350000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2024-05-29",
+  "titulo": "Apartamento en venta en Cedritos, Bogotá",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/10933754",
+  "verificar": false,
+  "zona": "Cedritos"
+ },
  "b73352414d0f79f6": {
   "area_m2": 137.0,
   "banos": null,
@@ -25264,6 +25883,7 @@
   "zona": "CIUDAD SALITRE NOR-ORIENTAL"
  },
  "b79649fa75dad9fe": {
+  "anunciante": "",
   "area_m2": 28.0,
   "banos": null,
   "barrio": "Santa Barbara",
@@ -25284,9 +25904,11 @@
   "titulo": "Apartamento en Santa Barbara",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-santa-barbara-bogota-3555201",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "b7a723f79ad4a5b8": {
+  "anunciante": "inmobiliaria",
   "area_m2": 180.0,
   "banos": 4,
   "barrio": "Chicó Alto",
@@ -25307,6 +25929,7 @@
   "titulo": "Apartamento en Venta en Chicó Alto, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-chico-alto-bogota/194141932",
+  "verificar": false,
   "zona": "Chicó"
  },
  "b814b82fcfd3d34c": {
@@ -25334,6 +25957,7 @@
   "zona": "Mazurén"
  },
  "b82fc8c06bcae4f6": {
+  "anunciante": "inmobiliaria",
   "area_m2": 118.0,
   "banos": 2,
   "barrio": "Altos de Bella Suiza",
@@ -25354,6 +25978,7 @@
   "titulo": "Apartamento en Venta en Bella suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/193862918",
+  "verificar": false,
   "zona": "Contador"
  },
  "b89aa7954be999b6": {
@@ -25403,6 +26028,7 @@
   "zona": "Cedritos"
  },
  "b8c0ab9621d834ab": {
+  "anunciante": "",
   "area_m2": 185.0,
   "banos": null,
   "barrio": "Chicó Norte",
@@ -25423,6 +26049,7 @@
   "titulo": "Apartamento en Chicó Norte",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-chico-norte-bogota-3940412",
+  "verificar": false,
   "zona": "Chicó"
  },
  "b8cd14eecc180051": {
@@ -25544,6 +26171,7 @@
   "zona": "Cedritos"
  },
  "b9ca5d8e2e4f6564": {
+  "anunciante": "verificar",
   "area_m2": 94.0,
   "banos": 2,
   "barrio": "Acacias usaquen",
@@ -25564,9 +26192,11 @@
   "titulo": "Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/194444372",
+  "verificar": true,
   "zona": "Cedritos"
  },
  "b9d02a5b2a0d065c": {
+  "anunciante": "inmobiliaria",
   "area_m2": 84.0,
   "banos": 2,
   "barrio": "Capri",
@@ -25587,6 +26217,7 @@
   "titulo": "Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/194466018",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "b9f5f194c71ae1cc": {
@@ -25611,6 +26242,31 @@
   "ultima_vez": "2026-11-08",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-sucre-bogota-3844448",
   "zona": "Chicó"
+ },
+ "b9fcfc65e3d59ff1": {
+  "anunciante": "Habi (empresa)",
+  "area_m2": 77.0,
+  "banos": 2,
+  "barrio": "Contador",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "habi",
+  "habitaciones": 3,
+  "operacion": "venta",
+  "precio": 519750000,
+  "precios": [
+   [
+    "2026-11-09",
+    519750000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "",
+  "titulo": "Mafer - Apartamento en Venta en El Contador, Usaquen",
+  "ultima_vez": "2026-11-09",
+  "url": "https://habi.co/venta-apartamentos/58884200477/mafer-apartamento-venta-contador-usaquen",
+  "verificar": false,
+  "zona": "Contador"
  },
  "ba1d8c713b86ac5f": {
   "area_m2": 90.0,
@@ -25659,6 +26315,7 @@
   "zona": "Cedritos"
  },
  "ba9ecab2f679eaef": {
+  "anunciante": "verificar",
   "area_m2": 78.0,
   "banos": 3,
   "barrio": "Acacias usaquen",
@@ -25679,6 +26336,7 @@
   "titulo": "Apartamento en Venta en Usaquen, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-usaquen-bogota/194519592",
+  "verificar": true,
   "zona": "Cedritos"
  },
  "bad159f1f700eb11": {
@@ -25754,6 +26412,7 @@
   "zona": "Tarragona del salitre et. ii"
  },
  "bb76cf680eb8ed64": {
+  "anunciante": "",
   "area_m2": 30.0,
   "banos": null,
   "barrio": "Santa Barbara",
@@ -25774,6 +26433,7 @@
   "titulo": "Apartamento en Santa Barbara",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-santa-barbara-bogota-3725629",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "bb86cba3ece41de5": {
@@ -25824,6 +26484,7 @@
   "zona": "Chicó Reservado"
  },
  "bbbf905f28fa9eb2": {
+  "anunciante": "inmobiliaria",
   "area_m2": 300.0,
   "banos": 4,
   "barrio": "Chico",
@@ -25844,6 +26505,7 @@
   "titulo": "Apartamento en Venta en El Virrey, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-el-virrey-bogota/194481901",
+  "verificar": false,
   "zona": "Chicó"
  },
  "bbdcfc6d1c00235d": {
@@ -25986,6 +26648,7 @@
   "zona": "FLORIDA BLANCA NORTE"
  },
  "bcdc1944fd30cb97": {
+  "anunciante": "verificar",
   "area_m2": 68.0,
   "banos": 2,
   "barrio": "Bella suiza",
@@ -26006,6 +26669,7 @@
   "titulo": "Apartamento en Venta en Bella suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/193746478",
+  "verificar": true,
   "zona": "Contador"
  },
  "bcfac18476af26ec": {
@@ -26104,6 +26768,7 @@
   "zona": "UB. CORDOBA NIZA"
  },
  "bd9fa9806bc6a821": {
+  "anunciante": "inmobiliaria",
   "area_m2": 133.0,
   "banos": 3,
   "barrio": "Chico",
@@ -26124,9 +26789,11 @@
   "titulo": "Apartamento en Venta en El refugio, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-el-refugio-bogota/194035745",
+  "verificar": false,
   "zona": "Chicó"
  },
  "bdae6b3a57d9af24": {
+  "anunciante": "inmobiliaria",
   "area_m2": 105.0,
   "banos": 3,
   "barrio": "Acacias usaquen",
@@ -26147,6 +26814,7 @@
   "titulo": "Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/194459847",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "bdc87a34297de679": {
@@ -26173,6 +26841,7 @@
   "zona": "Chicó"
  },
  "bde4fa93870324ef": {
+  "anunciante": "",
   "area_m2": 330.8,
   "banos": null,
   "barrio": "El Contador",
@@ -26193,6 +26862,7 @@
   "titulo": "Apartamento en El Contador",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/casa-en-venta-en-el-contador-bogota-3756075",
+  "verificar": false,
   "zona": "Contador"
  },
  "be39acf706d03b66": {
@@ -26408,6 +27078,7 @@
   "zona": "Chicó"
  },
  "bffa712a63fe4d24": {
+  "anunciante": "inmobiliaria",
   "area_m2": 652.0,
   "banos": 6,
   "barrio": "La cabrera",
@@ -26428,6 +27099,7 @@
   "titulo": "Apartamento en Venta en El refugio, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-el-refugio-bogota/194134038",
+  "verificar": false,
   "zona": "Chicó"
  },
  "c03b2f013d1a2f09": {
@@ -26478,6 +27150,7 @@
   "zona": "Usaquen"
  },
  "c06e887559c91f64": {
+  "anunciante": "inmobiliaria",
   "area_m2": 113.0,
   "banos": 3,
   "barrio": "Nuevo Country",
@@ -26498,6 +27171,7 @@
   "titulo": "Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/194378097",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "c080b37c713cb35e": {
@@ -26548,6 +27222,7 @@
   "zona": "LA VERACRUZ"
  },
  "c0c00ccc71224510": {
+  "anunciante": "inmobiliaria",
   "area_m2": 64.0,
   "banos": 2,
   "barrio": "Acacias usaquen",
@@ -26568,6 +27243,7 @@
   "titulo": "Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/193553952",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "c0d22378289e9ef3": {
@@ -26734,6 +27410,7 @@
   "zona": "Contador"
  },
  "c20ab355ff0f177c": {
+  "anunciante": "inmobiliaria",
   "area_m2": 131.0,
   "banos": 3,
   "barrio": "Chico",
@@ -26754,6 +27431,7 @@
   "titulo": "Apartamento en Venta en Chico norte, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-chico-norte-bogota/193611112",
+  "verificar": false,
   "zona": "Chicó"
  },
  "c2404db808bcf30a": {
@@ -26804,6 +27482,7 @@
   "zona": "Cedritos"
  },
  "c2b050a0cb3a528a": {
+  "anunciante": "inmobiliaria",
   "area_m2": 213.0,
   "banos": 4,
   "barrio": "Altos de Bella Suiza",
@@ -26824,6 +27503,7 @@
   "titulo": "Apartamento en Venta en Altos de Bella Suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-altos-de-bella-suiza-bogota/194301262",
+  "verificar": false,
   "zona": "Contador"
  },
  "c2c97f87529bb9ef": {
@@ -27038,6 +27718,7 @@
   "zona": "La soledad"
  },
  "c410f2f95cb1923c": {
+  "anunciante": "",
   "area_m2": 327.0,
   "banos": null,
   "barrio": "Chicó Norte",
@@ -27058,6 +27739,7 @@
   "titulo": "Apartamento en Chicó Norte",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-chico-norte-bogota-3113688",
+  "verificar": false,
   "zona": "Chicó"
  },
  "c45a90f66b184c27": {
@@ -27132,6 +27814,7 @@
   "zona": "Centro Comercial Palatino"
  },
  "c51c453678fea125": {
+  "anunciante": "",
   "area_m2": 64.0,
   "banos": null,
   "barrio": "CEDRO MADEIRAS",
@@ -27152,9 +27835,11 @@
   "titulo": "Apartamento en CEDRO MADEIRAS",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-cedro-madeiras-bogota-3488162",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "c52205b94493cf36": {
+  "anunciante": "inmobiliaria",
   "area_m2": 126.0,
   "banos": 4,
   "barrio": "Caobos salazar",
@@ -27175,6 +27860,7 @@
   "titulo": "Apartamento en Venta en Caobos salazar, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-caobos-salazar-bogota/194205942",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "c52c4d51b4354e4c": {
@@ -27318,6 +28004,7 @@
   "zona": "Cedritos"
  },
  "c61de9cf57bed7b1": {
+  "anunciante": "inmobiliaria",
   "area_m2": 69.0,
   "banos": 2,
   "barrio": "Bella suiza",
@@ -27338,6 +28025,7 @@
   "titulo": "Apartamento en Venta en Bella suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/193516874",
+  "verificar": false,
   "zona": "Contador"
  },
  "c6290708f043c564": {
@@ -27364,6 +28052,7 @@
   "zona": "Contador"
  },
  "c62c85bae7f9208d": {
+  "anunciante": "inmobiliaria",
   "area_m2": 63.0,
   "banos": 2,
   "barrio": "Acacias usaquen",
@@ -27384,6 +28073,7 @@
   "titulo": "Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/194161455",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "c64320fd6cf1b0a2": {
@@ -27526,6 +28216,7 @@
   "zona": "Chicó"
  },
  "c6cf1916e4c27484": {
+  "anunciante": "inmobiliaria",
   "area_m2": 174.0,
   "banos": 3,
   "barrio": "Multicentro",
@@ -27546,6 +28237,7 @@
   "titulo": "Apartamento en Venta en Santa barbara central, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-central-bogota/193858356",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "c6ddc1e980d40ffd": {
@@ -27897,6 +28589,7 @@
   "zona": "Contador"
  },
  "c936fc6d4e1263f8": {
+  "anunciante": "inmobiliaria",
   "area_m2": 54.0,
   "banos": 1,
   "barrio": "Acacias usaquen",
@@ -27917,6 +28610,7 @@
   "titulo": "Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/194510736",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "c949273aecb0d717": {
@@ -27944,6 +28638,7 @@
   "zona": "El contador"
  },
  "c9a4f41130bf51dd": {
+  "anunciante": "inmobiliaria",
   "area_m2": 73.0,
   "banos": 2,
   "barrio": "Bella suiza",
@@ -27964,6 +28659,7 @@
   "titulo": "Apartamento en Venta en Bella suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/194210141",
+  "verificar": false,
   "zona": "Contador"
  },
  "c9b0bb92ca46d87d": {
@@ -27991,6 +28687,7 @@
   "zona": "Chico norte"
  },
  "ca2436e58f9c42c9": {
+  "anunciante": "inmobiliaria",
   "area_m2": 350.0,
   "banos": 6,
   "barrio": "La cabrera",
@@ -28011,6 +28708,7 @@
   "titulo": "Apartamento en Venta en El refugio, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-el-refugio-bogota/193953745",
+  "verificar": false,
   "zona": "Chicó"
  },
  "caa8c38ca50150de": {
@@ -28385,6 +29083,7 @@
   "zona": "Cedritos"
  },
  "ce08cb7f8099745f": {
+  "anunciante": "",
   "area_m2": 60.7,
   "banos": null,
   "barrio": "Cedritos",
@@ -28405,9 +29104,11 @@
   "titulo": "Apartamento en Cedritos",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-cedritos-bogota-3467781",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "ce1216d4ca7bb7ac": {
+  "anunciante": "inmobiliaria",
   "area_m2": 78.0,
   "banos": 2,
   "barrio": "Multicentro",
@@ -28428,6 +29129,7 @@
   "titulo": "Apartamento en Venta en Santa barbara central, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-central-bogota/194152470",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "ce1c2946625bb5b2": {
@@ -28477,6 +29179,7 @@
   "zona": "Chicó"
  },
  "ce5ea8b41416af59": {
+  "anunciante": "",
   "area_m2": 21.0,
   "banos": null,
   "barrio": "La Castellana",
@@ -28497,6 +29200,7 @@
   "titulo": "Apartamento en La Castellana",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-la-castellana-bogota-3923763",
+  "verificar": false,
   "zona": "Chicó"
  },
  "ce859b83e6444324": {
@@ -28546,6 +29250,7 @@
   "zona": "Cedritos"
  },
  "cf21812a8d25553f": {
+  "anunciante": "inmobiliaria",
   "area_m2": 210.0,
   "banos": 3,
   "barrio": "Chico",
@@ -28566,9 +29271,11 @@
   "titulo": "Apartamento en Venta en El chico, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-el-chico-bogota/194402591",
+  "verificar": false,
   "zona": "Chicó"
  },
  "cf344df1df09ba10": {
+  "anunciante": "verificar",
   "area_m2": 200.0,
   "banos": 4,
   "barrio": "Chico",
@@ -28589,6 +29296,7 @@
   "titulo": "Apartamento en Venta en Chico, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-chico-bogota/194457775",
+  "verificar": true,
   "zona": "Chicó"
  },
  "cf4fd822dcaee407": {
@@ -28615,6 +29323,7 @@
   "zona": "Contador"
  },
  "cf61a0ea10323816": {
+  "anunciante": "inmobiliaria",
   "area_m2": 115.0,
   "banos": 2,
   "barrio": "Chico",
@@ -28635,6 +29344,7 @@
   "titulo": "Apartamento en Venta en El Virrey, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-el-virrey-bogota/192858573",
+  "verificar": false,
   "zona": "Chicó"
  },
  "cfff5617fda2c12b": {
@@ -28685,6 +29395,7 @@
   "zona": "Chicó"
  },
  "d06a8230f5885fcc": {
+  "anunciante": "verificar",
   "area_m2": 102.0,
   "banos": 2,
   "barrio": "Chico",
@@ -28705,6 +29416,7 @@
   "titulo": "Apartamento en Venta en Chico, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-chico-bogota/193884590",
+  "verificar": true,
   "zona": "Chicó"
  },
  "d070dde1193d92cd": {
@@ -28732,6 +29444,7 @@
   "zona": "Chapinero"
  },
  "d0a0f5228eaed904": {
+  "anunciante": "",
   "area_m2": 65.56,
   "banos": null,
   "barrio": "LOS CEDRITOS",
@@ -28752,6 +29465,7 @@
   "titulo": "Apartamento en LOS CEDRITOS",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-los-cedritos-bogota-3839311",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "d0aa69358cca0666": {
@@ -28802,6 +29516,7 @@
   "zona": "El virrey"
  },
  "d0c987c588f01eed": {
+  "anunciante": "inmobiliaria",
   "area_m2": 18.0,
   "banos": 1,
   "barrio": "El chico",
@@ -28822,6 +29537,7 @@
   "titulo": "Apartamento en Venta en El chico, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-el-chico-bogota/194173262",
+  "verificar": false,
   "zona": "Chicó"
  },
  "d0df18c65d56c5b7": {
@@ -28871,6 +29587,7 @@
   "zona": "Chicó"
  },
  "d0ef3b024ee306cb": {
+  "anunciante": "inmobiliaria",
   "area_m2": 200.0,
   "banos": 4,
   "barrio": "Multicentro",
@@ -28891,6 +29608,7 @@
   "titulo": "Apartamento en Venta en Santa Barbara, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-bogota/193638992",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "d0f5204962978f7b": {
@@ -28940,6 +29658,7 @@
   "zona": "Santa Bárbara"
  },
  "d1841272c2e9d6b3": {
+  "anunciante": "verificar",
   "area_m2": 117.0,
   "banos": 3,
   "barrio": "Capri",
@@ -28960,6 +29679,7 @@
   "titulo": "Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/194521275",
+  "verificar": true,
   "zona": "Cedritos"
  },
  "d21fc1ab8e65a7cb": {
@@ -29080,6 +29800,7 @@
   "zona": "Hayuelos"
  },
  "d2c3af1eb232852e": {
+  "anunciante": "inmobiliaria",
   "area_m2": 65.0,
   "banos": 2,
   "barrio": "Paramo",
@@ -29100,9 +29821,11 @@
   "titulo": "Apartamento en Venta en Bella suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/193557459",
+  "verificar": false,
   "zona": "Contador"
  },
  "d2dd56d134d3e065": {
+  "anunciante": "inmobiliaria",
   "area_m2": 65.0,
   "banos": 2,
   "barrio": "Lisboa Usaquén",
@@ -29123,6 +29846,32 @@
   "titulo": "Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/194439099",
+  "verificar": false,
+  "zona": "Cedritos"
+ },
+ "d2e5e3272b50ce94": {
+  "anunciante": "inmobiliaria",
+  "area_m2": 52.0,
+  "banos": 2,
+  "barrio": "Belmira",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "fincaraiz",
+  "habitaciones": null,
+  "operacion": "venta",
+  "precio": 475000000,
+  "precios": [
+   [
+    "2026-11-09",
+    475000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-10-13",
+  "titulo": "Apartamento en Venta en Cedritos, Bogotá",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/194394471",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "d2f529b1c59e8f10": {
@@ -29149,6 +29898,7 @@
   "zona": "Chicó"
  },
  "d36f2c764435da8e": {
+  "anunciante": "",
   "area_m2": 143.34,
   "banos": null,
   "barrio": "CHICO NORTE ET. II",
@@ -29169,6 +29919,7 @@
   "titulo": "Apartamento en CHICO NORTE ET. II",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-chico-norte-et-ii-bogota-3541549",
+  "verificar": false,
   "zona": "Chicó"
  },
  "d372f446bca926e3": {
@@ -29290,6 +30041,7 @@
   "zona": "Rincon del chico"
  },
  "d42d04aaf31657e7": {
+  "anunciante": "verificar",
   "area_m2": 189.0,
   "banos": 4,
   "barrio": "Chico",
@@ -29310,6 +30062,7 @@
   "titulo": "Apartamento en Venta en El chico, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-el-chico-bogota/194510236",
+  "verificar": true,
   "zona": "Chicó"
  },
  "d42e51c6d5b3c89e": {
@@ -29430,6 +30183,7 @@
   "zona": "Chico norte"
  },
  "d4fb1c55598bc537": {
+  "anunciante": "",
   "area_m2": 85.54,
   "banos": 3,
   "barrio": "Cedritos",
@@ -29450,9 +30204,11 @@
   "titulo": "ELEMENT 142, Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/element-142-apartamento-en-venta-en-cedritos-bogota/192608746",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "d52d038a80a59d3f": {
+  "anunciante": "inmobiliaria",
   "area_m2": 219.0,
   "banos": 5,
   "barrio": "Multicentro",
@@ -29473,6 +30229,7 @@
   "titulo": "Apartamento en Venta en Multicentro, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-multicentro-bogota/192781904",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "d54863a21f11c040": {
@@ -29524,6 +30281,7 @@
   "zona": "El contador"
  },
  "d5cd879d7bfdf73e": {
+  "anunciante": "inmobiliaria",
   "area_m2": 109.0,
   "banos": 3,
   "barrio": "Santa barbara central",
@@ -29544,6 +30302,7 @@
   "titulo": "Apartamento en Venta en Santa barbara central, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-central-bogota/194232566",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "d5d79f45cbf82eb3": {
@@ -29664,6 +30423,7 @@
   "zona": "Santa Bárbara"
  },
  "d68b4626eebd49df": {
+  "anunciante": "inmobiliaria",
   "area_m2": 235.0,
   "banos": 4,
   "barrio": "Paramo",
@@ -29684,9 +30444,11 @@
   "titulo": "Apartamento en Venta en Bella suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/194095313",
+  "verificar": false,
   "zona": "Contador"
  },
  "d6d08566c7ce9e06": {
+  "anunciante": "inmobiliaria",
   "area_m2": 54.0,
   "banos": 2,
   "barrio": "Bella suiza",
@@ -29707,6 +30469,7 @@
   "titulo": "Apartamento en Venta en Bella suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/194200896",
+  "verificar": false,
   "zona": "Contador"
  },
  "d6dbaf91e5ca0f88": {
@@ -29825,6 +30588,7 @@
   "zona": "Contador"
  },
  "d7c4b9536ed4d20b": {
+  "anunciante": "",
   "area_m2": 66.0,
   "banos": null,
   "barrio": "ACACIAS USAQUEN",
@@ -29845,6 +30609,7 @@
   "titulo": "Apartamento en ACACIAS USAQUEN",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-acacias-usaquen-bogota-3893524",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "d7e3bf343259547d": {
@@ -29918,6 +30683,7 @@
   "zona": "Santa Bárbara"
  },
  "d86b84617a491b84": {
+  "anunciante": "verificar",
   "area_m2": 76.0,
   "banos": 3,
   "barrio": "Montearroyo",
@@ -29938,6 +30704,7 @@
   "titulo": "Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/193838558",
+  "verificar": true,
   "zona": "Cedritos"
  },
  "d8709cef6c986d90": {
@@ -30127,6 +30894,7 @@
   "zona": "La carolina"
  },
  "d9a292812ba2f3f0": {
+  "anunciante": "verificar",
   "area_m2": 130.0,
   "banos": 2,
   "barrio": "Caobos salazar",
@@ -30147,6 +30915,7 @@
   "titulo": "Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/194326288",
+  "verificar": true,
   "zona": "Cedritos"
  },
  "da2c85ea994f2616": {
@@ -30570,6 +31339,7 @@
   "zona": "Engativá"
  },
  "dd1f28903fa6c202": {
+  "anunciante": "inmobiliaria",
   "area_m2": 131.0,
   "banos": 3,
   "barrio": "San patricio",
@@ -30590,9 +31360,11 @@
   "titulo": "Apartamento en Venta en San patricio, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-san-patricio-bogota/194484474",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "dd31861bf726d399": {
+  "anunciante": "",
   "area_m2": 489.0,
   "banos": null,
   "barrio": "El Contador",
@@ -30613,6 +31385,7 @@
   "titulo": "Apartamento en El Contador",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/casa-en-arriendo-o-venta-en-el-contador-bogota-3841844",
+  "verificar": false,
   "zona": "Contador"
  },
  "dd4e2963a0317149": {
@@ -30686,6 +31459,7 @@
   "zona": "Cedritos"
  },
  "dd77b62f9e1d8a60": {
+  "anunciante": "inmobiliaria",
   "area_m2": 57.0,
   "banos": 2,
   "barrio": "Acacias usaquen",
@@ -30706,9 +31480,11 @@
   "titulo": "Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/194173275",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "dd7c84160e95e418": {
+  "anunciante": "inmobiliaria",
   "area_m2": 98.0,
   "banos": 3,
   "barrio": "Santa barbara occidental",
@@ -30729,9 +31505,11 @@
   "titulo": "Apartamento en Venta en Santa Barbara, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-bogota/194427700",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "dda946eb7ac1b61d": {
+  "anunciante": "inmobiliaria",
   "area_m2": 300.0,
   "banos": 5,
   "barrio": "Chico norte",
@@ -30752,6 +31530,7 @@
   "titulo": "Apartamento en Venta en Chico, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-chico-bogota/194442261",
+  "verificar": false,
   "zona": "Chicó"
  },
  "ddb0a541a8302c8c": {
@@ -30802,6 +31581,7 @@
   "zona": "Pasadena"
  },
  "ddc0f6d72d56cb43": {
+  "anunciante": "",
   "area_m2": 71.0,
   "banos": null,
   "barrio": "Cedritos",
@@ -30822,9 +31602,11 @@
   "titulo": "Apartamento en Cedritos",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-cedritos-bogota-3853363",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "ddca9ccf373e43df": {
+  "anunciante": "inmobiliaria",
   "area_m2": 222.0,
   "banos": 4,
   "barrio": "Paramo",
@@ -30845,6 +31627,7 @@
   "titulo": "Apartamento en Venta en Ginebra, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-ginebra-bogota/193910967",
+  "verificar": false,
   "zona": "Contador"
  },
  "ddd174f3393d00c7": {
@@ -31013,6 +31796,7 @@
   "zona": "Britalia"
  },
  "decddf553f5f52ff": {
+  "anunciante": "",
   "area_m2": 134.0,
   "banos": null,
   "barrio": "Los Cedros Oriental",
@@ -31033,6 +31817,7 @@
   "titulo": "Apartamento en Los Cedros Oriental",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-los-cedros-oriental-bogota-3346653",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "dee5b3886479dac9": {
@@ -31059,6 +31844,7 @@
   "zona": "Cedritos"
  },
  "df116bf1c4dfcd0b": {
+  "anunciante": "inmobiliaria",
   "area_m2": 135.0,
   "banos": 2,
   "barrio": "Chico norte",
@@ -31079,6 +31865,7 @@
   "titulo": "Apartamento en Venta en Chico norte, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-chico-norte-bogota/194244435",
+  "verificar": false,
   "zona": "Chicó"
  },
  "dff8f5e8b5acad28": {
@@ -31199,6 +31986,7 @@
   "zona": "Santa Bárbara"
  },
  "e0ce9400193818fd": {
+  "anunciante": "inmobiliaria",
   "area_m2": 183.0,
   "banos": 4,
   "barrio": "Chico",
@@ -31219,9 +32007,11 @@
   "titulo": "Apartamento en Venta en El refugio, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-el-refugio-bogota/194261133",
+  "verificar": false,
   "zona": "Chicó"
  },
  "e10e8b9c3e97be52": {
+  "anunciante": "verificar",
   "area_m2": 128.0,
   "banos": 3,
   "barrio": "Multicentro",
@@ -31242,6 +32032,32 @@
   "titulo": "Apartamento en Venta en Santa barbara central, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-central-bogota/194332222",
+  "verificar": true,
+  "zona": "Santa Bárbara"
+ },
+ "e141e2dcb1267b78": {
+  "anunciante": "inmobiliaria",
+  "area_m2": 51.0,
+  "banos": 2,
+  "barrio": "Multicentro",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "fincaraiz",
+  "habitaciones": null,
+  "operacion": "venta",
+  "precio": 565000000,
+  "precios": [
+   [
+    "2026-11-09",
+    565000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-08-04",
+  "titulo": "Apartamento en Venta en Santa Barbara, Bogotá",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-bogota/194075499",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "e15f876cb038387f": {
@@ -31292,6 +32108,7 @@
   "zona": "Nicolas de federman"
  },
  "e1a88dcaba3d8460": {
+  "anunciante": "",
   "area_m2": 67.77,
   "banos": 2,
   "barrio": "Cedritos",
@@ -31312,6 +32129,7 @@
   "titulo": "ELEMENT 142, Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/element-142-apartamento-en-venta-en-cedritos-bogota/192608751",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "e1ae8e606f68bef2": {
@@ -31339,6 +32157,7 @@
   "zona": "San cipriano"
  },
  "e1fb158b05e7007d": {
+  "anunciante": "inmobiliaria",
   "area_m2": 83.0,
   "banos": 2,
   "barrio": "Multicentro",
@@ -31359,6 +32178,7 @@
   "titulo": "Apartamento en Venta en Santa Barbara, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-bogota/194383602",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "e2359d21adddf928": {
@@ -31502,6 +32322,7 @@
   "zona": "Lagos de Torca"
  },
  "e27d3bc7c312cfb3": {
+  "anunciante": "",
   "area_m2": 58.0,
   "banos": null,
   "barrio": "CHICO",
@@ -31522,9 +32343,11 @@
   "titulo": "Apartamento en CHICO",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-chico-bogota-3624440",
+  "verificar": false,
   "zona": "Chicó"
  },
  "e2b884dbeea46712": {
+  "anunciante": "inmobiliaria",
   "area_m2": 211.0,
   "banos": 3,
   "barrio": "Chico",
@@ -31545,6 +32368,7 @@
   "titulo": "Apartamento en Venta en Chico, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-chico-bogota/194305555",
+  "verificar": false,
   "zona": "Chicó"
  },
  "e2d54b06207346f4": {
@@ -31596,6 +32420,7 @@
   "zona": "Chapinero"
  },
  "e324838182754701": {
+  "anunciante": "inmobiliaria",
   "area_m2": 126.0,
   "banos": 3,
   "barrio": "Bella suiza",
@@ -31616,6 +32441,7 @@
   "titulo": "Apartamento en Venta en Altos de Bella Suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-altos-de-bella-suiza-bogota/194454984",
+  "verificar": false,
   "zona": "Contador"
  },
  "e3291021ee2877d9": {
@@ -31667,6 +32493,7 @@
   "zona": "La Calleja"
  },
  "e3362cd8dad2bcad": {
+  "anunciante": "dueño directo",
   "area_m2": 60.0,
   "banos": 2,
   "barrio": "Contador",
@@ -31687,6 +32514,7 @@
   "titulo": "Apartamento en Venta en Contador, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-contador-bogota/194269467",
+  "verificar": false,
   "zona": "Contador"
  },
  "e336663356e4fc7e": {
@@ -31736,6 +32564,7 @@
   "zona": "Santa Bárbara"
  },
  "e3890ee7e4a64f70": {
+  "anunciante": "inmobiliaria",
   "area_m2": 75.0,
   "banos": 2,
   "barrio": "Multicentro",
@@ -31744,11 +32573,15 @@
   "fuente": "fincaraiz",
   "habitaciones": null,
   "operacion": "venta",
-  "precio": 650000000,
+  "precio": 620000000,
   "precios": [
    [
     "2026-11-08",
     650000000
+   ],
+   [
+    "2026-11-09",
+    620000000
    ]
   ],
   "primera_vez": "2026-11-08",
@@ -31756,6 +32589,7 @@
   "titulo": "Apartamento en Venta en Santa barbara central, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-central-bogota/193988250",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "e3ebcc35b48b7d85": {
@@ -32062,6 +32896,7 @@
   "zona": "Chicó"
  },
  "e4fc4e818eb7b717": {
+  "anunciante": "inmobiliaria",
   "area_m2": 131.0,
   "banos": 2,
   "barrio": "La cabrera",
@@ -32082,6 +32917,7 @@
   "titulo": "Apartamento en Venta en La cabrera, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-la-cabrera-bogota/194506239",
+  "verificar": false,
   "zona": "Chicó"
  },
  "e55a049e6bbff53d": {
@@ -32108,6 +32944,7 @@
   "zona": "Santa Bárbara"
  },
  "e570e68712fabbbb": {
+  "anunciante": "inmobiliaria",
   "area_m2": 128.0,
   "banos": 4,
   "barrio": "Contador",
@@ -32128,9 +32965,11 @@
   "titulo": "Apartamento en Venta en Bella suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/193993982",
+  "verificar": false,
   "zona": "Contador"
  },
  "e5aff8c19d7c1d3f": {
+  "anunciante": "inmobiliaria",
   "area_m2": 140.0,
   "banos": 4,
   "barrio": "La Sonora",
@@ -32151,6 +32990,7 @@
   "titulo": "Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/194403548",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "e5fea8392b4c30de": {
@@ -32178,6 +33018,7 @@
   "zona": "Bosque De Pinos"
  },
  "e60cfc3e685e6f10": {
+  "anunciante": "inmobiliaria",
   "area_m2": 247.0,
   "banos": 4,
   "barrio": "Chico",
@@ -32198,6 +33039,7 @@
   "titulo": "Apartamento en Venta en La cabrera, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-la-cabrera-bogota/194486469",
+  "verificar": false,
   "zona": "Chicó"
  },
  "e64a351358a06e78": {
@@ -32248,6 +33090,7 @@
   "zona": "Cedritos"
  },
  "e6b0f5df3736ac21": {
+  "anunciante": "inmobiliaria",
   "area_m2": 180.0,
   "banos": 3,
   "barrio": "Chico norte",
@@ -32268,7 +33111,33 @@
   "titulo": "Apartamento en Venta en Chico, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-chico-bogota/194333865",
+  "verificar": false,
   "zona": "Chicó"
+ },
+ "e6ba1c2aa2f0aabf": {
+  "anunciante": "inmobiliaria",
+  "area_m2": 110.0,
+  "banos": 3,
+  "barrio": "Acacias usaquen",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "fincaraiz",
+  "habitaciones": 3,
+  "operacion": "venta",
+  "precio": 930000000,
+  "precios": [
+   [
+    "2026-11-09",
+    930000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-09-19",
+  "titulo": "Apartamento en Venta en Cedritos, Bogotá",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/194283073",
+  "verificar": false,
+  "zona": "Cedritos"
  },
  "e6c9a15cf4e1583a": {
   "area_m2": 405.0,
@@ -32294,6 +33163,7 @@
   "zona": "Chicó"
  },
  "e6d467a287695686": {
+  "anunciante": "",
   "area_m2": 168.0,
   "banos": null,
   "barrio": "Chicó Norte",
@@ -32314,6 +33184,7 @@
   "titulo": "Apartamento en Chicó Norte",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-chico-norte-bogota-3675262",
+  "verificar": false,
   "zona": "Chicó"
  },
  "e6e60f9bf5ca81ad": {
@@ -32340,6 +33211,7 @@
   "zona": "Santa Bárbara"
  },
  "e740a6a05ca67664": {
+  "anunciante": "inmobiliaria",
   "area_m2": 106.0,
   "banos": 3,
   "barrio": "Cedritos",
@@ -32360,9 +33232,11 @@
   "titulo": "Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/193869015",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "e74f977740aed669": {
+  "anunciante": "inmobiliaria",
   "area_m2": 100.0,
   "banos": 3,
   "barrio": "La Sonora",
@@ -32383,9 +33257,11 @@
   "titulo": "Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/194472634",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "e7a702730053a5e1": {
+  "anunciante": "verificar",
   "area_m2": 57.0,
   "banos": 2,
   "barrio": "Santa barbara occidental",
@@ -32406,6 +33282,7 @@
   "titulo": "Apartamento en Venta en Santa Barbara, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-bogota/194488722",
+  "verificar": true,
   "zona": "Santa Bárbara"
  },
  "e7bddfd38a572bbf": {
@@ -32480,6 +33357,7 @@
   "zona": "Contador"
  },
  "e7f7b68a4933f109": {
+  "anunciante": "",
   "area_m2": 250.0,
   "banos": null,
   "barrio": "EL SEMINARIO",
@@ -32500,6 +33378,7 @@
   "titulo": "Apartamento en EL SEMINARIO",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-el-seminario-bogota-3515194",
+  "verificar": false,
   "zona": "Chicó"
  },
  "e81928bc3a51ce4e": {
@@ -32692,6 +33571,7 @@
   "zona": "La salle"
  },
  "e8bbd2247f4e2b4a": {
+  "anunciante": "",
   "area_m2": 78.0,
   "banos": null,
   "barrio": "Santa Bibiana",
@@ -32712,6 +33592,7 @@
   "titulo": "Apartamento en Santa Bibiana",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-santa-bibiana-bogota-3877747",
+  "verificar": false,
   "zona": "Chicó"
  },
  "e8e1ac23e237a5ca": {
@@ -32738,6 +33619,7 @@
   "zona": "Cedritos"
  },
  "e8ee576115e8efa7": {
+  "anunciante": "inmobiliaria",
   "area_m2": 101.0,
   "banos": 2,
   "barrio": "Chico",
@@ -32758,9 +33640,11 @@
   "titulo": "Apartamento en Venta en El Virrey, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-el-virrey-bogota/194323387",
+  "verificar": false,
   "zona": "Chicó"
  },
  "e8fc5f4d50876360": {
+  "anunciante": "inmobiliaria",
   "area_m2": 48.0,
   "banos": 1,
   "barrio": "Chico",
@@ -32781,6 +33665,7 @@
   "titulo": "Apartamento en Venta en Chico, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-chico-bogota/194454360",
+  "verificar": false,
   "zona": "Chicó"
  },
  "e9547b5b0b8e89a3": {
@@ -32878,6 +33763,7 @@
   "zona": "Puente Grande"
  },
  "e9beffef323c0da9": {
+  "anunciante": "verificar",
   "area_m2": 210.0,
   "banos": 4,
   "barrio": "Multicentro",
@@ -32898,6 +33784,7 @@
   "titulo": "Apartamento en Venta en Santa barbara central, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-central-bogota/194202496",
+  "verificar": true,
   "zona": "Santa Bárbara"
  },
  "ea08278db851f190": {
@@ -32995,6 +33882,7 @@
   "zona": "Chicó"
  },
  "eae7c066644269fb": {
+  "anunciante": "inmobiliaria",
   "area_m2": 62.0,
   "banos": 1,
   "barrio": "Bella suiza",
@@ -33015,6 +33903,7 @@
   "titulo": "Apartamento en Venta en Altos de Bella Suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-altos-de-bella-suiza-bogota/194445644",
+  "verificar": false,
   "zona": "Contador"
  },
  "eb1b7f1c9bbcbdaa": {
@@ -33065,6 +33954,7 @@
   "zona": "Galerias"
  },
  "eb3b5260337f0eea": {
+  "anunciante": "inmobiliaria",
   "area_m2": 365.0,
   "banos": 4,
   "barrio": "Chicó Reservado",
@@ -33085,6 +33975,7 @@
   "titulo": "Apartamento en Venta en Chicó Reservado, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-chico-reservado-bogota/10601930",
+  "verificar": false,
   "zona": "Chicó"
  },
  "eb558e96a48ea6e1": {
@@ -33158,6 +34049,7 @@
   "zona": "Chicó"
  },
  "ebc40da589fdc226": {
+  "anunciante": "inmobiliaria",
   "area_m2": 192.0,
   "banos": 3,
   "barrio": "Chico",
@@ -33178,6 +34070,7 @@
   "titulo": "Apartamento en Venta en El refugio, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-el-refugio-bogota/194131473",
+  "verificar": false,
   "zona": "Chicó"
  },
  "ebc866b3d53a0bcc": {
@@ -33366,6 +34259,7 @@
   "zona": "Chicó"
  },
  "ecea3c23cb73625e": {
+  "anunciante": "inmobiliaria",
   "area_m2": 200.0,
   "banos": 3,
   "barrio": "La cabrera",
@@ -33386,6 +34280,7 @@
   "titulo": "Apartamento en Venta en La cabrera, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-la-cabrera-bogota/194133894",
+  "verificar": false,
   "zona": "Chicó"
  },
  "ed1dce1d9649fd99": {
@@ -33412,6 +34307,7 @@
   "zona": "Chicó"
  },
  "eddc8566b505aa15": {
+  "anunciante": "inmobiliaria",
   "area_m2": 222.0,
   "banos": 5,
   "barrio": "Santa barbara occidental",
@@ -33432,9 +34328,11 @@
   "titulo": "Apartamento en Venta en Santa Barbara, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-bogota/192413676",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "ee3d2b6e811f5f74": {
+  "anunciante": "",
   "area_m2": 69.51,
   "banos": 2,
   "barrio": "Cedritos",
@@ -33455,9 +34353,11 @@
   "titulo": "Apartamento en Venta",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta/193834118",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "ee5e2bdda4274433": {
+  "anunciante": "verificar",
   "area_m2": 97.0,
   "banos": 3,
   "barrio": "Chico",
@@ -33478,6 +34378,7 @@
   "titulo": "Apartamento en Venta en Chico, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-chico-bogota/194481361",
+  "verificar": true,
   "zona": "Chicó"
  },
  "ee7f31fc8e25c61c": {
@@ -33550,6 +34451,7 @@
   "zona": "Cedritos"
  },
  "eec30d6da5fea5c0": {
+  "anunciante": "verificar",
   "area_m2": 75.0,
   "banos": 3,
   "barrio": "Bella suiza",
@@ -33570,6 +34472,7 @@
   "titulo": "Apartamento en Venta en Bella suiza, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-bella-suiza-bogota/194366452",
+  "verificar": true,
   "zona": "Contador"
  },
  "ef6a263787056b80": {
@@ -33713,7 +34616,33 @@
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-arriendo-en-chico-norte-et-iii-bogota-3892610",
   "zona": "Chicó"
  },
+ "f038885dff43598e": {
+  "anunciante": "verificar",
+  "area_m2": 124.0,
+  "banos": 4,
+  "barrio": "Belmira",
+  "base": false,
+  "dueno_directo": false,
+  "fuente": "fincaraiz",
+  "habitaciones": null,
+  "operacion": "venta",
+  "precio": 698000000,
+  "precios": [
+   [
+    "2026-11-09",
+    698000000
+   ]
+  ],
+  "primera_vez": "2026-11-09",
+  "publicado": "2026-09-29",
+  "titulo": "Apartamento en Venta en Cedritos, Bogotá",
+  "ultima_vez": "2026-11-09",
+  "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/194329772",
+  "verificar": true,
+  "zona": "Cedritos"
+ },
  "f0648ec1060a5c5a": {
+  "anunciante": "inmobiliaria",
   "area_m2": 145.0,
   "banos": 3,
   "barrio": "Chico",
@@ -33734,6 +34663,7 @@
   "titulo": "Apartamento en Venta en Chico, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-chico-bogota/194300479",
+  "verificar": false,
   "zona": "Chicó"
  },
  "f0799775c9391c11": {
@@ -33784,6 +34714,7 @@
   "zona": "Chicó"
  },
  "f0af14433f734612": {
+  "anunciante": "inmobiliaria",
   "area_m2": 122.0,
   "banos": 5,
   "barrio": "Chico",
@@ -33804,9 +34735,11 @@
   "titulo": "Apartamento en Venta en Rincon del chico, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-rincon-del-chico-bogota/194479877",
+  "verificar": false,
   "zona": "Chicó"
  },
  "f0c3d167b24e3e5c": {
+  "anunciante": "",
   "area_m2": 125.0,
   "banos": null,
   "barrio": "MOLINOS NORTE",
@@ -33831,6 +34764,7 @@
   "titulo": "Apartamento en MOLINOS NORTE",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-molinos-norte-bogota-3894331",
+  "verificar": false,
   "zona": "Chicó"
  },
  "f0c8a0b2d17e8173": {
@@ -34044,6 +34978,7 @@
   "zona": "Chicó"
  },
  "f2c45a4d2473bdba": {
+  "anunciante": "",
   "area_m2": 30.0,
   "banos": null,
   "barrio": "Santa Barbara",
@@ -34064,6 +34999,7 @@
   "titulo": "Apartamento en Santa Barbara",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-santa-barbara-bogota-3717718",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "f30a8e3297ceab68": {
@@ -34207,6 +35143,7 @@
   "zona": "Contador"
  },
  "f490a30df5736c34": {
+  "anunciante": "inmobiliaria",
   "area_m2": 86.0,
   "banos": 2,
   "barrio": "La cabrera",
@@ -34227,6 +35164,7 @@
   "titulo": "Apartamento en Venta en La cabrera, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-la-cabrera-bogota/194394981",
+  "verificar": false,
   "zona": "Chicó"
  },
  "f4c3655d4336a9bd": {
@@ -34323,6 +35261,7 @@
   "zona": "Chico norte"
  },
  "f55d9c8f78e59a7e": {
+  "anunciante": "inmobiliaria",
   "area_m2": 206.0,
   "banos": 2,
   "barrio": "Santa barbara occidental",
@@ -34343,6 +35282,7 @@
   "titulo": "Apartamento en Venta en Santa Barbara, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-bogota/193995114",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "f5624a8c32cb719d": {
@@ -34749,6 +35689,7 @@
   "zona": "Puente grande"
  },
  "f816299e583a718d": {
+  "anunciante": "inmobiliaria",
   "area_m2": 165.0,
   "banos": 3,
   "barrio": "Santa Barbara",
@@ -34769,6 +35710,7 @@
   "titulo": "Apartamento en Venta en Santa Barbara, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-bogota/194246085",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "f827e595fd902c6b": {
@@ -34841,6 +35783,7 @@
   "zona": "Chicó"
  },
  "f8f6cd84df40ea93": {
+  "anunciante": "inmobiliaria",
   "area_m2": 88.0,
   "banos": 3,
   "barrio": "El contador",
@@ -34861,6 +35804,7 @@
   "titulo": "Apartamento en Venta en Cedritos, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-cedritos-bogota/194338449",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "f90387d2d36fb8a0": {
@@ -34957,6 +35901,7 @@
   "zona": "Montevideo"
  },
  "fa3dfc14dd628351": {
+  "anunciante": "",
   "area_m2": 350.0,
   "banos": null,
   "barrio": "El Contador",
@@ -34977,6 +35922,7 @@
   "titulo": "Apartamento en El Contador",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/casa-en-venta-en-el-contador-bogota-2976248",
+  "verificar": false,
   "zona": "Contador"
  },
  "fa3f6b79b0d5b1b5": {
@@ -35075,6 +36021,7 @@
   "zona": "Colina Campestre"
  },
  "fa92debf4dc2a78c": {
+  "anunciante": "verificar",
   "area_m2": 120.0,
   "banos": 3,
   "barrio": "El Virrey",
@@ -35095,6 +36042,7 @@
   "titulo": "Apartamento en Venta en El chico, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-el-chico-bogota/193858155",
+  "verificar": true,
   "zona": "Chicó"
  },
  "fac4254f2427aee9": {
@@ -35145,6 +36093,7 @@
   "zona": "Chicó"
  },
  "fad1e57508ca8dff": {
+  "anunciante": "inmobiliaria",
   "area_m2": 230.0,
   "banos": 4,
   "barrio": "Santa barbara occidental",
@@ -35165,6 +36114,7 @@
   "titulo": "Apartamento en Venta en Santa Barbara, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-bogota/194406543",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "fadcba36c0155877": {
@@ -35215,6 +36165,7 @@
   "zona": "Engativá"
  },
  "fb0567497bf311f6": {
+  "anunciante": "verificar",
   "area_m2": 55.0,
   "banos": 2,
   "barrio": "Chico",
@@ -35235,9 +36186,11 @@
   "titulo": "Apartamento en Venta en El Virrey, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-el-virrey-bogota/194500099",
+  "verificar": true,
   "zona": "Chicó"
  },
  "fb459382b2c996e5": {
+  "anunciante": "verificar",
   "area_m2": 276.0,
   "banos": 5,
   "barrio": "Santa barbara central",
@@ -35258,9 +36211,11 @@
   "titulo": "Apartamento en Venta en Santa barbara central, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-central-bogota/194502105",
+  "verificar": true,
   "zona": "Santa barbara central"
  },
  "fb679c581e93c6b6": {
+  "anunciante": "",
   "area_m2": 88.0,
   "banos": null,
   "barrio": "LOS CEDRITOS",
@@ -35281,6 +36236,7 @@
   "titulo": "Apartamento en LOS CEDRITOS",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-los-cedritos-bogota-3913223",
+  "verificar": false,
   "zona": "Cedritos"
  },
  "fb7cf9e2f2b683de": {
@@ -35331,6 +36287,7 @@
   "zona": "Cedritos"
  },
  "fb9d078f292d9183": {
+  "anunciante": "",
   "area_m2": 48.0,
   "banos": null,
   "barrio": "Santa Barbara",
@@ -35351,6 +36308,7 @@
   "titulo": "Apartamento en Santa Barbara",
   "ultima_vez": "2026-11-09",
   "url": "https://www.ciencuadras.com/inmueble/apartamento-en-venta-en-santa-barbara-bogota-3104449",
+  "verificar": false,
   "zona": "Santa Bárbara"
  },
  "fba39fb55474f14e": {
@@ -35378,6 +36336,7 @@
   "zona": "Galan"
  },
  "fbb49bf2a45d0909": {
+  "anunciante": "inmobiliaria",
   "area_m2": 70.0,
   "banos": 3,
   "barrio": "Chico",
@@ -35398,6 +36357,7 @@
   "titulo": "Apartamento en Venta en Chico, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-chico-bogota/192536185",
+  "verificar": false,
   "zona": "Chicó"
  },
  "fbed4b33704c8663": {
@@ -35824,6 +36784,7 @@
   "zona": "Chicó"
  },
  "fe4bb69107d1b3e5": {
+  "anunciante": "verificar",
   "area_m2": 85.0,
   "banos": 3,
   "barrio": "Santa barbara occidental",
@@ -35844,9 +36805,11 @@
   "titulo": "Apartamento en Venta en Santa Barbara, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-santa-barbara-bogota/194419912",
+  "verificar": true,
   "zona": "Santa Bárbara"
  },
  "fe662798b8d3f3dd": {
+  "anunciante": "verificar",
   "area_m2": 130.0,
   "banos": 3,
   "barrio": "Nuevo Country",
@@ -35867,6 +36830,7 @@
   "titulo": "Apartamento en Venta en El contador, Bogotá",
   "ultima_vez": "2026-11-09",
   "url": "https://www.fincaraiz.com.co/apartamento-en-venta-en-el-contador-bogota/193985131",
+  "verificar": true,
   "zona": "Cedritos"
  },
  "fec0c96f0a217ded": {
