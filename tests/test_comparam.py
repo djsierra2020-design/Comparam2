@@ -484,7 +484,7 @@ def test_sin_navegador_se_omiten_habi_y_houm(monkeypatch):
     from comparam.config import crear_fuentes
     from comparam.sources import PORTALES
     monkeypatch.delenv("COMPARAM_NAVEGADOR", raising=False)
-    base = ["fincaraiz", "ciencuadras", "mercadolibre", "properati", "rentola"]
+    base = ["fincaraiz", "ciencuadras", "rentola"]
     # Sin navegador (Render): Metrocuadrado, Habi y Houm salen de los anuncios guardados
     assert [f.nombre for f in crear_fuentes()] == base + ["guardados"]
     assert [f.nombre for f in crear_fuentes(list(PORTALES))] == base + ["guardados"]
@@ -662,3 +662,25 @@ def test_diagnostico_no_se_cae_si_un_portal_falla(monkeypatch):
     r = webapp.app.test_client().get("/diagnostico?operacion=arriendo")
     html = r.get_data(as_text=True)
     assert r.status_code == 200 and "falla de la app: ValueError: dato raro" in html and "fincaraiz" in html
+
+
+def test_rentola_diagnostico_prueba_el_segundo_dominio(monkeypatch):
+    import requests
+    from comparam.sources import Rentola
+
+    class Resp:
+        status_code, text = 200, "<html><title>Rentola</title></html>"
+
+        def __init__(self, url):
+            self.url = url
+
+    class Sesion:
+        headers = {}
+
+        def get(self, url, timeout=None):
+            if url.startswith("https://rentola.com.co"):
+                raise requests.ConnectionError("no resuelve")
+            return Resp(url)
+
+    d = Rentola(sesion=Sesion()).diagnosticar("", "arriendo")
+    assert d["url"].startswith("https://rentola.co.com/") and d["estado"] == 200
