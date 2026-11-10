@@ -139,6 +139,15 @@ def service_worker():
     return r
 
 
+@app.get("/gastos")
+def gastos():
+    """App de gastos personales. Funciona por completo en el celular: los datos se guardan
+    en el navegador (localStorage), no en el servidor."""
+    r = send_from_directory(app.static_folder, "gastos.html")
+    r.headers["Cache-Control"] = "no-cache"
+    return r
+
+
 @app.get("/diagnostico")
 def diagnostico():
     """Muestra qué responde cada portal a la primera página de búsqueda."""

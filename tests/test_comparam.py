@@ -390,6 +390,23 @@ def test_app_instalable():
         assert c.get(f"/static/{f}").status_code == 200, f
 
 
+def test_app_gastos():
+    import json
+    import app as webapp
+    c = webapp.app.test_client()
+    r = c.get("/gastos")
+    html = r.get_data(as_text=True)
+    assert r.status_code == 200 and "text/html" in r.content_type
+    assert "gastos.webmanifest" in html and "Cierre del día" in html
+    for cat in ("Consignaciones", "Transporte", "Comida", "Póker", "Niños"):
+        assert cat in html, cat
+    m = json.loads(c.get("/static/gastos.webmanifest").get_data(as_text=True))
+    assert m["start_url"].startswith("/gastos") and m["display"] == "standalone"
+    for i in m["icons"]:
+        assert c.get(i["src"]).status_code == 200, i["src"]
+    assert "/gastos" in c.get("/sw.js").get_data(as_text=True)
+
+
 def test_diario_detecta_nuevos(tmp_path, monkeypatch):
     from datetime import date
     from comparam import diario
