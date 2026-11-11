@@ -978,3 +978,9 @@ def test_persona_con_varios_avisos_es_agente(tmp_path, monkeypatch):
     sandra = [e for e in h.values() if e["url"] in ("u1", "u2")]
     assert all(e["agente"] == 2 and not e["dueno_directo"] and not e["verificar"] for e in sandra)
     assert "SANDRA" not in json.dumps(h, ensure_ascii=False).upper()
+
+
+def test_nombres_de_empresa_mal_escritos():
+    assert not parece_persona("LAB G Real State")
+    assert not parece_persona("Bogota Real Estate Team")
+    assert parece_persona("GLORIA GAMBOA") and parece_persona("Esperanza Domínguez P")
