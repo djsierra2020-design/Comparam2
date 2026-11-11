@@ -824,3 +824,30 @@ def test_mercadolibre_api(monkeypatch):
     with pytest.raises(ml.FuenteError, match="HTTP 403"):
         ml.MercadoLibreAPI(sesion=Negada()).buscar("", "venta")
     ml._TOKEN.update(valor=None, vence=0)
+
+
+def test_mercadolibre_api_renueva_token_si_le_niegan(monkeypatch):
+    from comparam.sources import mercadolibre_api as ml
+    monkeypatch.setenv("ML_CLIENT_ID", "1")
+    monkeypatch.setenv("ML_CLIENT_SECRET", "s")
+    ml._TOKEN.update(valor="VIEJO", vence=10**12)
+
+    class Resp:
+        def __init__(self, code, data):
+            self.status_code, self._d, self.text = code, data, ""
+
+        def json(self):
+            return self._d
+
+    class Sesion:
+        def post(self, url, data=None, timeout=None):
+            return Resp(200, {"access_token": "NUEVO", "expires_in": 21600})
+
+        def get(self, url, params=None, headers=None, timeout=None):
+            if headers["Authorization"] == "Bearer VIEJO":
+                return Resp(403, {"message": "forbidden"})
+            return Resp(200, {"paging": {"total": 0}, "results": []})
+
+    assert ml.MercadoLibreAPI(paginas=1, sesion=Sesion()).buscar("", "venta") == []
+    assert ml._TOKEN["valor"] == "NUEVO"
+    ml._TOKEN.update(valor=None, vence=0)

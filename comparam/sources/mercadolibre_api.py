@@ -66,11 +66,17 @@ class MercadoLibreAPI(Source):
         return _TOKEN["valor"]
 
     def _get(self, ruta: str, params: dict) -> dict:
-        try:
-            r = self.sesion.get(f"{API}{ruta}", params=params, timeout=self.timeout,
-                                headers={"Authorization": f"Bearer {self._token()}"})
-        except requests.RequestException as e:
-            raise FuenteError(f"mercadolibre: no se pudo conectar ({e.__class__.__name__})") from e
+        for intento in range(2):
+            try:
+                r = self.sesion.get(f"{API}{ruta}", params=params, timeout=self.timeout,
+                                    headers={"Authorization": f"Bearer {self._token()}"})
+            except requests.RequestException as e:
+                raise FuenteError(f"mercadolibre: no se pudo conectar ({e.__class__.__name__})") from e
+            if r.status_code in (401, 403) and intento == 0:
+                # El token pudo pedirse antes de un cambio de permisos de la aplicación: uno nuevo.
+                _TOKEN.update(valor=None, vence=0)
+                continue
+            break
         if r.status_code != 200:
             raise FuenteError(f"mercadolibre: la API respondió HTTP {r.status_code} ({r.text[:150]})")
         return r.json()
