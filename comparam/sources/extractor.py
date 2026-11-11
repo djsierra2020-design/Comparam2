@@ -234,8 +234,28 @@ def _limpiar_titulo(t: str) -> str:
 _LUGAR_TEXTO = re.compile(r"([A-ZÁÉÍÓÚÑ][\wÁÉÍÓÚÑáéíóúñü.'\- ]{2,40}?),\s*Bogot", re.U)
 
 
+# Dirección con código postal (Rentola): «Calle 20C, Fontibón, 110921 Bogota, Colombia»
+_LUGAR_POSTAL = re.compile(r",\s*([A-ZÁÉÍÓÚÑ][^,\d]{2,40}?)\s*,\s*\d{5,6}\s+Bogot", re.U)
+_HACE = re.compile(r"\bhace\s+(\d+|un|una)\s+(hora|horas|d[ií]a|d[ií]as|semana|semanas|mes|meses)\b", re.I)
+
+
+def _fecha_hace(texto: str) -> str:
+    """«hace 12 días» -> fecha de publicación AAAA-MM-DD (aproximada para semanas y meses)."""
+    from datetime import date, timedelta
+
+    m = _HACE.search(texto or "")
+    if not m:
+        return ""
+    n = 1 if m.group(1).lower() in ("un", "una") else int(m.group(1))
+    unidad = m.group(2).lower()
+    dias = 0 if unidad.startswith("hora") else n * (7 if unidad.startswith("semana") else 30 if unidad.startswith("mes") else 1)
+    return (date.today() - timedelta(days=dias)).isoformat()
+
+
 def _barrio_en_texto(texto: str) -> str:
-    """Barrio en el texto de la tarjeta: «… Chapinero Alto, Bogotá …»."""
+    """Barrio en el texto de la tarjeta: «… Chapinero Alto, Bogotá …» o «…, Fontibón, 110921 Bogota»."""
+    if m := _LUGAR_POSTAL.search(texto or ""):
+        return m.group(1).strip()
     for m in _LUGAR_TEXTO.finditer(texto or ""):
         candidato = re.sub(r"^(?:apartamento|apto|casa|en|arriendo|venta|\W)+\s*", "", m.group(1), flags=re.I).strip()
         if candidato and not re.search(r"\d", candidato):
@@ -321,7 +341,8 @@ def extraer_de_tarjetas(html: str, fuente: str, base_url: str, operacion: str = 
         hab = re.search(r"(\d+)\s*(?:hab|alcoba)", texto, re.I)
         ban = re.search(r"(\d+)\s*baño", texto, re.I)
         anuncios.append(Listing(
-            fuente=fuente, titulo=titulo or "Apartamento", barrio=barrio_tarjeta, precio=precio,
+            fuente=fuente, titulo=titulo or (f"Apartamento en {barrio_tarjeta}" if barrio_tarjeta else "Apartamento"),
+            barrio=barrio_tarjeta, precio=precio, publicado=_fecha_hace(texto),
             area_m2=area, url=url, telefonos=extract_phones(texto) if _TELEFONO_TXT.search(texto) else [],
             publicado_por=etiqueta, es_dueno_directo=dueno,
             habitaciones=int(hab.group(1)) if hab else None, banos=int(ban.group(1)) if ban else None,

@@ -924,3 +924,17 @@ def test_tarjetas_sin_enlace_normal_rentola():
     assert [(x.barrio, x.url) for x in a] == [("Chapinero Alto", "https://rentola.co.com/arriendo/123"),
                                               ("Cedritos", "https://rentola.co.com/a/9")]
     assert a[0].habitaciones == 3 and MUESTRAS["rentola"].startswith("tarjeta:")
+
+
+def test_tarjeta_rentola_real():
+    from datetime import date, timedelta
+    from comparam.sources.extractor import extraer_de_tarjetas
+    html = """<div class="space-y-1"><span data-testid="t">hace 12 días</span><span>4 habitaciones</span>
+      <span>apartamento de 80m²</span><span>Calle 20C, Fontibón, 110921 Bogota, Colombia</span>
+      <span>$1.000.000 / mes</span></div>"""
+    a = extraer_de_tarjetas(html, "rentola", "https://rentola.co.com", "arriendo")
+    assert len(a) == 1
+    x = a[0]
+    assert (x.barrio, x.titulo, x.precio, x.area_m2, x.habitaciones) == \
+        ("Fontibón", "Apartamento en Fontibón", 1_000_000, 80, 4)
+    assert x.publicado == (date.today() - timedelta(days=12)).isoformat()
