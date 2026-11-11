@@ -1,0 +1,45 @@
+# Publica el sitio público (portada y precio del m² por barrio) en GitHub Pages.
+# Corre después de cada revisión diaria, cuando cambia el código en main, o a mano.
+# Requiere activar Pages una vez: Settings → Pages → Source: «GitHub Actions».
+name: Sitio público
+
+on:
+  workflow_run:
+    workflows: ["Anuncios diarios"]
+    types: [completed]
+  push:
+    branches: [main]
+    paths: ["comparam/**", "templates/sitio/**", "static/**", ".github/workflows/sitio.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main   # siempre con los datos más recientes
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Generar el sitio
+        run: python -m comparam.sitio sitio
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: sitio
+      - id: deploy
+        uses: actions/deploy-pages@v4

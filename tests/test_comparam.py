@@ -1019,3 +1019,25 @@ def test_mitula():
     v = Mitula(sesion=Sesion(FIX.read_text()), pausa=0, paginas=1).buscar("", "venta")
     assert sorted((x.es_dueno_directo, x.verificar, x.publicado_por == "inmobiliaria") for x in v) == \
         [(False, False, True), (True, False, False), (True, False, False)]
+
+
+def test_sitio_publico(tmp_path):
+    from datetime import date
+    from comparam import sitio
+
+    def e(i, op, zona, precio, area, dueno=False):
+        return {"operacion": op, "zona": zona, "barrio": zona, "titulo": f"Apartamento en Venta en {zona}, Bogotá",
+                "url": f"https://f.co/{i}", "fuente": "fincaraiz", "precio": precio, "area_m2": area,
+                "dueno_directo": dueno, "publicado": "2026-10-01", "primera_vez": "2026-11-08",
+                "ultima_vez": "2026-11-11", "precios": [["2026-11-08", precio]], "habitaciones": 3}
+
+    h = {str(i): e(i, "venta", "Cedritos", 300_000_000 + i * 10_000_000, 60 + i, dueno=i < 2) for i in range(6)}
+    h.update({f"c{i}": e(f"c{i}", "venta", "Chapinero Alto", 500_000_000, 60) for i in range(3)})  # pocos: sin página
+    r = sitio.construir(tmp_path, date(2026, 11, 11), h)
+    ced = (tmp_path / "precio-m2/venta/cedritos/index.html").read_text()
+    assert "Precio del metro cuadrado en Cedritos" in ced and "2 de 6" in ced and "https://f.co/0" in ced
+    assert (tmp_path / "precio-m2/venta/localidad-usaquen/index.html").exists()
+    assert not (tmp_path / "precio-m2/venta/chapinero-alto").exists()
+    mapa = (tmp_path / "sitemap.xml").read_text()
+    assert "/precio-m2/venta/cedritos/" in mapa and (tmp_path / "robots.txt").exists()
+    assert "Probar la app" in (tmp_path / "index.html").read_text() and r["zonas"] == 2
