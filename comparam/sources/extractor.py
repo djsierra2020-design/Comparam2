@@ -275,13 +275,18 @@ def extraer_de_tarjetas(html: str, fuente: str, base_url: str, operacion: str = 
         titulo_el = el.find(["h1", "h2", "h3", "h4"]) or enlace
         titulo = (titulo_el.get_text(" ", strip=True) if titulo_el is not None else "")[:200]
         titulo = _limpiar_titulo(titulo)[:120]
+        if not barrio_por_defecto:
+            from ..busqueda import zona_de  # barrio del título: «… en venta en Modelia, Fontibón»
+            barrio_tarjeta = zona_de(Listing(fuente, titulo, "", 1, 1))
+        else:
+            barrio_tarjeta = barrio_por_defecto
         if _NO_APTO.search(titulo) or _NO_APTO.search(texto[:200]):
             continue
         etiqueta, dueno = clasificar_anunciante("", "", texto)
         hab = re.search(r"(\d+)\s*(?:hab|alcoba)", texto, re.I)
         ban = re.search(r"(\d+)\s*baño", texto, re.I)
         anuncios.append(Listing(
-            fuente=fuente, titulo=titulo or "Apartamento", barrio=barrio_por_defecto, precio=precio,
+            fuente=fuente, titulo=titulo or "Apartamento", barrio=barrio_tarjeta, precio=precio,
             area_m2=area, url=url, telefonos=extract_phones(texto) if _TELEFONO_TXT.search(texto) else [],
             publicado_por=etiqueta, es_dueno_directo=dueno,
             habitaciones=int(hab.group(1)) if hab else None, banos=int(ban.group(1)) if ban else None,
@@ -311,6 +316,22 @@ def contar_bloques_json(html: str) -> int:
     return sum(1 for _ in _bloques_json(html))
 
 
+# Muestra de los datos crudos del primer anuncio de cada portal (para /diagnostico).
+MUESTRAS: dict[str, str] = {}
+
+
+def _muestra(d: dict) -> str:
+    """Datos del anuncio en texto corto: claves y valores simples (sin listas largas ni textos)."""
+    partes = []
+    for k, v in d.items():
+        if isinstance(v, dict):
+            v = "{" + ", ".join(f"{kk}: {str(vv)[:40]}" for kk, vv in list(v.items())[:8]) + "}"
+        elif isinstance(v, list):
+            v = f"[{len(v)} elementos]"
+        partes.append(f"{k}: {str(v)[:60]}")
+    return " · ".join(partes)[:1500]
+
+
 def extraer_de_json(bloques: list, fuente: str, base_url: str, operacion: str = "venta",
                     barrio_por_defecto: str = "") -> list[Listing]:
     """Reconoce anuncios en cualquier estructura JSON de la página."""
@@ -338,6 +359,8 @@ def extraer_de_json(bloques: list, fuente: str, base_url: str, operacion: str = 
             if clave in vistos:
                 continue
             vistos.add(clave)
+            if not anuncios:
+                MUESTRAS[fuente] = _muestra(d)
             tipo, nombre = _anunciante(d)
             etiqueta, dueno = clasificar_anunciante(tipo, nombre, descripcion)
             # Nombre y apellido (2+ palabras): una sola palabra suele ser una marca («PROVIVENDA»).

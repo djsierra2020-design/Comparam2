@@ -886,3 +886,29 @@ def test_mercadolibre_autorizacion_de_usuario(monkeypatch):
     assert "MercadoLibre funciona" in html and "1234" in html and "trajo 1 anuncios" in html
     assert capturado == {"code": "TG-abc", "redirect_uri": "https://comparam2.onrender.com"}
     assert "no es válida" in c.get("/?code=x&state=1.malo").get_data(as_text=True)
+
+
+def test_barrio_en_titulos_de_habi_y_houm():
+    assert zona_de(_l("Modelia imperial 2 - apartamento en venta en modelia, fontibón")) == "Modelia"
+    assert zona_de(_l("Torre Estacion - Apartamento en Venta en San Victorino, Los Mártires")) == "San Victorino"
+    assert zona_de(_l("Apartamento Usaquén, Bogotá")) == "Usaquén"
+    html = """<div class="c"><a href="/v/1"><h3>Modelia imperial 2 - apartamento en venta en modelia, fontibón</h3></a>
+      <p>$ 300.000.000</p><p>60 m²</p></div>"""
+    a = extraer_anuncios(html, "habi", "https://habi.co")
+    assert a[0].barrio == "Modelia"
+
+
+def test_historial_actualiza_titulo_y_barrio(tmp_path, monkeypatch):
+    from datetime import date
+    from comparam import diario
+    monkeypatch.setattr(diario, "HISTORIAL", tmp_path / "h.json")
+    monkeypatch.setattr(diario, "CARPETA_DIA", tmp_path / "d")
+    h = {}
+    viejo = _l("Anterior Siguiente $ 250.000.000 30 m² Apartamento Usaquén, Bogotá")
+    viejo.url = "https://houm.com/1"
+    diario.registrar(h, viejo, "venta", "Bogotá", "2026-11-09", False, ciudad=True)
+    nuevo = _l("Apartamento Usaquén, Bogotá", "Usaquén")
+    nuevo.url = "https://houm.com/1"
+    diario.registrar(h, nuevo, "venta", "Usaquén", "2026-11-10", False, ciudad=True)
+    e = next(iter(h.values()))
+    assert (e["titulo"], e["barrio"], e["zona"]) == ("Apartamento Usaquén, Bogotá", "Usaquén", "Usaquén")

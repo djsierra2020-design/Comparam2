@@ -118,7 +118,10 @@ def _recolectar(fuentes: list[Source], barrio: str, operacion: str
 _LUGAR_TITULO = re.compile(r"\ben\s+((?:(?!\ben\s)[^,|])+?),\s*bogot", re.I)
 
 
-_LUGAR_FINAL = re.compile(r"\ben\s+(?:venta|arriendo)\s+en\s+([^,|]+?)\s*$", re.I)
+# «… Apartamento en Venta en San Cristóbal Norte» y «… en venta en Modelia, Fontibón» (Habi)
+_LUGAR_FINAL = re.compile(r"\ben\s+(?:venta|arriendo)\s+en\s+([^,|]+?)(?:\s*,\s*[^,|]+)?\s*$", re.I)
+# «Apartamento Usaquén, Bogotá» (Houm: indica la localidad)
+_LUGAR_TIPO = re.compile(r"\bapartamento\s+((?:(?!\ben\s)[^,|$\d])+?),\s*bogot", re.I)
 
 
 def es_del_barrio(a: Listing, barrio: str) -> bool:
@@ -167,12 +170,14 @@ def zona_de(a: Listing) -> str:
         candidatos.append(m.group(1))
     elif m := _LUGAR_FINAL.search(a.titulo or ""):  # «Torres X - Apartamento en Venta en San Cristóbal Norte»
         candidatos.append(m.group(1))
+    elif m := _LUGAR_TIPO.search(a.titulo or ""):  # «Apartamento Usaquén, Bogotá»
+        candidatos.append(m.group(1))
     candidatos.append(a.barrio)
     candidatos += (a.ubicacion or "").split("|")
     for c in candidatos:
         c = (c or "").strip()
         if slugify(c) not in _GENERICOS:
-            return c
+            return c.title() if c.islower() else c  # «modelia» -> «Modelia»
     return ""
 
 

@@ -91,6 +91,12 @@ def registrar(historial: dict, a: Listing, operacion: str, zona: str, dia: str, 
         return True
     e["ultima_vez"] = dia
     e["anunciante"] = categoria(a) or e.get("anunciante", "")
+    if a.titulo and a.titulo != "Apartamento":
+        e["titulo"] = a.titulo[:120]
+    if a.barrio:
+        e["barrio"] = a.barrio[:60]
+    if zona and zona != "Bogotá":
+        e["zona"] = zona
     if not ciudad:
         e.pop("ciudad", None)  # también está en las zonas del cliente
     e["dueno_directo"] = e["dueno_directo"] or a.es_dueno_directo
