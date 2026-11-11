@@ -154,6 +154,8 @@ def diagnostico():
     barrio = request.args.get("barrio", "").strip()
     operacion = "arriendo" if request.args.get("operacion") == "arriendo" else "venta"
     portales = [cls(paginas=1, detalle=False) for cls in PORTALES.values()]
+    from comparam.sources import mercadolibre_api
+    portales.append(mercadolibre_api.MercadoLibreAPI(paginas=1))  # muestra si faltan las credenciales
     def una(p):
         # Un portal que falle no debe tumbar la página completa (antes daba «Error interno»).
         try:

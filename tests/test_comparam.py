@@ -760,3 +760,67 @@ def test_navegador_se_corta_si_la_pagina_se_traba(tmp_path, monkeypatch):
     if "no pudo abrir" in str(e.value) and "Executable" in str(e.value):
         pytest.skip("navegador no instalado")
     assert time.time() - t < 60
+
+
+def test_mercadolibre_api(monkeypatch):
+    from comparam.config import crear_fuentes
+    from comparam.sources import mercadolibre_api as ml
+
+    monkeypatch.delenv("ML_CLIENT_ID", raising=False)
+    monkeypatch.delenv("ML_CLIENT_SECRET", raising=False)
+    assert "mercadolibre" not in [f.nombre for f in crear_fuentes()]  # sin credenciales no se usa
+    monkeypatch.setenv("ML_CLIENT_ID", "123")
+    monkeypatch.setenv("ML_CLIENT_SECRET", "abc")
+    ml._TOKEN.update(valor=None, vence=0)
+    assert "mercadolibre" in [f.nombre for f in crear_fuentes()]
+
+    def res(id_, precio, area, op="Venta", tipo="Apartamento", barrio="Cedritos", agencia=False):
+        return {"id": id_, "title": f"Apto {barrio}", "price": precio, "currency_id": "COP",
+                "permalink": f"https://ml.co/{id_}", "date_created": "2026-10-01T10:00:00Z",
+                "location": {"neighborhood": {"name": barrio}, "city": {"name": "Bogotá"}},
+                "seller": {"real_estate_agency": agencia},
+                "attributes": [{"id": "OPERATION", "value_name": op}, {"id": "PROPERTY_TYPE", "value_name": tipo},
+                               {"id": "COVERED_AREA", "value_name": f"{area} m²", "value_struct": {"number": area}},
+                               {"id": "BEDROOMS", "value_name": "3"}]}
+
+    class Resp:
+        def __init__(self, code, data):
+            self.status_code, self._d, self.text = code, data, str(data)
+
+        def json(self):
+            return self._d
+
+    class Sesion:
+        def __init__(self):
+            self.llamadas = []
+
+        def post(self, url, data=None, timeout=None):
+            assert data["grant_type"] == "client_credentials" and data["client_secret"] == "abc"
+            return Resp(200, {"access_token": "TOK", "expires_in": 21600})
+
+        def get(self, url, params=None, headers=None, timeout=None):
+            self.llamadas.append(params)
+            assert headers["Authorization"] == "Bearer TOK"
+            return Resp(200, {"paging": {"total": 4210}, "results": [
+                res(1, 350_000_000, 70), res(2, 2_000_000, 50, op="Arriendo"), res(3, 400_000_000, 120, tipo="Casa"),
+                res(4, 500_000_000, 80, barrio="Chicó", agencia=True)]})
+
+    ses = Sesion()
+    a = ml.MercadoLibreAPI(paginas=1, sesion=ses).buscar("Cedritos", "venta")
+    assert [x.url for x in a] == ["https://ml.co/1"]  # ni arriendo, ni casa, ni otro barrio
+    x = a[0]
+    assert x.es_dueno_directo and x.area_m2 == 70 and x.habitaciones == 3 and x.publicado == "2026-10-01"
+    assert ses.llamadas[0]["q"] == "apartamento venta Cedritos bogota" and ses.llamadas[0]["category"] == "MCO1459"
+    todos = ml.MercadoLibreAPI(paginas=1, sesion=Sesion()).buscar("", "venta")
+    assert {y.url for y in todos} == {"https://ml.co/1", "https://ml.co/4"}
+    assert not next(y for y in todos if y.url.endswith("/4")).es_dueno_directo
+
+    class Negada(Sesion):
+        def post(self, url, data=None, timeout=None):
+            return Resp(403, {"message": "forbidden"})
+
+    ml._TOKEN.update(valor=None, vence=0)
+    import pytest
+    with pytest.raises(ml.FuenteError, match="HTTP 403"):
+        ml.MercadoLibreAPI(sesion=Negada()).buscar("", "venta")
+    ml._TOKEN.update(valor=None, vence=0)
