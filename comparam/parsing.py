@@ -69,7 +69,7 @@ def extract_phones(*textos: str) -> list[str]:
 
 _EMPRESA = re.compile(
     r"inmobiliari|bienes|ra[ií]z|ra[ií]ces|propiedad|inversion|constructor|consult|asesor|agencia|grupo|group"
-    r"|realty|real\s*estate|broker|corredor|capital|servicios|soluciones|proyectos|negocios|gesti[oó]n"
+    r"|realty|real\s*e?state|\blab\b|\bstudio\b|\bteam\b|\bgroup\b|\bpartners\b|broker|corredor|capital|servicios|soluciones|proyectos|negocios|gesti[oó]n"
     r"|\bs\.?a\.?s\b|\bs\.?a\b|ltda|\bcia\b|&|\.com|\bde\s+colombia\b|home|house|homes|living|arriendos",
     re.I,
 )
