@@ -314,7 +314,7 @@ def extraer_de_tarjetas(html: str, fuente: str, base_url: str, operacion: str = 
         else:
             barrio_tarjeta = barrio_por_defecto
         if not anuncios:
-            MUESTRAS.setdefault(fuente, "tarjeta: " + _muestra_tarjeta(el, texto))
+            MUESTRAS[fuente] = "tarjeta: " + _muestra_tarjeta(el, texto)  # la más reciente
         if _NO_APTO.search(titulo) or _NO_APTO.search(texto[:200]):
             continue
         etiqueta, dueno = clasificar_anunciante("", "", texto)
