@@ -87,8 +87,54 @@ def _url_con_inmobiliarias() -> str:
 app.jinja_env.globals["url_con_inmobiliarias"] = _url_con_inmobiliarias
 
 
+ML_REDIRECT = os.environ.get("ML_REDIRECT_URI", "https://comparam2.onrender.com")
+
+
+@app.get("/ml/conectar")
+def ml_conectar():
+    """Prueba: la persona autoriza a comparam2 en MercadoLibre y se hace una búsqueda de prueba."""
+    from flask import redirect
+    from comparam.sources import mercadolibre_api as ml
+    if not ml.configurado():
+        return _pagina_ml("Faltan ML_CLIENT_ID y ML_CLIENT_SECRET en Render.", ok=False)
+    return redirect(ml.url_autorizacion(ML_REDIRECT))
+
+
+def _pagina_ml(mensaje: str, ok: bool, ejemplos: list | None = None, total=None) -> str:
+    from markupsafe import escape
+    filas = "".join(f"<li>{escape(e)}</li>" for e in (ejemplos or []))
+    return (f"""<!doctype html><html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>Comparam · MercadoLibre</title>
+<style>body{{font:16px/1.5 system-ui,sans-serif;max-width:640px;margin:0 auto;padding:24px 16px;background:#f3f5f7;color:#14181f}}
+.c{{background:#fff;border-radius:18px;padding:18px;box-shadow:0 2px 10px rgba(0,0,0,.06)}}
+h1{{font-size:22px;margin:0 0 8px;color:{'#067647' if ok else '#b42318'}}} a{{color:#0d7466}}</style></head><body>
+<div class="c"><h1>{'✓ MercadoLibre funciona' if ok else '✗ MercadoLibre no funcionó'}</h1><p>{escape(mensaje)}</p>
+{f'<p>Total de anuncios que reporta MercadoLibre: <b>{escape(total)}</b></p>' if total is not None else ''}
+{f'<ol>{filas}</ol>' if filas else ''}<p><a href="/">Volver a Comparam</a></p></div></body></html>""")
+
+
+def _ml_regreso():
+    """Regreso desde MercadoLibre (la dirección registrada es la raíz del sitio)."""
+    from comparam.sources import mercadolibre_api as ml
+    if not ml.estado_valido(request.args.get("state", "")):
+        return _pagina_ml("La autorización expiró o no es válida. Vuelve a intentar desde /ml/conectar.", ok=False)
+    try:
+        tok = ml.canjear_codigo(request.args["code"], ML_REDIRECT)
+        fuente = ml.MercadoLibreAPI(paginas=1, token=tok["access_token"])
+        anuncios = fuente.buscar("Cedritos", "venta")
+    except ml.FuenteError as e:
+        return _pagina_ml(str(e), ok=False)
+    ejemplos = [f"{a.titulo[:60]} · {pesos(a.precio)} · {a.area_m2:g} m² · {a.publicado_por or 'anunciante ?'}"
+                for a in anuncios[:5]]
+    return _pagina_ml(f"Con tu autorización, la búsqueda de prueba (apartamentos en venta en Cedritos) "
+                      f"trajo {len(anuncios)} anuncios. No se guardó ningún dato de tu cuenta.", ok=True,
+                      ejemplos=ejemplos, total=fuente.total_publicados)
+
+
 @app.get("/")
 def inicio():
+    if request.args.get("code") and request.args.get("state"):
+        return _ml_regreso()
     if _es_ciudad():
         elegidas, rc = _consulta_ciudad()
         return render_template("index.html", barrio="", barrios=BARRIOS, fuentes=FUENTES, elegidas=elegidas,

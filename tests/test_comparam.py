@@ -851,3 +851,38 @@ def test_mercadolibre_api_renueva_token_si_le_niegan(monkeypatch):
     assert ml.MercadoLibreAPI(paginas=1, sesion=Sesion()).buscar("", "venta") == []
     assert ml._TOKEN["valor"] == "NUEVO"
     ml._TOKEN.update(valor=None, vence=0)
+
+
+def test_mercadolibre_autorizacion_de_usuario(monkeypatch):
+    from urllib.parse import parse_qs, urlparse
+    import app as webapp
+    from comparam.sources import mercadolibre_api as ml
+
+    monkeypatch.setenv("ML_CLIENT_ID", "864")
+    monkeypatch.setenv("ML_CLIENT_SECRET", "secreto")
+    c = webapp.app.test_client()
+    r = c.get("/ml/conectar")
+    assert r.status_code == 302
+    q = parse_qs(urlparse(r.location).query)
+    assert r.location.startswith("https://auth.mercadolibre.com.co/authorization")
+    assert q["client_id"] == ["864"] and q["redirect_uri"] == ["https://comparam2.onrender.com"]
+    estado = q["state"][0]
+    assert ml.estado_valido(estado) and not ml.estado_valido("123.falso")
+
+    capturado = {}
+
+    def canjear(code, redirect_uri, sesion=None):
+        capturado.update(code=code, redirect_uri=redirect_uri)
+        return {"access_token": "USR", "refresh_token": "R"}
+
+    def buscar(self, barrio, operacion="venta"):
+        assert self.token_usuario == "USR"
+        self.total_publicados = 1234
+        return [_l("Apartamento en Venta en Cedritos, Bogotá")]
+
+    monkeypatch.setattr(ml, "canjear_codigo", canjear)
+    monkeypatch.setattr(ml.MercadoLibreAPI, "buscar", buscar)
+    html = c.get(f"/?code=TG-abc&state={estado}").get_data(as_text=True)
+    assert "MercadoLibre funciona" in html and "1234" in html and "trajo 1 anuncios" in html
+    assert capturado == {"code": "TG-abc", "redirect_uri": "https://comparam2.onrender.com"}
+    assert "no es válida" in c.get("/?code=x&state=1.malo").get_data(as_text=True)

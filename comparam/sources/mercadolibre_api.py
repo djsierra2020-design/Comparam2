@@ -41,14 +41,18 @@ class MercadoLibreAPI(Source):
     nombre = "mercadolibre"
     por_pagina = 50
 
-    def __init__(self, paginas: int = 2, sesion: requests.Session | None = None, timeout: float = 20, **_):
+    def __init__(self, paginas: int = 2, sesion: requests.Session | None = None, timeout: float = 20,
+                 token: str | None = None, **_):
         self.paginas = paginas
+        self.token_usuario = token  # token de una persona usuaria (flujo authorization_code)
         self.sesion = sesion or requests.Session()
         self.timeout = timeout
         self.total_publicados = None
 
     # --- acceso -----------------------------------------------------------------------------
     def _token(self) -> str:
+        if self.token_usuario:
+            return self.token_usuario
         if _TOKEN["valor"] and time.time() < _TOKEN["vence"]:
             return _TOKEN["valor"]
         if not configurado():
@@ -72,7 +76,7 @@ class MercadoLibreAPI(Source):
                                     headers={"Authorization": f"Bearer {self._token()}"})
             except requests.RequestException as e:
                 raise FuenteError(f"mercadolibre: no se pudo conectar ({e.__class__.__name__})") from e
-            if r.status_code in (401, 403) and intento == 0:
+            if r.status_code in (401, 403) and intento == 0 and not self.token_usuario:
                 # El token pudo pedirse antes de un cambio de permisos de la aplicación: uno nuevo.
                 _TOKEN.update(valor=None, vence=0)
                 continue
@@ -144,3 +148,46 @@ class MercadoLibreAPI(Source):
                 "dueno_directo": sum(a.es_dueno_directo for a in anuncios),
                 "ejemplos": [f"{a.titulo[:50]} · ${a.precio:,.0f} · {a.area_m2:g} m² · {a.publicado_por or '?'}"
                              for a in anuncios[:5]]}
+
+
+# --- Autorización de una persona usuaria (authorization_code) -----------------------------------
+# La búsqueda de inmuebles exige un token generado cuando una persona autoriza la aplicación.
+AUTH_URL = os.environ.get("ML_AUTH_URL", "https://auth.mercadolibre.com.co/authorization")
+
+
+def _firma(texto: str) -> str:
+    import hashlib
+    import hmac
+    return hmac.new(os.environ.get("ML_CLIENT_SECRET", "").encode(), texto.encode(), hashlib.sha256).hexdigest()[:24]
+
+
+def estado_nuevo() -> str:
+    """Valor «state» firmado (protege el regreso desde MercadoLibre contra solicitudes falsas)."""
+    t = str(int(time.time()))
+    return f"{t}.{_firma(t)}"
+
+
+def estado_valido(estado: str, max_segundos: int = 900) -> bool:
+    import hmac
+    t, _, firma = (estado or "").partition(".")
+    return (t.isdigit() and hmac.compare_digest(firma, _firma(t)) and 0 <= time.time() - int(t) <= max_segundos)
+
+
+def url_autorizacion(redirect_uri: str) -> str:
+    from urllib.parse import urlencode
+    return AUTH_URL + "?" + urlencode({"response_type": "code", "client_id": os.environ.get("ML_CLIENT_ID", ""),
+                                       "redirect_uri": redirect_uri, "state": estado_nuevo()})
+
+
+def canjear_codigo(code: str, redirect_uri: str, sesion: requests.Session | None = None) -> dict:
+    """Cambia el código de autorización por un token de usuario (y su refresh token)."""
+    sesion = sesion or requests.Session()
+    try:
+        r = sesion.post(f"{API}/oauth/token", timeout=20, data={
+            "grant_type": "authorization_code", "client_id": os.environ.get("ML_CLIENT_ID", ""),
+            "client_secret": os.environ.get("ML_CLIENT_SECRET", ""), "code": code, "redirect_uri": redirect_uri})
+    except requests.RequestException as e:
+        raise FuenteError(f"mercadolibre: no se pudo conectar ({e.__class__.__name__})") from e
+    if r.status_code != 200:
+        raise FuenteError(f"mercadolibre: no aceptó la autorización (HTTP {r.status_code}: {r.text[:150]})")
+    return r.json()
