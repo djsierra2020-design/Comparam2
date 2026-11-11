@@ -139,9 +139,12 @@ class PortalWeb(Source):
             bloques_json=contar_bloques_json(html), anuncios=len(anuncios),
             total_publicado=total_publicados(html, len(anuncios)),
             dueno_directo=sum(a.es_dueno_directo for a in anuncios),
-            ejemplos=[f"{a.titulo[:50]} · ${a.precio:,.0f} · {a.area_m2:g} m² · {a.publicado_por or 'anunciante ?'}"
-                      for a in anuncios[:5]],
+            ejemplos=[f"{a.titulo[:50]} · ${a.precio:,.0f} · {a.area_m2:g} m² · barrio: {a.barrio or '?'} · "
+                      f"{a.publicado_por or 'anunciante ?'}" for a in anuncios[:5]],
         )
+        from .extractor import MUESTRAS
+        if anuncios and self.nombre in MUESTRAS:
+            info["muestra"] = MUESTRAS[self.nombre]
         if not anuncios:
             info["pistas"] = _pistas(html)
         return info
