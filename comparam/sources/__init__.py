@@ -8,8 +8,9 @@ from .archivo import ArchivoCSV
 # quedan fuera; no se intenta saltar esas protecciones.
 # Metrocuadrado tampoco muestra anuncios a un navegador automático (0 incluso con navegador en
 # GitHub): queda fuera; no se intenta evadir esa detección.
-PORTALES = {"fincaraiz": FincaRaiz, "ciencuadras": Ciencuadras, "rentola": Rentola, "mitula": Mitula,
-            "habi": Habi, "houm": Houm}
+# Mitula (HTTP 401, misma empresa que Properati) también bloquea las consultas automáticas: fuera.
+PORTALES = {"fincaraiz": FincaRaiz, "ciencuadras": Ciencuadras, "rentola": Rentola, "habi": Habi,
+            "houm": Houm}
 
 __all__ = ["Source", "FuenteError", "FincaRaiz", "Metrocuadrado", "Ciencuadras", "Habi", "Houm",
            "MercadoLibre", "Properati", "Rentola", "Mitula", "ArchivoCSV", "PORTALES"]
