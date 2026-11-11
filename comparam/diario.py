@@ -22,7 +22,7 @@ from datetime import date, datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-from .busqueda import _recolectar, _sin_duplicados, buscar, zona_de
+from .busqueda import _recolectar, _sin_duplicados, buscar, nombre_anunciante, zona_de
 from .config import RAIZ, crear_fuentes
 from .localidades import localidad_de
 from .models import Listing
@@ -74,9 +74,12 @@ def categoria(a: Listing) -> str:
 
 
 def registrar(historial: dict, a: Listing, operacion: str, zona: str, dia: str, base: bool,
-              ciudad: bool = False) -> bool:
-    """Agrega o actualiza un anuncio en el historial. Devuelve True si es nuevo."""
+              ciudad: bool = False, nombres: dict | None = None) -> bool:
+    """Agrega o actualiza un anuncio en el historial. Devuelve True si es nuevo.
+    `nombres` (solo en memoria, nunca se guarda) junta quién publicó cada anuncio para contar avisos."""
     k = clave(a, operacion)
+    if nombres is not None and (n := nombre_anunciante(a)):
+        nombres[k] = n
     e = historial.get(k)
     if e is None:
         historial[k] = {
@@ -115,6 +118,7 @@ def correr(config: dict | None = None, fuentes_por_operacion=None, dia: date | N
     historial = cargar_json(HISTORIAL, {})
     base = not historial  # primer día: todo es punto de partida
     resumen = {"fecha": dia_txt, "base": base, "nuevos": [], "zonas": {}, "revisados": 0, "errores": []}
+    nombres: dict[str, str] = {}  # clave del anuncio -> anunciante (solo en memoria)
     for operacion in config.get("operaciones", ["venta", "arriendo"]):
         for zona in config.get("barrios", []):
             fuentes = (fuentes_por_operacion(operacion) if fuentes_por_operacion
@@ -128,7 +132,7 @@ def correr(config: dict | None = None, fuentes_por_operacion=None, dia: date | N
                                                            "anuncios": r.zona.anuncios}
             for a in r.usados_zona:
                 resumen["revisados"] += 1
-                if registrar(historial, a, operacion, zona, dia_txt, base) and not base:
+                if registrar(historial, a, operacion, zona, dia_txt, base, nombres=nombres) and not base:
                     resumen["nuevos"].append(clave(a, operacion))
             _guardar(historial, resumen, dia_txt)  # si la revisión se corta, no se pierde lo avanzado
     # Toda Bogotá: guarda también los anuncios del resto de la ciudad para tener historial, días
@@ -147,10 +151,24 @@ def correr(config: dict | None = None, fuentes_por_operacion=None, dia: date | N
                 zona = z or localidad_de(a.titulo, a.barrio, a.ubicacion) or "Bogotá"
                 if clave(a, operacion) not in historial:
                     ciudad += 1
-                registrar(historial, a, operacion, zona, dia_txt, base, ciudad=True)
+                registrar(historial, a, operacion, zona, dia_txt, base, ciudad=True, nombres=nombres)
                 resumen["revisados"] += 1
             resumen.setdefault("nuevos_ciudad", {})[operacion] = ciudad
             _guardar(historial, resumen, dia_txt)
+    # Personas con más de un aviso en el día (tus barrios y toda Bogotá): son agentes, no dueños.
+    from collections import Counter
+    conteo = Counter(nombres.values())
+    for k, n in nombres.items():
+        e = historial.get(k)
+        if e is None:
+            continue
+        if conteo[n] >= 2:
+            e["agente"] = conteo[n]
+            e["dueno_directo"] = e["verificar"] = False
+            e["anunciante"] = "agente"
+        else:
+            e.pop("agente", None)
+    resumen["agentes"] = sum(1 for n in conteo.values() if n >= 2)
     _guardar(historial, resumen, dia_txt)
     return resumen
 
@@ -226,7 +244,7 @@ def info(e: dict, dia: date | None = None) -> dict:
     dias, texto = dias_publicado(e, dia)
     primero, actual = e["precios"][0][1], e["precios"][-1][1]
     baja = round((1 - actual / primero) * 100) if primero and actual < primero else 0
-    return {"dias": dias, "texto": texto, "baja_pct": baja}
+    return {"dias": dias, "texto": texto, "baja_pct": baja, "agente": e.get("agente", 0)}
 
 
 _INDICE: dict = {"mtime": None, "por_url": {}}

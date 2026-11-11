@@ -65,6 +65,47 @@ def _sin_duplicados(anuncios: list[Listing]) -> list[Listing]:
     return unicos
 
 
+def nombre_anunciante(a: Listing) -> str:
+    """Nombre de la persona que publica, si el portal lo da («persona natural · Ana», «verificar · Ana»)."""
+    etiqueta = a.publicado_por or ""
+    partes = [p.strip() for p in etiqueta.split("·")]
+    if len(partes) >= 2 and partes[0] in ("persona natural", "verificar", "agente"):
+        return slugify(partes[1])
+    return ""
+
+
+def marcar_agentes(anuncios: list[Listing], minimo: int = 2) -> int:
+    """Una persona con más de un aviso no es dueño directo: es agente (p. ej. «SANDRA REY» con 4
+    avisos). Se marca «agente · N avisos» y deja de contar como dueño o «verificar». Devuelve
+    cuántos anuncios cambió."""
+    from collections import Counter
+
+    conteo = Counter(n for a in anuncios if (n := nombre_anunciante(a)))
+    cambiados = 0
+    for a in anuncios:
+        n = nombre_anunciante(a)
+        if n and conteo[n] >= minimo:
+            nombre = a.publicado_por.split("·")[1].strip()
+            a.publicado_por = f"agente · {nombre} · {conteo[n]} avisos"
+            a.es_dueno_directo = a.verificar = False
+            cambiados += 1
+    return cambiados
+
+
+def _aplicar_historial_agentes(anuncios: list[Listing], operacion: str) -> None:
+    """Marca como agente a quien la revisión diaria ya vio con varios avisos en toda Bogotá."""
+    from . import diario
+    for a in anuncios:
+        if (a.es_dueno_directo or a.verificar) and a.url:
+            try:
+                h = diario.por_url(a.url, operacion)
+            except Exception:  # noqa: BLE001 - el historial es opcional
+                h = None
+            if h and h.get("agente"):
+                a.es_dueno_directo = a.verificar = False
+                a.publicado_por = f"agente · {h['agente']} avisos en Bogotá"
+
+
 def _filtrar(anuncios, solo_dueno, con_telefono, area_min, precio_max) -> list[Listing]:
     return [
         a for a in anuncios
@@ -151,6 +192,8 @@ def buscar(barrio: str, fuentes: list[Source], operacion: str = "venta", solo_du
     for a in todos:
         a.barrio = a.barrio or barrio
     unicos = _sin_duplicados(todos)
+    marcar_agentes(unicos)
+    _aplicar_historial_agentes(unicos, operacion)
     filtrados = _filtrar(unicos, solo_dueno, con_telefono, area_min, precio_max)
     filtrados.sort(key=lambda a: a.precio_m2)
     ocultos = sum(1 for a in unicos if not (a.es_dueno_directo or a.verificar)) if solo_dueno else 0
@@ -224,6 +267,8 @@ def buscar_ciudad(fuentes: list[Source], operacion: str = "venta", solo_dueno: b
     else:
         todos, errores, por_fuente, publicados = _recolectar(fuentes, "", operacion)
         unicos = _sin_duplicados(todos)
+        marcar_agentes(unicos)
+        _aplicar_historial_agentes(unicos, operacion)
         if not errores or unicos:
             _CACHE[clave] = (time.time(), unicos, errores, por_fuente, publicados)
 
