@@ -912,3 +912,15 @@ def test_historial_actualiza_titulo_y_barrio(tmp_path, monkeypatch):
     diario.registrar(h, nuevo, "venta", "Usaquén", "2026-11-10", False, ciudad=True)
     e = next(iter(h.values()))
     assert (e["titulo"], e["barrio"], e["zona"]) == ("Apartamento Usaquén, Bogotá", "Usaquén", "Usaquén")
+
+
+def test_tarjetas_sin_enlace_normal_rentola():
+    from comparam.sources.extractor import MUESTRAS, extraer_de_tarjetas
+    html = """<div class="card" data-url="/arriendo/123"><div><span>$ 1.200.000 / mes</span><span>68 m²</span>
+    <span>3 habitaciones</span><p>Chapinero Alto, Bogotá</p></div></div>
+    <div class="card" onclick="location.href='https://rentola.co.com/a/9'"><span>$ 2.000.000</span><span>50 m²</span>
+    <p>Apartamento en arriendo Cedritos, Bogotá D.C.</p></div>"""
+    a = extraer_de_tarjetas(html, "rentola", "https://rentola.co.com", "arriendo")
+    assert [(x.barrio, x.url) for x in a] == [("Chapinero Alto", "https://rentola.co.com/arriendo/123"),
+                                              ("Cedritos", "https://rentola.co.com/a/9")]
+    assert a[0].habitaciones == 3 and MUESTRAS["rentola"].startswith("tarjeta:")
