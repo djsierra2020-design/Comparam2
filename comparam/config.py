@@ -27,6 +27,10 @@ def crear_fuentes(nombres: list[str] | None = None, csv: list[str] | None = None
             fuentes.append(PORTALES[n](paginas=paginas, detalle=detalle))
         else:
             raise ValueError(f"Fuente desconocida: {n}")
+    # MercadoLibre por su API oficial, solo si están las credenciales de desarrollador.
+    from .sources import mercadolibre_api
+    if todos and mercadolibre_api.configurado():
+        fuentes.append(mercadolibre_api.MercadoLibreAPI(paginas=paginas))
     if omitidos and todos:  # sin navegador: sus anuncios guardados por la revisión diaria
         from .sources.guardados import Guardados
         fuentes.append(Guardados())

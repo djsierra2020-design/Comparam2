@@ -33,6 +33,8 @@ jobs:
         env:
           COMPARAM_NAVEGADOR: "1"
           COMPARAM_PAGINAS_NAVEGADOR: "2"
+          ML_CLIENT_ID: ${{ secrets.ML_CLIENT_ID }}
+          ML_CLIENT_SECRET: ${{ secrets.ML_CLIENT_SECRET }}
         run: python -m comparam.diario
       - name: Guardar el historial en el repositorio
         if: always()
