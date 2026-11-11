@@ -231,6 +231,39 @@ def _limpiar_titulo(t: str) -> str:
     return re.sub(r"\s+", " ", t).strip(" ·-|")
 
 
+_LUGAR_TEXTO = re.compile(r"([A-ZÁÉÍÓÚÑ][\wÁÉÍÓÚÑáéíóúñü.'\- ]{2,40}?),\s*Bogot", re.U)
+
+
+def _barrio_en_texto(texto: str) -> str:
+    """Barrio en el texto de la tarjeta: «… Chapinero Alto, Bogotá …»."""
+    for m in _LUGAR_TEXTO.finditer(texto or ""):
+        candidato = re.sub(r"^(?:apartamento|apto|casa|en|arriendo|venta|\W)+\s*", "", m.group(1), flags=re.I).strip()
+        if candidato and not re.search(r"\d", candidato):
+            return candidato
+    return ""
+
+
+def _url_en_atributos(el, base_url: str) -> str:
+    """Enlace del anuncio en atributos (data-href, data-url, onclick…) cuando la tarjeta no usa <a>."""
+    padres = [p for p in list(el.parents)[:3] if getattr(p, "attrs", None) is not None]
+    for nodo in [el, *el.find_all(True)[:200], *padres]:
+        for k, v in nodo.attrs.items():
+            if not isinstance(v, str):
+                continue
+            if k in ("data-href", "data-url", "data-link", "href") and v.strip() and not v.startswith("#"):
+                return urljoin(base_url, v.strip())
+            if k == "onclick" and (m := re.search(r"['\"](/[^'\"]+|https?://[^'\"]+)['\"]", v)):
+                return urljoin(base_url, m.group(1))
+    return ""
+
+
+def _muestra_tarjeta(el, texto: str) -> str:
+    """Texto y atributos de una tarjeta (para el diagnóstico)."""
+    attrs = {k: (" ".join(v) if isinstance(v, list) else str(v))[:60] for k, v in el.attrs.items()}
+    hijos = sorted({k for h in el.find_all(True)[:60] for k in h.attrs if k.startswith("data-")})
+    return f"<{el.name} {attrs}> atributos data de los hijos: {hijos[:15]} · texto: {texto[:400]}"
+
+
 def extraer_de_tarjetas(html: str, fuente: str, base_url: str, operacion: str = "venta",
                         barrio_por_defecto: str = "") -> list[Listing]:
     """Lee los anuncios desde las tarjetas visibles de la página (precio, área y enlace), para
@@ -267,7 +300,7 @@ def extraer_de_tarjetas(html: str, fuente: str, base_url: str, operacion: str = 
         enlace = el if el.name == "a" and el.get("href") else el.find("a", href=True)
         if enlace is None:
             enlace = el.find_parent("a", href=True)
-        url = urljoin(base_url, enlace["href"]) if enlace is not None else ""
+        url = urljoin(base_url, enlace["href"]) if enlace is not None else _url_en_atributos(el, base_url)
         clave = (url, precio, area)
         if clave in vistos:
             continue
@@ -277,9 +310,11 @@ def extraer_de_tarjetas(html: str, fuente: str, base_url: str, operacion: str = 
         titulo = _limpiar_titulo(titulo)[:120]
         if not barrio_por_defecto:
             from ..busqueda import zona_de  # barrio del título: «… en venta en Modelia, Fontibón»
-            barrio_tarjeta = zona_de(Listing(fuente, titulo, "", 1, 1))
+            barrio_tarjeta = zona_de(Listing(fuente, titulo, "", 1, 1)) or _barrio_en_texto(texto)
         else:
             barrio_tarjeta = barrio_por_defecto
+        if not anuncios:
+            MUESTRAS[fuente] = "tarjeta: " + _muestra_tarjeta(el, texto)  # la más reciente
         if _NO_APTO.search(titulo) or _NO_APTO.search(texto[:200]):
             continue
         etiqueta, dueno = clasificar_anunciante("", "", texto)
