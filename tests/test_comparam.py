@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 from comparam.busqueda import buscar, buscar_ciudad, es_del_barrio, zona_de
@@ -938,3 +939,42 @@ def test_tarjeta_rentola_real():
     assert (x.barrio, x.titulo, x.precio, x.area_m2, x.habitaciones) == \
         ("Fontibón", "Apartamento en Fontibón", 1_000_000, 80, 4)
     assert x.publicado == (date.today() - timedelta(days=12)).isoformat()
+
+
+def test_persona_con_varios_avisos_es_agente(tmp_path, monkeypatch):
+    from datetime import date
+    from comparam import diario
+    from comparam.busqueda import marcar_agentes
+
+    def anuncio(url, quien, precio):
+        a = _l("Apartamento en Venta en Quinta paredes, Bogotá")
+        a.url, a.precio, a.publicado_por = url, precio, quien
+        a.verificar = quien.startswith("verificar")
+        a.es_dueno_directo = quien.startswith("persona natural")
+        return a
+
+    lista = [anuncio("u1", "verificar · SANDRA REY", 560e6), anuncio("u2", "verificar · Sandra Rey", 420e6),
+             anuncio("u3", "persona natural · Andrea", 300e6)]
+    assert marcar_agentes(lista) == 2
+    assert lista[0].publicado_por == "agente · SANDRA REY · 2 avisos" and not lista[0].verificar
+    assert lista[2].es_dueno_directo  # una sola publicación: sigue siendo dueño directo
+
+    class P:
+        nombre = "fincaraiz"
+
+        def buscar(self, barrio, operacion="venta"):
+            return [anuncio("u1", "verificar · SANDRA REY", 560e6), anuncio("u2", "verificar · SANDRA REY", 420e6),
+                    anuncio("u3", "persona natural · Andrea", 300e6)]
+
+    r = buscar("Quinta Paredes", [P()])
+    assert [a.url for a in r.anuncios] == ["u3"] and r.ocultos == 2
+
+    # Revisión diaria: guarda la marca de agente (sin el nombre) y deja de contar como dueño
+    monkeypatch.setattr(diario, "HISTORIAL", tmp_path / "h.json")
+    monkeypatch.setattr(diario, "CARPETA_DIA", tmp_path / "d")
+    diario.correr({"barrios": ["Quinta Paredes"], "operaciones": ["venta"], "toda_bogota": False},
+                  lambda op: [P()], date(2026, 11, 11))
+    h = diario.cargar_json(diario.HISTORIAL, {})
+    sandra = [e for e in h.values() if e["url"] in ("u1", "u2")]
+    assert all(e["agente"] == 2 and not e["dueno_directo"] and not e["verificar"] for e in sandra)
+    assert "SANDRA" not in json.dumps(h, ensure_ascii=False).upper()
