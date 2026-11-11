@@ -502,7 +502,7 @@ def test_sin_navegador_se_omiten_habi_y_houm(monkeypatch):
     from comparam.config import crear_fuentes
     from comparam.sources import PORTALES
     monkeypatch.delenv("COMPARAM_NAVEGADOR", raising=False)
-    base = ["fincaraiz", "ciencuadras", "rentola", "mitula"]
+    base = ["fincaraiz", "ciencuadras", "rentola"]
     # Sin navegador (Render): Metrocuadrado, Habi y Houm salen de los anuncios guardados
     assert [f.nombre for f in crear_fuentes()] == base + ["guardados"]
     assert [f.nombre for f in crear_fuentes(list(PORTALES))] == base + ["guardados"]
