@@ -373,3 +373,24 @@ class Rentola(PortalCiudad):
             if "no se pudo conectar" not in str(info.get("error", "")):
                 return info
         return info
+
+
+class Mitula(PortalCiudad):
+    """Mitula: agregador que junta anuncios de varios portales (incluye algunos de Metrocuadrado).
+
+    Se usan sus páginas de «dueño directo» de Bogotá. Mitula marca «dueño directo» por el texto del
+    anuncio, sin verificarlo: los anuncios entran como «verificar (Mitula)» salvo que el propio texto
+    lo confirme (entonces quedan como dueño directo)."""
+    nombre = "mitula"
+    base_url = "https://casas.mitula.com.co"
+    operaciones = {"venta": "", "arriendo": "arriendo-"}
+    plantilla_ciudad = base_url + "/casas/{operacion}apartamentos-due%C3%B1o-directo-bogota?page={pagina}"
+
+    def buscar(self, barrio: str, operacion: str = "venta") -> list[Listing]:
+        self.detalle = False
+        anuncios = super().buscar(barrio, operacion)
+        for a in anuncios:
+            if not a.es_dueno_directo and "inmobiliaria" not in (a.publicado_por or ""):
+                # Sin «·» en la etiqueta: no se confunde con el nombre de una persona al contar avisos.
+                a.verificar, a.publicado_por = True, "verificar (Mitula: «dueño directo»)"
+        return anuncios
