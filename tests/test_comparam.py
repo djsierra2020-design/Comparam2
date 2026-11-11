@@ -502,7 +502,7 @@ def test_sin_navegador_se_omiten_habi_y_houm(monkeypatch):
     from comparam.config import crear_fuentes
     from comparam.sources import PORTALES
     monkeypatch.delenv("COMPARAM_NAVEGADOR", raising=False)
-    base = ["fincaraiz", "ciencuadras", "rentola"]
+    base = ["fincaraiz", "ciencuadras", "rentola", "mitula"]
     # Sin navegador (Render): Metrocuadrado, Habi y Houm salen de los anuncios guardados
     assert [f.nombre for f in crear_fuentes()] == base + ["guardados"]
     assert [f.nombre for f in crear_fuentes(list(PORTALES))] == base + ["guardados"]
@@ -984,3 +984,38 @@ def test_nombres_de_empresa_mal_escritos():
     assert not parece_persona("LAB G Real State")
     assert not parece_persona("Bogota Real Estate Team")
     assert parece_persona("GLORIA GAMBOA") and parece_persona("Esperanza Domínguez P")
+
+
+def test_mitula():
+    from comparam.busqueda import nombre_anunciante
+    from comparam.sources import Mitula
+
+    tarjeta_sin_anunciante = """<div class="c"><a href="/a/77"><h3>Apartamento en arriendo en Suba, Bogotá</h3></a>
+      <p>$ 1.500.000</p><p>60 m²</p></div>"""
+
+    class Resp:
+        status_code = 200
+
+        def __init__(self, url, text):
+            self.url, self.text = url, text
+
+    class Sesion:
+        headers = {}
+
+        def __init__(self, html):
+            self.urls, self.html = [], html
+
+        def get(self, url, timeout=None):
+            self.urls.append(url)
+            return Resp(url, self.html if "page=1" in url else "<html></html>")
+
+    ses = Sesion(tarjeta_sin_anunciante)
+    a = Mitula(sesion=ses, pausa=0, paginas=1).buscar("", "arriendo")
+    assert ses.urls[0] == "https://casas.mitula.com.co/casas/arriendo-apartamentos-due%C3%B1o-directo-bogota?page=1"
+    assert len(a) == 1 and a[0].verificar and a[0].publicado_por == "verificar (Mitula: «dueño directo»)"
+    assert nombre_anunciante(a[0]) == ""  # no se cuenta como una persona con muchos avisos
+    assert Mitula().url_busqueda("", "venta", 2).endswith("/casas/apartamentos-due%C3%B1o-directo-bogota?page=2")
+    # Con datos del anunciante: el dueño confirmado se mantiene y la inmobiliaria también
+    v = Mitula(sesion=Sesion(FIX.read_text()), pausa=0, paginas=1).buscar("", "venta")
+    assert sorted((x.es_dueno_directo, x.verificar, x.publicado_por == "inmobiliaria") for x in v) == \
+        [(False, False, True), (True, False, False), (True, False, False)]
