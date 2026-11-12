@@ -149,6 +149,7 @@ CREATE TABLE IF NOT EXISTS entradas (
     origen TEXT NOT NULL,
     eliminado_en TEXT,
     eliminado_por INTEGER REFERENCES personal(id),
+    espera_desde TEXT,
     creado_en TEXT NOT NULL,
     UNIQUE (torneo_id, jugador_id, numero)
 );
@@ -321,6 +322,8 @@ AJUSTES_POR_DEFECTO = {
     "minutos_codigo": "5",
     # Fase 1: el celular solo consulta. En fase 2 se enciende la compra desde el celular.
     "compras_desde_celular": "0",
+    # Capacidad física de la sala: 30 mesas (de 9 asientos por defecto = 270 jugadores sentados a la vez).
+    "mesas_sala": "30",
 }
 
 
@@ -356,6 +359,9 @@ class BaseDatos:
         with self._bloqueo:
             c = self.conexion()
             c.executescript(ESQUEMA)
+            columnas = {r[1] for r in c.execute("PRAGMA table_info(entradas)")}
+            if "espera_desde" not in columnas:  # bases creadas antes de la lista de alternos
+                c.execute("ALTER TABLE entradas ADD COLUMN espera_desde TEXT")
             for k, v in AJUSTES_POR_DEFECTO.items():
                 c.execute("INSERT OR IGNORE INTO ajustes (clave, valor) VALUES (?, ?)", (k, v))
             c.commit()

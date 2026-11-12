@@ -306,6 +306,12 @@ def api_sentar_inscritos(tid):
     return jsonify(movimientos=T.sentar_inscritos(db(), _pid(), tid))
 
 
+@bp.post("/api/torneos/<int:tid>/sentar-alternos")
+@personal("floor")
+def api_sentar_alternos(tid):
+    return jsonify(movimientos=T.sentar_alternos(db(), _pid(), tid))
+
+
 @bp.post("/api/torneos/<int:tid>/inscribir")
 @personal("caja")
 def api_inscribir(tid):
@@ -324,7 +330,7 @@ def api_sentar_qr():
 @bp.post("/api/entradas/<int:eid>/sentar")
 @personal("floor")
 def api_sentar(eid):
-    return jsonify(T.sentar(db(), eid, _pid()))
+    return jsonify(T.sentar_o_esperar(db(), eid, _pid()))
 
 
 @bp.post("/api/entradas/<int:eid>/eliminar")
@@ -501,8 +507,8 @@ def api_demo_sms():
 
 
 def _asiento(entrada_id):
-    return db().uno("SELECT m.numero AS mesa, e.asiento FROM entradas e LEFT JOIN mesas m ON m.id = e.mesa_id "
-                    "WHERE e.id = ?", (entrada_id,))
+    return db().uno("SELECT m.numero AS mesa, e.asiento, e.espera_desde IS NOT NULL AS alterno FROM entradas e "
+                    "LEFT JOIN mesas m ON m.id = e.mesa_id WHERE e.id = ?", (entrada_id,))
 
 
 # --- App del jugador -----------------------------------------------------------------------------
@@ -547,6 +553,9 @@ def api_jugador_inicio():
     j = caja.jugador(db(), jid)
     mis = db().todos(
         "SELECT e.id, e.torneo_id, e.estado, e.codigo_qr, e.asiento, e.fichas, e.numero, m.numero AS mesa, "
+        "CASE WHEN e.estado = 'inscrito' AND e.espera_desde IS NOT NULL THEN (SELECT COUNT(*) FROM entradas x "
+        "WHERE x.torneo_id = e.torneo_id AND x.estado = 'inscrito' AND x.espera_desde IS NOT NULL AND "
+        "(x.espera_desde < e.espera_desde OR (x.espera_desde = e.espera_desde AND x.id <= e.id))) END AS turno_alterno, "
         "t.nombre AS torneo, t.fecha, t.estado AS estado_torneo FROM entradas e JOIN torneos t ON t.id = e.torneo_id "
         "LEFT JOIN mesas m ON m.id = e.mesa_id WHERE e.jugador_id = ? AND t.estado IN ('programado','en_curso') "
         "AND e.estado != 'eliminado' ORDER BY t.fecha", (jid,))

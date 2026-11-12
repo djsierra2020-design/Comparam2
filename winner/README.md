@@ -16,6 +16,10 @@ dentro de esta misma app Flask.
 - **Sentado automático**: se escanea el QR del jugador (o se escribe el código) y queda en un asiento al azar de la mesa con menos jugadores.
 - **Tablero en vivo**: cada mesa con sus asientos, nombre, fichas y estado. Se actualiza cada 4 s.
 - **Balanceo**: avisa cuando hay 2 o más jugadores de diferencia entre mesas y lo corrige con un botón.
+- **Sala de 30 mesas de 9** (270 asientos, configurable en Administración). No deja abrir más mesas que las que tiene la sala.
+- **Lista de alternos**: con aforo de 300 y 270 asientos, quien llega con la sala llena queda en espera por orden de llegada,
+  ve su turno en la app y entra apenas se libera un asiento («Sentar alternos»). Nadie se adelanta, ni las re-entradas.
+  Mientras haya alternos esperando, el sistema no sugiere cerrar mesas.
 - **Cierre de mesas**: avisa cuándo sobra una mesa. Al cerrarla, reparte a sus jugadores en los asientos libres de las mesas con menos gente. Si no caben, no mueve a nadie.
 - **Historial de movimientos**: quién se movió, de qué mesa y asiento a cuál, el motivo, la hora y quién lo hizo. El jugador recibe aviso en la app.
 - **Fichas**: conteos oficiales con historial, líderes, stack promedio y diferencia entre las fichas esperadas (entradas × stack + recompras + add-ons) y las contadas.
@@ -41,9 +45,10 @@ pero está **apagada** hasta que el área jurídica de Winner la apruebe. Se enc
 
 ## Demo
 
-Con `WINNER_DEMO=1` (así está en `render.yaml`) la app arranca con datos ficticios: 40 jugadores y un torneo en curso.
+Con `WINNER_DEMO=1` (así está en `render.yaml`) la app arranca con datos ficticios del tamaño real: 300 cajas,
+torneo en curso con 296 inscritos en 30 mesas de 9 (270 sentados y 26 alternos).
 - Personal: `admin`, `director`, `floor`, `crupier`, `cajero` y `supervisor`, todos con la clave `winner2026`.
-- Jugador: celulares `3000000000` a `3000000039`. El código SMS aparece en la misma pantalla.
+- Jugador: celulares `3000000000` a `3000000299`. El código SMS aparece en la misma pantalla.
 
 En el plan gratis de Render el disco se borra con cada despliegue, así que la demo vuelve a empezar desde cero.
 
@@ -68,8 +73,9 @@ aparecen al abrir la app), lista de espera de cash y mover a jugadores al asient
 python -m pytest tests/test_winner.py
 ```
 
-Incluye un torneo completo de 300 jugadores (el aforo máximo de Winner) hasta el ganador. Después de cada eliminación
-verifica que ninguna mesa tenga más de un jugador de diferencia con otra y que estén abiertas solo las mesas necesarias.
+Incluye el escenario real: sala de 30 mesas de 9 con 300 inscritos (270 sentados + 30 alternos), jugado hasta el
+ganador. Después de cada eliminación verifica que los alternos entren en orden de llegada, que ninguna mesa tenga más de
+un jugador de diferencia con otra y que estén abiertas solo las mesas necesarias.
 
 **Prueba de carga** (300 celulares con la app abierta + 3 pantallas de floor, gunicorn con 1 proceso y 4 hilos):
 0 errores, el celular responde en 3 ms (mediana) y el tablero de 34 mesas en 16 ms. Para el torneo real se recomienda

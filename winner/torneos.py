@@ -110,6 +110,11 @@ def abrir_mesas(db, personal_id, torneo_id, cantidad=1) -> list[int]:
         t = torneo(db, torneo_id)
         if t["estado"] in ("finalizado", "cancelado"):
             raise ErrorNegocio("El torneo ya terminó")
+        abiertas = mesas_abiertas_sala(db)
+        maximo = db.ajuste("mesas_sala")
+        if abiertas + cantidad > maximo:
+            raise ErrorNegocio(f"La sala tiene {maximo} mesas y ya hay {abiertas} abiertas. "
+                               "Los jugadores que lleguen quedan en la lista de alternos.", 409)
         siguiente = db.valor("SELECT COALESCE(MAX(numero), 0) FROM mesas WHERE torneo_id = ?", (torneo_id,))
         ids = []
         for i in range(cantidad):
@@ -117,6 +122,12 @@ def abrir_mesas(db, personal_id, torneo_id, cantidad=1) -> list[int]:
                                  (torneo_id, siguiente + i + 1, t["asientos_por_mesa"])).lastrowid)
         db.auditar(personal_id, "abrir_mesas", "torneo", torneo_id, f"{cantidad} mesa(s)")
         return ids
+
+
+def mesas_abiertas_sala(db) -> int:
+    """Mesas físicas en uso por todos los torneos activos de la sala."""
+    return db.valor("SELECT COUNT(*) FROM mesas m JOIN torneos t ON t.id = m.torneo_id "
+                    "WHERE m.estado = 'abierta' AND t.estado IN ('programado','en_curso')")
 
 
 # --- Inscripción -------------------------------------------------------------------------------
@@ -217,7 +228,7 @@ def inscribir(db, torneo_id, jugador_id, *, origen, personal_id=None, pago="sald
                 descripcion=f"{nombre} {t['nombre']}")
         db.auditar(personal_id, tipo, "entrada", eid, f"{origen}/{pago}")
         if sentar_ya or tipo == "reentrada" and origen == "app":
-            sentar(db, eid, personal_id, motivo=tipo)
+            sentar_o_esperar(db, eid, personal_id, motivo=tipo)
         else:
             db.notificar(jugador_id, "inscripcion", f"Inscrito: {t['nombre']}",
                          "Muestre su código QR en el ingreso para que le asignen asiento.")
@@ -272,7 +283,9 @@ def sentar(db, entrada_id, personal_id=None, motivo="sentado") -> dict:
             raise ErrorNegocio("El torneo ya terminó")
         candidatas = [m for m in _ocupacion(db, e["torneo_id"]) if _libres(m)]
         if not candidatas:
-            raise ErrorNegocio("No hay asientos libres: abra una mesa nueva", 409)
+            if mesas_abiertas_sala(db) < db.ajuste("mesas_sala"):
+                raise ErrorNegocio("No hay asientos libres: abra una mesa nueva", 409)
+            raise ErrorNegocio("Sala llena: el jugador queda en la lista de alternos", 409)
         menor = min(len(m["ocupados"]) for m in candidatas)
         mesa = _azar.choice([m for m in candidatas if len(m["ocupados"]) == menor])
         return _mover(db, e, mesa, _azar.choice(_libres(mesa)), motivo, personal_id)
@@ -288,15 +301,62 @@ def sentar_por_qr(db, codigo, personal_id) -> dict:
     if e["estado"] in ("sentado", "reservado"):
         m = db.uno("SELECT numero FROM mesas WHERE id = ?", (e["mesa_id"],))
         raise ErrorNegocio(f"Ya está sentado en mesa {m['numero']}, asiento {e['asiento']}", 409)
-    resultado = sentar(db, e["id"], personal_id, "sentado")
+    if e["estado"] == "eliminado":
+        raise ErrorNegocio("Esa entrada ya fue eliminada", 409)
+    resultado = sentar_o_esperar(db, e["id"], personal_id, "sentado")
     resultado["nombre"] = db.valor("SELECT nombre FROM jugadores WHERE id = ?", (e["jugador_id"],))
     return resultado
 
 
-def sentar_inscritos(db, personal_id, torneo_id) -> list[dict]:
+def sentar_o_esperar(db, entrada_id, personal_id=None, motivo="sentado") -> dict:
+    """Sienta al jugador o, si la sala está llena, lo pone en la lista de alternos por orden de llegada."""
+    with db.transaccion() as c:
+        if not db.valor("SELECT 1 FROM entradas WHERE id = ? AND espera_desde IS NOT NULL", (entrada_id,)):
+            # Si ya hay alternos esperando, nadie se les adelanta.
+            e = entrada(db, entrada_id)
+            if not db.valor("SELECT 1 FROM entradas WHERE torneo_id = ? AND estado = 'inscrito' "
+                            "AND espera_desde IS NOT NULL", (e["torneo_id"],)):
+                try:
+                    return sentar(db, entrada_id, personal_id, motivo)
+                except ErrorNegocio as err:
+                    if "Sala llena" not in err.mensaje:
+                        raise
+            c.execute("UPDATE entradas SET espera_desde = ? WHERE id = ?", (ahora(), entrada_id))
+        e = entrada(db, entrada_id)
+        turno = db.valor("SELECT COUNT(*) FROM entradas WHERE torneo_id = ? AND estado = 'inscrito' "
+                         "AND espera_desde IS NOT NULL AND (espera_desde < ? OR (espera_desde = ? AND id <= ?))",
+                         (e["torneo_id"], e["espera_desde"], e["espera_desde"], e["id"]))
+        db.notificar(e["jugador_id"], "asiento", f"Lista de alternos: turno {turno}",
+                     "La sala está llena. Le avisaremos cuando tenga asiento; permanezca cerca de la sala.")
+        return {"entrada_id": e["id"], "jugador_id": e["jugador_id"], "alterno": True, "turno": turno}
+
+
+def alternos(db, torneo_id) -> list[dict]:
+    return db.todos("SELECT e.id, e.codigo_qr, e.espera_desde, j.nombre FROM entradas e "
+                    "JOIN jugadores j ON j.id = e.jugador_id WHERE e.torneo_id = ? AND e.estado = 'inscrito' "
+                    "AND e.espera_desde IS NOT NULL ORDER BY e.espera_desde, e.id", (torneo_id,))
+
+
+def sentar_alternos(db, personal_id, torneo_id) -> list[dict]:
+    """Sienta a los alternos en orden de llegada mientras haya asientos libres."""
+    movimientos = []
     with db.transaccion():
-        return [sentar(db, e["id"], personal_id) for e in db.todos(
-            "SELECT id FROM entradas WHERE torneo_id = ? AND estado = 'inscrito' ORDER BY id", (torneo_id,))]
+        vencer_reservas(db)
+        for a in alternos(db, torneo_id):
+            if not any(_libres(m) for m in _ocupacion(db, torneo_id)):
+                break
+            movimientos.append(sentar(db, a["id"], personal_id, "alterno"))
+        if movimientos:
+            db.auditar(personal_id, "sentar_alternos", "torneo", torneo_id, f"{len(movimientos)} alterno(s)")
+    return movimientos
+
+
+def sentar_inscritos(db, personal_id, torneo_id) -> list[dict]:
+    """Sienta a todos los inscritos sin asiento; los que no quepan pasan a la lista de alternos."""
+    with db.transaccion():
+        return [sentar_o_esperar(db, e["id"], personal_id) for e in db.todos(
+            "SELECT id FROM entradas WHERE torneo_id = ? AND estado = 'inscrito' AND espera_desde IS NULL "
+            "ORDER BY id", (torneo_id,))]
 
 
 def balancear(db, personal_id, torneo_id) -> list[dict]:
@@ -351,7 +411,12 @@ def sugerencias(db, torneo_id) -> list[dict]:
         return []
     salida = []
     conteo = [len(m["ocupados"]) for m in mesas]
-    vivos = sum(conteo)
+    en_espera = len(alternos(db, torneo_id))
+    libres = sum(len(_libres(m)) for m in mesas)
+    if en_espera and libres:
+        salida.append({"tipo": "alternos", "texto": f"Hay {libres} asiento(s) libre(s) y {en_espera} alterno(s) "
+                                                     "esperando: siéntelos en orden de llegada."})
+    vivos = sum(conteo) + en_espera
     asientos = mesas[0]["asientos"]
     necesarias = max(1, math.ceil(vivos / asientos))
     if len(mesas) > necesarias:
@@ -556,10 +621,12 @@ def tablero(db, torneo_id) -> dict:
                              "fichas": e["fichas"] if e else None, "nombre": nombres.get(e["jugador_id"]) if e else None})
         mesas.append({"id": m["id"], "numero": m["numero"], "ocupados": len(m["ocupados"]), "asientos": asientos})
     inscritos = db.todos("SELECT e.id, e.codigo_qr, j.nombre FROM entradas e JOIN jugadores j ON j.id = e.jugador_id "
-                         "WHERE e.torneo_id = ? AND e.estado = 'inscrito' ORDER BY e.id", (torneo_id,))
+                         "WHERE e.torneo_id = ? AND e.estado = 'inscrito' AND e.espera_desde IS NULL ORDER BY e.id",
+                         (torneo_id,))
     vivos = db.valor("SELECT COUNT(*) FROM entradas WHERE torneo_id = ? AND estado IN ('inscrito','sentado','reservado')",
                      (torneo_id,))
-    return {"torneo": t, "mesas": mesas, "sin_asiento": inscritos, "vivos": vivos,
+    return {"torneo": t, "mesas": mesas, "sin_asiento": inscritos, "alternos": alternos(db, torneo_id), "vivos": vivos,
+            "mesas_sala": db.ajuste("mesas_sala"), "mesas_sala_abiertas": mesas_abiertas_sala(db),
             "entradas_totales": db.valor("SELECT COUNT(*) FROM entradas WHERE torneo_id = ?", (torneo_id,)),
             "sugerencias": sugerencias(db, torneo_id)}
 

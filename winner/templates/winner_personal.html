@@ -131,7 +131,7 @@
 <script>
 const ROLES = {cajero: "Cajero", crupier: "Crupier", floor: "Floor", director: "Director de torneo", supervisor: "Supervisor", admin: "Administrador"};
 const ESTADOS_T = {programado: "Programado", en_curso: "En curso", finalizado: "Finalizado", cancelado: "Cancelado"};
-const MOTIVOS = {sentado: "Sentado", balanceo: "Balanceo", cierre_mesa: "Cierre de mesa", recompra: "Recompra", reentrada: "Re-entrada", inscripcion: "Inscripción"};
+const MOTIVOS = {alterno: "Alterno sentado", sentado: "Sentado", balanceo: "Balanceo", cierre_mesa: "Cierre de mesa", recompra: "Recompra", reentrada: "Re-entrada", inscripcion: "Inscripción"};
 const TIPOS = {deposito: "Depósito", retiro: "Retiro", inscripcion: "Inscripción", recompra: "Recompra", reentrada: "Re-entrada", addon: "Add-on", premio: "Premio", correccion: "Corrección"};
 let yo = null, torneos = [], torneoId = null, tablero = null, pestana = "mesas", sondeo = null;
 const puede = p => !p || (yo && yo.permisos.includes(p));
@@ -205,10 +205,13 @@ async function cargarTablero() {
   const f = fichas.resumen;
   $("#kpis").innerHTML = [
     ["Estado", ESTADOS_T[t.estado]], ["Jugadores vivos", tablero.vivos], ["Entradas totales", tablero.entradas_totales],
-    ["Mesas abiertas", tablero.mesas.length], ["Stack promedio", miles(f.promedio)], ["Nivel", t.nivel],
+    ["Mesas abiertas (sala)", `${tablero.mesas_sala_abiertas} de ${tablero.mesas_sala}`],
+    ["Alternos esperando", tablero.alternos.length], ["Stack promedio", miles(f.promedio)], ["Nivel", t.nivel],
   ].map(([e, v]) => `<div class="kpi"><div class="e">${e}</div><div class="v">${esc(v)}</div></div>`).join("");
   $("#sugerencias").innerHTML = tablero.sugerencias.map(s => `<div class="aviso"><span>⚠️ ${esc(s.texto)}</span>${puede("floor") ?
-    (s.tipo === "cerrar_mesa" ? `<button class="oro" onclick="cerrarMesa(${s.mesa_id}, ${s.mesa})">Cerrar mesa ${s.mesa}</button>` : `<button class="oro" onclick="balancear()">Balancear ahora</button>`) : ""}</div>`).join("");
+    (s.tipo === "cerrar_mesa" ? `<button class="oro" onclick="cerrarMesa(${s.mesa_id}, ${s.mesa})">Cerrar mesa ${s.mesa}</button>`
+      : s.tipo === "alternos" ? `<button class="oro" onclick="sentarAlternos()">Sentar alternos</button>`
+      : `<button class="oro" onclick="balancear()">Balancear ahora</button>`) : ""}</div>`).join("");
   $("#nivel").textContent = t.nivel;
   const tog = (id, v) => { $(id).textContent = v ? "Abierta ✓" : "Cerrada"; $(id).className = v ? "auto" : "sec auto"; };
   tog("#t-registro", t.registro_abierto); tog("#t-recompras", t.recompras_abiertas); tog("#t-addon", t.addon_abierto);
@@ -220,7 +223,8 @@ async function cargarTablero() {
         ? `<div class="asiento libre"><b>${a.asiento}</b> libre</div>`
         : `<button class="asiento ${a.estado}" onclick="abrirAsiento(${a.entrada_id})"><b>${a.asiento}</b>${a.estado === "reservado" ? "⏳ " : ""}<span class="nom">${esc(a.nombre)}</span><span class="fi">${a.estado === "reservado" ? "esperando recompra" : miles(a.fichas)}</span></button>`).join("")}</div></div>`).join("")
     || `<p class="suave">No hay mesas abiertas.</p>`;
-  $("#sin-asiento").innerHTML = tablero.sin_asiento.length ? `<table>${tablero.sin_asiento.map(e => `<tr><td>${esc(e.nombre)}</td><td class="suave">${e.codigo_qr}</td><td class="n">${puede("floor") ? `<button class="sec" onclick="sentarEntrada(${e.id})">Sentar</button>` : ""}</td></tr>`).join("")}</table>` : "Ninguno.";
+  $("#sin-asiento").innerHTML = (tablero.sin_asiento.length ? `<p style="margin:0 0 4px">Inscritos que aún no llegan:</p><table>${tablero.sin_asiento.map(e => `<tr><td>${esc(e.nombre)}</td><td class="suave">${e.codigo_qr}</td><td class="n">${puede("floor") ? `<button class="sec" onclick="sentarEntrada(${e.id})">Sentar</button>` : ""}</td></tr>`).join("")}</table>` : "<p style='margin:0'>Todos los inscritos tienen asiento.</p>")
+    + (tablero.alternos.length ? `<p style="margin:12px 0 4px;color:var(--oro)">Lista de alternos (sala llena), en orden de llegada:</p><table>${tablero.alternos.map((a, i) => `<tr><td>${i + 1}.</td><td>${esc(a.nombre)}</td><td class="suave">desde ${hora(a.espera_desde)}</td></tr>`).join("")}</table>` : "");
   const dif = f.diferencia;
   $("#fichas").innerHTML = `<div class="kpis"><div class="kpi"><div class="e">Esperadas</div><div class="v">${miles(f.esperado)}</div></div>
     <div class="kpi"><div class="e">Contadas en mesa</div><div class="v">${miles(f.en_juego)}</div></div>
@@ -239,21 +243,29 @@ window.cerrarMesa = async (id, numero) => {
   if (!await confirmar(`¿Cerrar la mesa ${numero}?`, "Sus jugadores se reparten en los asientos libres de las mesas con menos jugadores.")) return;
   accion(async () => { const r = await api(`/torneos/${torneoId}/mesas/${id}/cerrar`, "POST", {}); await cargarTablero(); mostrarMovimientos(`Mesa ${numero} cerrada`, r.movimientos); });
 };
+window.sentarAlternos = () => accion(async () => { const r = await api(`/torneos/${torneoId}/sentar-alternos`, "POST", {}); await cargarTablero(); mostrarMovimientos("Alternos sentados", r.movimientos); });
 window.balancear = () => accion(async () => { const r = await api(`/torneos/${torneoId}/balancear`, "POST", {}); await cargarTablero(); mostrarMovimientos("Balanceo", r.movimientos); });
 $("#b-balancear").onclick = () => window.balancear();
 $("#b-abrir-mesa").onclick = async () => {
   const d = await pedir("Abrir mesas", [{n: "cantidad", l: "Cantidad", tipo: "number", valor: 1}]);
   if (d) accion(async () => { await api(`/torneos/${torneoId}/mesas`, "POST", d); cargarTablero(); });
 };
-$("#b-sentar-todos").onclick = () => accion(async () => { const r = await api(`/torneos/${torneoId}/sentar-inscritos`, "POST", {}); aviso(`${r.movimientos.length} jugador(es) sentados`); cargarTablero(); });
+$("#b-sentar-todos").onclick = () => accion(async () => {
+  const r = await api(`/torneos/${torneoId}/sentar-inscritos`, "POST", {});
+  const alt = r.movimientos.filter(m => m.alterno).length;
+  aviso(`${r.movimientos.length - alt} jugador(es) sentados` + (alt ? ` · ${alt} a la lista de alternos` : ""));
+  cargarTablero();
+});
 $("#b-iniciar").onclick = () => accion(async () => { await api(`/torneos/${torneoId}/iniciar`, "POST", {}); await cargarTorneos(); cargarTablero(); });
-window.sentarEntrada = id => accion(async () => { const r = await api(`/entradas/${id}/sentar`, "POST", {}); aviso(`Mesa ${r.a_mesa}, asiento ${r.a_asiento}`); cargarTablero(); });
+window.sentarEntrada = id => accion(async () => { const r = await api(`/entradas/${id}/sentar`, "POST", {}); aviso(r.alterno ? `Sala llena: alterno, turno ${r.turno}` : `Mesa ${r.a_mesa}, asiento ${r.a_asiento}`); cargarTablero(); });
 
 async function sentarQR(codigo) {
   return accion(async () => {
     const r = await api("/qr", "POST", {codigo});
     $("#qr").value = "";
-    pedir(`${r.nombre}`, [], "Listo", `<p class="grande">Mesa ${r.a_mesa} · Asiento ${r.a_asiento}</p>`);
+    pedir(`${r.nombre}`, [], "Listo", r.alterno
+      ? `<p class="grande" style="color:var(--oro)">Alterno · turno ${r.turno}</p><p class="suave">La sala está llena. Se le avisará al celular cuando tenga asiento.</p>`
+      : `<p class="grande">Mesa ${r.a_mesa} · Asiento ${r.a_asiento}</p>`);
     cargarTablero();
   }, $("#b-qr"));
 }
@@ -374,7 +386,7 @@ window.inscribirJugador = async (id) => {
     {n: "sentar_ya", l: "Sentarlo ya (el jugador está en la sala)", tipo: "check"}], "Inscribir");
   if (d) accion(async () => {
     const r = await api(`/torneos/${d.torneo}/inscribir`, "POST", {jugador_id: id, pago: d.pago, sentar_ya: d.sentar_ya});
-    pedir("Inscrito", [], "Listo", r.asiento && r.asiento.mesa ? `<p class="grande">Mesa ${r.asiento.mesa} · Asiento ${r.asiento.asiento}</p>` : `<p>Código QR: <b>${r.entrada.codigo_qr}</b><br><span class="suave">El jugador lo ve en su app; el floor lo escanea para sentarlo.</span></p>`);
+    pedir("Inscrito", [], "Listo", r.asiento && r.asiento.alterno ? `<p class="grande" style="color:var(--oro)">Sala llena: lista de alternos</p>` : r.asiento && r.asiento.mesa ? `<p class="grande">Mesa ${r.asiento.mesa} · Asiento ${r.asiento.asiento}</p>` : `<p>Código QR: <b>${r.entrada.codigo_qr}</b><br><span class="suave">El jugador lo ve en su app; el floor lo escanea para sentarlo.</span></p>`);
     verJugador(id);
   });
 };
@@ -508,6 +520,7 @@ const NOMBRES_AJUSTE = {
   intentos_maximos: "Intentos fallidos antes de bloquear", minutos_bloqueo: "Minutos de bloqueo tras intentos fallidos",
   minutos_reserva_asiento: "Minutos de reserva de asiento para recomprar", minutos_codigo: "Vigencia del código al celular (min)",
   compras_desde_celular: "Compras desde el celular (0 = apagado, fase 1; 1 = encendido)",
+  mesas_sala: "Mesas físicas de la sala (límite de mesas abiertas)",
 };
 async function cargarAdmin() {
   const [pers, aj] = await Promise.all([api("/personal"), api("/ajustes")]);

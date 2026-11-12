@@ -118,31 +118,63 @@ def test_qr_sienta_una_sola_vez(db, staff):
         T.sentar_por_qr(db, "NOEXISTE", staff["floor"])
 
 
-def test_torneo_completo_balanceo_y_cierre_de_mesas(db, staff):
-    """Aforo máximo de Winner (300) hasta el ganador: nunca más de 1 de diferencia entre mesas y mesas mínimas."""
+def test_sala_de_30_mesas_con_300_jugadores_y_alternos(db, staff):
+    """Sala de Winner: 30 mesas de 9 (270 asientos) y aforo de 300 → 30 alternos que entran en orden.
+
+    Después de cada eliminación: alternos primero, nunca más de 1 de diferencia entre mesas y solo las
+    mesas necesarias abiertas.
+    """
     t = nuevo_torneo(db, staff, reentrada_max=1, recompra_max=1, recompra_precio=50_000, recompra_fichas=5_000)
-    T.abrir_mesas(db, staff["floor"], t, 34)
-    for i in range(300):
-        T.inscribir(db, t, nuevo_jugador(db, staff, i, celular=False), origen="caja",
-                    personal_id=staff["cajero"], pago="efectivo")
+    T.abrir_mesas(db, staff["floor"], t, 30)
+    with pytest.raises(ErrorNegocio, match="La sala tiene 30 mesas"):
+        T.abrir_mesas(db, staff["floor"], t, 1)
+    entradas = [T.inscribir(db, t, nuevo_jugador(db, staff, i, celular=False), origen="caja",
+                            personal_id=staff["cajero"], pago="efectivo")["id"] for i in range(300)]
     T.iniciar_torneo(db, staff["floor"], t)
-    T.sentar_inscritos(db, staff["floor"], t)
+    r = T.sentar_inscritos(db, staff["floor"], t)
+    assert sum(1 for m in r if m.get("alterno")) == 30
+    assert conteo_mesas(db, t) == [9] * 30
+    orden = [a["id"] for a in T.alternos(db, t)]
+    assert orden == entradas[270:]  # en orden de llegada
+    # Un QR escaneado con la sala llena también va al final de la fila (no se adelanta).
     rnd = random.Random(7)
+    sentados_alterno = []
     while True:
         sentados = db.todos("SELECT id FROM entradas WHERE torneo_id = ? AND estado = 'sentado'", (t,))
-        if len(sentados) <= 1:
+        if len(sentados) + len(T.alternos(db, t)) <= 1:
             break
         T.eliminar(db, staff["crupier"], rnd.choice(sentados)["id"])
         vencer_todo(db)
+        tipos = [s["tipo"] for s in T.sugerencias(db, t)]
+        if T.alternos(db, t):
+            assert "alternos" in tipos and "cerrar_mesa" not in tipos
+            sentados_alterno += [m["entrada_id"] for m in T.sentar_alternos(db, staff["floor"], t)]
         for s in T.sugerencias(db, t):
             if s["tipo"] == "cerrar_mesa":
                 T.cerrar_mesa(db, staff["floor"], t, s["mesa_id"])
         T.balancear(db, staff["floor"], t)
         c = conteo_mesas(db, t)
         assert max(c) - min(c) <= 1
-        assert len(c) == max(1, math.ceil(sum(c) / 9))
+        assert len(c) == min(30, max(1, math.ceil((sum(c) + len(T.alternos(db, t))) / 9)))
+    assert sentados_alterno == orden
     motivos = {h["motivo"] for h in T.historial_asientos(db, t, 100_000)}
-    assert {"sentado", "balanceo", "cierre_mesa"} <= motivos
+    assert {"sentado", "alterno", "balanceo", "cierre_mesa"} <= motivos
+
+
+def test_qr_con_sala_llena_va_a_alternos(db, staff):
+    db.conexion().execute("UPDATE ajustes SET valor = '1' WHERE clave = 'mesas_sala'")
+    t = nuevo_torneo(db, staff, asientos_por_mesa=2)
+    T.abrir_mesas(db, staff["floor"], t, 1)
+    es = [T.inscribir(db, t, nuevo_jugador(db, staff, i, celular=False), origen="caja",
+                      personal_id=staff["cajero"], pago="efectivo") for i in range(4)]
+    T.iniciar_torneo(db, staff["floor"], t)
+    assert T.sentar_por_qr(db, es[0]["codigo_qr"], staff["floor"])["a_mesa"] == 1
+    T.sentar_por_qr(db, es[1]["codigo_qr"], staff["floor"])
+    r = T.sentar_por_qr(db, es[3]["codigo_qr"], staff["floor"])
+    assert r["alterno"] and r["turno"] == 1
+    assert T.sentar_por_qr(db, es[2]["codigo_qr"], staff["floor"])["turno"] == 2
+    T.eliminar(db, staff["crupier"], es[0]["id"])
+    assert [m["entrada_id"] for m in T.sentar_alternos(db, staff["floor"], t)] == [es[3]["id"]]
 
 
 def test_cerrar_mesa_sin_espacio_no_mueve_a_nadie(db, staff):
@@ -351,7 +383,7 @@ def test_api_roles_y_tablero(cliente):
     assert cliente.post("/winner/api/personal/ingresar", json={"usuario": "crupier", "clave": "winner2026"}).status_code == 403
     assert cliente.post("/winner/api/personal/ingresar", json={"usuario": "crupier", "clave": "winner2026"}, headers=H).status_code == 200
     tb = cliente.get("/winner/api/torneos/1/tablero", headers=H).get_json()
-    assert tb["vivos"] == 36 and len(tb["mesas"]) == 5
+    assert tb["vivos"] == 296 and len(tb["mesas"]) == 30 and len(tb["alternos"]) == 26
     assert cliente.post("/winner/api/torneos", json={"nombre": "x"}, headers=H).status_code == 403
     entrada = next(a for m in tb["mesas"] for a in m["asientos"] if a["entrada_id"])["entrada_id"]
     assert cliente.post(f"/winner/api/entradas/{entrada}/eliminar", json={}, headers=H).get_json()["estado"] == "reservado"
@@ -368,7 +400,7 @@ def test_api_jugador_ingreso_y_saldo(cliente):
     inicio = cliente.get("/winner/api/jugador/inicio", headers=H).get_json()
     assert inicio["saldo"] > 0 and inicio["torneos"][0]["estado"] == "sentado"
     assert cliente.get("/winner/api/torneos", headers=H).status_code == 401  # la sesión de jugador no sirve para el panel
-    assert cliente.get("/winner/api/publico/1").get_json()["vivos"] == 36
+    assert cliente.get("/winner/api/publico/1").get_json()["vivos"] == 296
 
 
 def test_pantallas_cargan(cliente):

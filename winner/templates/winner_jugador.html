@@ -37,7 +37,7 @@
       <button id="b-ingresar" style="width:100%;margin-top:12px">Ingresar</button>
       <button id="b-volver" class="sec" style="width:100%;margin-top:8px">Cambiar celular</button>
     </div>
-    {% if demo %}<div class="aviso" style="margin-top:14px;font-size:13px;display:block">Demo: celulares <b>3000000000</b> a <b>3000000039</b>. En la demo los SMS se muestran aquí:<div id="sms-demo" class="suave"></div></div>{% endif %}
+    {% if demo %}<div class="aviso" style="margin-top:14px;font-size:13px;display:block">Demo: celulares <b>3000000000</b> a <b>3000000299</b>. En la demo los SMS se muestran aquí:<div id="sms-demo" class="suave"></div></div>{% endif %}
   </section>
 
   <section id="v-app" class="oculto">
@@ -127,6 +127,7 @@ async function refrescar(abrir = false) {
   $("#mis-torneos").innerHTML = r.torneos.length ? r.torneos.map(t => `<div style="margin-bottom:14px"><b>${esc(t.torneo)}</b> <span class="suave">${esc(t.fecha)}</span><br>
       ${t.estado === "sentado" ? `<div class="asiento-grande">Mesa ${t.mesa} · Asiento ${t.asiento}</div>`
         : t.estado === "reservado" ? `<span class="chip oro">Esperando su decisión de recompra</span>`
+        : t.turno_alterno ? `<div class="asiento-grande" style="font-size:22px">Alterno · turno ${t.turno_alterno}</div><p class="suave" style="margin:4px 0">Sala llena: le avisaremos cuando tenga asiento.</p>`
         : `<p class="suave" style="margin:6px 0">Muestre este código en el ingreso para que le asignen asiento:</p><div class="qr" id="qr-${t.id}"></div><div class="suave" style="margin-top:4px">${t.codigo_qr}</div>`}</div>`).join("")
     : `<p class="suave">No está inscrito en ningún torneo activo.</p>`;
   r.torneos.filter(t => t.estado === "inscrito").forEach(t => {
@@ -156,7 +157,7 @@ window.comprar = async (entrada, tipo, precio) => {
   const pin = await pedirPin(tipo === "recompra" ? "Recompra" : "Re-entrada", `Se descuentan <b>${pesos(precio)}</b> de su saldo.`);
   if (pin) accion(async () => {
     const r = await api(`/jugador/entradas/${entrada}/${tipo}`, "POST", {pin});
-    aviso(r.asiento ? `Siéntese en mesa ${r.asiento.mesa}, asiento ${r.asiento.asiento}` : "Recompra confirmada: vuelva a su asiento");
+    aviso(r.asiento ? (r.asiento.alterno ? "Sala llena: quedó en la lista de alternos" : `Siéntese en mesa ${r.asiento.mesa}, asiento ${r.asiento.asiento}`) : "Recompra confirmada: vuelva a su asiento");
     refrescar();
   });
 };
