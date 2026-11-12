@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import re
 import statistics
 import time
@@ -156,6 +157,25 @@ def _recolectar(fuentes: list[Source], barrio: str, operacion: str
     return todos, errores, por_fuente, publicados
 
 
+_CACHE_BARRIO: dict[tuple, tuple] = {}
+
+
+def _recolectar_barrio(fuentes: list[Source], barrio: str, operacion: str):
+    """Como `_recolectar`, pero guarda 15 minutos lo que trajeron los portales reales: así la lista para
+    cliente (o un cambio de filtro) usa los mismos anuncios que se acaban de ver y abre al instante."""
+    from .sources import PORTALES
+    cacheable = all(type(f) is PORTALES.get(getattr(f, "nombre", "")) for f in fuentes) and fuentes
+    clave = (tuple(sorted(f"{f.nombre}:{getattr(f, 'paginas', '')}" for f in fuentes)), slugify(barrio),
+             operacion) if cacheable else None
+    guardado = _CACHE_BARRIO.get(clave) if cacheable else None
+    if guardado and time.time() - guardado[0] < CACHE_SEGUNDOS:
+        return copy.deepcopy(guardado[1]), *guardado[2:]
+    todos, errores, por_fuente, publicados = _recolectar(fuentes, barrio, operacion)
+    if cacheable and todos:
+        _CACHE_BARRIO[clave] = (time.time(), copy.deepcopy(todos), errores, por_fuente, publicados)
+    return todos, errores, por_fuente, publicados
+
+
 _LUGAR_TITULO = re.compile(r"\ben\s+((?:(?!\ben\s)[^,|])+?),\s*bogot", re.I)
 
 
@@ -186,7 +206,7 @@ def buscar(barrio: str, fuentes: list[Source], operacion: str = "venta", solo_du
            con_telefono: bool = False, area_min: float | None = None, precio_max: float | None = None,
            limite: int | None = None) -> Resultado:
     """Busca en todas las fuentes y ordena de menor a mayor precio por m²."""
-    todos, errores, por_fuente, publicados = _recolectar(fuentes, barrio, operacion)
+    todos, errores, por_fuente, publicados = _recolectar_barrio(fuentes, barrio, operacion)
     otros = [a for a in todos if not es_del_barrio(a, barrio)]
     todos = [a for a in todos if es_del_barrio(a, barrio)]
     for a in todos:

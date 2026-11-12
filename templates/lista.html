@@ -37,7 +37,7 @@
 </style></head>
 <body>
 <div class="panel">
-  <form method="get" action="/lista">
+  <form method="get" action="/lista" onsubmit="this.querySelector('button').textContent='Buscando… (hasta 1 minuto)'">
     <label>Barrio<input name="barrio" value="{{ barrio }}" required></label>
     <label>Operación<select name="operacion"><option value="arriendo" {% if p.operacion == 'arriendo' %}selected{% endif %}>Arriendo</option><option value="venta" {% if p.operacion == 'venta' %}selected{% endif %}>Venta</option></select></label>
     <label>Precio máximo<input name="precio_max" inputmode="numeric" value="{{ args.precio_max or '' }}" placeholder="Sin límite"></label>

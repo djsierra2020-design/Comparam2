@@ -1053,3 +1053,19 @@ def test_lista_para_cliente_sin_enlaces_y_con_telefono():
     assert "fincaraiz.com" not in html and "href=\"http" not in html  # sin enlaces a portales
     assert c.get("/lista").status_code == 200
     assert "Lista para cliente" in c.get("/?barrio=Cedritos&fuente=ejemplo").get_data(as_text=True)
+
+
+def test_busqueda_de_barrio_reutiliza_lo_traido(monkeypatch):
+    from comparam import busqueda
+    from comparam.sources import PORTALES
+    llamadas = []
+    cls = PORTALES["fincaraiz"]
+    monkeypatch.setattr(cls, "buscar", lambda self, b, op="venta": llamadas.append(1) or [
+        Listing("fincaraiz", "Apto en Cedritos, Bogotá", "Cedritos", 300e6, 60, telefonos=["3001234567"],
+                es_dueno_directo=True, url="u1")])
+    busqueda._CACHE_BARRIO.clear()
+    f = [cls(paginas=1)]
+    r1 = busqueda.buscar("Cedritos", f)
+    r2 = busqueda.buscar("Cedritos", f, con_telefono=True)
+    assert len(llamadas) == 1 and len(r1.anuncios) == len(r2.anuncios) == 1
+    busqueda._CACHE_BARRIO.clear()
