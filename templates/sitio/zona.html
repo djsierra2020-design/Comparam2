@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% set que = "venta" if op == "venta" else "arriendo" %}
+{% set lugar = ("localidad de " ~ nombre) if tipo == "localidad" else nombre %}
+{% block titulo %}Precio del metro cuadrado en {{ nombre }}, Bogotá ({{ que }}) – {{ fecha_txt }} | Comparam{% endblock %}
+{% block descripcion %}Precio de oferta del m² de apartamentos en {{ que }} en {{ lugar }}, Bogotá: {{ st.mediana|pesos }} por m² (mediana de {{ st.anuncios }} anuncios), {{ st.duenos }} de dueño directo. Actualizado el {{ dia_txt }}.{% endblock %}
+{% block ruta %}{{ ruta }}{% endblock %}
+{% block datos %}<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
+{"@type":"ListItem","position":1,"name":"Comparam","item":"{{ SITIO_URL }}/"},
+{"@type":"ListItem","position":2,"name":"Precio m² {{ que }}","item":"{{ SITIO_URL }}/precio-m2/{{ op }}/"},
+{"@type":"ListItem","position":3,"name":"{{ nombre }}","item":"{{ SITIO_URL }}/{{ ruta }}"}]}</script>{% endblock %}
+{% block contenido %}
+<nav class="migas"><a href="{{ raiz }}">Comparam</a> › <a href="{{ raiz }}precio-m2/{{ op }}/">Precio del m² en {{ que }}</a> › {{ nombre }}</nav>
+<h1>Precio del metro cuadrado en {{ nombre }}{% if tipo == "localidad" %} (localidad){% endif %}, Bogotá – {{ que }}</h1>
+<p class="sub">Apartamentos en {{ que }} · {{ fecha_txt }} · calculado con {{ st.anuncios }} anuncios publicados en los últimos días</p>
+
+<div class="kpis">
+  <div class="kpi d"><div class="t">Precio del m² (mediana)</div><b>{{ st.mediana|pesos }}</b></div>
+  <div class="kpi"><div class="t">{{ "Precio" if op == "venta" else "Canon" }} mediano</div><b>{{ st.precio_mediano|pesos }}</b></div>
+  <div class="kpi"><div class="t">Área mediana</div><b>{{ '%.0f'|format(st.area_mediana) }} m²</b></div>
+  <div class="kpi"><div class="t">De dueño directo</div><b>{{ st.duenos }} de {{ st.anuncios }}</b></div>
+  {% if st.dias_mediana is not none %}<div class="kpi"><div class="t">Días publicados (mediana)</div><b>{{ st.dias_mediana }}</b></div>{% endif %}
+</div>
+
+<h2>¿Cómo está {{ nombre }} frente a su zona?</h2>
+<div class="card">
+<table>
+  <tr><th>Zona</th><th class="n">m² (mediana)</th><th class="n">Anuncios</th></tr>
+  <tr><td><b>{{ nombre }}</b></td><td class="n"><b>{{ st.mediana|pesos }}</b></td><td class="n">{{ st.anuncios }}</td></tr>
+  {% if loc_st %}<tr><td>Localidad {{ localidad }}</td><td class="n">{{ loc_st.mediana|pesos }}</td><td class="n">{{ loc_st.anuncios }}</td></tr>{% endif %}
+  {% if ciudad_st %}<tr><td>Bogotá (lo analizado)</td><td class="n">{{ ciudad_st.mediana|pesos }}</td><td class="n">{{ ciudad_st.anuncios|miles }}</td></tr>{% endif %}
+</table>
+{% if loc_st %}{% set dif = (st.mediana / loc_st.mediana - 1) * 100 %}
+<p>El m² en {{ nombre }} está <b>{{ '%.0f'|format(dif|abs) }}% {{ "por encima" if dif > 0 else "por debajo" }}</b> de la mediana de la localidad {{ localidad }}.</p>{% endif %}
+<p class="nota">Rango observado: {{ st.minimo|pesos }} – {{ st.maximo|pesos }} por m². Promedio: {{ st.promedio|pesos }}.</p>
+</div>
+
+<h2>Los 5 apartamentos más baratos por m² en {{ nombre }}</h2>
+<div class="card">
+<table>
+  <tr><th>Anuncio</th><th class="n">m²</th><th class="n ocultar-movil">{{ "Precio" if op == "venta" else "Canon" }}</th><th class="n">$/m²</th></tr>
+  {% for b in st.baratos %}
+  <tr><td>{% if b.url %}<a href="{{ b.url }}" rel="nofollow noopener" target="_blank">{{ b.titulo[:70] }}</a>{% else %}{{ b.titulo[:70] }}{% endif %}
+      <br><span class="tag">{{ b.fuente|portal }}</span>{% if b.dueno %} <span class="tag">dueño directo</span>{% endif %}{% if b.habitaciones %} <span class="nota">· {{ b.habitaciones }} hab</span>{% endif %}</td>
+    <td class="n">{{ '%g'|format(b.area) }}</td><td class="n ocultar-movil">{{ b.precio|pesos }}</td><td class="n"><b>{{ b.m2|pesos }}</b></td></tr>
+  {% endfor %}
+</table>
+<a class="cta" href="{{ APP_URL }}/?barrio={{ nombre|urlencode }}&operacion={{ op }}&modo=barrio">Ver todos los apartamentos de {{ nombre }} en la app</a>
+</div>
+
+<h2>¿Eres inmobiliaria?</h2>
+<div class="card">
+<p>Recibe cada mañana los <b>dueños directos nuevos</b> de {{ nombre }} y los barrios que trabajas, con el precio del m² de la zona y cuántos días llevan publicados: los mejores argumentos para captar.</p>
+<a class="cta sec" href="{{ APP_URL }}/nuevos">Ver cómo funciona el envío diario</a>
+</div>
+
+{% if vecinos %}<h2>Barrios cercanos</h2><div class="chips">{% for n, u in vecinos %}<a href="{{ raiz }}{{ u }}">{{ n }}</a>{% endfor %}</div>{% endif %}
+{% if url_otra %}<p style="margin-top:18px"><a href="{{ raiz }}{{ url_otra }}">Ver el precio del m² en {{ "arriendo" if op == "venta" else "venta" }} en {{ nombre }} →</a></p>{% endif %}
+{% endblock %}

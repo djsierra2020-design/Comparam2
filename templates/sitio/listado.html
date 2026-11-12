@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% set que = "venta" if op == "venta" else "arriendo" %}
+{% block titulo %}Precio del metro cuadrado en Bogotá por barrio ({{ que }}) – {{ fecha_txt }} | Comparam{% endblock %}
+{% block descripcion %}Precio de oferta del m² de apartamentos en {{ que }} en cada barrio y localidad de Bogotá, actualizado el {{ dia_txt }}.{% endblock %}
+{% block ruta %}precio-m2/{{ op }}/{% endblock %}
+{% block contenido %}
+<nav class="migas"><a href="{{ raiz }}">Comparam</a> › Precio del m² en {{ que }}</nav>
+<h1>Precio del metro cuadrado en Bogotá por barrio – {{ que }}</h1>
+<p class="sub">{{ fecha_txt }}{% if ciudad_st %} · Bogotá: {{ ciudad_st.mediana|pesos }} por m² (mediana de {{ ciudad_st.anuncios|miles }} anuncios){% endif %}</p>
+<div class="card">
+<table>
+  <tr><th>Barrio o localidad</th><th class="n">m² (mediana)</th><th class="n">Anuncios</th></tr>
+  {% for nombre, tipo, url, st in filas %}
+  <tr><td><a href="{{ raiz }}{{ url }}">{{ nombre }}</a>{% if tipo == "localidad" %} <span class="tag">localidad</span>{% endif %}</td>
+    <td class="n">{{ st.mediana|pesos }}</td><td class="n">{{ st.anuncios }}</td></tr>
+  {% endfor %}
+</table>
+</div>
+<p><a href="{{ raiz }}precio-m2/{{ "arriendo" if op == "venta" else "venta" }}/">Ver precios de {{ "arriendo" if op == "venta" else "venta" }} →</a></p>
+{% endblock %}
