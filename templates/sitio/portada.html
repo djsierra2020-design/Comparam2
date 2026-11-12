@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block titulo %}Comparam – Precio del metro cuadrado por barrio en Bogotá y dueños directos{% endblock %}
+{% block descripcion %}Comparamos a diario los anuncios de 5 portales inmobiliarios de Bogotá: precio del m² por barrio, dueños directos y días publicados. Para inmobiliarias, compradores y arrendatarios.{% endblock %}
+{% block ruta %}{% endblock %}
+{% block datos %}<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Comparam","url":"{{ SITIO_URL }}/"}</script>{% endblock %}
+{% block contenido %}
+<h1>Encuentra cada mañana los dueños que venden o arriendan solos en tus barrios</h1>
+<p class="sub">Comparam compara a diario los anuncios de Finca Raíz, Ciencuadras, Rentola, Habi y Houm, y te muestra el precio real del metro cuadrado de cada barrio de Bogotá.</p>
+<div class="kpis">
+  <div class="kpi d"><div class="t">Anuncios analizados (últimos días)</div><b>{{ total|miles }}</b></div>
+  {% if ciudad.venta %}<div class="kpi"><div class="t">m² en venta, Bogotá</div><b>{{ ciudad.venta.mediana|pesos }}</b></div>{% endif %}
+  {% if ciudad.arriendo %}<div class="kpi"><div class="t">m² en arriendo, Bogotá</div><b>{{ ciudad.arriendo.mediana|pesos }}</b></div>{% endif %}
+  <div class="kpi"><div class="t">Se actualiza</div><b>Todos los días</b></div>
+</div>
+<a class="cta" href="{{ APP_URL }}">Probar la app gratis</a>
+
+<h2>Cómo funciona</h2>
+<div class="kpis">
+  <div class="kpi"><div class="t">1</div><b style="font-size:18px">Elige tus barrios</b><p class="nota">Venta, arriendo o las dos.</p></div>
+  <div class="kpi"><div class="t">2</div><b style="font-size:18px">Recibe los dueños directos nuevos</b><p class="nota">Cada mañana, listos para enviar por WhatsApp.</p></div>
+  <div class="kpi"><div class="t">3</div><b style="font-size:18px">Capta con datos</b><p class="nota">Precio del m² de la zona, días publicado y bajadas de precio.</p></div>
+</div>
+
+<h2>Para quién es</h2>
+<div class="kpis">
+  <div class="kpi"><b style="font-size:18px">Inmobiliarias y asesores</b><p class="nota">Dueños directos nuevos de tus barrios, quiénes piden por encima de su zona y quiénes llevan más de 30 días sin vender: los más fáciles de captar.</p></div>
+  <div class="kpi"><b style="font-size:18px">Compradores y arrendatarios</b><p class="nota">Los apartamentos más baratos por m² frente al precio de su propio barrio, con enlace al anuncio original.</p></div>
+</div>
+
+<h2>Precio del metro cuadrado por barrio</h2>
+{% for op, nombre_op in [("venta", "Venta"), ("arriendo", "Arriendo")] %}{% if listado[op] %}
+<p><b>{{ nombre_op }}:</b></p>
+<div class="chips">{% for nombre, tipo, url, st in listado[op][:24] %}<a href="{{ raiz }}{{ url }}">{{ nombre }}</a>{% endfor %}
+<a href="{{ raiz }}precio-m2/{{ op }}/"><b>Ver todos →</b></a></div>
+{% endif %}{% endfor %}
+
+<h2>Preguntas frecuentes</h2>
+<div class="card">
+<p><b>¿De dónde salen los datos?</b><br>De anuncios públicos de portales inmobiliarios, revisados cada día. Cada anuncio enlaza a su publicación original.</p>
+<p><b>¿El precio del m² es un avalúo?</b><br>No. Es la mediana del precio que piden los anuncios (precio de oferta). Sirve como referencia del mercado, no reemplaza un avalúo.</p>
+<p><b>¿Cómo saben si es dueño directo?</b><br>Por los datos del portal y el texto del anuncio. Si una misma persona tiene varios avisos, la consideramos agente, no dueña.</p>
+<p><b>¿Guardan datos personales?</b><br>No publicamos nombres ni teléfonos de anunciantes.</p>
+</div>
+{% endblock %}
