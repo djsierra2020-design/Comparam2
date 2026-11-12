@@ -98,19 +98,21 @@ $("#salir").onclick = () => accion(async () => { await api("/jugador/salir", "PO
 
 async function entrar() {
   $("#v-ingreso").classList.add("oculto"); $("#v-app").classList.remove("oculto"); $("#salir").classList.remove("oculto");
-  await refrescar();
+  await refrescar(true);
   clearInterval(sondeo);
-  sondeo = setInterval(refrescar, 5000);
+  // Cada 10 s solo mientras la app está a la vista: con 300 jugadores la mayoría tiene el celular guardado.
+  sondeo = setInterval(() => { if (!document.hidden) refrescar(); }, 10000);
 }
+document.addEventListener("visibilitychange", () => { if (!document.hidden && !$("#v-app").classList.contains("oculto")) refrescar(true); });
 
 async function pedirPin(titulo, detalle) {
   const d = await pedir(titulo, [{n: "pin", l: "Confirme con su PIN", tipo: "password"}], "Confirmar compra", `<p>${detalle}</p>`);
   return d && d.pin;
 }
 
-async function refrescar() {
+async function refrescar(abrir = false) {
   let r;
-  try { r = await api("/jugador/inicio"); }
+  try { r = await api("/jugador/inicio" + (abrir ? "?abrir=1" : "")); }
   catch (e) { if (e.status === 401) { window.alSalir(); aviso(e.message, true); } return; }
   ultimo = r;
   $("#saldo").textContent = pesos(r.saldo);
@@ -164,7 +166,7 @@ window.rechazar = async entrada => {
 };
 
 // Si ya hay sesión abierta, entra directo.
-api("/jugador/inicio").then(entrar).catch(() => {});
+api("/jugador/inicio?abrir=1").then(entrar).catch(() => {});
 </script>
 </body>
 </html>

@@ -228,9 +228,13 @@ def inscribir(db, torneo_id, jugador_id, *, origen, personal_id=None, pago="sald
 
 def _ocupacion(db, torneo_id) -> list[dict]:
     mesas = db.todos("SELECT * FROM mesas WHERE torneo_id = ? AND estado = 'abierta' ORDER BY numero", (torneo_id,))
+    por_mesa = {m["id"]: {} for m in mesas}
+    for r in db.todos("SELECT * FROM entradas WHERE torneo_id = ? AND estado IN ('sentado','reservado') "
+                      "AND mesa_id IS NOT NULL", (torneo_id,)):
+        if r["mesa_id"] in por_mesa:
+            por_mesa[r["mesa_id"]][r["asiento"]] = r
     for m in mesas:
-        m["ocupados"] = {r["asiento"]: r for r in db.todos(
-            "SELECT * FROM entradas WHERE mesa_id = ? AND estado IN ('sentado','reservado')", (m["id"],))}
+        m["ocupados"] = por_mesa[m["id"]]
     return mesas
 
 
@@ -540,14 +544,16 @@ def tablero(db, torneo_id) -> dict:
     """Ocupación en tiempo real: mesas con sus asientos."""
     vencer_reservas(db)
     t = torneo(db, torneo_id)
+    nombres = {r["id"]: r["nombre"] for r in db.todos(
+        "SELECT j.id, j.nombre FROM jugadores j JOIN entradas e ON e.jugador_id = j.id "
+        "WHERE e.torneo_id = ? AND e.estado IN ('sentado','reservado')", (torneo_id,))}
     mesas = []
     for m in _ocupacion(db, torneo_id):
         asientos = []
         for a in range(1, m["asientos"] + 1):
             e = m["ocupados"].get(a)
             asientos.append({"asiento": a, "entrada_id": e["id"] if e else None, "estado": e["estado"] if e else "libre",
-                             "fichas": e["fichas"] if e else None,
-                             "nombre": db.valor("SELECT nombre FROM jugadores WHERE id = ?", (e["jugador_id"],)) if e else None})
+                             "fichas": e["fichas"] if e else None, "nombre": nombres.get(e["jugador_id"]) if e else None})
         mesas.append({"id": m["id"], "numero": m["numero"], "ocupados": len(m["ocupados"]), "asientos": asientos})
     inscritos = db.todos("SELECT e.id, e.codigo_qr, j.nombre FROM entradas e JOIN jugadores j ON j.id = e.jugador_id "
                          "WHERE e.torneo_id = ? AND e.estado = 'inscrito' ORDER BY e.id", (torneo_id,))

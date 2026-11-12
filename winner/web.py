@@ -539,9 +539,11 @@ def api_jugador_salir():
 @jugador_sesion
 def api_jugador_inicio():
     jid = g.jugador_id
-    disp, ip = _cliente()
-    with db().transaccion():
-        seg.registrar_acceso(db(), "jugador", jid, "consulta_saldo", None, disp, ip)
+    if request.args.get("abrir") == "1":
+        # Se registra cada vez que el jugador abre o actualiza la app, no en cada sondeo automático.
+        disp, ip = _cliente()
+        with db().transaccion():
+            seg.registrar_acceso(db(), "jugador", jid, "consulta_saldo", None, disp, ip)
     j = caja.jugador(db(), jid)
     mis = db().todos(
         "SELECT e.id, e.torneo_id, e.estado, e.codigo_qr, e.asiento, e.fichas, e.numero, m.numero AS mesa, "

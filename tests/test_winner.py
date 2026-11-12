@@ -119,10 +119,10 @@ def test_qr_sienta_una_sola_vez(db, staff):
 
 
 def test_torneo_completo_balanceo_y_cierre_de_mesas(db, staff):
-    """120 jugadores hasta el ganador: nunca más de 1 de diferencia entre mesas y mesas mínimas."""
+    """Aforo máximo de Winner (300) hasta el ganador: nunca más de 1 de diferencia entre mesas y mesas mínimas."""
     t = nuevo_torneo(db, staff, reentrada_max=1, recompra_max=1, recompra_precio=50_000, recompra_fichas=5_000)
-    T.abrir_mesas(db, staff["floor"], t, 14)
-    for i in range(120):
+    T.abrir_mesas(db, staff["floor"], t, 34)
+    for i in range(300):
         T.inscribir(db, t, nuevo_jugador(db, staff, i, celular=False), origen="caja",
                     personal_id=staff["cajero"], pago="efectivo")
     T.iniciar_torneo(db, staff["floor"], t)

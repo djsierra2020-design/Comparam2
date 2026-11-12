@@ -68,5 +68,9 @@ aparecen al abrir la app), lista de espera de cash y mover a jugadores al asient
 python -m pytest tests/test_winner.py
 ```
 
-Incluye un torneo completo de 120 jugadores hasta el ganador. Después de cada eliminación verifica que ninguna mesa tenga
-más de un jugador de diferencia con otra y que estén abiertas solo las mesas necesarias.
+Incluye un torneo completo de 300 jugadores (el aforo máximo de Winner) hasta el ganador. Después de cada eliminación
+verifica que ninguna mesa tenga más de un jugador de diferencia con otra y que estén abiertas solo las mesas necesarias.
+
+**Prueba de carga** (300 celulares con la app abierta + 3 pantallas de floor, gunicorn con 1 proceso y 4 hilos):
+0 errores, el celular responde en 3 ms (mediana) y el tablero de 34 mesas en 16 ms. Para el torneo real se recomienda
+como mínimo un servidor pago (no el plan gratis de Render, que tiene muy poca CPU y se duerme).
