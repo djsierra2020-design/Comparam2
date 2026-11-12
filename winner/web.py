@@ -421,6 +421,20 @@ def api_evento(tid):
                    clasificados=eventos.clasificados_vigentes(db(), final_id))
 
 
+@bp.post("/api/tickets/<int:kid>/codigo-traspaso")
+@personal("caja")
+def api_codigo_traspaso(kid):
+    eventos.solicitar_codigo_traspaso(db(), _pid(), kid)
+    return jsonify(ok=True)
+
+
+@bp.post("/api/tickets/<int:kid>/traspasar")
+@personal("caja")
+def api_traspasar(kid):
+    d = _datos()
+    return jsonify(eventos.traspasar_ticket(db(), _pid(), kid, d.get("comprador"), d.get("documento"), d.get("codigo")))
+
+
 @bp.post("/api/tickets/<int:kid>/anular")
 @personal("aprobar")
 def api_anular_ticket(kid):

@@ -122,7 +122,11 @@ CREATE TABLE IF NOT EXISTS torneos (
     tipo TEXT NOT NULL DEFAULT 'normal',
     principal_id INTEGER REFERENCES torneos(id),
     satelite_de INTEGER REFERENCES torneos(id),
-    porcentaje_clasifica INTEGER,
+    -- Días clasificatorios: cómo se decide quién clasifica (lo define el administrador en cada torneo).
+    -- nivel: el día termina al acabar el nivel N · porcentaje: hasta quedar el N % de las entradas ·
+    -- jugadores: hasta quedar N jugadores
+    modo_clasifica TEXT,
+    clasifica_valor INTEGER,
     creado_en TEXT NOT NULL,
     finalizado_en TEXT
 );
@@ -292,6 +296,16 @@ CREATE TABLE IF NOT EXISTS tickets (
     personal_id INTEGER REFERENCES personal(id)
 );
 
+-- Venta/traspaso de un ticket entre jugadores (el casino no devuelve dinero por un cupo).
+CREATE TABLE IF NOT EXISTS traspasos_ticket (
+    id INTEGER PRIMARY KEY,
+    ticket_id INTEGER NOT NULL REFERENCES tickets(id),
+    de_jugador INTEGER NOT NULL REFERENCES jugadores(id),
+    a_jugador INTEGER NOT NULL REFERENCES jugadores(id),
+    personal_id INTEGER NOT NULL REFERENCES personal(id),
+    fecha TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS mesas_cash (
     id INTEGER PRIMARY KEY,
     nombre TEXT NOT NULL,
@@ -365,7 +379,8 @@ AJUSTES_POR_DEFECTO = {
 COLUMNAS_NUEVAS = {
     "entradas": {"espera_desde": "TEXT", "fichas_iniciales": "INTEGER", "pago": "TEXT"},
     "torneos": {"tipo": "TEXT NOT NULL DEFAULT 'normal'", "principal_id": "INTEGER REFERENCES torneos(id)",
-                "satelite_de": "INTEGER REFERENCES torneos(id)", "porcentaje_clasifica": "INTEGER"},
+                "satelite_de": "INTEGER REFERENCES torneos(id)", "modo_clasifica": "TEXT",
+                "clasifica_valor": "INTEGER"},
     "premios_tabla": {"tipo": "TEXT NOT NULL DEFAULT 'dinero'"},
     "premiacion_detalle": {"tipo": "TEXT NOT NULL DEFAULT 'dinero'", "ticket_id": "INTEGER"},
 }
@@ -378,6 +393,9 @@ def _migrar(c: sqlite3.Connection) -> None:
         for col, ddl in cols.items():
             if col not in existentes:
                 c.execute(f"ALTER TABLE {tabla} ADD COLUMN {col} {ddl}")
+    if "porcentaje_clasifica" in {r[1] for r in c.execute("PRAGMA table_info(torneos)")}:
+        c.execute("UPDATE torneos SET modo_clasifica = 'porcentaje', clasifica_valor = porcentaje_clasifica "
+                  "WHERE porcentaje_clasifica IS NOT NULL AND modo_clasifica IS NULL")
     sql = c.execute("SELECT sql FROM sqlite_master WHERE name = 'entradas'").fetchone()[0]
     if "'clasificado'" not in sql:
         # SQLite no permite cambiar un CHECK: se reconstruye la tabla (procedimiento oficial).

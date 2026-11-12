@@ -445,7 +445,7 @@ def test_evento_cinco_dias_clasificatorios_y_final(db, staff):
                                                         stack_inicial=40_000, tipo="final"))
     dias = [T.crear_torneo(db, staff["director"], dict(nombre=f"Día 1{letra}", fecha=f"2026-12-0{i + 1}", buyin=500_000,
                                                         stack_inicial=40_000, tipo="dia1", principal_id=final,
-                                                        porcentaje_clasifica=20))
+                                                        modo_clasifica="porcentaje", clasifica_valor=20))
             for i, letra in enumerate("ABCDE")]
     jugadores = [nuevo_jugador(db, staff, i, celular=False) for i in range(100)]
     doble = jugadores[0]  # juega dos días
@@ -507,7 +507,8 @@ def test_evento_cinco_dias_clasificatorios_y_final(db, staff):
 def test_cerrar_dia_exige_reservas_y_alternos_resueltos(db, staff):
     final = T.crear_torneo(db, staff["director"], dict(nombre="F", fecha="2026-12-10", buyin=1, stack_inicial=1, tipo="final"))
     dia = T.crear_torneo(db, staff["director"], dict(nombre="1A", fecha="2026-12-01", buyin=100_000, stack_inicial=10_000,
-                                                      tipo="dia1", principal_id=final, reentrada_max=1))
+                                                      tipo="dia1", principal_id=final, reentrada_max=1,
+                                                      modo_clasifica="nivel", clasifica_valor=10))
     T.abrir_mesas(db, staff["floor"], dia, 1)
     es = [T.inscribir(db, dia, nuevo_jugador(db, staff, i, celular=False), origen="caja", personal_id=staff["cajero"],
                       pago="efectivo", sentar_ya=True) for i in range(3)]
@@ -553,7 +554,8 @@ def test_satelite_premia_tickets_y_el_ticket_sirve_en_un_dia_clasificatorio(db, 
     final = T.crear_torneo(db, staff["director"], dict(nombre="Main Event", fecha="2026-12-10", buyin=600_000,
                                                         stack_inicial=40_000, tipo="final"))
     dia = T.crear_torneo(db, staff["director"], dict(nombre="Día 1A", fecha="2026-12-01", buyin=600_000,
-                                                      stack_inicial=40_000, tipo="dia1", principal_id=final))
+                                                      stack_inicial=40_000, tipo="dia1", principal_id=final,
+                                                      modo_clasifica="jugadores", clasifica_valor=10))
     sat = T.crear_torneo(db, staff["director"], dict(nombre="Satélite", fecha="2026-11-20", buyin=150_000,
                                                       stack_inicial=10_000, tipo="satelite", satelite_de=final))
     with pytest.raises(ErrorNegocio, match="Solo los satélites"):
@@ -592,3 +594,59 @@ def test_satelite_premia_tickets_y_el_ticket_sirve_en_un_dia_clasificatorio(db, 
     with pytest.raises(ErrorNegocio, match="no tiene un ticket"):
         T.inscribir(db, dia, js[0], origen="caja", personal_id=staff["cajero"], pago="ticket")
     assert eventos.resumen_evento(db, final)["entradas_con_ticket"] == 1
+
+
+def test_forma_de_clasificar_la_decide_el_administrador(db, staff):
+    final = T.crear_torneo(db, staff["director"], dict(nombre="F", fecha="2026-12-10", buyin=1, stack_inicial=1, tipo="final"))
+    base = dict(fecha="2026-12-01", buyin=100_000, stack_inicial=10_000, tipo="dia1", principal_id=final)
+    with pytest.raises(ErrorNegocio, match="cómo se decide"):
+        T.crear_torneo(db, staff["director"], dict(nombre="1A", **base))
+    with pytest.raises(ErrorNegocio, match="Valor inválido"):
+        T.crear_torneo(db, staff["director"], dict(nombre="1A", modo_clasifica="porcentaje", clasifica_valor=150, **base))
+    dia = T.crear_torneo(db, staff["director"], dict(nombre="1A", modo_clasifica="nivel", clasifica_valor=8, **base))
+    T.abrir_mesas(db, staff["floor"], dia, 2)
+    for i in range(12):
+        T.inscribir(db, dia, nuevo_jugador(db, staff, i, celular=False), origen="caja", personal_id=staff["cajero"],
+                    pago="efectivo", sentar_ya=True)
+    T.iniciar_torneo(db, staff["floor"], dia)
+    cierre = lambda: [s for s in T.sugerencias(db, dia) if s["tipo"] == "cerrar_dia"]  # noqa: E731
+    T.actualizar_torneo(db, staff["floor"], dia, {"nivel": 7})
+    assert not cierre()
+    T.actualizar_torneo(db, staff["floor"], dia, {"nivel": 8})
+    assert "último nivel" in cierre()[0]["texto"]
+    # Se puede cambiar durante el día: ahora clasifican 10 jugadores.
+    T.actualizar_torneo(db, staff["director"], dia, {"modo_clasifica": "jugadores", "clasifica_valor": 10})
+    assert not cierre()
+    vivos = db.todos("SELECT id FROM entradas WHERE torneo_id = ? AND estado = 'sentado'", (dia,))
+    T.eliminar(db, staff["crupier"], vivos[0]["id"])
+    T.eliminar(db, staff["crupier"], vivos[1]["id"])
+    assert "Quedan 10" in cierre()[0]["texto"]
+
+
+def test_ticket_repetido_no_se_devuelve_pero_se_puede_vender(db, staff):
+    final = T.crear_torneo(db, staff["director"], dict(nombre="Main", fecha="2026-12-10", buyin=600_000,
+                                                        stack_inicial=40_000, tipo="final"))
+    dia = T.crear_torneo(db, staff["director"], dict(nombre="1A", fecha="2026-12-01", buyin=600_000, stack_inicial=40_000,
+                                                      tipo="dia1", principal_id=final, modo_clasifica="nivel", clasifica_valor=10))
+    vendedor = nuevo_jugador(db, staff, 1)
+    comprador = nuevo_jugador(db, staff, 2)
+    eventos.crear_ticket(db, staff["director"], vendedor, final, None, 600_000)
+    kid = eventos.crear_ticket(db, staff["director"], vendedor, final, None, 600_000)  # ganó un segundo cupo
+    saldo_antes = caja.saldo(db, vendedor)
+    codigo = eventos.solicitar_codigo_traspaso(db, staff["cajero"], kid)
+    numero_comprador = caja.jugador(db, comprador)["numero_caja"]
+    with pytest.raises(ErrorNegocio, match="documento no corresponde"):
+        eventos.traspasar_ticket(db, staff["cajero"], kid, numero_comprador, "123456789", codigo)
+    with pytest.raises(ErrorNegocio, match="mismo dueño"):
+        eventos.traspasar_ticket(db, staff["cajero"], kid, caja.jugador(db, vendedor)["numero_caja"], "500000001", codigo)
+    with pytest.raises(ErrorNegocio, match="Código incorrecto"):
+        eventos.traspasar_ticket(db, staff["cajero"], kid, numero_comprador, "500000001", "000000")
+    r = eventos.traspasar_ticket(db, staff["cajero"], kid, numero_comprador.lower(), "500000001", codigo)
+    assert r["a"] == numero_comprador
+    assert caja.saldo(db, vendedor) == saldo_antes  # el casino no mueve dinero
+    assert len(eventos.tickets_jugador(db, vendedor)) == 1 and len(eventos.tickets_jugador(db, comprador)) == 1
+    e = T.inscribir(db, dia, comprador, origen="caja", personal_id=staff["cajero"], pago="ticket")
+    assert e["pago"] == "ticket"
+    with pytest.raises(ErrorNegocio, match="disponible"):  # ya usado: no se puede volver a traspasar
+        eventos.solicitar_codigo_traspaso(db, staff["cajero"], kid)
+    assert db.valor("SELECT COUNT(*) FROM auditoria WHERE accion = 'traspaso_ticket'") == 1

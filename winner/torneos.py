@@ -83,6 +83,11 @@ def crear_torneo(db, personal_id, datos: dict) -> int:
 
 def actualizar_torneo(db, personal_id, torneo_id, datos: dict) -> None:
     d = _limpiar_campos(datos)
+    if "modo_clasifica" in datos or "clasifica_valor" in datos:
+        from .eventos import validar_clasificacion
+        if torneo(db, torneo_id)["tipo"] != "dia1":
+            raise ErrorNegocio("Solo los días clasificatorios tienen forma de clasificar")
+        d.update(validar_clasificacion(datos.get("modo_clasifica"), datos.get("clasifica_valor")))
     if db.valor("SELECT 1 FROM mesas WHERE torneo_id = ?", (torneo_id,)):
         d.pop("asientos_por_mesa", None)  # ya hay mesas armadas con ese tamaño
     if not d:
@@ -466,12 +471,10 @@ def sugerencias(db, torneo_id) -> list[dict]:
         salida.append({"tipo": "cerrar_mesa", "mesa_id": menor["id"], "mesa": menor["numero"],
                        "texto": f"Quedan {vivos} jugadores: caben en {necesarias} mesa(s). "
                                 f"Cierre la mesa {menor['numero']}."})
-    t = torneo(db, torneo_id)
-    from .eventos import objetivo_clasificados
-    objetivo = objetivo_clasificados(db, t)
-    if objetivo and t["estado"] == "en_curso" and sum(conteo) + en_espera <= objetivo:
-        salida.insert(0, {"tipo": "cerrar_dia", "texto": f"Quedan {sum(conteo)} jugadores: ya se llegó al "
-                                                         f"{t['porcentaje_clasifica']}% que clasifica ({objetivo}). Cierre el día."})
+    from .eventos import aviso_cierre
+    texto = aviso_cierre(db, torneo(db, torneo_id), sum(conteo) + en_espera)
+    if texto:
+        salida.insert(0, {"tipo": "cerrar_dia", "texto": texto})
     if max(conteo) - min(conteo) > 1:
         llena = max(mesas, key=lambda m: len(m["ocupados"]))
         vacia = min(mesas, key=lambda m: len(m["ocupados"]))

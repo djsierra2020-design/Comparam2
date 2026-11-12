@@ -22,7 +22,7 @@ def validar_tipo(db, datos: dict) -> dict:
     tipo = datos.get("tipo") or "normal"
     if tipo not in TIPOS:
         raise ErrorNegocio("Tipo de torneo inválido")
-    limpio = {"tipo": tipo, "principal_id": None, "satelite_de": None, "porcentaje_clasifica": None}
+    limpio = {"tipo": tipo, "principal_id": None, "satelite_de": None, "modo_clasifica": None, "clasifica_valor": None}
     if tipo == "dia1":
         final = torneo(db, int(datos.get("principal_id") or 0)) if datos.get("principal_id") else None
         if not final or final["tipo"] != "final":
@@ -30,12 +30,7 @@ def validar_tipo(db, datos: dict) -> dict:
         if final["estado"] != "programado":
             raise ErrorNegocio("La final ya empezó: no se pueden agregar días clasificatorios")
         limpio["principal_id"] = final["id"]
-        pct = datos.get("porcentaje_clasifica")
-        if pct not in (None, ""):
-            pct = int(pct)
-            if not 1 <= pct <= 100:
-                raise ErrorNegocio("El porcentaje que clasifica debe estar entre 1 y 100")
-            limpio["porcentaje_clasifica"] = pct
+        limpio.update(validar_clasificacion(datos.get("modo_clasifica"), datos.get("clasifica_valor")))
     elif tipo == "satelite":
         destino = torneo(db, int(datos.get("satelite_de") or 0)) if datos.get("satelite_de") else None
         if not destino or destino["tipo"] not in ("final", "normal"):
@@ -52,12 +47,61 @@ def dias_de(db, final_id) -> list[dict]:
                     "FROM torneos t WHERE t.principal_id = ? ORDER BY t.fecha, t.id", (final_id,))
 
 
+MODOS_CLASIFICA = {
+    "nivel": "Al terminar el nivel",
+    "porcentaje": "Hasta quedar este % de las entradas",
+    "jugadores": "Hasta quedar este número de jugadores",
+}
+
+
+def validar_clasificacion(modo, valor) -> dict:
+    """El administrador decide en cada día clasificatorio cómo se define quién clasifica."""
+    if modo in (None, ""):
+        raise ErrorNegocio("Elija cómo se decide quién clasifica en este día")
+    if modo not in MODOS_CLASIFICA:
+        raise ErrorNegocio("Forma de clasificar inválida")
+    try:
+        valor = int(str(valor).strip())
+    except (TypeError, ValueError):
+        raise ErrorNegocio("Escriba el valor (nivel, porcentaje o número de jugadores)") from None
+    if valor < 1 or (modo == "porcentaje" and valor > 100):
+        raise ErrorNegocio("Valor inválido para la forma de clasificar")
+    return {"modo_clasifica": modo, "clasifica_valor": valor}
+
+
+def texto_clasificacion(t: dict) -> str:
+    if t.get("tipo") != "dia1" or not t.get("modo_clasifica"):
+        return ""
+    v = t["clasifica_valor"]
+    return {"nivel": f"El día termina al acabar el nivel {v}",
+            "porcentaje": f"Clasifica el {v} % de las entradas",
+            "jugadores": f"Clasifican {v} jugadores"}[t["modo_clasifica"]]
+
+
 def objetivo_clasificados(db, t: dict) -> int | None:
-    """Cuántos clasifican si el día se juega hasta un porcentaje de las entradas."""
-    if t["tipo"] != "dia1" or not t["porcentaje_clasifica"]:
+    """Cuántos clasifican si el día se juega hasta un porcentaje o un número fijo de jugadores."""
+    if t["tipo"] != "dia1" or t.get("modo_clasifica") not in ("porcentaje", "jugadores"):
         return None
+    if t["modo_clasifica"] == "jugadores":
+        return t["clasifica_valor"]
     entradas = db.valor("SELECT COUNT(*) FROM entradas WHERE torneo_id = ?", (t["id"],))
-    return max(1, math.ceil(entradas * t["porcentaje_clasifica"] / 100))
+    return max(1, math.ceil(entradas * t["clasifica_valor"] / 100))
+
+
+def aviso_cierre(db, t: dict, vivos: int) -> str | None:
+    """Texto del aviso «cierre el día» cuando se cumple la regla que fijó el administrador."""
+    if t["tipo"] != "dia1" or t["estado"] != "en_curso" or not t.get("modo_clasifica"):
+        return None
+    if t["modo_clasifica"] == "nivel":
+        if t["nivel"] >= t["clasifica_valor"]:
+            return (f"Nivel {t['nivel']}: es el último nivel del día. Al terminarlo, cierre el día "
+                    f"({vivos} jugadores clasificarían).")
+        return None
+    objetivo = objetivo_clasificados(db, t)
+    if vivos <= objetivo:
+        regla = f"{t['clasifica_valor']} % de las entradas" if t["modo_clasifica"] == "porcentaje" else "el número fijado"
+        return f"Quedan {vivos} jugadores: se llegó a {regla} ({objetivo}). Cierre el día."
+    return None
 
 
 # --- Días clasificatorios ----------------------------------------------------------------------
@@ -139,7 +183,8 @@ def traer_clasificados(db, personal_id, final_id) -> int:
 # --- Satélites y tickets -------------------------------------------------------------------------
 
 def tickets_jugador(db, jugador_id, estado="disponible") -> list[dict]:
-    return db.todos("SELECT k.*, t.nombre AS destino, o.nombre AS origen FROM tickets k "
+    return db.todos("SELECT k.*, t.nombre AS destino, o.nombre AS origen, "
+                    "(SELECT COUNT(*) FROM traspasos_ticket x WHERE x.ticket_id = k.id) AS traspasos FROM tickets k "
                     "JOIN torneos t ON t.id = k.destino_id LEFT JOIN torneos o ON o.id = k.origen_torneo "
                     "WHERE k.jugador_id = ? AND (? IS NULL OR k.estado = ?) ORDER BY k.id DESC",
                     (jugador_id, estado, estado))
@@ -169,6 +214,61 @@ def crear_ticket(db, personal_id, jugador_id, destino_id, origen_torneo, valor) 
     db.notificar(jugador_id, "premio", "¡Ganó un cupo!",
                  f"Tiene un ticket para {destino['nombre']} (vale {caja.pesos(valor)}). Úselo al inscribirse en la caja.")
     return cur.lastrowid
+
+
+def solicitar_codigo_traspaso(db, personal_id, ticket_id) -> str:
+    """Envía al dueño del ticket un código para autorizar la venta (traspaso) en la caja."""
+    from . import seguridad as seg
+    with db.transaccion():
+        k = db.uno("SELECT * FROM tickets WHERE id = ?", (ticket_id,))
+        if not k or k["estado"] != "disponible":
+            raise ErrorNegocio("Solo se traspasa un ticket disponible")
+        dueno = caja.jugador(db, k["jugador_id"])
+        if dueno["estado"] != "activo" or not dueno["celular_verificado"]:
+            raise ErrorNegocio("La cuenta del dueño debe estar activa y con celular vinculado")
+        destino = torneo(db, k["destino_id"])
+        db.auditar(personal_id, "codigo_traspaso", "ticket", ticket_id)
+        return seg.generar_codigo(db, dueno, "retiro", texto=(
+            f"Winner Poker: código para TRASPASAR su ticket de {destino['nombre']}: {{c}}. "
+            "Si usted no está en la caja vendiendo su cupo, no lo entregue."))
+
+
+def traspasar_ticket(db, personal_id, ticket_id, comprador, documento, codigo) -> dict:
+    """Venta de un cupo entre jugadores: el ticket pasa al comprador. El casino no mueve dinero.
+
+    Lo hace el dueño en persona en la caja, con su documento y el código que le llega al celular.
+    """
+    from . import seguridad as seg
+    k = db.uno("SELECT * FROM tickets WHERE id = ?", (ticket_id,))
+    if not k or k["estado"] != "disponible":
+        raise ErrorNegocio("Solo se traspasa un ticket disponible")
+    dueno = caja.jugador(db, k["jugador_id"])
+    if seg.hash_documento(documento or "") != dueno["doc_hash"]:
+        raise ErrorNegocio("El documento no corresponde al dueño del ticket")
+    texto = str(comprador or "").strip().upper()
+    nuevo = db.uno("SELECT * FROM jugadores WHERE numero_caja = ? OR id = ?",
+                   (texto, int(texto) if texto.isdigit() else -1))
+    if not nuevo:
+        raise ErrorNegocio("No se encontró la caja del comprador (use su número de caja, p. ej. W000123)", 404)
+    if nuevo["id"] == dueno["id"]:
+        raise ErrorNegocio("El comprador es el mismo dueño")
+    if nuevo["estado"] != "activo":
+        raise ErrorNegocio("La cuenta del comprador está bloqueada")
+    destino = torneo(db, k["destino_id"])
+    if destino["estado"] in ("finalizado", "cancelado"):
+        raise ErrorNegocio("El torneo del ticket ya terminó")
+    with db.transaccion() as c:
+        seg.verificar_codigo(db, dueno["id"], "retiro", codigo)
+        c.execute("UPDATE tickets SET jugador_id = ? WHERE id = ? AND estado = 'disponible'", (nuevo["id"], ticket_id))
+        c.execute("INSERT INTO traspasos_ticket (ticket_id, de_jugador, a_jugador, personal_id, fecha) VALUES (?,?,?,?,?)",
+                  (ticket_id, dueno["id"], nuevo["id"], personal_id, ahora()))
+        db.auditar(personal_id, "traspaso_ticket", "ticket", ticket_id,
+                   f"de {dueno['numero_caja']} a {nuevo['numero_caja']} ({destino['nombre']})")
+        db.notificar(dueno["id"], "seguridad", "Ticket traspasado",
+                     f"Su ticket para {destino['nombre']} pasó a {nuevo['nombre']} ({nuevo['numero_caja']}).")
+        db.notificar(nuevo["id"], "premio", "Recibió un ticket",
+                     f"Ahora tiene un ticket para {destino['nombre']} (vale {caja.pesos(k['valor'])}). Úselo al inscribirse en la caja.")
+    return {"ticket_id": ticket_id, "de": dueno["numero_caja"], "a": nuevo["numero_caja"], "nombre": nuevo["nombre"]}
 
 
 def anular_ticket(db, supervisor_id, ticket_id, motivo) -> None:
@@ -202,7 +302,7 @@ def advertencias_satelite(db, t: dict, detalle: list[dict]) -> list[str]:
             motivos.append("ya está inscrito")
         if motivos:
             salida.append(f"{d['posicion']}° {d.get('nombre', '')}: {', '.join(motivos)} para {destino['nombre']}. "
-                          "Si la regla del casino lo indica, pase el cupo al siguiente con «Ajustar».")
+                          "Igual recibe el ticket (no se devuelve dinero) y puede venderlo con un traspaso en caja.")
     return salida
 
 

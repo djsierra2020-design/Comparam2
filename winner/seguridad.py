@@ -144,7 +144,7 @@ def _exito(db, tabla, fila_id) -> None:
 
 # --- Códigos al celular --------------------------------------------------------------------
 
-def generar_codigo(db: BaseDatos, jugador: dict, proposito: str) -> str:
+def generar_codigo(db: BaseDatos, jugador: dict, proposito: str, texto: str | None = None) -> str:
     if not jugador.get("celular"):
         raise ErrorNegocio("La cuenta no tiene celular vinculado")
     codigo = f"{secrets.randbelow(1_000_000):06d}"
@@ -161,7 +161,7 @@ def generar_codigo(db: BaseDatos, jugador: dict, proposito: str) -> str:
                   "no lo entregue y avise al casino.",
         "vinculacion": "Winner Poker: código para vincular este celular a su caja: {c}.",
     }
-    enviar_sms(db, jugador["celular"], textos[proposito].format(c=codigo))
+    enviar_sms(db, jugador["celular"], (texto or textos[proposito]).format(c=codigo))
     return codigo
 
 

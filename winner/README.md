@@ -24,14 +24,16 @@ dentro de esta misma app Flask.
   libres, el panel muestra un mapa de la sala (qué torneo usa cada mesa) y una mesa que cierra un torneo queda libre
   para otro. Un jugador puede estar inscrito en dos torneos a la vez.
 - **Eventos de varios días**: una final (Día 2) con días clasificatorios (Día 1A, 1B… los que se necesiten). Cada día
-  se juega como un torneo y al cerrarlo los que siguen vivos guardan sus fichas y clasifican. Si el día se juega hasta
-  un porcentaje (p. ej. 15 % de las entradas), el sistema avisa cuándo se llegó. Un jugador que cae en un día puede
-  jugar otro, y si clasifica dos veces se queda con su **stack mayor**. A la final se entra solo clasificando (el
-  director puede abrir entrada directa). Al empezar el Día 2 se traen los clasificados con sus fichas y se sortean
-  los asientos.
+  se juega como un torneo y al cerrarlo los que siguen vivos guardan sus fichas y clasifican. **El administrador decide en
+  cada día cómo se clasifica**: nivel fijo (el día termina al acabar el nivel N), porcentaje de las entradas o número fijo
+  de jugadores. Puede cambiarlo durante el día, y el sistema avisa cuándo cerrar. Un jugador que cae en un día puede jugar
+  otro, y si clasifica dos veces se queda con su **stack mayor**. Todo el premio es para la final; los días
+  clasificatorios no pagan. A la final se entra solo clasificando (el director puede abrir entrada directa). Al empezar el
+  Día 2 se traen los clasificados con sus fichas y se sortean los asientos.
 - **Satélites**: la tabla de premios puede tener **tickets** (cupos) para el torneo destino, más premios en dinero.
-  El ticket vale el buy-in del destino y sirve en cualquiera de sus días clasificatorios. Si un ganador ya tenía
-  ticket o ya clasificó, el sistema lo advierte para pasar el cupo al siguiente. El supervisor puede anular un ticket.
+  El ticket vale el buy-in del destino y sirve en cualquiera de sus días clasificatorios. Si un ganador ya tenía cupo,
+  **no se le devuelve dinero, pero puede vender el ticket**: el traspaso se hace en la caja, con el dueño presente,
+  su documento y un código a su celular. El pago entre jugadores no pasa por la caja. El supervisor puede anular un ticket.
 - **Cierre de mesas**: avisa cuándo sobra una mesa. Al cerrarla, reparte a sus jugadores en los asientos libres de las mesas con menos gente. Si no caben, no mueve a nadie.
 - **Historial de movimientos**: quién se movió, de qué mesa y asiento a cuál, el motivo, la hora y quién lo hizo. El jugador recibe aviso en la app.
 - **Fichas**: conteos oficiales con historial, líderes, stack promedio y diferencia entre las fichas esperadas (entradas × stack + recompras + add-ons) y las contadas.
@@ -58,7 +60,8 @@ pero está **apagada** hasta que el área jurídica de Winner la apruebe. Se enc
 ## Demo
 
 Con `WINNER_DEMO=1` (así está en `render.yaml`) la app arranca con datos ficticios de una semana de evento: 300 cajas,
-Main Event con 5 días clasificatorios y final; el Día 1A ya cerrado (18 clasificados); el Día 1B en curso en 24 mesas
+Main Event con 5 días clasificatorios (cada uno termina al acabar el nivel 12) y final; el Día 1A ya cerrado
+(18 clasificados); el Día 1B en curso en 24 mesas
 (230 entradas, 14 alternos) y, al mismo tiempo, un satélite al Main Event en otras 4 mesas.
 - Personal: `admin`, `director`, `floor`, `crupier`, `cajero` y `supervisor`, todos con la clave `winner2026`.
 - Jugador: celulares `3000000000` a `3000000299`. El código SMS aparece en la misma pantalla.
@@ -76,9 +79,9 @@ En el plan gratis de Render el disco se borra con cada despliegue, así que la d
 
 También hay que servir la app solo por HTTPS.
 
-**Reglas que se asumieron y conviene confirmar con Winner:** clasificar dos veces → se conserva el stack mayor;
-un ganador de satélite que ya tiene cupo → el director decide si lo pasa al siguiente (el sistema solo advierte);
-los días clasificatorios no pagan premios (todo el premio está en la final).
+**Reglas confirmadas con Winner:** clasificar dos veces → se conserva el stack mayor; cupo repetido de satélite → no se
+devuelve dinero, se puede vender (traspaso); todo el premio va a la final; la forma de clasificar la decide el
+administrador en cada día.
 
 **Pendiente en la app:** huella digital (WebAuthn) como alternativa al PIN, notificaciones push (hoy los avisos
 aparecen al abrir la app), lista de espera de cash y mover a jugadores al asiento equivalente según el botón al balancear

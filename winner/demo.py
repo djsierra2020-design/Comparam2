@@ -53,7 +53,7 @@ def sembrar(db) -> None:
 def _evento_demo(db, director, cajero, jugadores) -> None:
     """Una semana de evento en la sala de 30 mesas, con torneos simultáneos.
 
-    - Final «Main Event Día 2» con 5 días clasificatorios (1A a 1E), clasifica el 15 %.
+    - Final «Main Event Día 2» con 5 días clasificatorios (1A a 1E); cada día termina al acabar el nivel 12.
     - Día 1A ya jugado y cerrado (sus sobrevivientes ya están clasificados).
     - Día 1B en curso en 24 mesas, con lista de alternos.
     - Satélite al Main Event en curso, al mismo tiempo, en 4 mesas (premia 3 tickets).
@@ -69,19 +69,21 @@ def _evento_demo(db, director, cajero, jugadores) -> None:
     base = {"buyin": 600_000, "stack_inicial": 40_000, "asientos_por_mesa": 9, "reentrada_max": 1}
     final = T.crear_torneo(db, director, {**base, "nombre": "Main Event Winner · Día 2", "fecha": dia(4), "tipo": "final"})
     dias = [T.crear_torneo(db, director, {**base, "nombre": f"Main Event · Día 1{letra}", "fecha": dia(n - 1),
-                                          "tipo": "dia1", "principal_id": final, "porcentaje_clasifica": 15})
+                                          "tipo": "dia1", "principal_id": final,
+                                          # el administrador elige por día: aquí, nivel fijo (termina al acabar el nivel 12)
+                                          "modo_clasifica": "nivel", "clasifica_valor": 12})
             for n, letra in enumerate("ABCDE")]
     definir_tabla(db, director, final, [{"posicion": p, "monto": m} for p, m in enumerate(
         [40_000_000, 25_000_000, 16_000_000, 11_000_000, 8_000_000, 6_000_000, 4_500_000, 3_500_000, 3_000_000], 1)])
 
-    # Día 1A (ayer): 120 jugadores, se juega hasta el 15 % y se cierra.
+    # Día 1A (ayer): 120 jugadores; al acabar el nivel 12 quedaban 18 y se cerró el día.
     d1a = dias[0]
     T.abrir_mesas(db, director, d1a, 14)
     for j in jugadores[:120]:
         T.inscribir(db, d1a, j, origen="caja", personal_id=cajero, pago="saldo")
     T.iniciar_torneo(db, director, d1a)
     T.sentar_inscritos(db, director, d1a)
-    objetivo = 18  # 15 % de 120
+    objetivo = 18
     while db.valor("SELECT COUNT(*) FROM entradas WHERE torneo_id = ? AND estado = 'sentado'", (d1a,)) > objetivo:
         vivos = db.todos("SELECT id FROM entradas WHERE torneo_id = ? AND estado = 'sentado'", (d1a,))
         T.eliminar(db, director, rnd.choice(vivos)["id"])
@@ -92,6 +94,7 @@ def _evento_demo(db, director, cajero, jugadores) -> None:
         T.balancear(db, director, d1a)
     for e in db.todos("SELECT id FROM entradas WHERE torneo_id = ? AND estado = 'sentado'", (d1a,)):
         T.registrar_conteo(db, director, e["id"], rnd.randrange(80, 600) * 1_000)
+    db.conexion().execute("UPDATE torneos SET nivel = 12 WHERE id = ?", (d1a,))
     cerrar_dia(db, director, d1a)
     eliminados_1a = [r["jugador_id"] for r in db.todos(
         "SELECT DISTINCT jugador_id FROM entradas WHERE torneo_id = ? AND estado = 'eliminado'", (d1a,))]
@@ -114,3 +117,4 @@ def _evento_demo(db, director, cajero, jugadores) -> None:
         T.inscribir(db, d1b, j, origen="caja", personal_id=cajero, pago="saldo")
     T.iniciar_torneo(db, director, d1b)
     T.sentar_inscritos(db, director, d1b)  # 216 sentados, el resto queda en la lista de alternos
+    db.conexion().execute("UPDATE torneos SET nivel = 4 WHERE id = ?", (d1b,))

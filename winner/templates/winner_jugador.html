@@ -126,7 +126,7 @@ async function refrescar(abrir = false) {
       <button class="sec" onclick="rechazar(${x.entrada_id})">No, gracias</button></div></div>`;
   }).join("");
   $("#extras").innerHTML = r.clasificaciones.map(c => `<div class="tarjeta" style="border-color:var(--verde)"><h3>✅ Clasificado a ${esc(c.final)}</h3><p style="margin:0">Su stack para el Día 2: <b>${miles(c.fichas)}</b> fichas${c.veces > 1 ? ` (el mayor de sus ${c.veces} clasificaciones)` : ""}.</p></div>`).join("")
-    + r.tickets.map(k => `<div class="tarjeta" style="border-color:var(--oro)"><h3>🎟️ Ticket para ${esc(k.destino)}</h3><p style="margin:0" class="suave">Vale una entrada (${pesos(k.valor)}). Ganado en ${esc(k.origen || "satélite")}. Úselo al inscribirse en la caja.</p></div>`).join("");
+    + r.tickets.map(k => `<div class="tarjeta" style="border-color:var(--oro)"><h3>🎟️ Ticket para ${esc(k.destino)}</h3><p style="margin:0" class="suave">Vale una entrada (${pesos(k.valor)}). Ganado en ${esc(k.origen || "satélite")}. Úselo al inscribirse en la caja. Si no lo va a usar, puede venderlo: el traspaso se hace en la caja con su documento.</p></div>`).join("");
   $("#mis-torneos").innerHTML = r.torneos.length ? r.torneos.map(t => `<div style="margin-bottom:14px"><b>${esc(t.torneo)}</b> <span class="suave">${esc(t.fecha)}</span><br>
       ${t.estado === "sentado" ? `<div class="asiento-grande">Mesa ${t.mesa} · Asiento ${t.asiento}</div>`
         : t.estado === "reservado" ? `<span class="chip oro">Esperando su decisión de recompra</span>`

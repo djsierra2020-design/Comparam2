@@ -134,6 +134,9 @@
 <script src="{{ url_for('winner.static', filename='comun.js') }}"></script>
 <script>
 const ROLES = {cajero: "Cajero", crupier: "Crupier", floor: "Floor", director: "Director de torneo", supervisor: "Supervisor", admin: "Administrador"};
+const MODOS_CLASIFICA = [["nivel", "Nivel fijo: el día termina al acabar un nivel"], ["porcentaje", "Porcentaje de las entradas"], ["jugadores", "Número fijo de jugadores"]];
+const reglaDia = t => !t.modo_clasifica ? "Sin regla de clasificación" : t.modo_clasifica === "nivel" ? `El día termina al acabar el nivel ${t.clasifica_valor}`
+  : t.modo_clasifica === "porcentaje" ? `Clasifica el ${t.clasifica_valor} % de las entradas` : `Clasifican ${t.clasifica_valor} jugadores`;
 const TIPOS_T = {normal: "Torneo", dia1: "Día clasificatorio", final: "Final", satelite: "Satélite"};
 const ESTADOS_T = {programado: "Programado", en_curso: "En curso", finalizado: "Finalizado", cancelado: "Cancelado"};
 const MOTIVOS = {alterno: "Alterno sentado", sentado: "Sentado", balanceo: "Balanceo", cierre_mesa: "Cierre de mesa", recompra: "Recompra", reentrada: "Re-entrada", inscripcion: "Inscripción"};
@@ -263,6 +266,7 @@ async function cargarEvento(t) {
   const ev = r.resumen;
   el.style.display = "";
   el.innerHTML = `<h3>Evento: ${esc(ev.final.nombre)}</h3>
+    ${t.tipo === "dia1" ? `<div class="aviso verde">📋 ${esc(t.nombre)}: ${esc(reglaDia(t))}${puede("director") && t.estado !== "finalizado" ? ` <button class="sec" style="padding:3px 10px;font-size:12px" onclick="cambiarRegla()">Cambiar</button>` : ""}</div>` : ""}
     <div class="kpis"><div class="kpi"><div class="e">Entradas en días clasificatorios</div><div class="v">${ev.entradas_totales}</div></div>
       <div class="kpi"><div class="e">Clasificados al Día 2</div><div class="v">${ev.clasificados}</div></div>
       <div class="kpi"><div class="e">Recaudo en dinero</div><div class="v">${pesos(ev.recaudo_dinero)}</div></div>
@@ -270,6 +274,12 @@ async function cargarEvento(t) {
     <table><tr><th>Día</th><th>Fecha</th><th>Estado</th><th class="n">Entradas</th><th class="n">Clasificados</th></tr>${ev.dias.map(d => `<tr><td>${esc(d.nombre)}</td><td>${esc(d.fecha)}</td><td>${ESTADOS_T[d.estado]}</td><td class="n">${d.entradas}</td><td class="n">${d.clasificados}</td></tr>`).join("") || `<tr><td colspan="5" class="suave">Aún no hay días clasificatorios: créelos con «+ Nuevo torneo» → Día clasificatorio.</td></tr>`}</table>
     ${r.clasificados.length ? `<details style="margin-top:10px"><summary>Ver clasificados (stack mayor de cada jugador)</summary><table><tr><th>#</th><th>Jugador</th><th>Día</th><th class="n">Fichas</th></tr>${r.clasificados.map((c, i) => `<tr><td>${i + 1}</td><td>${esc(c.nombre)}</td><td>${esc(c.dia)}</td><td class="n">${miles(c.fichas)}</td></tr>`).join("")}</table></details>` : ""}`;
 }
+window.cambiarRegla = async () => {
+  const d = await pedir("Forma de clasificar de este día", [
+    {n: "modo_clasifica", l: "¿Cómo se decide quién clasifica?", tipo: "select", opciones: MODOS_CLASIFICA},
+    {n: "clasifica_valor", l: "Valor: nivel, % o número de jugadores", tipo: "number", valor: tablero.torneo.clasifica_valor || ""}], "Guardar");
+  if (d) accion(async () => { await api(`/torneos/${torneoId}`, "PATCH", d); cargarTablero(); });
+};
 window.cerrarDia = async () => {
   if (!await confirmar("¿Cerrar el día?", "Los jugadores sentados guardan sus fichas y clasifican al Día 2. Si alguien ya había clasificado, se queda con su stack mayor. Se cierran las mesas de este día.")) return;
   accion(async () => { const r = await api(`/torneos/${torneoId}/cerrar-dia`, "POST", {}); aviso(`${r.clasificados} jugadores clasificados`); await cargarTorneos(); cargarTablero(); });
@@ -388,7 +398,8 @@ $("#b-nuevo-torneo").onclick = async () => {
   if (k.tipo === "dia1") {
     if (!finales.length) return aviso("Primero cree la final (Día 2) del evento", true);
     extra.push({n: "principal_id", l: "Final a la que clasifica", tipo: "select", opciones: finales.map(t => [t.id, t.nombre])},
-               {n: "porcentaje_clasifica", l: "% de las entradas que clasifica (opcional; el sistema avisa al llegar)", tipo: "number"});
+               {n: "modo_clasifica", l: "¿Cómo se decide quién clasifica?", tipo: "select", opciones: MODOS_CLASIFICA},
+               {n: "clasifica_valor", l: "Valor: nivel en que termina el día, % de las entradas o número de jugadores", tipo: "number"});
   }
   if (k.tipo === "satelite") {
     if (!destinos.length) return aviso("Primero cree el torneo al que da cupos el satélite", true);
@@ -427,7 +438,7 @@ window.verJugador = async (id) => {
     ${j.motivo_bloqueo ? `<div class="aviso rojo">Bloqueo: ${esc(j.motivo_bloqueo)}</div>` : ""}
     <div class="kpi" style="margin-bottom:12px"><div class="e">Saldo en caja</div><div class="v">${pesos(r.saldo)}</div></div>
     ${r.clasificaciones.map(c => `<div class="aviso verde">Clasificado a ${esc(c.final)} con ${miles(c.fichas)} fichas${c.veces > 1 ? ` (stack mayor de ${c.veces} clasificaciones)` : ""}</div>`).join("")}
-    ${r.tickets.filter(k => k.estado === "disponible").map(k => `<div class="aviso">🎟️ Ticket para ${esc(k.destino)} (${pesos(k.valor)}) · ganado en ${esc(k.origen || "—")}${puede("aprobar") ? ` <button class="sec" style="padding:3px 8px;font-size:12px" onclick="anularTicket(${k.id}, ${id})">Anular</button>` : ""}</div>`).join("")}
+    ${r.tickets.filter(k => k.estado === "disponible").map(k => `<div class="aviso">🎟️ Ticket para ${esc(k.destino)} (${pesos(k.valor)}) · ganado en ${esc(k.origen || "—")}${k.traspasos ? " · comprado/traspasado" : ""}${caja ? ` <button class="sec" style="padding:3px 8px;font-size:12px" onclick="traspasarTicket(${k.id}, ${id})">Vender / traspasar</button>` : ""}${puede("aprobar") ? ` <button class="sec" style="padding:3px 8px;font-size:12px" onclick="anularTicket(${k.id}, ${id})">Anular</button>` : ""}</div>`).join("")}
     <div class="fila">
       ${abiertos.length ? `<button class="auto" onclick="inscribirJugador(${id})">Inscribir a torneo</button>` : ""}
       ${caja ? `<button class="auto sec" onclick="depositar(${id})">Depósito</button><button class="auto sec" onclick="retirar(${id})">Retiro</button>
@@ -448,6 +459,15 @@ window.inscribirJugador = async (id) => {
     pedir("Inscrito", [], "Listo", r.asiento && r.asiento.alterno ? `<p class="grande" style="color:var(--oro)">Sala llena: lista de alternos</p>` : r.asiento && r.asiento.mesa ? `<p class="grande">Mesa ${r.asiento.mesa} · Asiento ${r.asiento.asiento}</p>` : `<p>Código QR: <b>${r.entrada.codigo_qr}</b><br><span class="suave">El jugador lo ve en su app; el floor lo escanea para sentarlo.</span></p>`);
     verJugador(id);
   });
+};
+window.traspasarTicket = async (kid, jid) => {
+  if (!await accion(() => api(`/tickets/${kid}/codigo-traspaso`, "POST", {}))) return;
+  const d = await pedir("Vender / traspasar ticket", [
+    {n: "comprador", l: "Número de caja del comprador (p. ej. W000123)"},
+    {n: "documento", l: "Documento del dueño del ticket (verifique el original)"},
+    {n: "codigo", l: "Código que le llegó al dueño al celular"}], "Traspasar",
+    `<p class="suave">El casino no devuelve dinero por un cupo: el jugador puede venderlo. El pago entre ellos no pasa por la caja.</p>`);
+  if (d) accion(async () => { const r = await api(`/tickets/${kid}/traspasar`, "POST", d); aviso(`Ticket traspasado a ${r.nombre} (${r.a})`); verJugador(jid); });
 };
 window.anularTicket = async (kid, jid) => {
   const d = await pedir("Anular ticket", [{n: "motivo", l: "Motivo"}], "Anular");
