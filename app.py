@@ -144,6 +144,27 @@ def inicio():
                            elegidas=elegidas, p=params, r=resultado, args=request.args)
 
 
+@app.get("/lista")
+def lista_cliente():
+    """Lista para enviar a un cliente: solo dueños directos con teléfono, sin enlaces a los portales.
+    Se guarda como PDF desde el navegador (Imprimir → Guardar como PDF)."""
+    barrio = request.args.get("barrio", "").strip()
+    params = {**_params(), "solo_dueno": True, "con_telefono": True}
+    hab_min = int(request.args["hab_min"]) if request.args.get("hab_min", "").isdigit() else None
+    cliente = request.args.get("cliente", "").strip()[:60]
+    elegidas = [f for f in request.args.getlist("fuente") if f in FUENTES] or list(PORTALES)
+    resultado = buscar(barrio, crear_fuentes(elegidas), **params) if barrio else None
+    anuncios = []
+    if resultado:
+        anuncios = [a for a in resultado.anuncios if a.telefonos and a.es_dueno_directo and not a.verificar
+                    and (not hab_min or (a.habitaciones or 0) >= hab_min)]
+        anuncios.sort(key=lambda a: a.precio_m2)
+    from comparam import diario
+    return render_template("lista.html", barrio=barrio, p=params, r=resultado, anuncios=anuncios,
+                           cliente=cliente, hab_min=hab_min, fecha=diario.hoy().strftime("%d/%m/%Y"),
+                           args=request.args)
+
+
 def _mensaje_whatsapp(lista: list[dict], fecha: str) -> str:
     """Texto listo para pegar en WhatsApp con los anuncios nuevos."""
     if not lista:
