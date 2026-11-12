@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Winner · Torneos y caja</title>
+<link rel="stylesheet" href="{{ url_for('winner.static', filename='winner.css') }}">
+</head>
+<body>
+<header class="barra"><div class="marca">WINNER <span>Torneos y caja</span></div></header>
+<main class="contenedor" style="max-width:720px">
+  <div class="tarjeta">
+    <h2>Plataforma de torneos y caja para jugadores</h2>
+    <p class="suave">Registro sin duplicados, sentado automático, balanceo y cierre de mesas con historial,
+      control de fichas, eliminaciones desde la app y caja con saldo del jugador.</p>
+    <div class="fila" style="margin-top:14px">
+      <a class="boton auto" href="{{ url_for('winner.pantalla_personal') }}">Panel de sala (personal)</a>
+      <a class="boton sec auto" href="{{ url_for('winner.pantalla_jugador') }}">App del jugador</a>
+    </div>
+  </div>
+  {% if demo %}
+  <div class="tarjeta">
+    <h3>Modo demostración</h3>
+    <p class="suave">Datos ficticios: 40 jugadores y un torneo en curso con 36 jugadores en 5 mesas.</p>
+    <ul class="suave">
+      <li>Personal: usuarios <b>admin</b>, <b>director</b>, <b>floor</b>, <b>crupier</b>, <b>cajero</b>, <b>supervisor</b> · clave <b>winner2026</b>.</li>
+      <li>Jugador: celulares <b>3000000000</b> a <b>3000000039</b>. El código SMS aparece en la misma pantalla.</li>
+      <li>Pantalla de sala: <a href="{{ url_for('winner.pantalla_publica', torneo_id=1) }}">torneo demo</a>.</li>
+    </ul>
+  </div>
+  {% endif %}
+</main>
+</body>
+</html>

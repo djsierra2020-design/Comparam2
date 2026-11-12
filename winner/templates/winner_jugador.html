@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a100d">
+<title>Winner · Mi caja</title>
+<link rel="stylesheet" href="{{ url_for('winner.static', filename='winner.css') }}">
+<style>
+.contenedor{max-width:520px}
+.saldo{background:linear-gradient(135deg,#1f7a4a,#123826);border-radius:16px;padding:18px;margin-bottom:16px}
+.saldo .e{color:#cfe9da;font-size:13px}
+.saldo .v{font-size:34px;font-weight:800;font-variant-numeric:tabular-nums}
+.qr{background:#fff;padding:12px;border-radius:12px;display:inline-block}
+.asiento-grande{font-size:28px;font-weight:800;color:var(--oro)}
+.noti{border-bottom:1px solid var(--borde);padding:8px 0}
+.noti.nueva b{color:var(--oro)}
+.reserva{border:2px solid var(--oro);background:#2a2210}
+</style>
+</head>
+<body>
+<header class="barra"><div class="marca">WINNER <span>Mi caja</span></div><div class="espacio"></div>
+  <button class="sec oculto" id="salir">Salir</button></header>
+<main class="contenedor">
+  <section id="v-ingreso" class="tarjeta">
+    <h2>Ingresar</h2>
+    <p class="suave">Use el celular que vinculó en la caja del casino.</p>
+    <div id="paso1">
+      <label>Celular</label><input id="celular" inputmode="numeric" autocomplete="tel" placeholder="300 123 4567">
+      <button id="b-codigo" style="width:100%;margin-top:12px">Enviarme un código</button>
+    </div>
+    <div id="paso2" class="oculto">
+      <label>Código que le llegó por SMS</label><input id="codigo" inputmode="numeric" autocomplete="one-time-code" maxlength="6">
+      <div id="campo-pin"><label>PIN</label><input id="pin" type="password" inputmode="numeric" maxlength="6"></div>
+      <div id="campo-pin-nuevo" class="oculto"><label>Cree su PIN (4 a 6 dígitos)</label><input id="pin-nuevo" type="password" inputmode="numeric" maxlength="6">
+        <label>Repita el PIN</label><input id="pin-nuevo2" type="password" inputmode="numeric" maxlength="6"></div>
+      <button id="b-ingresar" style="width:100%;margin-top:12px">Ingresar</button>
+      <button id="b-volver" class="sec" style="width:100%;margin-top:8px">Cambiar celular</button>
+    </div>
+    {% if demo %}<div class="aviso" style="margin-top:14px;font-size:13px;display:block">Demo: celulares <b>3000000000</b> a <b>3000000039</b>. En la demo los SMS se muestran aquí:<div id="sms-demo" class="suave"></div></div>{% endif %}
+  </section>
+
+  <section id="v-app" class="oculto">
+    <div class="saldo"><div class="e">Saldo disponible en su caja Winner</div><div class="v" id="saldo"></div>
+      <div class="e" id="titular"></div></div>
+    <div id="reservas"></div>
+    <div class="tarjeta"><h3>Mis torneos</h3><div id="mis-torneos"></div></div>
+    <div class="tarjeta"><h3>Torneos</h3><div id="disponibles"></div></div>
+    <div class="tarjeta"><h3>Avisos</h3><div id="notis"></div></div>
+    <div class="tarjeta"><h3>Movimientos</h3><div id="movs"></div>
+      <p class="suave" style="font-size:13px">Los depósitos y retiros se hacen solo en persona en la caja del casino, con su documento.</p></div>
+  </section>
+</main>
+<div id="toast"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="{{ url_for('winner.static', filename='comun.js') }}"></script>
+<script>
+const TIPOS = {deposito: "Depósito", retiro: "Retiro", inscripcion: "Inscripción", recompra: "Recompra", reentrada: "Re-entrada", addon: "Add-on", premio: "Premio", correccion: "Corrección"};
+let sondeo = null, ultimo = null, notiVista = 0;
+const cel = () => $("#celular").value.replace(/\D/g, "");
+
+window.alSalir = () => {
+  clearInterval(sondeo);
+  $("#v-app").classList.add("oculto"); $("#salir").classList.add("oculto");
+  $("#v-ingreso").classList.remove("oculto"); $("#paso1").classList.remove("oculto"); $("#paso2").classList.add("oculto");
+};
+
+{% if demo %}
+async function verSMS() {
+  try { const s = await api("/demo/sms"); $("#sms-demo").innerHTML = s.slice(0, 3).map(m => `<div>${esc(m.celular)}: ${esc(m.texto)}</div>`).join(""); } catch (e) { /* sin demo */ }
+}
+{% else %}
+async function verSMS() {}
+{% endif %}
+
+$("#b-codigo").onclick = () => accion(async () => {
+  const r = await api("/jugador/codigo", "POST", {celular: cel()});
+  aviso(r.mensaje);
+  $("#paso1").classList.add("oculto"); $("#paso2").classList.remove("oculto"); $("#codigo").focus();
+  verSMS();
+}, $("#b-codigo"));
+$("#b-volver").onclick = () => { $("#paso2").classList.add("oculto"); $("#paso1").classList.remove("oculto"); };
+$("#b-ingresar").onclick = () => accion(async () => {
+  const d = {celular: cel(), codigo: $("#codigo").value, pin: $("#pin").value};
+  if (!$("#campo-pin-nuevo").classList.contains("oculto")) {
+    if ($("#pin-nuevo").value !== $("#pin-nuevo2").value) throw new Error("Los PIN no coinciden");
+    d.pin_nuevo = $("#pin-nuevo").value;
+  }
+  try { await api("/jugador/ingresar", "POST", d); }
+  catch (e) {
+    if (e.status === 409) { $("#campo-pin").classList.add("oculto"); $("#campo-pin-nuevo").classList.remove("oculto"); throw new Error("Primer ingreso: cree su PIN"); }
+    throw e;
+  }
+  $("#codigo").value = $("#pin").value = $("#pin-nuevo").value = $("#pin-nuevo2").value = "";
+  entrar();
+}, $("#b-ingresar"));
+$("#salir").onclick = () => accion(async () => { await api("/jugador/salir", "POST", {}); window.alSalir(); });
+
+async function entrar() {
+  $("#v-ingreso").classList.add("oculto"); $("#v-app").classList.remove("oculto"); $("#salir").classList.remove("oculto");
+  await refrescar();
+  clearInterval(sondeo);
+  sondeo = setInterval(refrescar, 5000);
+}
+
+async function pedirPin(titulo, detalle) {
+  const d = await pedir(titulo, [{n: "pin", l: "Confirme con su PIN", tipo: "password"}], "Confirmar compra", `<p>${detalle}</p>`);
+  return d && d.pin;
+}
+
+async function refrescar() {
+  let r;
+  try { r = await api("/jugador/inicio"); }
+  catch (e) { if (e.status === 401) { window.alSalir(); aviso(e.message, true); } return; }
+  ultimo = r;
+  $("#saldo").textContent = pesos(r.saldo);
+  $("#titular").textContent = `${r.jugador.nombre} · Caja ${r.jugador.numero_caja}`;
+  $("#reservas").innerHTML = r.reservas.map(x => {
+    const ops = x.opciones.split(",");
+    return `<div class="tarjeta reserva"><h3>⏳ Su asiento está reservado</h3><p>${esc(x.torneo)} · mesa ${x.mesa}, asiento ${x.asiento}<br>Vence a las <b>${hora(x.vence_en)}</b></p>
+      <div class="fila">${ops.includes("recompra") ? `<button class="oro" onclick="comprar(${x.entrada_id}, 'recompra', ${x.recompra_precio})">Recomprar ${pesos(x.recompra_precio)}</button>` : ""}
+      ${ops.includes("reentrada") ? `<button onclick="comprar(${x.entrada_id}, 'reentrada', ${x.buyin})">Re-entrar ${pesos(x.buyin)}</button>` : ""}
+      <button class="sec" onclick="rechazar(${x.entrada_id})">No, gracias</button></div></div>`;
+  }).join("");
+  $("#mis-torneos").innerHTML = r.torneos.length ? r.torneos.map(t => `<div style="margin-bottom:14px"><b>${esc(t.torneo)}</b> <span class="suave">${esc(t.fecha)}</span><br>
+      ${t.estado === "sentado" ? `<div class="asiento-grande">Mesa ${t.mesa} · Asiento ${t.asiento}</div>`
+        : t.estado === "reservado" ? `<span class="chip oro">Esperando su decisión de recompra</span>`
+        : `<p class="suave" style="margin:6px 0">Muestre este código en el ingreso para que le asignen asiento:</p><div class="qr" id="qr-${t.id}"></div><div class="suave" style="margin-top:4px">${t.codigo_qr}</div>`}</div>`).join("")
+    : `<p class="suave">No está inscrito en ningún torneo activo.</p>`;
+  r.torneos.filter(t => t.estado === "inscrito").forEach(t => {
+    const el = $("#qr-" + t.id);
+    if (el && window.QRCode) new QRCode(el, {text: "WINNER:" + t.codigo_qr, width: 180, height: 180});
+  });
+  $("#disponibles").innerHTML = r.disponibles.length ? `<table>${r.disponibles.map(t => `<tr><td><b>${esc(t.nombre)}</b><br><span class="suave">${esc(t.fecha)} · ${t.inscritos} inscritos</span></td><td class="n">${pesos(t.buyin)}<br>
+      ${t.inscrito ? '<span class="chip verde">Inscrito</span>' : t.puede_inscribirse ? `<button onclick="inscribir(${t.id}, ${t.buyin}, '${esc(t.nombre).replace(/'/g, "")}')">Inscribirme</button>` : r.compras_habilitadas ? "" : '<span class="suave" style="font-size:12px">Inscripción en caja</span>'}</td></tr>`).join("")}</table>`
+    : `<p class="suave">No hay torneos abiertos.</p>`;
+  const nuevas = r.notificaciones.filter(n => !n.leida);
+  if (nuevas.length && nuevas[0].id > notiVista) {
+    if (notiVista) aviso(nuevas[0].titulo + ": " + nuevas[0].texto);
+    notiVista = nuevas[0].id;
+    if (navigator.vibrate && ["eliminacion", "asiento", "premio"].includes(nuevas[0].tipo)) navigator.vibrate(200);
+  }
+  $("#notis").innerHTML = r.notificaciones.length ? r.notificaciones.slice(0, 12).map(n => `<div class="noti ${n.leida ? "" : "nueva"}"><b>${esc(n.titulo)}</b> <span class="suave" style="font-size:12px">${hora(n.fecha)}</span><br><span class="suave">${esc(n.texto)}</span></div>`).join("")
+    + (nuevas.length ? `<button class="sec" style="margin-top:8px" onclick="leidas()">Marcar como leídos</button>` : "") : `<p class="suave">Sin avisos.</p>`;
+  $("#movs").innerHTML = r.movimientos.length ? `<table>${r.movimientos.map(m => `<tr><td>${TIPOS[m.tipo]}<br><span class="suave" style="font-size:12px">${hora(m.fecha)} · ${esc(m.descripcion || "")}</span></td><td class="n" style="color:${m.monto > 0 ? "var(--verde)" : "var(--rojo)"}">${pesos(m.monto)}</td></tr>`).join("")}</table>` : `<p class="suave">Sin movimientos.</p>`;
+}
+
+window.leidas = () => accion(async () => { await api("/jugador/notificaciones/leidas", "POST", {}); refrescar(); });
+window.inscribir = async (id, precio, nombre) => {
+  const pin = await pedirPin("Inscripción", `${nombre}: se descuentan <b>${pesos(precio)}</b> de su saldo.`);
+  if (pin) accion(async () => { await api(`/jugador/torneos/${id}/inscribir`, "POST", {pin}); aviso("¡Inscrito! Muestre su QR en el ingreso"); refrescar(); });
+};
+window.comprar = async (entrada, tipo, precio) => {
+  const pin = await pedirPin(tipo === "recompra" ? "Recompra" : "Re-entrada", `Se descuentan <b>${pesos(precio)}</b> de su saldo.`);
+  if (pin) accion(async () => {
+    const r = await api(`/jugador/entradas/${entrada}/${tipo}`, "POST", {pin});
+    aviso(r.asiento ? `Siéntese en mesa ${r.asiento.mesa}, asiento ${r.asiento.asiento}` : "Recompra confirmada: vuelva a su asiento");
+    refrescar();
+  });
+};
+window.rechazar = async entrada => {
+  if (await confirmar("¿Liberar su asiento?", "Ya no podrá recomprar desde este asiento."))
+    accion(async () => { await api(`/jugador/entradas/${entrada}/rechazar`, "POST", {}); refrescar(); });
+};
+
+// Si ya hay sesión abierta, entra directo.
+api("/jugador/inicio").then(entrar).catch(() => {});
+</script>
+</body>
+</html>

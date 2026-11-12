@@ -61,6 +61,9 @@ def finalizar(db, personal_id, torneo_id) -> dict:
         if db.valor("SELECT COUNT(*) FROM entradas WHERE torneo_id = ? AND estado = 'reservado'", (torneo_id,)):
             raise ErrorNegocio("Hay jugadores con reserva de recompra pendiente; espere o resuélvalas")
         pos = posiciones(db, torneo_id)
+        vivos = sum(1 for p in pos if p["estado"] != "eliminado")
+        if vivos > len(premios):
+            raise ErrorNegocio(f"Aún quedan {vivos} jugadores y solo se pagan {len(premios)} puestos")
         if len(pos) < len(premios):
             raise ErrorNegocio("Hay más premios que jugadores; ajuste la tabla")
         c.execute("UPDATE torneos SET estado = 'finalizado', finalizado_en = ?, registro_abierto = 0, "

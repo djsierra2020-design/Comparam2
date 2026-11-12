@@ -6,3 +6,4 @@ __pycache__/
 resultados*.csv
 .playwright/
 /sitio/
+data/winner.db*

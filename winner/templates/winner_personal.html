@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Winner · Panel de sala</title>
+<link rel="stylesheet" href="{{ url_for('winner.static', filename='winner.css') }}">
+</head>
+<body>
+<header class="barra">
+  <div class="marca">WINNER <span>Panel de sala</span></div>
+  <nav class="pestanas oculto" id="pestanas">
+    <button data-p="mesas" data-perm="">Mesas</button>
+    <button data-p="jugadores" data-perm="">Jugadores y caja</button>
+    <button data-p="premios" data-perm="">Premios</button>
+    <button data-p="reportes" data-perm="reportes">Reportes</button>
+    <button data-p="admin" data-perm="admin">Administración</button>
+  </nav>
+  <div class="espacio"></div>
+  <span id="quien" class="suave"></span>
+  <button class="sec oculto" id="salir">Salir</button>
+</header>
+
+<main class="contenedor">
+  <!-- Ingreso -->
+  <section id="v-ingreso" class="tarjeta" style="max-width:380px;margin:40px auto">
+    <h2>Ingreso del personal</h2>
+    <form id="f-ingreso">
+      <label>Usuario</label><input name="usuario" autocomplete="username" required>
+      <label>Clave</label><input name="clave" type="password" autocomplete="current-password" required>
+      <div style="margin-top:14px"><button style="width:100%">Ingresar</button></div>
+    </form>
+    {% if demo %}<p class="suave" style="font-size:13px;margin-top:14px">Demo: usuarios <b>admin</b>, <b>director</b>, <b>floor</b>, <b>crupier</b>, <b>cajero</b>, <b>supervisor</b> · clave <b>winner2026</b></p>{% endif %}
+  </section>
+
+  <!-- Mesas -->
+  <section id="v-mesas" class="oculto">
+    <div class="tarjeta">
+      <div class="fila">
+        <div><label>Torneo</label><select id="sel-torneo"></select></div>
+        <button class="auto sec" id="b-nuevo-torneo" data-perm="director">+ Nuevo torneo</button>
+        <a class="boton sec auto" id="enlace-pantalla" target="_blank">Pantalla de sala ↗</a>
+      </div>
+    </div>
+    <div id="tablero-vacio" class="tarjeta oculto suave">No hay torneos. Cree uno con «+ Nuevo torneo».</div>
+    <div id="tablero" class="oculto">
+      <div class="kpis" id="kpis"></div>
+      <div id="sugerencias"></div>
+      <div class="tarjeta">
+        <div class="fila">
+          <div data-perm="floor"><label>Código QR del jugador (escanear o escribir)</label>
+            <input id="qr" placeholder="Ej. 3FA9C21B0D" autocomplete="off"></div>
+          <button class="auto" id="b-qr" data-perm="floor">Sentar</button>
+          <button class="auto sec" id="b-camara" data-perm="floor">📷 Cámara</button>
+          <button class="auto sec" id="b-abrir-mesa" data-perm="floor">+ Abrir mesa</button>
+          <button class="auto sec" id="b-sentar-todos" data-perm="floor">Sentar inscritos</button>
+          <button class="auto sec" id="b-balancear" data-perm="floor">Balancear</button>
+          <button class="auto oro oculto" id="b-iniciar" data-perm="floor">Iniciar torneo</button>
+        </div>
+        <video id="video" class="oculto" style="width:100%;max-width:360px;margin-top:10px;border-radius:10px" playsinline muted></video>
+        <div class="fila" style="margin-top:12px" data-perm="floor">
+          <div class="auto"><label>Nivel</label>
+            <div class="fila"><button class="sec auto" id="b-nivel-menos">−</button><span id="nivel" class="grande auto" style="min-width:48px;text-align:center"></span><button class="sec auto" id="b-nivel-mas">+</button></div></div>
+          <div class="auto"><label>Inscripción / re-entrada</label><button class="sec auto" id="t-registro"></button></div>
+          <div class="auto"><label>Recompras</label><button class="sec auto" id="t-recompras"></button></div>
+          <div class="auto"><label>Add-on</label><button class="sec auto" id="t-addon"></button></div>
+        </div>
+      </div>
+      <div class="mesas" id="mesas"></div>
+      <div class="dos" style="margin-top:16px">
+        <div class="tarjeta"><h3>Inscritos sin asiento</h3><div id="sin-asiento" class="suave"></div></div>
+        <div class="tarjeta"><h3>Fichas</h3><div id="fichas"></div></div>
+      </div>
+      <div class="tarjeta"><h3>Historial de movimientos de asiento</h3><div class="scroll" id="historial"></div></div>
+    </div>
+  </section>
+
+  <!-- Jugadores y caja -->
+  <section id="v-jugadores" class="oculto">
+    <div class="dos">
+      <div class="tarjeta">
+        <h2>Buscar jugador</h2>
+        <div class="fila"><input id="q" placeholder="Nombre, documento, celular o número de caja"><button class="auto" id="b-buscar">Buscar</button></div>
+        <div id="resultados" style="margin-top:10px"></div>
+        <div style="margin-top:12px" data-perm="caja"><button class="sec" id="b-abrir-caja">+ Abrir caja a jugador nuevo</button></div>
+      </div>
+      <div class="tarjeta" id="ficha-jugador"><p class="suave">Seleccione un jugador.</p></div>
+    </div>
+  </section>
+
+  <!-- Premios -->
+  <section id="v-premios" class="oculto">
+    <div class="tarjeta"><div class="fila"><div><label>Torneo</label><select id="sel-torneo-premios"></select></div></div></div>
+    <div class="dos">
+      <div class="tarjeta"><h3>Tabla de premios</h3><div id="tabla-premios"></div></div>
+      <div class="tarjeta"><h3>Premiación</h3><div id="premiacion"></div></div>
+    </div>
+  </section>
+
+  <!-- Reportes -->
+  <section id="v-reportes" class="oculto">
+    <div class="tarjeta">
+      <h2>Cuadre de caja diario</h2>
+      <div class="fila"><div class="auto"><label>Día</label><input type="date" id="dia"></div><button class="auto" id="b-cuadre">Ver</button>
+        <button class="auto sec" id="b-arqueo" data-perm="caja">Registrar arqueo (efectivo contado)</button></div>
+      <div id="cuadre" style="margin-top:12px"></div>
+    </div>
+    <div class="tarjeta">
+      <h2>Resumen por torneo</h2>
+      <div class="fila"><div><select id="sel-torneo-reporte"></select></div><button class="auto" id="b-rep-torneo">Ver</button></div>
+      <div id="rep-torneo" style="margin-top:12px"></div>
+    </div>
+    <div class="tarjeta" data-perm="auditoria">
+      <h2>Auditoría</h2><button class="sec" id="b-auditoria">Cargar últimos 300 registros</button>
+      <div class="scroll" id="auditoria" style="margin-top:10px"></div>
+    </div>
+  </section>
+
+  <!-- Administración -->
+  <section id="v-admin" class="oculto">
+    <div class="dos">
+      <div class="tarjeta"><h2>Personal</h2><div id="personal"></div>
+        <button class="sec" id="b-nuevo-personal" style="margin-top:10px">+ Nuevo usuario</button></div>
+      <div class="tarjeta"><h2>Ajustes y topes</h2><div id="ajustes"></div></div>
+    </div>
+  </section>
+</main>
+<div id="toast"></div>
+
+<script src="{{ url_for('winner.static', filename='comun.js') }}"></script>
+<script>
+const ROLES = {cajero: "Cajero", crupier: "Crupier", floor: "Floor", director: "Director de torneo", supervisor: "Supervisor", admin: "Administrador"};
+const ESTADOS_T = {programado: "Programado", en_curso: "En curso", finalizado: "Finalizado", cancelado: "Cancelado"};
+const MOTIVOS = {sentado: "Sentado", balanceo: "Balanceo", cierre_mesa: "Cierre de mesa", recompra: "Recompra", reentrada: "Re-entrada", inscripcion: "Inscripción"};
+const TIPOS = {deposito: "Depósito", retiro: "Retiro", inscripcion: "Inscripción", recompra: "Recompra", reentrada: "Re-entrada", addon: "Add-on", premio: "Premio", correccion: "Corrección"};
+let yo = null, torneos = [], torneoId = null, tablero = null, pestana = "mesas", sondeo = null;
+const puede = p => !p || (yo && yo.permisos.includes(p));
+
+function aplicarPermisos() {
+  $$("[data-perm]").forEach(el => el.classList.toggle("oculto", !puede(el.dataset.perm)));
+}
+
+window.alSalir = () => { yo = null; mostrarIngreso(); };
+function mostrarIngreso() {
+  clearInterval(sondeo);
+  $$("main > section").forEach(s => s.classList.add("oculto"));
+  $("#v-ingreso").classList.remove("oculto");
+  $("#pestanas").classList.add("oculto"); $("#salir").classList.add("oculto"); $("#quien").textContent = "";
+}
+
+async function arrancar() {
+  try { yo = await api("/personal/yo"); } catch (e) { return mostrarIngreso(); }
+  $("#v-ingreso").classList.add("oculto");
+  $("#pestanas").classList.remove("oculto"); $("#salir").classList.remove("oculto");
+  $("#quien").textContent = `${yo.nombre} · ${ROLES[yo.rol]}`;
+  aplicarPermisos();
+  await cargarTorneos();
+  ir(pestana);
+}
+
+$("#f-ingreso").addEventListener("submit", ev => {
+  ev.preventDefault();
+  const d = Object.fromEntries(new FormData(ev.target));
+  accion(async () => { await api("/personal/ingresar", "POST", d); ev.target.reset(); arrancar(); }, $("button", ev.target));
+});
+$("#salir").onclick = () => accion(async () => { await api("/personal/salir", "POST", {}); window.alSalir(); });
+
+$$("#pestanas button").forEach(b => b.onclick = () => ir(b.dataset.p));
+function ir(p) {
+  pestana = p;
+  $$("#pestanas button").forEach(b => b.classList.toggle("activa", b.dataset.p === p));
+  $$("main > section").forEach(s => s.classList.toggle("oculto", s.id !== "v-" + p));
+  clearInterval(sondeo);
+  if (p === "mesas") { cargarTablero(); sondeo = setInterval(cargarTablero, 4000); }
+  if (p === "premios") cargarPremios();
+  if (p === "reportes") { if (!$("#dia").value) $("#dia").value = new Date().toLocaleDateString("en-CA"); }
+  if (p === "admin") cargarAdmin();
+}
+
+// ---------- Torneos y tablero ----------
+async function cargarTorneos() {
+  torneos = await api("/torneos");
+  if (!torneoId || !torneos.find(t => t.id === torneoId)) {
+    const activo = torneos.find(t => t.estado === "en_curso") || torneos.find(t => t.estado === "programado") || torneos[0];
+    torneoId = activo ? activo.id : null;
+  }
+  const ops = torneos.map(t => `<option value="${t.id}">${esc(t.nombre)} · ${esc(t.fecha)} · ${ESTADOS_T[t.estado]}</option>`).join("");
+  ["#sel-torneo", "#sel-torneo-premios", "#sel-torneo-reporte"].forEach(s => { $(s).innerHTML = ops; if (torneoId) $(s).value = torneoId; });
+}
+["#sel-torneo", "#sel-torneo-premios"].forEach(s => $(s).onchange = e => {
+  torneoId = +e.target.value;
+  ["#sel-torneo", "#sel-torneo-premios", "#sel-torneo-reporte"].forEach(x => $(x).value = torneoId);
+  pestana === "mesas" ? cargarTablero() : cargarPremios();
+});
+
+async function cargarTablero() {
+  $("#tablero-vacio").classList.toggle("oculto", !!torneoId);
+  $("#tablero").classList.toggle("oculto", !torneoId);
+  if (!torneoId) return;
+  $("#enlace-pantalla").href = `/winner/pantalla/${torneoId}`;
+  try { tablero = await api(`/torneos/${torneoId}/tablero`); }
+  catch (e) { if (e.status === 401) window.alSalir(); return; }
+  const t = tablero.torneo;
+  const fichas = await api(`/torneos/${torneoId}/fichas`);
+  const f = fichas.resumen;
+  $("#kpis").innerHTML = [
+    ["Estado", ESTADOS_T[t.estado]], ["Jugadores vivos", tablero.vivos], ["Entradas totales", tablero.entradas_totales],
+    ["Mesas abiertas", tablero.mesas.length], ["Stack promedio", miles(f.promedio)], ["Nivel", t.nivel],
+  ].map(([e, v]) => `<div class="kpi"><div class="e">${e}</div><div class="v">${esc(v)}</div></div>`).join("");
+  $("#sugerencias").innerHTML = tablero.sugerencias.map(s => `<div class="aviso"><span>⚠️ ${esc(s.texto)}</span>${puede("floor") ?
+    (s.tipo === "cerrar_mesa" ? `<button class="oro" onclick="cerrarMesa(${s.mesa_id}, ${s.mesa})">Cerrar mesa ${s.mesa}</button>` : `<button class="oro" onclick="balancear()">Balancear ahora</button>`) : ""}</div>`).join("");
+  $("#nivel").textContent = t.nivel;
+  const tog = (id, v) => { $(id).textContent = v ? "Abierta ✓" : "Cerrada"; $(id).className = v ? "auto" : "sec auto"; };
+  tog("#t-registro", t.registro_abierto); tog("#t-recompras", t.recompras_abiertas); tog("#t-addon", t.addon_abierto);
+  $("#b-iniciar").classList.toggle("oculto", t.estado !== "programado" || !puede("floor"));
+  $("#mesas").innerHTML = tablero.mesas.map(m => `<div class="mesa"><div class="titulo"><span>Mesa ${m.numero}</span>
+      <span><span class="chip">${m.ocupados}/${m.asientos.length}</span>
+      ${puede("floor") ? `<button class="sec" style="padding:3px 8px;font-size:12px" onclick="cerrarMesa(${m.id}, ${m.numero})">Cerrar</button>` : ""}</span></div>
+      <div class="asientos">${m.asientos.map(a => a.estado === "libre"
+        ? `<div class="asiento libre"><b>${a.asiento}</b> libre</div>`
+        : `<button class="asiento ${a.estado}" onclick="abrirAsiento(${a.entrada_id})"><b>${a.asiento}</b>${a.estado === "reservado" ? "⏳ " : ""}<span class="nom">${esc(a.nombre)}</span><span class="fi">${a.estado === "reservado" ? "esperando recompra" : miles(a.fichas)}</span></button>`).join("")}</div></div>`).join("")
+    || `<p class="suave">No hay mesas abiertas.</p>`;
+  $("#sin-asiento").innerHTML = tablero.sin_asiento.length ? `<table>${tablero.sin_asiento.map(e => `<tr><td>${esc(e.nombre)}</td><td class="suave">${e.codigo_qr}</td><td class="n">${puede("floor") ? `<button class="sec" onclick="sentarEntrada(${e.id})">Sentar</button>` : ""}</td></tr>`).join("")}</table>` : "Ninguno.";
+  const dif = f.diferencia;
+  $("#fichas").innerHTML = `<div class="kpis"><div class="kpi"><div class="e">Esperadas</div><div class="v">${miles(f.esperado)}</div></div>
+    <div class="kpi"><div class="e">Contadas en mesa</div><div class="v">${miles(f.en_juego)}</div></div>
+    <div class="kpi"><div class="e">Diferencia</div><div class="v" style="color:${dif === 0 ? "var(--verde)" : "var(--rojo)"}">${dif > 0 ? "+" : ""}${miles(dif)}</div></div></div>
+    <p class="suave" style="margin:0 0 6px">${f.entradas} entradas × stack + ${f.recompras} recompras + ${f.addons} add-ons</p>
+    <table><tr><th>#</th><th>Líderes</th><th>Mesa</th><th class="n">Fichas</th></tr>${f.lideres.map((l, i) => `<tr><td>${i + 1}</td><td>${esc(l.nombre)}</td><td>${l.mesa ? l.mesa + "-" + l.asiento : "—"}</td><td class="n">${miles(l.fichas)}</td></tr>`).join("")}</table>`;
+  const hist = await api(`/torneos/${torneoId}/historial`);
+  $("#historial").innerHTML = hist.length ? `<table><tr><th>Hora</th><th>Jugador</th><th>De</th><th>A</th><th>Motivo</th><th>Por</th></tr>${hist.slice(0, 80).map(h => `<tr><td>${hora(h.fecha)}</td><td>${esc(h.nombre)}</td><td>${h.de_mesa ? `M${h.de_mesa}-${h.de_asiento}` : "—"}</td><td>M${h.a_mesa}-${h.a_asiento}</td><td>${MOTIVOS[h.motivo] || h.motivo}</td><td class="suave">${esc(h.hecho_por || "Sistema")}</td></tr>`).join("")}</table>` : `<p class="suave">Sin movimientos.</p>`;
+}
+
+function mostrarMovimientos(titulo, movs) {
+  if (!movs.length) return aviso("No hubo que mover a nadie");
+  pedir(titulo, [], "Listo", `<p class="suave">Avise a estos jugadores (también les llegó al celular):</p><ul>${movs.map(m => `<li>${esc(m.nombre)}: ${m.de_mesa ? `M${m.de_mesa}-${m.de_asiento}` : ""} → <b>Mesa ${m.a_mesa}, asiento ${m.a_asiento}</b></li>`).join("")}</ul>`);
+}
+window.cerrarMesa = async (id, numero) => {
+  if (!await confirmar(`¿Cerrar la mesa ${numero}?`, "Sus jugadores se reparten en los asientos libres de las mesas con menos jugadores.")) return;
+  accion(async () => { const r = await api(`/torneos/${torneoId}/mesas/${id}/cerrar`, "POST", {}); await cargarTablero(); mostrarMovimientos(`Mesa ${numero} cerrada`, r.movimientos); });
+};
+window.balancear = () => accion(async () => { const r = await api(`/torneos/${torneoId}/balancear`, "POST", {}); await cargarTablero(); mostrarMovimientos("Balanceo", r.movimientos); });
+$("#b-balancear").onclick = () => window.balancear();
+$("#b-abrir-mesa").onclick = async () => {
+  const d = await pedir("Abrir mesas", [{n: "cantidad", l: "Cantidad", tipo: "number", valor: 1}]);
+  if (d) accion(async () => { await api(`/torneos/${torneoId}/mesas`, "POST", d); cargarTablero(); });
+};
+$("#b-sentar-todos").onclick = () => accion(async () => { const r = await api(`/torneos/${torneoId}/sentar-inscritos`, "POST", {}); aviso(`${r.movimientos.length} jugador(es) sentados`); cargarTablero(); });
+$("#b-iniciar").onclick = () => accion(async () => { await api(`/torneos/${torneoId}/iniciar`, "POST", {}); await cargarTorneos(); cargarTablero(); });
+window.sentarEntrada = id => accion(async () => { const r = await api(`/entradas/${id}/sentar`, "POST", {}); aviso(`Mesa ${r.a_mesa}, asiento ${r.a_asiento}`); cargarTablero(); });
+
+async function sentarQR(codigo) {
+  return accion(async () => {
+    const r = await api("/qr", "POST", {codigo});
+    $("#qr").value = "";
+    pedir(`${r.nombre}`, [], "Listo", `<p class="grande">Mesa ${r.a_mesa} · Asiento ${r.a_asiento}</p>`);
+    cargarTablero();
+  }, $("#b-qr"));
+}
+$("#b-qr").onclick = () => sentarQR($("#qr").value);
+$("#qr").addEventListener("keydown", e => { if (e.key === "Enter") sentarQR($("#qr").value); });
+
+// Lector de QR con la cámara (Chrome en Android y escritorio). Si no hay soporte, se escribe el código.
+let flujo = null;
+$("#b-camara").onclick = async () => {
+  const v = $("#video");
+  if (flujo) { flujo.getTracks().forEach(t => t.stop()); flujo = null; v.classList.add("oculto"); return; }
+  if (!("BarcodeDetector" in window)) return aviso("Este navegador no lee QR con la cámara: use Chrome o escriba el código", true);
+  try { flujo = await navigator.mediaDevices.getUserMedia({video: {facingMode: "environment"}}); }
+  catch (e) { return aviso("No se pudo abrir la cámara", true); }
+  v.srcObject = flujo; v.classList.remove("oculto"); await v.play();
+  const det = new BarcodeDetector({formats: ["qr_code"]});
+  const leer = async () => {
+    if (!flujo) return;
+    try { const c = await det.detect(v); if (c.length) { flujo.getTracks().forEach(t => t.stop()); flujo = null; v.classList.add("oculto"); return sentarQR(c[0].rawValue); } } catch (e) { /* cuadro sin código */ }
+    requestAnimationFrame(leer);
+  };
+  leer();
+};
+
+async function cambiarTorneo(datos) {
+  return accion(async () => { await api(`/torneos/${torneoId}`, "PATCH", datos); cargarTablero(); });
+}
+$("#b-nivel-mas").onclick = () => cambiarTorneo({nivel: tablero.torneo.nivel + 1});
+$("#b-nivel-menos").onclick = () => tablero.torneo.nivel > 1 && cambiarTorneo({nivel: tablero.torneo.nivel - 1});
+$("#t-registro").onclick = () => cambiarTorneo({registro_abierto: tablero.torneo.registro_abierto ? 0 : 1});
+$("#t-recompras").onclick = () => cambiarTorneo({recompras_abiertas: tablero.torneo.recompras_abiertas ? 0 : 1});
+$("#t-addon").onclick = () => cambiarTorneo({addon_abierto: tablero.torneo.addon_abierto ? 0 : 1});
+
+window.abrirAsiento = async (entradaId) => {
+  let asiento = null, mesa = null;
+  tablero.mesas.forEach(m => m.asientos.forEach(a => { if (a.entrada_id === entradaId) { asiento = a; mesa = m; } }));
+  if (!asiento) return;
+  const t = tablero.torneo;
+  const ops = [];
+  if (asiento.estado === "sentado") {
+    if (puede("mesas")) ops.push(["fichas", "Registrar conteo de fichas"], ["eliminar", "Confirmar eliminación"]);
+    if (puede("caja") && t.addon_abierto && t.addon_precio) ops.push(["addon", `Add-on en ventanilla (${pesos(t.addon_precio)})`]);
+  } else if (asiento.estado === "reservado" && puede("caja")) {
+    if (t.recompra_precio) ops.push(["recompra", `Recompra en ventanilla (${pesos(t.recompra_precio)})`]);
+    ops.push(["reentrada", `Re-entrada en ventanilla (${pesos(t.buyin)})`]);
+  }
+  if (!ops.length) return aviso(asiento.estado === "reservado" ? "Esperando que el jugador recompre" : "Sin acciones para su rol");
+  const d = await pedir(`Mesa ${mesa.numero} · Asiento ${asiento.asiento}`, [{n: "op", l: "Acción", tipo: "select", opciones: ops}], "Continuar",
+    `<p><b>${esc(asiento.nombre)}</b><br><span class="suave">Fichas: ${miles(asiento.fichas)}</span></p>`);
+  if (!d) return;
+  if (d.op === "fichas") {
+    const c = await pedir("Conteo oficial de fichas", [{n: "fichas", l: "Fichas contadas", tipo: "number", valor: asiento.fichas}], "Guardar");
+    if (c) accion(async () => { await api(`/entradas/${entradaId}/fichas`, "POST", c); cargarTablero(); });
+  } else if (d.op === "eliminar") {
+    if (!await confirmar(`¿Eliminar a ${asiento.nombre}?`, "Confirme que el jugador perdió todas sus fichas.", "Sí, eliminar")) return;
+    accion(async () => {
+      const r = await api(`/entradas/${entradaId}/eliminar`, "POST", {});
+      aviso(r.estado === "reservado" ? `Asiento reservado: puede ${r.opciones.join(" o ")} hasta ${hora(r.vence_en)}` : "Jugador eliminado");
+      cargarTablero();
+    });
+  } else {
+    const p = await pedir("Medio de pago", [{n: "pago", l: "Pago", tipo: "select", opciones: [["efectivo", "Efectivo en ventanilla"], ["saldo", "Saldo de su caja"]]}], "Cobrar");
+    if (p) accion(async () => {
+      const r = await api(`/entradas/${entradaId}/${d.op}`, "POST", p);
+      aviso(r.asiento ? `Re-entrada: mesa ${r.asiento.mesa}, asiento ${r.asiento.asiento}` : "Listo");
+      cargarTablero();
+    });
+  }
+};
+
+$("#b-nuevo-torneo").onclick = async () => {
+  const d = await pedir("Nuevo torneo", [
+    {n: "nombre", l: "Nombre"}, {n: "fecha", l: "Fecha", tipo: "date", valor: new Date().toLocaleDateString("en-CA")},
+    {n: "buyin", l: "Buy-in ($)", tipo: "number"}, {n: "stack_inicial", l: "Stack inicial (fichas)", tipo: "number"},
+    {n: "asientos_por_mesa", l: "Asientos por mesa", tipo: "number", valor: 9},
+    {n: "reentrada_max", l: "Re-entradas permitidas por jugador", tipo: "number", valor: 0},
+    {n: "recompra_max", l: "Recompras permitidas por entrada", tipo: "number", valor: 0},
+    {n: "recompra_precio", l: "Precio recompra ($)", tipo: "number", valor: 0},
+    {n: "recompra_fichas", l: "Fichas recompra", tipo: "number", valor: 0},
+    {n: "addon_precio", l: "Precio add-on ($)", tipo: "number", valor: 0},
+    {n: "addon_fichas", l: "Fichas add-on", tipo: "number", valor: 0},
+    {n: "tope_compra", l: "Tope de compras por celular en este torneo ($, opcional)", tipo: "number"},
+  ], "Crear");
+  if (d) accion(async () => { const r = await api("/torneos", "POST", d); torneoId = r.id; await cargarTorneos(); cargarTablero(); aviso("Torneo creado: abra las mesas"); });
+};
+
+// ---------- Jugadores y caja ----------
+$("#b-buscar").onclick = buscar;
+$("#q").addEventListener("keydown", e => { if (e.key === "Enter") buscar(); });
+async function buscar() {
+  const r = await accion(() => api("/jugadores?q=" + encodeURIComponent($("#q").value)));
+  if (!r) return;
+  $("#resultados").innerHTML = r.length ? `<table>${r.map(j => `<tr style="cursor:pointer" onclick="verJugador(${j.id})"><td><b>${esc(j.nombre)}</b><br><span class="suave">${j.numero_caja} · doc ${j.documento}</span></td><td>${j.estado === "bloqueado" ? '<span class="chip rojo">Bloqueada</span>' : ""}</td><td class="n">${pesos(j.saldo)}</td></tr>`).join("")}</table>` : `<p class="suave">Sin resultados.</p>`;
+}
+window.verJugador = async (id) => {
+  const r = await accion(() => api(`/jugadores/${id}`));
+  if (!r) return;
+  const j = r.jugador, caja = puede("caja");
+  const abiertos = torneos.filter(t => t.estado === "programado" || t.estado === "en_curso");
+  $("#ficha-jugador").innerHTML = `<h2>${esc(j.nombre)} ${j.estado === "bloqueado" ? '<span class="chip rojo">Bloqueada</span>' : '<span class="chip verde">Activa</span>'}</h2>
+    <p class="suave">${j.numero_caja} · Documento ${j.documento} · Celular ${j.celular || "sin vincular"} ${j.celular && !j.celular_verificado ? '<span class="chip oro">sin verificar</span>' : ""}</p>
+    ${j.motivo_bloqueo ? `<div class="aviso rojo">Bloqueo: ${esc(j.motivo_bloqueo)}</div>` : ""}
+    <div class="kpi" style="margin-bottom:12px"><div class="e">Saldo en caja</div><div class="v">${pesos(r.saldo)}</div></div>
+    <div class="fila">
+      ${abiertos.length ? `<button class="auto" onclick="inscribirJugador(${id})">Inscribir a torneo</button>` : ""}
+      ${caja ? `<button class="auto sec" onclick="depositar(${id})">Depósito</button><button class="auto sec" onclick="retirar(${id})">Retiro</button>
+        <button class="auto sec" onclick="vincular(${id})">${j.celular_verificado ? "Cambiar celular" : "Vincular celular"}</button>
+        ${j.estado === "activo" ? `<button class="auto peligro" onclick="bloquear(${id})">Bloquear cuenta</button>` : puede("aprobar") ? `<button class="auto sec" onclick="desbloquear(${id})">Desbloquear</button>` : ""}` : ""}
+    </div>
+    ${r.movimientos.length ? `<h3 style="margin-top:16px">Movimientos</h3><div class="scroll"><table><tr><th>#</th><th>Fecha</th><th>Tipo</th><th>Detalle</th><th class="n">Monto</th><th class="n">Saldo</th>${puede("aprobar") ? "<th></th>" : ""}</tr>
+      ${r.movimientos.map(m => `<tr><td class="suave">${m.id}</td><td>${hora(m.fecha)}</td><td>${TIPOS[m.tipo]}</td><td>${esc(m.descripcion || "")}</td><td class="n" style="color:${m.monto > 0 ? "var(--verde)" : "var(--rojo)"}">${pesos(m.monto)}</td><td class="n">${pesos(m.saldo_despues)}</td>${puede("aprobar") ? `<td>${m.tipo !== "correccion" ? `<button class="sec" style="padding:3px 8px;font-size:12px" onclick="corregir(${m.id}, ${id})">Corregir</button>` : ""}</td>` : ""}</tr>`).join("")}</table></div>` : ""}`;
+};
+window.inscribirJugador = async (id) => {
+  const abiertos = torneos.filter(t => t.estado === "programado" || t.estado === "en_curso");
+  const d = await pedir("Inscribir a torneo", [
+    {n: "torneo", l: "Torneo", tipo: "select", opciones: abiertos.map(t => [t.id, `${t.nombre} · ${pesos(t.buyin)}`])},
+    {n: "pago", l: "Pago", tipo: "select", opciones: [["efectivo", "Efectivo en ventanilla"], ["saldo", "Saldo de su caja"]]},
+    {n: "sentar_ya", l: "Sentarlo ya (el jugador está en la sala)", tipo: "check"}], "Inscribir");
+  if (d) accion(async () => {
+    const r = await api(`/torneos/${d.torneo}/inscribir`, "POST", {jugador_id: id, pago: d.pago, sentar_ya: d.sentar_ya});
+    pedir("Inscrito", [], "Listo", r.asiento && r.asiento.mesa ? `<p class="grande">Mesa ${r.asiento.mesa} · Asiento ${r.asiento.asiento}</p>` : `<p>Código QR: <b>${r.entrada.codigo_qr}</b><br><span class="suave">El jugador lo ve en su app; el floor lo escanea para sentarlo.</span></p>`);
+    verJugador(id);
+  });
+};
+window.depositar = async (id) => {
+  const d = await pedir("Depósito en efectivo", [{n: "monto", l: "Monto ($)", tipo: "number"}], "Registrar");
+  if (d) accion(async () => { await api(`/jugadores/${id}/deposito`, "POST", d); aviso("Depósito registrado"); verJugador(id); });
+};
+window.retirar = async (id) => {
+  const r = await accion(() => api(`/jugadores/${id}/codigo-retiro`, "POST", {}));
+  if (!r) return;
+  const d = await pedir("Retiro en persona", [
+    {n: "monto", l: "Monto ($)", tipo: "number"}, {n: "documento", l: "Número de documento (verifique el original)"},
+    {n: "codigo", l: "Código que le llegó al celular"},
+    {n: "supervisor_usuario", l: `Supervisor (solo si supera ${pesos(r.tope)})`}, {n: "supervisor_clave", l: "Clave del supervisor", tipo: "password"},
+  ], "Retirar", `<p class="suave">Se envió un código al celular vinculado.</p>`);
+  if (d) accion(async () => { await api(`/jugadores/${id}/retiro`, "POST", d); aviso("Retiro registrado: entregue el efectivo"); verJugador(id); });
+};
+window.vincular = async (id) => {
+  const d = await pedir("Vincular celular", [{n: "celular", l: "Celular (déjelo vacío para reenviar el código al mismo)"}], "Enviar código");
+  if (!d) return;
+  if (!await accion(() => api(`/jugadores/${id}/celular`, "POST", d))) return;
+  const c = await pedir("Código de vinculación", [{n: "codigo", l: "Código que le llegó al jugador"}], "Vincular");
+  if (c) accion(async () => { await api(`/jugadores/${id}/vincular`, "POST", c); aviso("Celular vinculado"); verJugador(id); });
+};
+window.bloquear = async (id) => {
+  const d = await pedir("Bloquear cuenta", [{n: "motivo", l: "Motivo (p. ej. perdió el celular)"}], "Bloquear");
+  if (d) accion(async () => { await api(`/jugadores/${id}/bloquear`, "POST", d); aviso("Cuenta bloqueada y sesiones cerradas"); verJugador(id); });
+};
+window.desbloquear = id => accion(async () => { await api(`/jugadores/${id}/desbloquear`, "POST", {}); verJugador(id); });
+window.corregir = async (mid, jid) => {
+  const d = await pedir(`Corregir movimiento #${mid}`, [{n: "motivo", l: "Motivo"}], "Registrar corrección", `<p class="suave">El movimiento original no se borra: se registra uno de signo contrario.</p>`);
+  if (d) accion(async () => { await api(`/movimientos/${mid}/corregir`, "POST", d); verJugador(jid); });
+};
+$("#b-abrir-caja").onclick = async () => {
+  const d = await pedir("Abrir caja (en persona)", [
+    {n: "nombre", l: "Nombre completo"}, {n: "documento", l: "Número de documento"}, {n: "celular", l: "Celular"},
+    {n: "documento_verificado", l: "Verifiqué el documento original", tipo: "check"}], "Abrir caja");
+  if (!d) return;
+  const r = await accion(() => api("/jugadores", "POST", d));
+  if (!r) return;
+  await verJugador(r.jugador.id);
+  if (r.codigo_enviado) {
+    const c = await pedir("Código de vinculación", [{n: "codigo", l: "Código que le llegó al jugador"}], "Vincular");
+    if (c) accion(async () => { await api(`/jugadores/${r.jugador.id}/vincular`, "POST", c); aviso("Caja abierta y celular vinculado"); verJugador(r.jugador.id); });
+  }
+};
+
+// ---------- Premios ----------
+async function cargarPremios() {
+  if (!torneoId) return;
+  const r = await accion(() => api(`/torneos/${torneoId}/premios`));
+  if (!r) return;
+  const t = torneos.find(x => x.id === torneoId);
+  const editable = puede("director") && (!r.premiacion || r.premiacion.estado === "borrador") && !r.premiacion;
+  $("#tabla-premios").innerHTML = (r.tabla.length ? `<table><tr><th>Puesto</th><th class="n">Premio</th></tr>${r.tabla.map(f => `<tr><td>${f.posicion}°</td><td class="n">${pesos(f.monto)}</td></tr>`).join("")}<tr><th>Total</th><th class="n">${pesos(r.tabla.reduce((s, f) => s + f.monto, 0))}</th></tr></table>` : `<p class="suave">Sin tabla de premios.</p>`)
+    + (editable ? `<button class="sec" style="margin-top:10px" onclick="editarTabla()">Editar tabla</button>` : "");
+  const p = r.premiacion;
+  let h = "";
+  if (!p) {
+    h = `<p class="suave">Clasificación actual:</p><table><tr><th>Pos.</th><th>Jugador</th><th>Estado</th></tr>${r.posiciones.slice(0, 15).map(x => `<tr><td>${x.posicion}</td><td>${esc(x.nombre)}</td><td>${x.estado === "eliminado" ? "Eliminado" : miles(x.fichas) + " fichas"}</td></tr>`).join("")}</table>`;
+    if (puede("director") && t && t.estado === "en_curso") h += `<button class="oro" style="margin-top:10px" onclick="finalizar()">Finalizar torneo y preparar premios</button>`;
+  } else {
+    const est = {borrador: '<span class="chip oro">Borrador: revise y confirme</span>', confirmada: '<span class="chip azul">Confirmada por el director</span>', acreditada: '<span class="chip verde">Acreditada en caja</span>'}[p.estado];
+    h = `${est}<table style="margin-top:10px"><tr><th>Pos.</th><th>Jugador</th><th class="n">Tabla</th><th class="n">A pagar</th></tr>${p.detalle.map(d => `<tr><td>${d.posicion}°</td><td>${esc(d.nombre)}<br><span class="suave">${d.numero_caja}${d.motivo_ajuste ? " · " + esc(d.motivo_ajuste) : ""}</span></td><td class="n">${pesos(d.monto_tabla)}</td><td class="n"><b>${pesos(d.monto_final)}</b></td></tr>`).join("")}<tr><th colspan="2">Total</th><th class="n">${pesos(p.total_tabla)}</th><th class="n">${pesos(p.total_final)}</th></tr></table>`;
+    if (p.confirmada_en) h += `<p class="suave">Confirmada por ${esc(p.confirmada_por_nombre)} · ${hora(p.confirmada_en)}</p>`;
+    if (p.acreditada_en) h += `<p class="suave">Acreditada por ${esc(p.acreditada_por_nombre)} · ${hora(p.acreditada_en)}</p>`;
+    if (puede("director") && p.estado === "borrador") h += `<div class="fila" style="margin-top:10px"><button class="sec auto" onclick="ajustarPremios()">Ajustar (empate / acuerdo)</button><button class="auto" onclick="confirmarPremios()">Confirmar posiciones</button></div>`;
+    if (puede("director") && p.estado === "confirmada") h += `<button class="oro" style="margin-top:10px" onclick="acreditarPremios()">Acreditar premios en caja</button>`;
+    window._premiacion = p;
+  }
+  $("#premiacion").innerHTML = h;
+}
+window.editarTabla = async () => {
+  const d = await pedir("Tabla de premios", [{n: "texto", l: "Un premio por línea, del 1° en adelante (separados por coma)", valor: ""}], "Guardar", `<p class="suave">Ejemplo: 4500000, 2700000, 1600000</p>`);
+  if (!d) return;
+  const filas = d.texto.split(/[\n,;]+/).map(s => s.replace(/[^\d]/g, "")).filter(Boolean).map((m, i) => ({posicion: i + 1, monto: +m}));
+  accion(async () => { await api(`/torneos/${torneoId}/premios`, "PUT", {filas}); cargarPremios(); });
+};
+window.finalizar = async () => {
+  if (!await confirmar("¿Finalizar el torneo?", "Se cierran mesas, inscripciones y recompras, y se cruza la tabla de premios con las posiciones finales.")) return;
+  accion(async () => { await api(`/torneos/${torneoId}/finalizar`, "POST", {}); await cargarTorneos(); cargarPremios(); });
+};
+window.ajustarPremios = async () => {
+  const p = window._premiacion;
+  const campos = [];
+  p.detalle.forEach(d => campos.push({n: "m" + d.posicion, l: `${d.posicion}° ${d.nombre} ($)`, tipo: "number", valor: d.monto_final}));
+  campos.push({n: "motivo", l: "Motivo (p. ej. acuerdo en mesa final entre 1° y 2°)"});
+  const d = await pedir("Ajustar montos", campos, "Guardar", `<p class="suave">El total debe seguir siendo ${pesos(p.total_tabla)}.</p>`);
+  if (!d) return;
+  const filas = p.detalle.map(x => ({posicion: x.posicion, monto_final: +d["m" + x.posicion], motivo: +d["m" + x.posicion] !== x.monto_tabla ? d.motivo : ""}));
+  accion(async () => { await api(`/torneos/${torneoId}/premios/ajustar`, "POST", {filas}); cargarPremios(); });
+};
+window.confirmarPremios = async () => {
+  if (await confirmar("¿Confirmar posiciones y montos?", "Queda registrado a su nombre. Después ya no se pueden ajustar."))
+    accion(async () => { await api(`/torneos/${torneoId}/premios/confirmar`, "POST", {}); cargarPremios(); });
+};
+window.acreditarPremios = async () => {
+  if (await confirmar("¿Acreditar los premios?", "Cada monto se suma a la caja del jugador y se le avisa al celular."))
+    accion(async () => { await api(`/torneos/${torneoId}/premios/acreditar`, "POST", {}); cargarPremios(); });
+};
+
+// ---------- Reportes ----------
+$("#b-cuadre").onclick = verCuadre;
+async function verCuadre() {
+  const r = await accion(() => api("/reportes/cuadre?dia=" + $("#dia").value));
+  if (!r) return;
+  $("#cuadre").innerHTML = `<div class="kpis"><div class="kpi"><div class="e">Efectivo esperado en caja (depósitos − retiros)</div><div class="v">${pesos(r.efectivo_esperado)}</div></div>
+    <div class="kpi"><div class="e">Total saldos de jugadores al cierre</div><div class="v">${pesos(r.saldos_jugadores)}</div></div></div>
+    <table><tr><th>Tipo</th><th>Medio</th><th class="n">Cantidad</th><th class="n">Total</th></tr>${r.por_tipo.map(f => `<tr><td>${TIPOS[f.tipo]}</td><td>${f.medio}</td><td class="n">${f.cantidad}</td><td class="n">${pesos(f.total)}</td></tr>`).join("") || `<tr><td colspan="4" class="suave">Sin movimientos.</td></tr>`}</table>
+    ${r.arqueos.length ? `<h3 style="margin-top:12px">Arqueos</h3><table><tr><th>Hora</th><th>Cajero</th><th class="n">Contado</th><th class="n">Esperado</th><th class="n">Diferencia</th></tr>${r.arqueos.map(a => `<tr><td>${hora(a.fecha)}</td><td>${esc(a.nombre)}</td><td class="n">${pesos(a.efectivo_contado)}</td><td class="n">${pesos(a.efectivo_esperado)}</td><td class="n" style="color:${a.diferencia ? "var(--rojo)" : "var(--verde)"}">${pesos(a.diferencia)}</td></tr>`).join("")}</table>` : ""}`;
+}
+$("#b-arqueo").onclick = async () => {
+  const d = await pedir("Arqueo de caja", [{n: "efectivo_contado", l: "Efectivo contado ($)", tipo: "number"}, {n: "nota", l: "Nota"}], "Registrar");
+  if (d) accion(async () => { await api("/reportes/arqueo", "POST", {...d, dia: $("#dia").value}); verCuadre(); });
+};
+$("#b-rep-torneo").onclick = async () => {
+  const r = await accion(() => api("/reportes/torneo/" + $("#sel-torneo-reporte").value));
+  if (!r) return;
+  $("#rep-torneo").innerHTML = `<div class="kpis">${[["Jugadores únicos", r.jugadores_unicos], ["Recaudado", pesos(r.recaudado)], ["Tabla de premios", pesos(r.tabla_premios)], ["Premios acreditados", pesos(r.premios_pagados)], ["Recaudo − premios", pesos(r.diferencia_recaudo_premios)], ["Diferencia de fichas", miles(r.fichas.diferencia)]].map(([e, v]) => `<div class="kpi"><div class="e">${e}</div><div class="v">${v}</div></div>`).join("")}</div>
+    <table><tr><th>Concepto</th><th class="n">Cantidad</th><th class="n">Total</th></tr>${r.por_tipo.map(f => `<tr><td>${TIPOS[f.tipo]}</td><td class="n">${f.cantidad}</td><td class="n">${pesos(f.total)}</td></tr>`).join("")}${r.correcciones ? `<tr><td>Correcciones</td><td></td><td class="n">${pesos(-r.correcciones)}</td></tr>` : ""}</table>`;
+};
+$("#b-auditoria").onclick = async () => {
+  const r = await accion(() => api("/auditoria"));
+  if (r) $("#auditoria").innerHTML = `<table><tr><th>Fecha</th><th>Quién</th><th>Acción</th><th>Detalle</th></tr>${r.map(a => `<tr><td>${hora(a.fecha)}</td><td>${esc(a.nombre || "Sistema")}</td><td>${esc(a.accion)}</td><td class="suave">${esc(a.entidad || "")} ${a.entidad_id || ""} ${esc(a.detalle || "")}</td></tr>`).join("")}</table>`;
+};
+
+// ---------- Administración ----------
+const NOMBRES_AJUSTE = {
+  tope_retiro_sin_supervisor: "Retiro máximo sin supervisor ($)", tope_compra_diario: "Tope diario de compras por celular ($)",
+  minutos_inactividad_jugador: "Cierre de sesión del jugador por inactividad (min)", minutos_inactividad_personal: "Cierre de sesión del personal por inactividad (min)",
+  intentos_maximos: "Intentos fallidos antes de bloquear", minutos_bloqueo: "Minutos de bloqueo tras intentos fallidos",
+  minutos_reserva_asiento: "Minutos de reserva de asiento para recomprar", minutos_codigo: "Vigencia del código al celular (min)",
+  compras_desde_celular: "Compras desde el celular (0 = apagado, fase 1; 1 = encendido)",
+};
+async function cargarAdmin() {
+  const [pers, aj] = await Promise.all([api("/personal"), api("/ajustes")]);
+  $("#personal").innerHTML = `<table><tr><th>Usuario</th><th>Nombre</th><th>Rol</th><th></th></tr>${pers.map(p => `<tr><td>${esc(p.usuario)}</td><td>${esc(p.nombre)}</td><td>${ROLES[p.rol]}</td><td>${p.id !== yo.id ? `<button class="sec" style="padding:3px 8px;font-size:12px" onclick="activarPersonal(${p.id}, ${p.activo ? 0 : 1})">${p.activo ? "Desactivar" : "Activar"}</button>` : ""}</td></tr>`).join("")}</table>`;
+  $("#ajustes").innerHTML = `<form id="f-ajustes">${Object.entries(NOMBRES_AJUSTE).map(([k, l]) => `<label>${l}</label><input name="${k}" value="${esc(aj[k])}" inputmode="numeric">`).join("")}<button style="margin-top:12px">Guardar ajustes</button></form>`;
+  $("#f-ajustes").onsubmit = ev => { ev.preventDefault(); accion(async () => { await api("/ajustes", "PUT", Object.fromEntries(new FormData(ev.target))); aviso("Ajustes guardados"); }); };
+}
+window.activarPersonal = (id, activo) => accion(async () => { await api(`/personal/${id}/activo`, "POST", {activo}); cargarAdmin(); });
+$("#b-nuevo-personal").onclick = async () => {
+  const d = await pedir("Nuevo usuario del personal", [{n: "usuario", l: "Usuario"}, {n: "nombre", l: "Nombre"},
+    {n: "rol", l: "Rol", tipo: "select", opciones: Object.entries(ROLES)}, {n: "clave", l: "Clave (mínimo 8 caracteres)", tipo: "password"}], "Crear");
+  if (d) accion(async () => { await api("/personal", "POST", d); cargarAdmin(); });
+};
+
+arrancar();
+</script>
+</body>
+</html>

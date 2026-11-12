@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Winner · Pantalla de sala</title>
+<link rel="stylesheet" href="{{ url_for('winner.static', filename='winner.css') }}">
+<style>
+body{font-size:18px}
+.cab{display:flex;gap:24px;align-items:baseline;flex-wrap:wrap;padding:18px 24px;background:#0a100d;border-bottom:1px solid var(--borde)}
+.cab h1{margin:0;color:var(--oro);font-size:30px}
+.dato{font-size:15px;color:var(--suave)}.dato b{display:block;color:var(--texto);font-size:28px}
+.lista{columns:4 260px;column-gap:28px;padding:18px 24px}
+.lista div{break-inside:avoid;padding:5px 0;border-bottom:1px solid var(--borde);display:flex;justify-content:space-between;gap:10px}
+.lista span.m{color:var(--oro);font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.cambios{padding:0 24px 18px}
+.cambio{display:inline-block;background:#3d3112;border:1px solid #7a6220;border-radius:10px;padding:6px 12px;margin:4px}
+</style>
+</head>
+<body>
+<div class="cab"><h1 id="nombre">Cargando…</h1>
+  <div class="dato">Nivel<b id="nivel"></b></div><div class="dato">Jugadores<b id="vivos"></b></div>
+  <div class="dato">Entradas<b id="entradas"></b></div><div class="dato">Mesas<b id="mesas"></b></div>
+  <div class="dato">Stack promedio<b id="promedio"></b></div></div>
+<div class="cambios" id="cambios"></div>
+<div class="lista" id="lista"></div>
+<script src="{{ url_for('winner.static', filename='comun.js') }}"></script>
+<script>
+async function cargar() {
+  try {
+    const r = await api("/publico/{{ torneo_id }}");
+    $("#nombre").textContent = r.torneo.nombre;
+    $("#nivel").textContent = r.torneo.nivel; $("#vivos").textContent = r.vivos; $("#entradas").textContent = r.entradas;
+    $("#mesas").textContent = r.mesas; $("#promedio").textContent = miles(r.promedio);
+    const recientes = r.cambios.filter(c => Date.now() - new Date(c.fecha) < 10 * 60 * 1000);
+    $("#cambios").innerHTML = recientes.length ? `<div class="dato" style="margin:10px 0 4px">Cambios de mesa recientes</div>` + recientes.map(c => `<span class="cambio">${esc(c.nombre)} → <b>Mesa ${c.a_mesa} · ${c.a_asiento}</b></span>`).join("") : "";
+    $("#lista").innerHTML = r.sentados.map(s => `<div><span>${esc(s.nombre)}</span><span class="m">${s.mesa} · ${s.asiento}</span></div>`).join("");
+  } catch (e) { $("#nombre").textContent = "Torneo no disponible"; }
+}
+cargar();
+setInterval(cargar, 5000);
+</script>
+</body>
+</html>

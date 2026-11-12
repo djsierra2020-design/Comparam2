@@ -150,6 +150,8 @@ def opciones_jugador(db, t: dict, jugador_id: int) -> dict:
 def _cobrar(db, jugador_id, t, tipo, monto, *, origen, personal_id, pago, descripcion) -> int:
     """Cobra una compra de torneo. ``pago``: 'saldo' (de la caja) o 'efectivo' (en ventanilla)."""
     if origen == "app":
+        if not db.ajuste("compras_desde_celular"):
+            raise ErrorNegocio("Las compras desde el celular aún no están habilitadas; acérquese a la caja", 403)
         caja.verificar_topes_app(db, jugador_id, t, monto)
     if pago == "efectivo":
         caja.registrar_movimiento(db, jugador_id, "deposito", monto, origen="caja", personal_id=personal_id,
@@ -250,6 +252,7 @@ def _mover(db, e, mesa, asiento, motivo, personal_id) -> dict:
                  textos.get(motivo, "Asiento asignado") + f": mesa {mesa['numero']}, asiento {asiento}.")
     mesa["ocupados"][asiento] = e
     return {"entrada_id": e["id"], "jugador_id": e["jugador_id"], "de_mesa": de_mesa,
+            "nombre": db.valor("SELECT nombre FROM jugadores WHERE id = ?", (e["jugador_id"],)),
             "de_asiento": e["asiento"] if e["mesa_id"] else None, "a_mesa": mesa["numero"], "a_asiento": asiento}
 
 
@@ -296,6 +299,7 @@ def balancear(db, personal_id, torneo_id) -> list[dict]:
     """Mueve jugadores de la mesa más llena a la más vacía hasta que la diferencia sea de 1 o menos."""
     movimientos = []
     with db.transaccion():
+        vencer_reservas(db)
         mesas = _ocupacion(db, torneo_id)
         while len(mesas) > 1:
             llena = max(mesas, key=lambda m: len(m["ocupados"]))
@@ -317,6 +321,7 @@ def cerrar_mesa(db, personal_id, torneo_id, mesa_id) -> list[dict]:
     """Cierra (rompe) una mesa y reparte a sus jugadores en las mesas con menos jugadores."""
     movimientos = []
     with db.transaccion() as c:
+        vencer_reservas(db)
         mesas = _ocupacion(db, torneo_id)
         cerrar = next((m for m in mesas if m["id"] == int(mesa_id)), None)
         if not cerrar:
@@ -336,6 +341,7 @@ def cerrar_mesa(db, personal_id, torneo_id, mesa_id) -> list[dict]:
 
 
 def sugerencias(db, torneo_id) -> list[dict]:
+    vencer_reservas(db)
     mesas = _ocupacion(db, torneo_id)
     if not mesas:
         return []

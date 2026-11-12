@@ -319,6 +319,8 @@ AJUSTES_POR_DEFECTO = {
     "minutos_bloqueo": "15",
     "minutos_reserva_asiento": "3",
     "minutos_codigo": "5",
+    # Fase 1: el celular solo consulta. En fase 2 se enciende la compra desde el celular.
+    "compras_desde_celular": "0",
 }
 
 

@@ -13,6 +13,11 @@ from comparam.sources import PORTALES
 
 app = Flask(__name__)
 app.jinja_env.filters["pesos"] = pesos
+
+# Winner Poker (torneos, mesas y caja del jugador) en /winner. Ver winner/README.md.
+from winner.web import iniciar as iniciar_winner  # noqa: E402
+
+iniciar_winner(app)
 NOMBRES_PORTAL = {"fincaraiz": "Finca Raíz", "metrocuadrado": "Metrocuadrado", "ciencuadras": "Ciencuadras",
                   "habi": "Habi", "houm": "Houm", "mercadolibre": "MercadoLibre", "properati": "Properati", "rentola": "Rentola", "mitula": "Mitula",
                   "metrocuadrado": "Metrocuadrado",

@@ -20,6 +20,12 @@ y avisa a Render cada vez que cambia `main`. Requiere guardar el *Deploy Hook* d
 
 El plan gratis se «duerme» si nadie lo usa; la primera búsqueda después puede tardar ~1 minuto.
 
+## Winner Poker (`/winner`)
+
+Plataforma de torneos, mesas y caja del jugador para los casinos de Winner Group: sentado automático por QR,
+tablero de mesas en vivo, balanceo, cierre de mesas con historial, fichas, eliminaciones, premios y caja con saldo.
+Ver [`winner/README.md`](winner/README.md).
+
 ## Mis gastos (`/gastos`)
 
 App de gastos personales para responder «¿en qué se me va la plata?». Ábrela en
