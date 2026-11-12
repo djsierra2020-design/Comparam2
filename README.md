@@ -20,24 +20,6 @@ y avisa a Render cada vez que cambia `main`. Requiere guardar el *Deploy Hook* d
 
 El plan gratis se «duerme» si nadie lo usa; la primera búsqueda después puede tardar ~1 minuto.
 
-## Mis gastos (`/gastos`)
-
-App de gastos personales para responder «¿en qué se me va la plata?». Ábrela en
-`https://<tu-app>.onrender.com/gastos` y, desde el menú del navegador, **Agregar a la pantalla
-de inicio** (se instala como una app aparte, con su propio ícono).
-
-- **Cierre del día**: cada día te pregunta cuánto tienes **en el banco** y **en efectivo**.
-- **Cuadre**: compara con el cierre anterior y con lo que anotaste. Lo que falta aparece como
-  **«Se te fueron sin anotar $X»**, y con un toque lo asignas a una categoría.
-- **Categorías**: Consignaciones, Transporte, Comida, Póker, Niños y Otros (puedes agregar más).
-  Las ganancias de póker se anotan como ingreso, así el resumen muestra el **póker neto**.
-- **Resumen** por 7 días, mes, mes pasado o todo: en qué se fue la plata (incluido lo «sin
-  explicar»), promedio diario y la evolución de tu dinero.
-- **Recordatorio diario**: Ajustes → *Agregar recordatorio diario al calendario* (archivo .ics).
-- **Privacidad**: los datos se guardan solo en tu celular (no en el servidor). Descarga una
-  copia de seguridad de vez en cuando (Ajustes); también se puede exportar a Excel (CSV).
-- Funciona sin internet después de abrirla una vez.
-
 ## Instalación
 
 ```bash

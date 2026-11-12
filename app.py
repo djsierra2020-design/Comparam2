@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import os
 
-from flask import Flask, jsonify, render_template, request, send_from_directory
+from flask import Flask, redirect, jsonify, render_template, request, send_from_directory
 
 from comparam.barrios import BARRIOS
 from comparam.busqueda import buscar, buscar_ciudad
@@ -12,6 +12,7 @@ from comparam.formato import pesos
 from comparam.sources import PORTALES
 
 app = Flask(__name__)
+GASTOS_URL = "https://djsierra2020-design.github.io/Mis-gastos-/"
 app.jinja_env.filters["pesos"] = pesos
 NOMBRES_PORTAL = {"fincaraiz": "Finca Raíz", "metrocuadrado": "Metrocuadrado", "ciencuadras": "Ciencuadras",
                   "habi": "Habi", "houm": "Houm", "mercadolibre": "MercadoLibre", "properati": "Properati", "rentola": "Rentola", "mitula": "Mitula",
@@ -208,11 +209,8 @@ def service_worker():
 
 @app.get("/gastos")
 def gastos():
-    """App de gastos personales. Funciona por completo en el celular: los datos se guardan
-    en el navegador (localStorage), no en el servidor."""
-    r = send_from_directory(app.static_folder, "gastos.html")
-    r.headers["Cache-Control"] = "no-cache"
-    return r
+    """La app de gastos personales se mudó a su propio sitio; se redirige para no romper enlaces viejos."""
+    return redirect(GASTOS_URL, code=301)
 
 
 @app.get("/diagnostico")
