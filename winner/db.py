@@ -118,6 +118,11 @@ CREATE TABLE IF NOT EXISTS torneos (
     addon_abierto INTEGER NOT NULL DEFAULT 0,
     tope_compra INTEGER,
     nivel INTEGER NOT NULL DEFAULT 1,
+    -- normal · dia1 (clasificatorio, pertenece a una final) · final (Día 2) · satelite (premia tickets)
+    tipo TEXT NOT NULL DEFAULT 'normal',
+    principal_id INTEGER REFERENCES torneos(id),
+    satelite_de INTEGER REFERENCES torneos(id),
+    porcentaje_clasifica INTEGER,
     creado_en TEXT NOT NULL,
     finalizado_en TEXT
 );
@@ -133,16 +138,18 @@ CREATE TABLE IF NOT EXISTS mesas (
 );
 
 -- estado: inscrito (pagó, sin asiento) · sentado · reservado (eliminado, esperando recompra,
--- asiento guardado) · eliminado
+-- asiento guardado) · eliminado · clasificado (sobrevivió un día clasificatorio y guardó sus fichas)
 CREATE TABLE IF NOT EXISTS entradas (
     id INTEGER PRIMARY KEY,
     torneo_id INTEGER NOT NULL REFERENCES torneos(id),
     jugador_id INTEGER NOT NULL REFERENCES jugadores(id),
     numero INTEGER NOT NULL,
-    estado TEXT NOT NULL CHECK (estado IN ('inscrito','sentado','reservado','eliminado')),
+    estado TEXT NOT NULL CHECK (estado IN ('inscrito','sentado','reservado','eliminado','clasificado')),
     mesa_id INTEGER REFERENCES mesas(id),
     asiento INTEGER,
     fichas INTEGER NOT NULL,
+    fichas_iniciales INTEGER,
+    pago TEXT,
     recompras INTEGER NOT NULL DEFAULT 0,
     addons INTEGER NOT NULL DEFAULT 0,
     codigo_qr TEXT NOT NULL UNIQUE,
@@ -233,6 +240,7 @@ CREATE TABLE IF NOT EXISTS premios_tabla (
     torneo_id INTEGER NOT NULL REFERENCES torneos(id),
     posicion INTEGER NOT NULL,
     monto INTEGER NOT NULL CHECK (monto > 0),
+    tipo TEXT NOT NULL DEFAULT 'dinero',
     PRIMARY KEY (torneo_id, posicion)
 );
 
@@ -254,7 +262,34 @@ CREATE TABLE IF NOT EXISTS premiacion_detalle (
     monto_final INTEGER NOT NULL,
     motivo_ajuste TEXT,
     movimiento_id INTEGER REFERENCES movimientos(id),
+    tipo TEXT NOT NULL DEFAULT 'dinero',
+    ticket_id INTEGER,
     PRIMARY KEY (torneo_id, posicion)
+);
+
+-- Fichas guardadas al cerrar un día clasificatorio. Si un jugador clasifica dos veces, vale el stack mayor.
+CREATE TABLE IF NOT EXISTS clasificados (
+    id INTEGER PRIMARY KEY,
+    principal_id INTEGER NOT NULL REFERENCES torneos(id),
+    jugador_id INTEGER NOT NULL REFERENCES jugadores(id),
+    torneo_origen INTEGER NOT NULL REFERENCES torneos(id),
+    entrada_id INTEGER NOT NULL REFERENCES entradas(id),
+    fichas INTEGER NOT NULL,
+    fecha TEXT NOT NULL
+);
+
+-- Cupos ganados en satélites: valen una entrada al torneo destino (o a cualquiera de sus días).
+CREATE TABLE IF NOT EXISTS tickets (
+    id INTEGER PRIMARY KEY,
+    jugador_id INTEGER NOT NULL REFERENCES jugadores(id),
+    destino_id INTEGER NOT NULL REFERENCES torneos(id),
+    origen_torneo INTEGER REFERENCES torneos(id),
+    valor INTEGER NOT NULL,
+    estado TEXT NOT NULL DEFAULT 'disponible' CHECK (estado IN ('disponible','usado','anulado')),
+    entrada_id INTEGER REFERENCES entradas(id),
+    creado_en TEXT NOT NULL,
+    usado_en TEXT,
+    personal_id INTEGER REFERENCES personal(id)
 );
 
 CREATE TABLE IF NOT EXISTS mesas_cash (
@@ -327,6 +362,38 @@ AJUSTES_POR_DEFECTO = {
 }
 
 
+COLUMNAS_NUEVAS = {
+    "entradas": {"espera_desde": "TEXT", "fichas_iniciales": "INTEGER", "pago": "TEXT"},
+    "torneos": {"tipo": "TEXT NOT NULL DEFAULT 'normal'", "principal_id": "INTEGER REFERENCES torneos(id)",
+                "satelite_de": "INTEGER REFERENCES torneos(id)", "porcentaje_clasifica": "INTEGER"},
+    "premios_tabla": {"tipo": "TEXT NOT NULL DEFAULT 'dinero'"},
+    "premiacion_detalle": {"tipo": "TEXT NOT NULL DEFAULT 'dinero'", "ticket_id": "INTEGER"},
+}
+
+
+def _migrar(c: sqlite3.Connection) -> None:
+    """Pone al día bases creadas con versiones anteriores (columnas y estados nuevos)."""
+    for tabla, cols in COLUMNAS_NUEVAS.items():
+        existentes = {r[1] for r in c.execute(f"PRAGMA table_info({tabla})")}
+        for col, ddl in cols.items():
+            if col not in existentes:
+                c.execute(f"ALTER TABLE {tabla} ADD COLUMN {col} {ddl}")
+    sql = c.execute("SELECT sql FROM sqlite_master WHERE name = 'entradas'").fetchone()[0]
+    if "'clasificado'" not in sql:
+        # SQLite no permite cambiar un CHECK: se reconstruye la tabla (procedimiento oficial).
+        nuevo = sql.replace("'reservado','eliminado')", "'reservado','eliminado','clasificado')")
+        nuevo = nuevo.replace("CREATE TABLE entradas", "CREATE TABLE entradas_nueva", 1)
+        cols = ", ".join(r[1] for r in c.execute("PRAGMA table_info(entradas)"))
+        c.execute("PRAGMA foreign_keys = OFF")
+        c.execute("BEGIN")
+        c.execute(nuevo)
+        c.execute(f"INSERT INTO entradas_nueva ({cols}) SELECT {cols} FROM entradas")
+        c.execute("DROP TABLE entradas")
+        c.execute("ALTER TABLE entradas_nueva RENAME TO entradas")
+        c.execute("COMMIT")
+        c.execute("PRAGMA foreign_keys = ON")
+
+
 class ErrorNegocio(Exception):
     """Error que se muestra tal cual al usuario (regla de negocio incumplida)."""
 
@@ -359,9 +426,8 @@ class BaseDatos:
         with self._bloqueo:
             c = self.conexion()
             c.executescript(ESQUEMA)
-            columnas = {r[1] for r in c.execute("PRAGMA table_info(entradas)")}
-            if "espera_desde" not in columnas:  # bases creadas antes de la lista de alternos
-                c.execute("ALTER TABLE entradas ADD COLUMN espera_desde TEXT")
+            _migrar(c)
+            c.executescript(ESQUEMA)  # vuelve a crear índices de tablas reconstruidas
             for k, v in AJUSTES_POR_DEFECTO.items():
                 c.execute("INSERT OR IGNORE INTO ajustes (clave, valor) VALUES (?, ?)", (k, v))
             c.commit()

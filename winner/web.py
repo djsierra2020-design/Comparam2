@@ -5,7 +5,7 @@ import functools
 
 from flask import Blueprint, current_app, g, jsonify, make_response, render_template, request
 
-from . import caja, premios, reportes
+from . import caja, eventos, premios, reportes
 from . import seguridad as seg
 from . import torneos as T
 from .db import BaseDatos, ErrorNegocio
@@ -98,7 +98,8 @@ def _pid():
 
 @bp.get("/")
 def inicio():
-    return render_template("winner_inicio.html", demo=seg.demo())
+    en_curso = db().valor("SELECT id FROM torneos WHERE estado = 'en_curso' ORDER BY (tipo = 'dia1') DESC, id LIMIT 1")
+    return render_template("winner_inicio.html", demo=seg.demo(), torneo_en_curso=en_curso)
 
 
 @bp.get("/personal")
@@ -185,7 +186,16 @@ def api_abrir_caja():
 def api_jugador(jid):
     j = caja.jugador(db(), jid)
     return jsonify(jugador=caja.publico(j), saldo=caja.saldo(db(), jid),
-                   movimientos=caja.movimientos(db(), jid, 50) if g.personal["rol"] in seg.PERMISOS["caja"] else [])
+                   movimientos=caja.movimientos(db(), jid, 50) if g.personal["rol"] in seg.PERMISOS["caja"] else [],
+                   tickets=eventos.tickets_jugador(db(), jid, None), clasificaciones=_clasificaciones(jid))
+
+
+def _clasificaciones(jid):
+    """Stack vigente (el mayor) del jugador en cada final a la que clasificó y que no ha terminado."""
+    return db().todos(
+        "SELECT f.id AS final_id, f.nombre AS final, f.fecha, MAX(c.fichas) AS fichas, COUNT(*) AS veces "
+        "FROM clasificados c JOIN torneos f ON f.id = c.principal_id WHERE c.jugador_id = ? "
+        "AND f.estado IN ('programado','en_curso') GROUP BY f.id ORDER BY f.fecha", (jid,))
 
 
 @bp.post("/api/jugadores/<int:jid>/celular")
@@ -386,6 +396,38 @@ def api_entradas(tid):
         "LEFT JOIN mesas m ON m.id = e.mesa_id WHERE e.torneo_id = ? ORDER BY j.nombre, e.numero", (tid,)))
 
 
+# --- Días clasificatorios, final y tickets ----------------------------------------------------------
+
+@bp.post("/api/torneos/<int:tid>/cerrar-dia")
+@personal("director")
+def api_cerrar_dia(tid):
+    return jsonify(eventos.cerrar_dia(db(), _pid(), tid))
+
+
+@bp.post("/api/torneos/<int:tid>/traer-clasificados")
+@personal("director")
+def api_traer_clasificados(tid):
+    return jsonify(nuevos=eventos.traer_clasificados(db(), _pid(), tid))
+
+
+@bp.get("/api/torneos/<int:tid>/evento")
+@personal()
+def api_evento(tid):
+    t = T.torneo(db(), tid)
+    final_id = t["principal_id"] if t["tipo"] == "dia1" else tid
+    if T.torneo(db(), final_id)["tipo"] != "final":
+        raise ErrorNegocio("Este torneo no es parte de un evento de varios días", 404)
+    return jsonify(resumen=eventos.resumen_evento(db(), final_id),
+                   clasificados=eventos.clasificados_vigentes(db(), final_id))
+
+
+@bp.post("/api/tickets/<int:kid>/anular")
+@personal("aprobar")
+def api_anular_ticket(kid):
+    eventos.anular_ticket(db(), _pid(), kid, _datos().get("motivo"))
+    return jsonify(ok=True)
+
+
 # --- Premios -------------------------------------------------------------------------------------
 
 @bp.get("/api/torneos/<int:tid>/premios")
@@ -564,10 +606,12 @@ def api_jugador_inicio():
     for t in T.lista_torneos(db(), solo_activos=True):
         op = T.opciones_jugador(db(), t, jid)
         disponibles.append({"id": t["id"], "nombre": t["nombre"], "fecha": t["fecha"], "buyin": t["buyin"],
+                            "tipo": t["tipo"], "principal": t["principal"], "destino": t["destino"],
                             "estado": t["estado"], "inscritos": t["vivos"],
                             "puede_inscribirse": compras and t["preinscripcion_movil"] and op["puede_inscribirse"],
                             "inscrito": op["entrada_viva"] is not None})
     return jsonify(jugador=caja.publico(j), saldo=caja.saldo(db(), jid), torneos=mis, disponibles=disponibles,
+                   tickets=eventos.tickets_jugador(db(), jid), clasificaciones=_clasificaciones(jid),
                    reservas=T.reserva_activa(db(), jid) if compras else [], compras_habilitadas=compras,
                    movimientos=caja.movimientos(db(), jid, 30),
                    notificaciones=db().todos("SELECT * FROM notificaciones WHERE jugador_id = ? ORDER BY id DESC LIMIT 30",

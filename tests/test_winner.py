@@ -382,29 +382,31 @@ def test_api_roles_y_tablero(cliente):
     assert cliente.post("/winner/api/personal/ingresar", json={"usuario": "crupier", "clave": "x"}, headers=H).status_code == 401
     assert cliente.post("/winner/api/personal/ingresar", json={"usuario": "crupier", "clave": "winner2026"}).status_code == 403
     assert cliente.post("/winner/api/personal/ingresar", json={"usuario": "crupier", "clave": "winner2026"}, headers=H).status_code == 200
-    tb = cliente.get("/winner/api/torneos/1/tablero", headers=H).get_json()
-    assert tb["vivos"] == 296 and len(tb["mesas"]) == 30 and len(tb["alternos"]) == 26
+    # Demo: Día 1B en curso (id 3) con 230 entradas en 24 mesas y el satélite en otras 4 mesas.
+    tb = cliente.get("/winner/api/torneos/3/tablero", headers=H).get_json()
+    assert tb["vivos"] == 230 and len(tb["mesas"]) == 24 and len(tb["alternos"]) == 14
+    assert tb["mesas_sala_abiertas"] == 28 and tb["sugerencias"][0]["tipo"] == "abrir_mesa"
     assert cliente.post("/winner/api/torneos", json={"nombre": "x"}, headers=H).status_code == 403
     entrada = next(a for m in tb["mesas"] for a in m["asientos"] if a["entrada_id"])["entrada_id"]
     assert cliente.post(f"/winner/api/entradas/{entrada}/eliminar", json={}, headers=H).get_json()["estado"] == "reservado"
 
 
 def test_api_jugador_ingreso_y_saldo(cliente):
-    assert cliente.post("/winner/api/jugador/codigo", json={"celular": "3000000005"}, headers=H).status_code == 200
+    assert cliente.post("/winner/api/jugador/codigo", json={"celular": "3000000150"}, headers=H).status_code == 200
     sms = cliente.get("/winner/api/demo/sms").get_json()[0]["texto"]
     codigo = "".join(c for c in sms if c.isdigit())[:6]
-    r = cliente.post("/winner/api/jugador/ingresar", json={"celular": "3000000005", "codigo": codigo}, headers=H)
+    r = cliente.post("/winner/api/jugador/ingresar", json={"celular": "3000000150", "codigo": codigo}, headers=H)
     assert r.status_code == 409  # primer ingreso: debe crear PIN
-    r = cliente.post("/winner/api/jugador/ingresar", json={"celular": "3000000005", "codigo": codigo, "pin_nuevo": "4826"}, headers=H)
+    r = cliente.post("/winner/api/jugador/ingresar", json={"celular": "3000000150", "codigo": codigo, "pin_nuevo": "4826"}, headers=H)
     assert r.status_code == 200
     inicio = cliente.get("/winner/api/jugador/inicio", headers=H).get_json()
     assert inicio["saldo"] > 0 and inicio["torneos"][0]["estado"] == "sentado"
     assert cliente.get("/winner/api/torneos", headers=H).status_code == 401  # la sesión de jugador no sirve para el panel
-    assert cliente.get("/winner/api/publico/1").get_json()["vivos"] == 296
+    assert cliente.get("/winner/api/publico/3").get_json()["vivos"] == 230
 
 
 def test_pantallas_cargan(cliente):
-    for ruta in ("/winner/", "/winner/personal", "/winner/app", "/winner/pantalla/1"):
+    for ruta in ("/winner/", "/winner/personal", "/winner/app", "/winner/pantalla/3"):
         assert cliente.get(ruta).status_code == 200
 
 
@@ -418,3 +420,175 @@ def test_no_finaliza_con_mas_vivos_que_premios(db, staff):
     premios.definir_tabla(db, staff["director"], t, [{"posicion": 1, "monto": 300_000}])
     with pytest.raises(ErrorNegocio, match="Aún quedan 3"):
         premios.finalizar(db, staff["director"], t)
+
+
+# --- Eventos de varios días, torneos simultáneos y satélites ----------------------------------------
+
+from winner import eventos  # noqa: E402
+
+
+def _jugar_hasta(db, staff, tid, quedan, rnd):
+    """Elimina al azar hasta que queden ``quedan`` jugadores sentados (sin recompras)."""
+    while db.valor("SELECT COUNT(*) FROM entradas WHERE torneo_id = ? AND estado = 'sentado'", (tid,)) > quedan:
+        vivos = db.todos("SELECT id FROM entradas WHERE torneo_id = ? AND estado = 'sentado'", (tid,))
+        T.eliminar(db, staff["crupier"], rnd.choice(vivos)["id"])
+        vencer_todo(db)
+        for s in T.sugerencias(db, tid):
+            if s["tipo"] == "cerrar_mesa":
+                T.cerrar_mesa(db, staff["floor"], tid, s["mesa_id"])
+        T.balancear(db, staff["floor"], tid)
+
+
+def test_evento_cinco_dias_clasificatorios_y_final(db, staff):
+    rnd = random.Random(3)
+    final = T.crear_torneo(db, staff["director"], dict(nombre="Gran Final", fecha="2026-12-10", buyin=500_000,
+                                                        stack_inicial=40_000, tipo="final"))
+    dias = [T.crear_torneo(db, staff["director"], dict(nombre=f"Día 1{letra}", fecha=f"2026-12-0{i + 1}", buyin=500_000,
+                                                        stack_inicial=40_000, tipo="dia1", principal_id=final,
+                                                        porcentaje_clasifica=20))
+            for i, letra in enumerate("ABCDE")]
+    jugadores = [nuevo_jugador(db, staff, i, celular=False) for i in range(100)]
+    doble = jugadores[0]  # juega dos días
+    stacks_doble = []
+    for n, dia in enumerate(dias):
+        T.abrir_mesas(db, staff["floor"], dia, 3)
+        participantes = jugadores[n * 20:(n + 1) * 20] + ([doble] if n == 1 else [])
+        for j in participantes:
+            T.inscribir(db, dia, j, origen="caja", personal_id=staff["cajero"], pago="efectivo")
+        T.iniciar_torneo(db, staff["floor"], dia)
+        T.sentar_inscritos(db, staff["floor"], dia)
+        objetivo = eventos.objetivo_clasificados(db, T.torneo(db, dia))
+        assert objetivo == math.ceil(len(participantes) * 0.2)
+        # el jugador doble sobrevive siempre para probar la regla del stack mayor
+        while db.valor("SELECT COUNT(*) FROM entradas WHERE torneo_id = ? AND estado = 'sentado'", (dia,)) > objetivo:
+            vivos = db.todos("SELECT id FROM entradas WHERE torneo_id = ? AND estado = 'sentado' AND jugador_id != ?",
+                             (dia, doble))
+            T.eliminar(db, staff["crupier"], rnd.choice(vivos)["id"])
+            for s in T.sugerencias(db, dia):
+                if s["tipo"] == "cerrar_mesa":
+                    T.cerrar_mesa(db, staff["floor"], dia, s["mesa_id"])
+        assert "cerrar_dia" in [s["tipo"] for s in T.sugerencias(db, dia)]
+        e_doble = db.uno("SELECT * FROM entradas WHERE torneo_id = ? AND jugador_id = ?", (dia, doble))
+        if e_doble:
+            nuevo = 90_000 if n == 0 else 55_000
+            T.registrar_conteo(db, staff["floor"], e_doble["id"], nuevo)
+            stacks_doble.append(nuevo)
+        eventos.cerrar_dia(db, staff["director"], dia)
+        if n < 4:
+            with pytest.raises(ErrorNegocio, match="Faltan días por cerrar"):
+                eventos.traer_clasificados(db, staff["director"], final)
+    assert stacks_doble == [90_000, 55_000]
+    vigentes = eventos.clasificados_vigentes(db, final)
+    # 20 % de cada día (el Día 1B tuvo 21 entradas → 5): 21 clasificaciones, pero el jugador doble cuenta una vez.
+    assert db.valor("SELECT COUNT(*) FROM clasificados WHERE principal_id = ?", (final,)) == 21
+    assert len(vigentes) == 20
+    assert next(v for v in vigentes if v["jugador_id"] == doble)["fichas"] == 90_000  # se queda con el mayor
+    assert len({v["jugador_id"] for v in vigentes}) == len(vigentes)
+    with pytest.raises(ErrorNegocio, match="se entra clasificando"):
+        T.inscribir(db, final, jugadores[50], origen="caja", personal_id=staff["cajero"], pago="efectivo")
+    assert eventos.traer_clasificados(db, staff["director"], final) == len(vigentes)
+    assert eventos.traer_clasificados(db, staff["director"], final) == 0  # no duplica
+    T.abrir_mesas(db, staff["floor"], final, 3)
+    T.iniciar_torneo(db, staff["floor"], final)
+    T.sentar_inscritos(db, staff["floor"], final)
+    fichas = T.resumen_fichas(db, final)
+    assert fichas["diferencia"] == 0 and fichas["esperado"] == sum(v["fichas"] for v in vigentes)
+    resumen = eventos.resumen_evento(db, final)
+    assert resumen["entradas_totales"] == 101 and resumen["recaudo_dinero"] == 101 * 500_000
+    premios.definir_tabla(db, staff["director"], final, [{"posicion": 1, "monto": 30_000_000},
+                                                         {"posicion": 2, "monto": 20_000_000}])
+    _jugar_hasta(db, staff, final, 1, rnd)
+    p = premios.finalizar(db, staff["director"], final)
+    assert len(p["detalle"]) == 2
+    with pytest.raises(ErrorNegocio, match="no pagan premios"):
+        premios.definir_tabla(db, staff["director"], dias[0], [{"posicion": 1, "monto": 1}])
+
+
+def test_cerrar_dia_exige_reservas_y_alternos_resueltos(db, staff):
+    final = T.crear_torneo(db, staff["director"], dict(nombre="F", fecha="2026-12-10", buyin=1, stack_inicial=1, tipo="final"))
+    dia = T.crear_torneo(db, staff["director"], dict(nombre="1A", fecha="2026-12-01", buyin=100_000, stack_inicial=10_000,
+                                                      tipo="dia1", principal_id=final, reentrada_max=1))
+    T.abrir_mesas(db, staff["floor"], dia, 1)
+    es = [T.inscribir(db, dia, nuevo_jugador(db, staff, i, celular=False), origen="caja", personal_id=staff["cajero"],
+                      pago="efectivo", sentar_ya=True) for i in range(3)]
+    T.iniciar_torneo(db, staff["floor"], dia)
+    T.eliminar(db, staff["crupier"], es[0]["id"])  # queda en reserva (puede re-entrar)
+    with pytest.raises(ErrorNegocio, match="decidiendo si recompran"):
+        eventos.cerrar_dia(db, staff["director"], dia)
+    vencer_todo(db)
+    with pytest.raises(ErrorNegocio, match="Cerrar día"):
+        premios.finalizar(db, staff["director"], dia)
+    assert eventos.cerrar_dia(db, staff["director"], dia)["clasificados"] == 2
+    assert T.torneo(db, dia)["estado"] == "finalizado"
+    with pytest.raises(ErrorNegocio, match="ya clasificó|no está abierto|cerrada"):
+        T.inscribir(db, dia, es[1]["jugador_id"], origen="caja", personal_id=staff["cajero"], pago="efectivo")
+
+
+def test_torneos_simultaneos_comparten_las_30_mesas_fisicas(db, staff):
+    a = nuevo_torneo(db, staff, nombre="Principal")
+    b = nuevo_torneo(db, staff, nombre="Satélite nocturno")
+    T.abrir_mesas(db, staff["floor"], a, 20)
+    T.abrir_mesas(db, staff["floor"], b, 10)
+    numeros = lambda t: sorted(m["numero"] for m in db.todos("SELECT numero FROM mesas WHERE torneo_id = ? AND estado = 'abierta'", (t,)))
+    assert numeros(a) == list(range(1, 21)) and numeros(b) == list(range(21, 31))
+    with pytest.raises(ErrorNegocio, match="La sala tiene 30 mesas"):
+        T.abrir_mesas(db, staff["floor"], b, 1)
+    mesa5 = db.valor("SELECT id FROM mesas WHERE torneo_id = ? AND numero = 5", (a,))
+    T.cerrar_mesa(db, staff["floor"], a, mesa5)
+    T.abrir_mesas(db, staff["floor"], b, 1)
+    assert 5 in numeros(b) and 5 not in numeros(a)  # la mesa física 5 pasó al otro torneo
+    mesa5b = db.valor("SELECT id FROM mesas WHERE torneo_id = ? AND numero = 5", (b,))
+    T.cerrar_mesa(db, staff["floor"], b, mesa5b)
+    T.abrir_mesas(db, staff["floor"], a, 1)  # el torneo A vuelve a abrir su mesa 5 (se reabre, no se duplica)
+    assert 5 in numeros(a)
+    mapa = T.mapa_sala(db)
+    assert len(mapa) == 30 and all(m["torneo_id"] for m in mapa)
+    # Un jugador puede estar inscrito en dos torneos simultáneos, uno por torneo.
+    j = nuevo_jugador(db, staff, 1, saldo=500_000)
+    T.inscribir(db, a, j, origen="caja", personal_id=staff["cajero"])
+    T.inscribir(db, b, j, origen="caja", personal_id=staff["cajero"])
+
+
+def test_satelite_premia_tickets_y_el_ticket_sirve_en_un_dia_clasificatorio(db, staff):
+    final = T.crear_torneo(db, staff["director"], dict(nombre="Main Event", fecha="2026-12-10", buyin=600_000,
+                                                        stack_inicial=40_000, tipo="final"))
+    dia = T.crear_torneo(db, staff["director"], dict(nombre="Día 1A", fecha="2026-12-01", buyin=600_000,
+                                                      stack_inicial=40_000, tipo="dia1", principal_id=final))
+    sat = T.crear_torneo(db, staff["director"], dict(nombre="Satélite", fecha="2026-11-20", buyin=150_000,
+                                                      stack_inicial=10_000, tipo="satelite", satelite_de=final))
+    with pytest.raises(ErrorNegocio, match="Solo los satélites"):
+        premios.definir_tabla(db, staff["director"], final, [{"posicion": 1, "tipo": "ticket"}])
+    T.abrir_mesas(db, staff["floor"], sat, 1)
+    js = [nuevo_jugador(db, staff, i, celular=False, saldo=150_000) for i in range(6)]
+    es = [T.inscribir(db, sat, j, origen="caja", personal_id=staff["cajero"], sentar_ya=True) for j in js]
+    T.iniciar_torneo(db, staff["floor"], sat)
+    premios.definir_tabla(db, staff["director"], sat, [{"posicion": 1, "tipo": "ticket"}, {"posicion": 2, "tipo": "ticket"},
+                                                       {"posicion": 3, "monto": 300_000}])
+    assert [f["monto"] for f in premios.tabla(db, sat)] == [600_000, 600_000, 300_000]
+    for e in es[:4]:
+        T.eliminar(db, staff["crupier"], e["id"])
+    # El ganador ya tenía un ticket: el sistema lo advierte para pasar el cupo al siguiente si así es la regla.
+    eventos.crear_ticket(db, staff["director"], js[5], final, None, 600_000)
+    p = premios.finalizar(db, staff["director"], sat)
+    assert any("ya tiene un ticket" in a for a in p["advertencias"])
+    with pytest.raises(ErrorNegocio, match="es un ticket"):
+        premios.ajustar(db, staff["director"], sat, [{"posicion": 1, "monto_final": 500_000, "motivo": "x"},
+                                                     {"posicion": 3, "monto_final": 400_000, "motivo": "x"}])
+    # Se pasa el cupo al siguiente: el que ya tenía ticket cobra el 3er puesto en dinero.
+    pos_doble = next(d["posicion"] for d in p["detalle"] if d["jugador_id"] == js[5])
+    tercero = next(d["jugador_id"] for d in p["detalle"] if d["posicion"] == 3)
+    premios.ajustar(db, staff["director"], sat, [{"posicion": pos_doble, "jugador_id": tercero, "motivo": "Ya tenía ticket"},
+                                                 {"posicion": 3, "jugador_id": js[5], "motivo": "Ya tenía ticket"}])
+    premios.confirmar(db, staff["director"], sat)
+    premios.acreditar(db, staff["director"], sat)
+    assert tercero == js[3]
+    assert caja.saldo(db, js[5]) == 300_000 and caja.saldo(db, js[3]) == 0
+    assert len(eventos.tickets_jugador(db, js[3])) == 1 and len(eventos.tickets_jugador(db, js[4])) == 1
+    # El ticket (destino: la final) sirve para entrar al Día 1A sin mover dinero.
+    antes = db.valor("SELECT COUNT(*) FROM movimientos")
+    e = T.inscribir(db, dia, js[3], origen="caja", personal_id=staff["cajero"], pago="ticket")
+    assert e["pago"] == "ticket" and db.valor("SELECT COUNT(*) FROM movimientos") == antes
+    assert not eventos.tickets_jugador(db, js[3])
+    with pytest.raises(ErrorNegocio, match="no tiene un ticket"):
+        T.inscribir(db, dia, js[0], origen="caja", personal_id=staff["cajero"], pago="ticket")
+    assert eventos.resumen_evento(db, final)["entradas_con_ticket"] == 1

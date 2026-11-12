@@ -44,6 +44,7 @@
     <div class="saldo"><div class="e">Saldo disponible en su caja Winner</div><div class="v" id="saldo"></div>
       <div class="e" id="titular"></div></div>
     <div id="reservas"></div>
+    <div id="extras"></div>
     <div class="tarjeta"><h3>Mis torneos</h3><div id="mis-torneos"></div></div>
     <div class="tarjeta"><h3>Torneos</h3><div id="disponibles"></div></div>
     <div class="tarjeta"><h3>Avisos</h3><div id="notis"></div></div>
@@ -124,6 +125,8 @@ async function refrescar(abrir = false) {
       ${ops.includes("reentrada") ? `<button onclick="comprar(${x.entrada_id}, 'reentrada', ${x.buyin})">Re-entrar ${pesos(x.buyin)}</button>` : ""}
       <button class="sec" onclick="rechazar(${x.entrada_id})">No, gracias</button></div></div>`;
   }).join("");
+  $("#extras").innerHTML = r.clasificaciones.map(c => `<div class="tarjeta" style="border-color:var(--verde)"><h3>✅ Clasificado a ${esc(c.final)}</h3><p style="margin:0">Su stack para el Día 2: <b>${miles(c.fichas)}</b> fichas${c.veces > 1 ? ` (el mayor de sus ${c.veces} clasificaciones)` : ""}.</p></div>`).join("")
+    + r.tickets.map(k => `<div class="tarjeta" style="border-color:var(--oro)"><h3>🎟️ Ticket para ${esc(k.destino)}</h3><p style="margin:0" class="suave">Vale una entrada (${pesos(k.valor)}). Ganado en ${esc(k.origen || "satélite")}. Úselo al inscribirse en la caja.</p></div>`).join("");
   $("#mis-torneos").innerHTML = r.torneos.length ? r.torneos.map(t => `<div style="margin-bottom:14px"><b>${esc(t.torneo)}</b> <span class="suave">${esc(t.fecha)}</span><br>
       ${t.estado === "sentado" ? `<div class="asiento-grande">Mesa ${t.mesa} · Asiento ${t.asiento}</div>`
         : t.estado === "reservado" ? `<span class="chip oro">Esperando su decisión de recompra</span>`
@@ -134,7 +137,7 @@ async function refrescar(abrir = false) {
     const el = $("#qr-" + t.id);
     if (el && window.QRCode) new QRCode(el, {text: "WINNER:" + t.codigo_qr, width: 180, height: 180});
   });
-  $("#disponibles").innerHTML = r.disponibles.length ? `<table>${r.disponibles.map(t => `<tr><td><b>${esc(t.nombre)}</b><br><span class="suave">${esc(t.fecha)} · ${t.inscritos} inscritos</span></td><td class="n">${pesos(t.buyin)}<br>
+  $("#disponibles").innerHTML = r.disponibles.length ? `<table>${r.disponibles.map(t => `<tr><td><b>${esc(t.nombre)}</b>${t.tipo === "dia1" ? `<br><span class="chip azul">Clasificatorio de ${esc(t.principal)}</span>` : t.tipo === "satelite" ? `<br><span class="chip oro">Satélite a ${esc(t.destino)}</span>` : t.tipo === "final" ? `<br><span class="chip verde">Final · se entra clasificando</span>` : ""}<br><span class="suave">${esc(t.fecha)} · ${t.inscritos} inscritos</span></td><td class="n">${pesos(t.buyin)}<br>
       ${t.inscrito ? '<span class="chip verde">Inscrito</span>' : t.puede_inscribirse ? `<button onclick="inscribir(${t.id}, ${t.buyin}, '${esc(t.nombre).replace(/'/g, "")}')">Inscribirme</button>` : r.compras_habilitadas ? "" : '<span class="suave" style="font-size:12px">Inscripción en caja</span>'}</td></tr>`).join("")}</table>`
     : `<p class="suave">No hay torneos abiertos.</p>`;
   const nuevas = r.notificaciones.filter(n => !n.leida);

@@ -56,6 +56,8 @@
           <button class="auto sec" id="b-sentar-todos" data-perm="floor">Sentar inscritos</button>
           <button class="auto sec" id="b-balancear" data-perm="floor">Balancear</button>
           <button class="auto oro oculto" id="b-iniciar" data-perm="floor">Iniciar torneo</button>
+          <button class="auto oro oculto" id="b-traer" data-perm="director">Traer clasificados</button>
+          <button class="auto oro oculto" id="b-cerrar-dia" data-perm="director">Cerrar día y clasificar</button>
         </div>
         <video id="video" class="oculto" style="width:100%;max-width:360px;margin-top:10px;border-radius:10px" playsinline muted></video>
         <div class="fila" style="margin-top:12px" data-perm="floor">
@@ -66,6 +68,8 @@
           <div class="auto"><label>Add-on</label><button class="sec auto" id="t-addon"></button></div>
         </div>
       </div>
+      <div class="tarjeta" id="evento" style="display:none"></div>
+      <div class="tarjeta"><h3 style="margin-bottom:8px">Mesas de la sala</h3><div id="sala" style="display:flex;flex-wrap:wrap;gap:5px"></div></div>
       <div class="mesas" id="mesas"></div>
       <div class="dos" style="margin-top:16px">
         <div class="tarjeta"><h3>Inscritos sin asiento</h3><div id="sin-asiento" class="suave"></div></div>
@@ -130,6 +134,7 @@
 <script src="{{ url_for('winner.static', filename='comun.js') }}"></script>
 <script>
 const ROLES = {cajero: "Cajero", crupier: "Crupier", floor: "Floor", director: "Director de torneo", supervisor: "Supervisor", admin: "Administrador"};
+const TIPOS_T = {normal: "Torneo", dia1: "Día clasificatorio", final: "Final", satelite: "Satélite"};
 const ESTADOS_T = {programado: "Programado", en_curso: "En curso", finalizado: "Finalizado", cancelado: "Cancelado"};
 const MOTIVOS = {alterno: "Alterno sentado", sentado: "Sentado", balanceo: "Balanceo", cierre_mesa: "Cierre de mesa", recompra: "Recompra", reentrada: "Re-entrada", inscripcion: "Inscripción"};
 const TIPOS = {deposito: "Depósito", retiro: "Retiro", inscripcion: "Inscripción", recompra: "Recompra", reentrada: "Re-entrada", addon: "Add-on", premio: "Premio", correccion: "Corrección"};
@@ -184,7 +189,7 @@ async function cargarTorneos() {
     const activo = torneos.find(t => t.estado === "en_curso") || torneos.find(t => t.estado === "programado") || torneos[0];
     torneoId = activo ? activo.id : null;
   }
-  const ops = torneos.map(t => `<option value="${t.id}">${esc(t.nombre)} · ${esc(t.fecha)} · ${ESTADOS_T[t.estado]}</option>`).join("");
+  const ops = torneos.map(t => `<option value="${t.id}">${t.tipo !== "normal" ? TIPOS_T[t.tipo] + ": " : ""}${esc(t.nombre)} · ${esc(t.fecha)} · ${ESTADOS_T[t.estado]}</option>`).join("");
   ["#sel-torneo", "#sel-torneo-premios", "#sel-torneo-reporte"].forEach(s => { $(s).innerHTML = ops; if (torneoId) $(s).value = torneoId; });
 }
 ["#sel-torneo", "#sel-torneo-premios"].forEach(s => $(s).onchange = e => {
@@ -211,11 +216,18 @@ async function cargarTablero() {
   $("#sugerencias").innerHTML = tablero.sugerencias.map(s => `<div class="aviso"><span>⚠️ ${esc(s.texto)}</span>${puede("floor") ?
     (s.tipo === "cerrar_mesa" ? `<button class="oro" onclick="cerrarMesa(${s.mesa_id}, ${s.mesa})">Cerrar mesa ${s.mesa}</button>`
       : s.tipo === "alternos" ? `<button class="oro" onclick="sentarAlternos()">Sentar alternos</button>`
+      : s.tipo === "abrir_mesa" ? `<button class="oro" onclick="abrirYSentar(${s.cantidad})">Abrir ${s.cantidad} mesa(s) y sentar alternos</button>`
+      : s.tipo === "cerrar_dia" ? (puede("director") ? `<button class="oro" onclick="cerrarDia()">Cerrar día</button>` : "")
       : `<button class="oro" onclick="balancear()">Balancear ahora</button>`) : ""}</div>`).join("");
   $("#nivel").textContent = t.nivel;
   const tog = (id, v) => { $(id).textContent = v ? "Abierta ✓" : "Cerrada"; $(id).className = v ? "auto" : "sec auto"; };
   tog("#t-registro", t.registro_abierto); tog("#t-recompras", t.recompras_abiertas); tog("#t-addon", t.addon_abierto);
   $("#b-iniciar").classList.toggle("oculto", t.estado !== "programado" || !puede("floor"));
+  $("#b-cerrar-dia").classList.toggle("oculto", t.tipo !== "dia1" || t.estado !== "en_curso" || !puede("director"));
+  $("#b-traer").classList.toggle("oculto", t.tipo !== "final" || ["finalizado", "cancelado"].includes(t.estado) || !puede("director"));
+  $("#sala").innerHTML = tablero.sala.map(m => `<span class="chip ${m.torneo_id === torneoId ? "verde" : m.torneo_id ? "azul" : ""}" title="${esc(m.torneo || "Libre")}">${m.numero}${m.torneo_id && m.torneo_id !== torneoId ? " · " + esc(m.torneo) : ""}</span>`).join("")
+    + `<span class="suave" style="font-size:12px;margin-left:6px">verde: este torneo · azul: otro torneo · gris: libre</span>`;
+  cargarEvento(t);
   $("#mesas").innerHTML = tablero.mesas.map(m => `<div class="mesa"><div class="titulo"><span>Mesa ${m.numero}</span>
       <span><span class="chip">${m.ocupados}/${m.asientos.length}</span>
       ${puede("floor") ? `<button class="sec" style="padding:3px 8px;font-size:12px" onclick="cerrarMesa(${m.id}, ${m.numero})">Cerrar</button>` : ""}</span></div>
@@ -243,6 +255,35 @@ window.cerrarMesa = async (id, numero) => {
   if (!await confirmar(`¿Cerrar la mesa ${numero}?`, "Sus jugadores se reparten en los asientos libres de las mesas con menos jugadores.")) return;
   accion(async () => { const r = await api(`/torneos/${torneoId}/mesas/${id}/cerrar`, "POST", {}); await cargarTablero(); mostrarMovimientos(`Mesa ${numero} cerrada`, r.movimientos); });
 };
+async function cargarEvento(t) {
+  const el = $("#evento");
+  if (t.tipo !== "dia1" && t.tipo !== "final") { el.style.display = "none"; return; }
+  let r;
+  try { r = await api(`/torneos/${t.id}/evento`); } catch (e) { el.style.display = "none"; return; }
+  const ev = r.resumen;
+  el.style.display = "";
+  el.innerHTML = `<h3>Evento: ${esc(ev.final.nombre)}</h3>
+    <div class="kpis"><div class="kpi"><div class="e">Entradas en días clasificatorios</div><div class="v">${ev.entradas_totales}</div></div>
+      <div class="kpi"><div class="e">Clasificados al Día 2</div><div class="v">${ev.clasificados}</div></div>
+      <div class="kpi"><div class="e">Recaudo en dinero</div><div class="v">${pesos(ev.recaudo_dinero)}</div></div>
+      <div class="kpi"><div class="e">Entradas con ticket de satélite</div><div class="v">${ev.entradas_con_ticket}</div></div></div>
+    <table><tr><th>Día</th><th>Fecha</th><th>Estado</th><th class="n">Entradas</th><th class="n">Clasificados</th></tr>${ev.dias.map(d => `<tr><td>${esc(d.nombre)}</td><td>${esc(d.fecha)}</td><td>${ESTADOS_T[d.estado]}</td><td class="n">${d.entradas}</td><td class="n">${d.clasificados}</td></tr>`).join("") || `<tr><td colspan="5" class="suave">Aún no hay días clasificatorios: créelos con «+ Nuevo torneo» → Día clasificatorio.</td></tr>`}</table>
+    ${r.clasificados.length ? `<details style="margin-top:10px"><summary>Ver clasificados (stack mayor de cada jugador)</summary><table><tr><th>#</th><th>Jugador</th><th>Día</th><th class="n">Fichas</th></tr>${r.clasificados.map((c, i) => `<tr><td>${i + 1}</td><td>${esc(c.nombre)}</td><td>${esc(c.dia)}</td><td class="n">${miles(c.fichas)}</td></tr>`).join("")}</table></details>` : ""}`;
+}
+window.cerrarDia = async () => {
+  if (!await confirmar("¿Cerrar el día?", "Los jugadores sentados guardan sus fichas y clasifican al Día 2. Si alguien ya había clasificado, se queda con su stack mayor. Se cierran las mesas de este día.")) return;
+  accion(async () => { const r = await api(`/torneos/${torneoId}/cerrar-dia`, "POST", {}); aviso(`${r.clasificados} jugadores clasificados`); await cargarTorneos(); cargarTablero(); });
+};
+$("#b-cerrar-dia").onclick = () => window.cerrarDia();
+$("#b-traer").onclick = async () => {
+  if (!await confirmar("¿Traer a los clasificados?", "Se inscriben en la final con su stack mayor. Después use «Sentar inscritos» para sortear los asientos.")) return;
+  accion(async () => { const r = await api(`/torneos/${torneoId}/traer-clasificados`, "POST", {}); aviso(`${r.nuevos} clasificados inscritos en la final`); cargarTablero(); });
+};
+window.abrirYSentar = cantidad => accion(async () => {
+  await api(`/torneos/${torneoId}/mesas`, "POST", {cantidad});
+  const r = await api(`/torneos/${torneoId}/sentar-alternos`, "POST", {});
+  await cargarTablero(); mostrarMovimientos("Alternos sentados", r.movimientos);
+});
 window.sentarAlternos = () => accion(async () => { const r = await api(`/torneos/${torneoId}/sentar-alternos`, "POST", {}); await cargarTablero(); mostrarMovimientos("Alternos sentados", r.movimientos); });
 window.balancear = () => accion(async () => { const r = await api(`/torneos/${torneoId}/balancear`, "POST", {}); await cargarTablero(); mostrarMovimientos("Balanceo", r.movimientos); });
 $("#b-balancear").onclick = () => window.balancear();
@@ -337,8 +378,24 @@ window.abrirAsiento = async (entradaId) => {
 };
 
 $("#b-nuevo-torneo").onclick = async () => {
-  const d = await pedir("Nuevo torneo", [
-    {n: "nombre", l: "Nombre"}, {n: "fecha", l: "Fecha", tipo: "date", valor: new Date().toLocaleDateString("en-CA")},
+  const k = await pedir("Nuevo torneo", [{n: "tipo", l: "Tipo", tipo: "select", opciones: [
+    ["normal", "Torneo de un día"], ["final", "Evento de varios días: Final (Día 2) — créela primero"],
+    ["dia1", "Día clasificatorio (Día 1A, 1B…) de una final"], ["satelite", "Satélite (premia cupos/tickets)"]]}], "Siguiente");
+  if (!k) return;
+  const finales = torneos.filter(t => t.tipo === "final" && t.estado === "programado");
+  const destinos = torneos.filter(t => ["final", "normal"].includes(t.tipo) && ["programado", "en_curso"].includes(t.estado));
+  const extra = [];
+  if (k.tipo === "dia1") {
+    if (!finales.length) return aviso("Primero cree la final (Día 2) del evento", true);
+    extra.push({n: "principal_id", l: "Final a la que clasifica", tipo: "select", opciones: finales.map(t => [t.id, t.nombre])},
+               {n: "porcentaje_clasifica", l: "% de las entradas que clasifica (opcional; el sistema avisa al llegar)", tipo: "number"});
+  }
+  if (k.tipo === "satelite") {
+    if (!destinos.length) return aviso("Primero cree el torneo al que da cupos el satélite", true);
+    extra.push({n: "satelite_de", l: "Da cupos para", tipo: "select", opciones: destinos.map(t => [t.id, `${t.nombre} (${pesos(t.buyin)})`])});
+  }
+  const d = await pedir(TIPOS_T[k.tipo] + ": datos", [...extra,
+    {n: "nombre", l: k.tipo === "dia1" ? "Nombre (p. ej. Día 1A)" : "Nombre"}, {n: "fecha", l: "Fecha", tipo: "date", valor: new Date().toLocaleDateString("en-CA")},
     {n: "buyin", l: "Buy-in ($)", tipo: "number"}, {n: "stack_inicial", l: "Stack inicial (fichas)", tipo: "number"},
     {n: "asientos_por_mesa", l: "Asientos por mesa", tipo: "number", valor: 9},
     {n: "reentrada_max", l: "Re-entradas permitidas por jugador", tipo: "number", valor: 0},
@@ -349,7 +406,7 @@ $("#b-nuevo-torneo").onclick = async () => {
     {n: "addon_fichas", l: "Fichas add-on", tipo: "number", valor: 0},
     {n: "tope_compra", l: "Tope de compras por celular en este torneo ($, opcional)", tipo: "number"},
   ], "Crear");
-  if (d) accion(async () => { const r = await api("/torneos", "POST", d); torneoId = r.id; await cargarTorneos(); cargarTablero(); aviso("Torneo creado: abra las mesas"); });
+  if (d) accion(async () => { const r = await api("/torneos", "POST", {...d, tipo: k.tipo}); torneoId = r.id; await cargarTorneos(); cargarTablero(); aviso("Torneo creado: abra las mesas"); });
 };
 
 // ---------- Jugadores y caja ----------
@@ -369,6 +426,8 @@ window.verJugador = async (id) => {
     <p class="suave">${j.numero_caja} · Documento ${j.documento} · Celular ${j.celular || "sin vincular"} ${j.celular && !j.celular_verificado ? '<span class="chip oro">sin verificar</span>' : ""}</p>
     ${j.motivo_bloqueo ? `<div class="aviso rojo">Bloqueo: ${esc(j.motivo_bloqueo)}</div>` : ""}
     <div class="kpi" style="margin-bottom:12px"><div class="e">Saldo en caja</div><div class="v">${pesos(r.saldo)}</div></div>
+    ${r.clasificaciones.map(c => `<div class="aviso verde">Clasificado a ${esc(c.final)} con ${miles(c.fichas)} fichas${c.veces > 1 ? ` (stack mayor de ${c.veces} clasificaciones)` : ""}</div>`).join("")}
+    ${r.tickets.filter(k => k.estado === "disponible").map(k => `<div class="aviso">🎟️ Ticket para ${esc(k.destino)} (${pesos(k.valor)}) · ganado en ${esc(k.origen || "—")}${puede("aprobar") ? ` <button class="sec" style="padding:3px 8px;font-size:12px" onclick="anularTicket(${k.id}, ${id})">Anular</button>` : ""}</div>`).join("")}
     <div class="fila">
       ${abiertos.length ? `<button class="auto" onclick="inscribirJugador(${id})">Inscribir a torneo</button>` : ""}
       ${caja ? `<button class="auto sec" onclick="depositar(${id})">Depósito</button><button class="auto sec" onclick="retirar(${id})">Retiro</button>
@@ -382,13 +441,17 @@ window.inscribirJugador = async (id) => {
   const abiertos = torneos.filter(t => t.estado === "programado" || t.estado === "en_curso");
   const d = await pedir("Inscribir a torneo", [
     {n: "torneo", l: "Torneo", tipo: "select", opciones: abiertos.map(t => [t.id, `${t.nombre} · ${pesos(t.buyin)}`])},
-    {n: "pago", l: "Pago", tipo: "select", opciones: [["efectivo", "Efectivo en ventanilla"], ["saldo", "Saldo de su caja"]]},
+    {n: "pago", l: "Pago", tipo: "select", opciones: [["efectivo", "Efectivo en ventanilla"], ["saldo", "Saldo de su caja"], ["ticket", "Ticket de satélite"]]},
     {n: "sentar_ya", l: "Sentarlo ya (el jugador está en la sala)", tipo: "check"}], "Inscribir");
   if (d) accion(async () => {
     const r = await api(`/torneos/${d.torneo}/inscribir`, "POST", {jugador_id: id, pago: d.pago, sentar_ya: d.sentar_ya});
     pedir("Inscrito", [], "Listo", r.asiento && r.asiento.alterno ? `<p class="grande" style="color:var(--oro)">Sala llena: lista de alternos</p>` : r.asiento && r.asiento.mesa ? `<p class="grande">Mesa ${r.asiento.mesa} · Asiento ${r.asiento.asiento}</p>` : `<p>Código QR: <b>${r.entrada.codigo_qr}</b><br><span class="suave">El jugador lo ve en su app; el floor lo escanea para sentarlo.</span></p>`);
     verJugador(id);
   });
+};
+window.anularTicket = async (kid, jid) => {
+  const d = await pedir("Anular ticket", [{n: "motivo", l: "Motivo"}], "Anular");
+  if (d) accion(async () => { await api(`/tickets/${kid}/anular`, "POST", d); verJugador(jid); });
 };
 window.depositar = async (id) => {
   const d = await pedir("Depósito en efectivo", [{n: "monto", l: "Monto ($)", tipo: "number"}], "Registrar");
@@ -441,7 +504,7 @@ async function cargarPremios() {
   if (!r) return;
   const t = torneos.find(x => x.id === torneoId);
   const editable = puede("director") && (!r.premiacion || r.premiacion.estado === "borrador") && !r.premiacion;
-  $("#tabla-premios").innerHTML = (r.tabla.length ? `<table><tr><th>Puesto</th><th class="n">Premio</th></tr>${r.tabla.map(f => `<tr><td>${f.posicion}°</td><td class="n">${pesos(f.monto)}</td></tr>`).join("")}<tr><th>Total</th><th class="n">${pesos(r.tabla.reduce((s, f) => s + f.monto, 0))}</th></tr></table>` : `<p class="suave">Sin tabla de premios.</p>`)
+  $("#tabla-premios").innerHTML = (r.tabla.length ? `<table><tr><th>Puesto</th><th class="n">Premio</th></tr>${r.tabla.map(f => `<tr><td>${f.posicion}°</td><td class="n">${f.tipo === "ticket" ? `🎟️ Ticket (${pesos(f.monto)})` : pesos(f.monto)}</td></tr>`).join("")}<tr><th>Total</th><th class="n">${pesos(r.tabla.reduce((s, f) => s + f.monto, 0))}</th></tr></table>` : `<p class="suave">Sin tabla de premios.</p>`)
     + (editable ? `<button class="sec" style="margin-top:10px" onclick="editarTabla()">Editar tabla</button>` : "");
   const p = r.premiacion;
   let h = "";
@@ -450,7 +513,7 @@ async function cargarPremios() {
     if (puede("director") && t && t.estado === "en_curso") h += `<button class="oro" style="margin-top:10px" onclick="finalizar()">Finalizar torneo y preparar premios</button>`;
   } else {
     const est = {borrador: '<span class="chip oro">Borrador: revise y confirme</span>', confirmada: '<span class="chip azul">Confirmada por el director</span>', acreditada: '<span class="chip verde">Acreditada en caja</span>'}[p.estado];
-    h = `${est}<table style="margin-top:10px"><tr><th>Pos.</th><th>Jugador</th><th class="n">Tabla</th><th class="n">A pagar</th></tr>${p.detalle.map(d => `<tr><td>${d.posicion}°</td><td>${esc(d.nombre)}<br><span class="suave">${d.numero_caja}${d.motivo_ajuste ? " · " + esc(d.motivo_ajuste) : ""}</span></td><td class="n">${pesos(d.monto_tabla)}</td><td class="n"><b>${pesos(d.monto_final)}</b></td></tr>`).join("")}<tr><th colspan="2">Total</th><th class="n">${pesos(p.total_tabla)}</th><th class="n">${pesos(p.total_final)}</th></tr></table>`;
+    h = `${est}${(p.advertencias || []).map(a => `<div class="aviso" style="margin-top:8px">⚠️ ${esc(a)}</div>`).join("")}<table style="margin-top:10px"><tr><th>Pos.</th><th>Jugador</th><th class="n">Tabla</th><th class="n">A pagar</th></tr>${p.detalle.map(d => `<tr><td>${d.posicion}°</td><td>${esc(d.nombre)}<br><span class="suave">${d.numero_caja}${d.motivo_ajuste ? " · " + esc(d.motivo_ajuste) : ""}</span></td><td class="n">${pesos(d.monto_tabla)}</td><td class="n"><b>${d.tipo === "ticket" ? "🎟️ " : ""}${pesos(d.monto_final)}</b></td></tr>`).join("")}<tr><th colspan="2">Total</th><th class="n">${pesos(p.total_tabla)}</th><th class="n">${pesos(p.total_final)}</th></tr></table>`;
     if (p.confirmada_en) h += `<p class="suave">Confirmada por ${esc(p.confirmada_por_nombre)} · ${hora(p.confirmada_en)}</p>`;
     if (p.acreditada_en) h += `<p class="suave">Acreditada por ${esc(p.acreditada_por_nombre)} · ${hora(p.acreditada_en)}</p>`;
     if (puede("director") && p.estado === "borrador") h += `<div class="fila" style="margin-top:10px"><button class="sec auto" onclick="ajustarPremios()">Ajustar (empate / acuerdo)</button><button class="auto" onclick="confirmarPremios()">Confirmar posiciones</button></div>`;
@@ -460,9 +523,11 @@ async function cargarPremios() {
   $("#premiacion").innerHTML = h;
 }
 window.editarTabla = async () => {
-  const d = await pedir("Tabla de premios", [{n: "texto", l: "Un premio por línea, del 1° en adelante (separados por coma)", valor: ""}], "Guardar", `<p class="suave">Ejemplo: 4500000, 2700000, 1600000</p>`);
+  const sat = (torneos.find(x => x.id === torneoId) || {}).tipo === "satelite";
+  const d = await pedir("Tabla de premios", [{n: "texto", l: "Premios del 1° en adelante, separados por coma", valor: ""}], "Guardar",
+    `<p class="suave">Ejemplo: 4500000, 2700000, 1600000${sat ? "<br>Satélite: escriba <b>T</b> por cada cupo. Ej.: T, T, T, 800000 (3 tickets y el 4° cobra en dinero)" : ""}</p>`);
   if (!d) return;
-  const filas = d.texto.split(/[\n,;]+/).map(s => s.replace(/[^\d]/g, "")).filter(Boolean).map((m, i) => ({posicion: i + 1, monto: +m}));
+  const filas = d.texto.split(/[\n,;]+/).map(x => x.trim()).filter(Boolean).map((m, i) => /^t/i.test(m) ? {posicion: i + 1, tipo: "ticket"} : {posicion: i + 1, monto: +m.replace(/[^\d]/g, ""), tipo: "dinero"});
   accion(async () => { await api(`/torneos/${torneoId}/premios`, "PUT", {filas}); cargarPremios(); });
 };
 window.finalizar = async () => {
@@ -505,7 +570,7 @@ $("#b-arqueo").onclick = async () => {
 $("#b-rep-torneo").onclick = async () => {
   const r = await accion(() => api("/reportes/torneo/" + $("#sel-torneo-reporte").value));
   if (!r) return;
-  $("#rep-torneo").innerHTML = `<div class="kpis">${[["Jugadores únicos", r.jugadores_unicos], ["Recaudado", pesos(r.recaudado)], ["Tabla de premios", pesos(r.tabla_premios)], ["Premios acreditados", pesos(r.premios_pagados)], ["Recaudo − premios", pesos(r.diferencia_recaudo_premios)], ["Diferencia de fichas", miles(r.fichas.diferencia)]].map(([e, v]) => `<div class="kpi"><div class="e">${e}</div><div class="v">${v}</div></div>`).join("")}</div>
+  $("#rep-torneo").innerHTML = `<div class="kpis">${[["Jugadores únicos", r.jugadores_unicos], ["Recaudado", pesos(r.recaudado)], ["Tabla de premios", pesos(r.tabla_premios)], ["Premios acreditados", pesos(r.premios_pagados)], ["Recaudo − premios", pesos(r.diferencia_recaudo_premios)], ["Diferencia de fichas", miles(r.fichas.diferencia)], ["Entradas con ticket", `${r.tickets_usados.cantidad} (${pesos(r.tickets_usados.valor)})`]].map(([e, v]) => `<div class="kpi"><div class="e">${e}</div><div class="v">${v}</div></div>`).join("")}</div>
     <table><tr><th>Concepto</th><th class="n">Cantidad</th><th class="n">Total</th></tr>${r.por_tipo.map(f => `<tr><td>${TIPOS[f.tipo]}</td><td class="n">${f.cantidad}</td><td class="n">${pesos(f.total)}</td></tr>`).join("")}${r.correcciones ? `<tr><td>Correcciones</td><td></td><td class="n">${pesos(-r.correcciones)}</td></tr>` : ""}</table>`;
 };
 $("#b-auditoria").onclick = async () => {

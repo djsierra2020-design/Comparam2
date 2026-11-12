@@ -44,7 +44,11 @@ def resumen_torneo(db, torneo_id) -> dict:
                       (torneo_id,))
     total_tabla = sum(f["monto"] for f in tabla(db, torneo_id))
     jugadores = db.valor("SELECT COUNT(DISTINCT jugador_id) FROM entradas WHERE torneo_id = ?", (torneo_id,))
-    return {"torneo": t, "por_tipo": filas, "correcciones": correcciones, "recaudado": recaudado,
+    from .eventos import resumen_evento
+    usados = db.todos("SELECT COUNT(*) AS cantidad, COALESCE(SUM(valor), 0) AS valor FROM tickets WHERE estado = 'usado' "
+                      "AND entrada_id IN (SELECT id FROM entradas WHERE torneo_id = ?)", (torneo_id,))[0]
+    return {"evento": resumen_evento(db, torneo_id) if t["tipo"] == "final" else None, "tickets_usados": usados,
+            "torneo": t, "por_tipo": filas, "correcciones": correcciones, "recaudado": recaudado,
             "jugadores_unicos": jugadores, "tabla_premios": total_tabla, "premios_pagados": pagado,
             "diferencia_recaudo_premios": recaudado - total_tabla, "fichas": resumen_fichas(db, torneo_id),
             "premiacion": premiacion(db, torneo_id)}

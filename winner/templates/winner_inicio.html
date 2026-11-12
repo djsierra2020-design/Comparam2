@@ -21,12 +21,17 @@
   {% if demo %}
   <div class="tarjeta">
     <h3>Modo demostración</h3>
-    <p class="suave">Datos ficticios con el aforo de Winner: sala de 30 mesas de 9 (270 asientos), torneo en curso con
-      296 inscritos → 270 sentados y 26 en la lista de alternos.</p>
+    <p class="suave">Datos ficticios de una semana de evento en la sala de 30 mesas de 9:</p>
+    <ul class="suave">
+      <li><b>Main Event</b> con 5 días clasificatorios (1A–1E) y final (Día 2). Clasifica el 15 %.</li>
+      <li>Día 1A ya jugado: 18 clasificados con sus fichas.</li>
+      <li>Día 1B en curso en 24 mesas: 230 entradas (incluye re-entradas de jugadores del 1A), 14 alternos.</li>
+      <li>Al mismo tiempo, un <b>satélite</b> al Main Event en 4 mesas: premia 3 tickets y el 4° cobra en dinero.</li>
+    </ul>
     <ul class="suave">
       <li>Personal: usuarios <b>admin</b>, <b>director</b>, <b>floor</b>, <b>crupier</b>, <b>cajero</b>, <b>supervisor</b> · clave <b>winner2026</b>.</li>
-      <li>Jugador: celulares <b>3000000000</b> a <b>3000000299</b> (del 3000000296 en adelante no están inscritos). El código SMS aparece en la misma pantalla.</li>
-      <li>Pantalla de sala: <a href="{{ url_for('winner.pantalla_publica', torneo_id=1) }}">torneo demo</a>.</li>
+      <li>Jugador: celulares <b>3000000000</b> a <b>3000000299</b> . El código SMS aparece en la misma pantalla.</li>
+      {% if torneo_en_curso %}<li>Pantalla de sala: <a href="{{ url_for('winner.pantalla_publica', torneo_id=torneo_en_curso) }}">Día 1B</a>.</li>{% endif %}
     </ul>
   </div>
   {% endif %}

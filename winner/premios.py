@@ -13,13 +13,24 @@ from .torneos import torneo, vencer_reservas
 
 
 def definir_tabla(db, personal_id, torneo_id, filas) -> None:
-    """``filas``: lista de {posicion, monto}."""
+    """``filas``: lista de {posicion, monto, tipo}. tipo 'ticket' (solo satélites) = un cupo al torneo destino."""
+    t = torneo(db, torneo_id)
+    if t["tipo"] == "dia1":
+        raise ErrorNegocio("Los días clasificatorios no pagan premios: los premios van en la final")
     tabla = {}
     for f in filas:
-        pos, monto = int(f["posicion"]), caja.monto_valido(f["monto"])
+        pos, tipo = int(f["posicion"]), f.get("tipo") or "dinero"
+        if tipo == "ticket":
+            if t["tipo"] != "satelite":
+                raise ErrorNegocio("Solo los satélites premian con tickets")
+            monto = torneo(db, t["satelite_de"])["buyin"]  # el ticket vale el buy-in del destino
+        elif tipo == "dinero":
+            monto = caja.monto_valido(f["monto"])
+        else:
+            raise ErrorNegocio("Tipo de premio inválido")
         if pos < 1 or pos in tabla:
             raise ErrorNegocio("Posiciones inválidas o repetidas en la tabla de premios")
-        tabla[pos] = monto
+        tabla[pos] = (monto, tipo)
     if sorted(tabla) != list(range(1, len(tabla) + 1)):
         raise ErrorNegocio("La tabla debe cubrir las posiciones 1, 2, 3… sin saltos")
     with db.transaccion() as c:
@@ -27,13 +38,13 @@ def definir_tabla(db, personal_id, torneo_id, filas) -> None:
         if db.valor("SELECT estado FROM premiaciones WHERE torneo_id = ?", (torneo_id,)) in ("confirmada", "acreditada"):
             raise ErrorNegocio("Los premios ya fueron confirmados")
         c.execute("DELETE FROM premios_tabla WHERE torneo_id = ?", (torneo_id,))
-        c.executemany("INSERT INTO premios_tabla (torneo_id, posicion, monto) VALUES (?,?,?)",
-                      [(torneo_id, p, m) for p, m in sorted(tabla.items())])
+        c.executemany("INSERT INTO premios_tabla (torneo_id, posicion, monto, tipo) VALUES (?,?,?,?)",
+                      [(torneo_id, p, m, k) for p, (m, k) in sorted(tabla.items())])
         db.auditar(personal_id, "tabla_premios", "torneo", torneo_id, json.dumps(tabla))
 
 
 def tabla(db, torneo_id) -> list[dict]:
-    return db.todos("SELECT posicion, monto FROM premios_tabla WHERE torneo_id = ? ORDER BY posicion", (torneo_id,))
+    return db.todos("SELECT posicion, monto, tipo FROM premios_tabla WHERE torneo_id = ? ORDER BY posicion", (torneo_id,))
 
 
 def posiciones(db, torneo_id) -> list[dict]:
@@ -53,6 +64,8 @@ def finalizar(db, personal_id, torneo_id) -> dict:
     with db.transaccion() as c:
         vencer_reservas(db)
         t = torneo(db, torneo_id)
+        if t["tipo"] == "dia1":
+            raise ErrorNegocio("Un día clasificatorio se cierra con «Cerrar día»: los vivos clasifican a la final")
         if t["estado"] != "en_curso":
             raise ErrorNegocio("Solo se finaliza un torneo en curso")
         premios = tabla(db, torneo_id)
@@ -74,9 +87,9 @@ def finalizar(db, personal_id, torneo_id) -> dict:
                   (torneo_id, ahora()))
         por_pos = {p["posicion"]: p for p in pos}
         for fila in premios:
-            c.execute("INSERT INTO premiacion_detalle (torneo_id, posicion, jugador_id, monto_tabla, monto_final) "
-                      "VALUES (?,?,?,?,?)", (torneo_id, fila["posicion"], por_pos[fila["posicion"]]["jugador_id"],
-                                              fila["monto"], fila["monto"]))
+            c.execute("INSERT INTO premiacion_detalle (torneo_id, posicion, jugador_id, monto_tabla, monto_final, tipo) "
+                      "VALUES (?,?,?,?,?,?)", (torneo_id, fila["posicion"], por_pos[fila["posicion"]]["jugador_id"],
+                                                fila["monto"], fila["monto"], fila["tipo"]))
         db.auditar(personal_id, "finalizar_torneo", "torneo", torneo_id,
                    f"{len(pos)} jugadores; ganador #{pos[0]['jugador_id']}")
     return premiacion(db, torneo_id)
@@ -93,6 +106,8 @@ def premiacion(db, torneo_id) -> dict | None:
                             (torneo_id,))
     p["total_tabla"] = sum(d["monto_tabla"] for d in p["detalle"])
     p["total_final"] = sum(d["monto_final"] for d in p["detalle"])
+    from .eventos import advertencias_satelite
+    p["advertencias"] = advertencias_satelite(db, torneo(db, torneo_id), p["detalle"]) if p["estado"] == "borrador" else []
     return p
 
 
@@ -114,6 +129,8 @@ def ajustar(db, personal_id, torneo_id, filas) -> dict:
             if pos not in actual:
                 raise ErrorNegocio(f"La posición {pos} no está en la tabla")
             monto = caja.monto_valido(f.get("monto_final", actual[pos]["monto_final"]))
+            if actual[pos]["tipo"] == "ticket" and monto != actual[pos]["monto_tabla"]:
+                raise ErrorNegocio(f"La posición {pos} es un ticket: se puede pasar a otro jugador, no cambiar su valor")
             jugador_id = int(f.get("jugador_id") or actual[pos]["jugador_id"])
             motivo = (f.get("motivo") or "").strip() or None
             if (monto != actual[pos]["monto_tabla"] or jugador_id != actual[pos]["jugador_id"]) and not motivo:
@@ -157,6 +174,12 @@ def acreditar(db, personal_id, torneo_id) -> dict:
             raise ErrorNegocio("Primero el director debe confirmar las posiciones")
         t = torneo(db, torneo_id)
         for d in p["detalle"]:
+            if d["tipo"] == "ticket":
+                from .eventos import crear_ticket
+                kid = crear_ticket(db, personal_id, d["jugador_id"], t["satelite_de"], torneo_id, d["monto_final"])
+                c.execute("UPDATE premiacion_detalle SET ticket_id = ? WHERE torneo_id = ? AND posicion = ?",
+                          (kid, torneo_id, d["posicion"]))
+                continue
             mid = caja.registrar_movimiento(db, d["jugador_id"], "premio", d["monto_final"], origen="sistema",
                                             personal_id=personal_id, torneo_id=torneo_id,
                                             descripcion=f"Premio {d['posicion']}° lugar {t['nombre']}")

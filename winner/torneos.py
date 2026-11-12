@@ -69,7 +69,11 @@ def crear_torneo(db, personal_id, datos: dict) -> int:
     d.setdefault("asientos_por_mesa", 9)
     if not 2 <= d["asientos_por_mesa"] <= 10:
         raise ErrorNegocio("Asientos por mesa entre 2 y 10")
+    from .eventos import validar_tipo
     with db.transaccion() as c:
+        d.update(validar_tipo(db, datos))
+        if d["tipo"] == "final" and "registro_abierto" not in datos:
+            d["registro_abierto"] = 0  # a la final se entra clasificando; el director puede abrir entrada directa
         cols = ", ".join(d)
         cur = c.execute(f"INSERT INTO torneos ({cols}, creado_en) VALUES ({', '.join('?' * len(d))}, ?)",
                         (*d.values(), ahora()))
@@ -115,13 +119,32 @@ def abrir_mesas(db, personal_id, torneo_id, cantidad=1) -> list[int]:
         if abiertas + cantidad > maximo:
             raise ErrorNegocio(f"La sala tiene {maximo} mesas y ya hay {abiertas} abiertas. "
                                "Los jugadores que lleguen quedan en la lista de alternos.", 409)
-        siguiente = db.valor("SELECT COALESCE(MAX(numero), 0) FROM mesas WHERE torneo_id = ?", (torneo_id,))
+        # Los números son las mesas físicas de la sala, compartidas entre torneos simultáneos.
+        ocupadas = {r["numero"] for r in db.todos(
+            "SELECT m.numero FROM mesas m JOIN torneos t ON t.id = m.torneo_id "
+            "WHERE m.estado = 'abierta' AND t.estado IN ('programado','en_curso')")}
+        libres = [n for n in range(1, maximo + 1) if n not in ocupadas][:cantidad]
         ids = []
-        for i in range(cantidad):
-            ids.append(c.execute("INSERT INTO mesas (torneo_id, numero, asientos) VALUES (?,?,?)",
-                                 (torneo_id, siguiente + i + 1, t["asientos_por_mesa"])).lastrowid)
-        db.auditar(personal_id, "abrir_mesas", "torneo", torneo_id, f"{cantidad} mesa(s)")
+        for numero in libres:
+            previa = db.uno("SELECT id FROM mesas WHERE torneo_id = ? AND numero = ?", (torneo_id, numero))
+            if previa:  # la mesa ya se usó en este torneo y se había cerrado: se reabre
+                c.execute("UPDATE mesas SET estado = 'abierta', cerrada_en = NULL, asientos = ? WHERE id = ?",
+                          (t["asientos_por_mesa"], previa["id"]))
+                ids.append(previa["id"])
+            else:
+                ids.append(c.execute("INSERT INTO mesas (torneo_id, numero, asientos) VALUES (?,?,?)",
+                                     (torneo_id, numero, t["asientos_por_mesa"])).lastrowid)
+        db.auditar(personal_id, "abrir_mesas", "torneo", torneo_id, "mesas " + ", ".join(map(str, libres)))
         return ids
+
+
+def mapa_sala(db) -> list[dict]:
+    """Las mesas físicas de la sala y qué torneo usa cada una."""
+    uso = {r["numero"]: r for r in db.todos(
+        "SELECT m.numero, t.id AS torneo_id, t.nombre FROM mesas m JOIN torneos t ON t.id = m.torneo_id "
+        "WHERE m.estado = 'abierta' AND t.estado IN ('programado','en_curso')")}
+    return [{"numero": n, "torneo_id": uso[n]["torneo_id"] if n in uso else None,
+             "torneo": uso[n]["nombre"] if n in uso else None} for n in range(1, db.ajuste("mesas_sala") + 1)]
 
 
 def mesas_abiertas_sala(db) -> int:
@@ -158,8 +181,14 @@ def opciones_jugador(db, t: dict, jugador_id: int) -> dict:
     }
 
 
-def _cobrar(db, jugador_id, t, tipo, monto, *, origen, personal_id, pago, descripcion) -> int:
-    """Cobra una compra de torneo. ``pago``: 'saldo' (de la caja) o 'efectivo' (en ventanilla)."""
+def _cobrar(db, jugador_id, t, tipo, monto, *, origen, personal_id, pago, descripcion, entrada_id=None):
+    """Cobra una compra de torneo. ``pago``: 'saldo' (de la caja), 'efectivo' (en ventanilla) o 'ticket'."""
+    if pago == "ticket":
+        if tipo not in ("inscripcion", "reentrada"):
+            raise ErrorNegocio("El ticket solo sirve como entrada al torneo")
+        from .eventos import usar_ticket
+        usar_ticket(db, jugador_id, t, entrada_id)
+        return None
     if origen == "app":
         if not db.ajuste("compras_desde_celular"):
             raise ErrorNegocio("Las compras desde el celular aún no están habilitadas; acérquese a la caja", 403)
@@ -179,9 +208,10 @@ def _nueva_entrada(db, t, jugador_id, numero, origen) -> int:
             break
     try:
         return db.conexion().execute(
-            "INSERT INTO entradas (torneo_id, jugador_id, numero, estado, fichas, codigo_qr, origen, creado_en) "
-            "VALUES (?,?,?,?,?,?,?,?)",
-            (t["id"], jugador_id, numero, "inscrito", t["stack_inicial"], codigo, origen, ahora())).lastrowid
+            "INSERT INTO entradas (torneo_id, jugador_id, numero, estado, fichas, fichas_iniciales, codigo_qr, origen, "
+            "creado_en) VALUES (?,?,?,?,?,?,?,?,?)",
+            (t["id"], jugador_id, numero, "inscrito", t["stack_inicial"], t["stack_inicial"], codigo, origen,
+             ahora())).lastrowid
     except Exception as e:  # sqlite3.IntegrityError
         if "UNIQUE" in str(e):
             raise ErrorNegocio("El jugador ya tiene una inscripción activa en este torneo") from None
@@ -194,7 +224,7 @@ def inscribir(db, torneo_id, jugador_id, *, origen, personal_id=None, pago="sald
     if origen == "app":
         if pago != "saldo":
             raise ErrorNegocio("Desde el celular solo se paga con el saldo de caja")
-    elif pago not in ("saldo", "efectivo"):
+    elif pago not in ("saldo", "efectivo", "ticket"):
         raise ErrorNegocio("Medio de pago inválido")
     with db.transaccion():
         vencer_reservas(db)
@@ -207,8 +237,13 @@ def inscribir(db, torneo_id, jugador_id, *, origen, personal_id=None, pago="sald
             if not t["preinscripcion_movil"]:
                 raise ErrorNegocio("Este torneo no admite inscripción desde el celular")
         op = opciones_jugador(db, t, jugador_id)
+        if op["entrada_viva"] and op["entrada_viva"]["estado"] == "clasificado":
+            raise ErrorNegocio("El jugador ya clasificó en este día")
         if op["entrada_viva"] and op["entrada_viva"]["estado"] != "reservado":
             raise ErrorNegocio("El jugador ya está inscrito en este torneo")
+        if t["tipo"] == "final" and not t["registro_abierto"]:
+            raise ErrorNegocio("A la final se entra clasificando en un día clasificatorio (o con entrada directa "
+                               "si el director la abre)")
         if op["puede_inscribirse"]:
             tipo, numero = "inscripcion", 1
         elif op["puede_reentrar"]:
@@ -225,7 +260,8 @@ def inscribir(db, torneo_id, jugador_id, *, origen, personal_id=None, pago="sald
         nombre = "Inscripción" if tipo == "inscripcion" else f"Re-entrada #{numero - 1}"
         eid = _nueva_entrada(db, t, jugador_id, numero, origen)
         _cobrar(db, jugador_id, t, tipo, t["buyin"], origen=origen, personal_id=personal_id, pago=pago,
-                descripcion=f"{nombre} {t['nombre']}")
+                descripcion=f"{nombre} {t['nombre']}", entrada_id=eid)
+        db.conexion().execute("UPDATE entradas SET pago = ? WHERE id = ?", (pago, eid))
         db.auditar(personal_id, tipo, "entrada", eid, f"{origen}/{pago}")
         if sentar_ya or tipo == "reentrada" and origen == "app":
             sentar_o_esperar(db, eid, personal_id, motivo=tipo)
@@ -319,7 +355,7 @@ def sentar_o_esperar(db, entrada_id, personal_id=None, motivo="sentado") -> dict
                 try:
                     return sentar(db, entrada_id, personal_id, motivo)
                 except ErrorNegocio as err:
-                    if "Sala llena" not in err.mensaje:
+                    if err.codigo != 409:  # 409 = no hay asiento libre en las mesas de este torneo
                         raise
             c.execute("UPDATE entradas SET espera_desde = ? WHERE id = ?", (ahora(), entrada_id))
         e = entrada(db, entrada_id)
@@ -327,7 +363,7 @@ def sentar_o_esperar(db, entrada_id, personal_id=None, motivo="sentado") -> dict
                          "AND espera_desde IS NOT NULL AND (espera_desde < ? OR (espera_desde = ? AND id <= ?))",
                          (e["torneo_id"], e["espera_desde"], e["espera_desde"], e["id"]))
         db.notificar(e["jugador_id"], "asiento", f"Lista de alternos: turno {turno}",
-                     "La sala está llena. Le avisaremos cuando tenga asiento; permanezca cerca de la sala.")
+                     "Las mesas están llenas. Le avisaremos cuando tenga asiento; permanezca cerca de la sala.")
         return {"entrada_id": e["id"], "jugador_id": e["jugador_id"], "alterno": True, "turno": turno}
 
 
@@ -416,6 +452,12 @@ def sugerencias(db, torneo_id) -> list[dict]:
     if en_espera and libres:
         salida.append({"tipo": "alternos", "texto": f"Hay {libres} asiento(s) libre(s) y {en_espera} alterno(s) "
                                                      "esperando: siéntelos en orden de llegada."})
+    libres_sala = db.ajuste("mesas_sala") - mesas_abiertas_sala(db)
+    if en_espera > libres and libres_sala > 0:
+        faltan = min(libres_sala, math.ceil((en_espera - libres) / mesas[0]["asientos"]))
+        salida.append({"tipo": "abrir_mesa", "cantidad": faltan,
+                       "texto": f"{en_espera} alterno(s) esperando y la sala tiene {libres_sala} mesa(s) libre(s): "
+                                f"abra {faltan} mesa(s)."})
     vivos = sum(conteo) + en_espera
     asientos = mesas[0]["asientos"]
     necesarias = max(1, math.ceil(vivos / asientos))
@@ -424,6 +466,12 @@ def sugerencias(db, torneo_id) -> list[dict]:
         salida.append({"tipo": "cerrar_mesa", "mesa_id": menor["id"], "mesa": menor["numero"],
                        "texto": f"Quedan {vivos} jugadores: caben en {necesarias} mesa(s). "
                                 f"Cierre la mesa {menor['numero']}."})
+    t = torneo(db, torneo_id)
+    from .eventos import objetivo_clasificados
+    objetivo = objetivo_clasificados(db, t)
+    if objetivo and t["estado"] == "en_curso" and sum(conteo) + en_espera <= objetivo:
+        salida.insert(0, {"tipo": "cerrar_dia", "texto": f"Quedan {sum(conteo)} jugadores: ya se llegó al "
+                                                         f"{t['porcentaje_clasifica']}% que clasifica ({objetivo}). Cierre el día."})
     if max(conteo) - min(conteo) > 1:
         llena = max(mesas, key=lambda m: len(m["ocupados"]))
         vacia = min(mesas, key=lambda m: len(m["ocupados"]))
@@ -577,9 +625,9 @@ def registrar_conteo(db, personal_id, entrada_id, fichas) -> None:
 def resumen_fichas(db, torneo_id) -> dict:
     t = torneo(db, torneo_id)
     tot = db.uno("SELECT COUNT(*) AS entradas, COALESCE(SUM(recompras),0) AS recompras, "
-                 "COALESCE(SUM(addons),0) AS addons FROM entradas WHERE torneo_id = ?", (torneo_id,))
-    esperado = (tot["entradas"] * t["stack_inicial"] + tot["recompras"] * t["recompra_fichas"]
-                + tot["addons"] * t["addon_fichas"])
+                 "COALESCE(SUM(addons),0) AS addons, COALESCE(SUM(COALESCE(fichas_iniciales, ?)), 0) AS iniciales "
+                 "FROM entradas WHERE torneo_id = ?", (t["stack_inicial"], torneo_id))
+    esperado = tot["iniciales"] + tot["recompras"] * t["recompra_fichas"] + tot["addons"] * t["addon_fichas"]
     vivos = db.todos("SELECT e.id, e.fichas, e.estado, e.asiento, m.numero AS mesa, j.nombre, "
                      "(SELECT MAX(fecha) FROM conteos WHERE entrada_id = e.id) AS ultimo_conteo "
                      "FROM entradas e JOIN jugadores j ON j.id = e.jugador_id LEFT JOIN mesas m ON m.id = e.mesa_id "
@@ -627,12 +675,17 @@ def tablero(db, torneo_id) -> dict:
                      (torneo_id,))
     return {"torneo": t, "mesas": mesas, "sin_asiento": inscritos, "alternos": alternos(db, torneo_id), "vivos": vivos,
             "mesas_sala": db.ajuste("mesas_sala"), "mesas_sala_abiertas": mesas_abiertas_sala(db),
+            "sala": mapa_sala(db), "clasificados": db.valor("SELECT COUNT(*) FROM entradas WHERE torneo_id = ? AND "
+                                                            "estado = 'clasificado'", (torneo_id,)),
             "entradas_totales": db.valor("SELECT COUNT(*) FROM entradas WHERE torneo_id = ?", (torneo_id,)),
             "sugerencias": sugerencias(db, torneo_id)}
 
 
 def lista_torneos(db, solo_activos=False) -> list[dict]:
-    filtro = "WHERE estado IN ('programado','en_curso')" if solo_activos else ""
-    return db.todos(f"SELECT t.*, (SELECT COUNT(*) FROM entradas e WHERE e.torneo_id = t.id) AS entradas, "
+    filtro = "WHERE t.estado IN ('programado','en_curso')" if solo_activos else ""
+    return db.todos(f"SELECT t.*, p.nombre AS principal, s.nombre AS destino, "
+                    f"(SELECT COUNT(*) FROM entradas e WHERE e.torneo_id = t.id) AS entradas, "
                     f"(SELECT COUNT(*) FROM entradas e WHERE e.torneo_id = t.id AND e.estado IN "
-                    f"('inscrito','sentado','reservado')) AS vivos FROM torneos t {filtro} ORDER BY t.fecha DESC, t.id DESC")
+                    f"('inscrito','sentado','reservado')) AS vivos FROM torneos t "
+                    f"LEFT JOIN torneos p ON p.id = t.principal_id LEFT JOIN torneos s ON s.id = t.satelite_de "
+                    f"{filtro} ORDER BY t.fecha DESC, t.id DESC")
