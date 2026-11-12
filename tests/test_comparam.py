@@ -1041,3 +1041,15 @@ def test_sitio_publico(tmp_path):
     mapa = (tmp_path / "sitemap.xml").read_text()
     assert "/precio-m2/venta/cedritos/" in mapa and (tmp_path / "robots.txt").exists()
     assert "Probar la app" in (tmp_path / "index.html").read_text() and r["zonas"] == 2
+
+
+def test_lista_para_cliente_sin_enlaces_y_con_telefono():
+    import app as webapp
+    c = webapp.app.test_client()
+    html = c.get("/lista?barrio=Cedritos&fuente=ejemplo&operacion=venta&cliente=Ana").get_data(as_text=True)
+    assert "Compara m²" in html and "Ana" in html
+    assert "300 000 0001" in html          # dueño directo con teléfono
+    assert "Inmobiliaria Ejemplo" not in html
+    assert "fincaraiz.com" not in html and "href=\"http" not in html  # sin enlaces a portales
+    assert c.get("/lista").status_code == 200
+    assert "Lista para cliente" in c.get("/?barrio=Cedritos&fuente=ejemplo").get_data(as_text=True)

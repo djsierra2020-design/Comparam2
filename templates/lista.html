@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Compara m² · {{ barrio or 'Lista' }}{% if cliente %} · {{ cliente }}{% endif %}</title>
+<meta name="robots" content="noindex">
+<style>
+  :root { --verde:#0d7466; --osc:#06423a; --amar:#ffd84d; --mut:#5b6573 }
+  * { box-sizing:border-box }
+  body { margin:0; font:15px/1.45 "Segoe UI",system-ui,Roboto,sans-serif; color:#14181f; background:#eef1f3 }
+  .hoja { max-width:820px; margin:0 auto; background:#fff; min-height:100vh }
+  header { background:linear-gradient(160deg,var(--verde),var(--osc)); color:#fff; padding:22px 24px; display:flex; gap:16px; align-items:center }
+  header img { width:58px; height:58px; border-radius:14px }
+  header b { font-size:26px; font-weight:900; display:block; line-height:1.1 }
+  header span { opacity:.9 }
+  .datos { padding:16px 24px 4px; display:flex; flex-wrap:wrap; gap:6px 22px; color:var(--mut) }
+  .datos b { color:#14181f }
+  .zona { margin:12px 24px; padding:14px 16px; background:#f0f8f6; border-radius:14px; border-left:5px solid var(--verde) }
+  .zona b { font-size:22px; color:var(--osc) }
+  .apto { margin:0 24px; padding:14px 0; border-bottom:1px solid #e3e7ea; display:grid; grid-template-columns:34px 1fr; gap:4px 10px; break-inside:avoid }
+  .n { grid-row:span 3; width:30px; height:30px; border-radius:50%; background:var(--verde); color:#fff; font-weight:800; display:grid; place-items:center }
+  .t { font-weight:700 }
+  .m { color:var(--mut) } .m b { color:#14181f }
+  .tel { font-size:18px; font-weight:800; color:var(--osc) }
+  .tag { display:inline-block; padding:1px 9px; border-radius:20px; font-size:13px; font-weight:700; margin-left:6px }
+  .bajo { background:#d9f5e4; color:#067647 } .alto { background:#fdecea; color:#b42318 } .baja { background:#fff4cc; color:#7a5b00 }
+  footer { padding:18px 24px 30px; color:var(--mut); font-size:13px }
+  .vacio { padding:24px; text-align:center; color:var(--mut) }
+  .panel { max-width:820px; margin:0 auto; padding:14px 16px; background:#14181f; color:#fff }
+  .panel form { display:flex; flex-wrap:wrap; gap:8px; align-items:end }
+  .panel label { font-size:12px; display:flex; flex-direction:column; gap:3px; flex:1 1 140px }
+  .panel input, .panel select { padding:9px; border-radius:10px; border:0; font:inherit }
+  .panel button { padding:11px 14px; border-radius:12px; border:0; font:inherit; font-weight:800; cursor:pointer }
+  .pdf { background:var(--amar); color:var(--osc); width:100%; margin-top:10px; font-size:17px }
+  .panel p { margin:8px 0 0; font-size:13px; opacity:.8 }
+  .panel a { color:var(--amar) }
+  @media print { .panel { display:none } body { background:#fff } .hoja { max-width:none }
+    header, .zona, .n, .tag { -webkit-print-color-adjust:exact; print-color-adjust:exact } }
+</style></head>
+<body>
+<div class="panel">
+  <form method="get" action="/lista">
+    <label>Barrio<input name="barrio" value="{{ barrio }}" required></label>
+    <label>Operación<select name="operacion"><option value="arriendo" {% if p.operacion == 'arriendo' %}selected{% endif %}>Arriendo</option><option value="venta" {% if p.operacion == 'venta' %}selected{% endif %}>Venta</option></select></label>
+    <label>Precio máximo<input name="precio_max" inputmode="numeric" value="{{ args.precio_max or '' }}" placeholder="Sin límite"></label>
+    <label>Habitaciones mín.<select name="hab_min"><option value="">Cualquiera</option>{% for n in range(1,5) %}<option value="{{ n }}" {% if hab_min == n %}selected{% endif %}>{{ n }}+</option>{% endfor %}</select></label>
+    <label>Nombre del cliente<input name="cliente" value="{{ cliente }}" placeholder="Opcional"></label>
+    <input type="hidden" name="area_min" value="{{ args.area_min or '' }}">
+    <button type="submit">Actualizar</button>
+  </form>
+  {% if anuncios %}<button class="pdf" type="button" onclick="window.print()">📄 Guardar como PDF</button>
+  <p>En el celular: en la ventana que se abre elige <b>Guardar como PDF</b> y toca el botón de descargar. Luego envíalo por WhatsApp.</p>{% endif %}
+  <p><a href="/?barrio={{ barrio|urlencode }}&operacion={{ p.operacion }}">← Volver a la búsqueda</a></p>
+</div>
+<div class="hoja">
+  <header><img src="/static/icon-192.png" alt=""><div><b>Compara m²</b><span>Apartamentos directo con el dueño · WhatsApp 316 398 8646</span></div></header>
+  {% if barrio %}
+  <div class="datos">
+    {% if cliente %}<div>Para: <b>{{ cliente }}</b></div>{% endif %}
+    <div>Barrio: <b>{{ barrio }}</b></div>
+    <div>{{ 'Arriendo' if p.operacion == 'arriendo' else 'Venta' }}{% if p.precio_max %} · hasta <b>{{ p.precio_max|pesos }}</b>{% endif %}{% if hab_min %} · <b>{{ hab_min }}+</b> hab{% endif %}</div>
+    <div>Fecha: <b>{{ fecha }}</b></div>
+  </div>
+  {% if r and r.zona %}
+  <div class="zona">Precio del m² en {{ barrio }} (mediana de {{ r.zona.anuncios }} anuncios): <b>{{ r.zona.mediana|pesos }}</b><br>
+    <span class="m">Verde = el apartamento pide menos por m² que el promedio del barrio.</span></div>
+  {% endif %}
+  {% for a in anuncios %}{% set h = hist(a, p.operacion) %}
+  <div class="apto">
+    <div class="n">{{ loop.index }}</div>
+    <div class="t">{{ a.precio|pesos }}{% if p.operacion == 'arriendo' %}/mes{% endif %} · {{ '%g'|format(a.area_m2) }} m²
+      {% if r.zona %}{% set d = r.zona.diferencia(a.precio_m2) %}<span class="tag {{ 'bajo' if d < 0 else 'alto' }}">{{ '%.0f'|format(d|abs) }}% {{ 'bajo' if d < 0 else 'sobre' }} el barrio</span>{% endif %}
+      {% if h and h.baja_pct %}<span class="tag baja">Bajó {{ h.baja_pct }}%</span>{% endif %}</div>
+    <div class="m">{{ a.precio_m2|pesos }}/m²{% if a.habitaciones %} · <b>{{ a.habitaciones }}</b> hab{% endif %}{% if a.banos %} · <b>{{ a.banos }}</b> baños{% endif %}{% if a.barrio %} · {{ a.barrio }}{% endif %}{% if h and h.dias is not none %} · {{ h.texto }}{% endif %}</div>
+    <div class="tel">📞 {{ a.telefonos|join(' · ') }}</div>
+  </div>
+  {% else %}
+  <div class="vacio">{% if r %}No hay apartamentos de dueño directo con teléfono publicado para esta búsqueda. Prueba otro barrio, sube el precio máximo o quita el filtro de habitaciones.{% else %}Escribe un barrio arriba y toca Actualizar.{% endif %}</div>
+  {% endfor %}
+  {% if anuncios %}<footer>{{ anuncios|length }} apartamento{{ 's' if anuncios|length != 1 }} publicados directamente por sus dueños, ordenados del más barato al más caro por m². Precios y disponibilidad según lo publicado el {{ fecha }}; confirma con el dueño antes de visitar. Compara m² no cobra comisión de inmobiliaria.</footer>{% endif %}
+  {% else %}
+  <div class="vacio">Escribe un barrio arriba y toca Actualizar.</div>
+  {% endif %}
+</div>
+</body></html>
