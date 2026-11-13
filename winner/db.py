@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS jugadores (
     numero_caja TEXT NOT NULL UNIQUE,
     nombre TEXT NOT NULL,
     doc_hash TEXT NOT NULL UNIQUE,
+    tipo_doc TEXT NOT NULL DEFAULT 'CC',
     doc_ultimos TEXT NOT NULL,
     celular TEXT UNIQUE,
     celular_verificado INTEGER NOT NULL DEFAULT 0,
@@ -215,7 +216,8 @@ CREATE TABLE IF NOT EXISTS movimientos (
         ('deposito','retiro','inscripcion','recompra','reentrada','addon','premio','correccion')),
     monto INTEGER NOT NULL CHECK (monto != 0),
     saldo_despues INTEGER NOT NULL,
-    medio TEXT NOT NULL DEFAULT 'saldo' CHECK (medio IN ('saldo','efectivo','ventanilla')),
+    -- efectivo / datafono / transferencia: dinero que entra o sale por la ventanilla; ventanilla: compra pagada así
+    medio TEXT NOT NULL DEFAULT 'saldo' CHECK (medio IN ('saldo','efectivo','ventanilla','datafono','transferencia')),
     torneo_id INTEGER REFERENCES torneos(id),
     corrige_id INTEGER REFERENCES movimientos(id),
     descripcion TEXT,
@@ -383,7 +385,30 @@ COLUMNAS_NUEVAS = {
                 "clasifica_valor": "INTEGER"},
     "premios_tabla": {"tipo": "TEXT NOT NULL DEFAULT 'dinero'"},
     "premiacion_detalle": {"tipo": "TEXT NOT NULL DEFAULT 'dinero'", "ticket_id": "INTEGER"},
+    "jugadores": {"tipo_doc": "TEXT NOT NULL DEFAULT 'CC'"},
 }
+
+
+def _reconstruir(c: sqlite3.Connection, tabla: str, viejo: str, nuevo: str) -> None:
+    """SQLite no permite cambiar un CHECK: se reconstruye la tabla (procedimiento oficial).
+
+    Los índices y disparadores (p. ej. los que impiden borrar el libro) se vuelven a crear con ESQUEMA.
+    """
+    sql = c.execute("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = ?", (tabla,)).fetchone()[0]
+    if nuevo in sql:
+        return
+    if viejo not in sql:
+        raise RuntimeError(f"No se pudo migrar la tabla {tabla}")
+    crear = sql.replace(viejo, nuevo).replace(f"CREATE TABLE {tabla}", f"CREATE TABLE {tabla}_nueva", 1)
+    cols = ", ".join(r[1] for r in c.execute(f"PRAGMA table_info({tabla})"))
+    c.execute("PRAGMA foreign_keys = OFF")
+    c.execute("BEGIN")
+    c.execute(crear)
+    c.execute(f"INSERT INTO {tabla}_nueva ({cols}) SELECT {cols} FROM {tabla}")
+    c.execute(f"DROP TABLE {tabla}")
+    c.execute(f"ALTER TABLE {tabla}_nueva RENAME TO {tabla}")
+    c.execute("COMMIT")
+    c.execute("PRAGMA foreign_keys = ON")
 
 
 def _migrar(c: sqlite3.Connection) -> None:
@@ -396,20 +421,9 @@ def _migrar(c: sqlite3.Connection) -> None:
     if "porcentaje_clasifica" in {r[1] for r in c.execute("PRAGMA table_info(torneos)")}:
         c.execute("UPDATE torneos SET modo_clasifica = 'porcentaje', clasifica_valor = porcentaje_clasifica "
                   "WHERE porcentaje_clasifica IS NOT NULL AND modo_clasifica IS NULL")
-    sql = c.execute("SELECT sql FROM sqlite_master WHERE name = 'entradas'").fetchone()[0]
-    if "'clasificado'" not in sql:
-        # SQLite no permite cambiar un CHECK: se reconstruye la tabla (procedimiento oficial).
-        nuevo = sql.replace("'reservado','eliminado')", "'reservado','eliminado','clasificado')")
-        nuevo = nuevo.replace("CREATE TABLE entradas", "CREATE TABLE entradas_nueva", 1)
-        cols = ", ".join(r[1] for r in c.execute("PRAGMA table_info(entradas)"))
-        c.execute("PRAGMA foreign_keys = OFF")
-        c.execute("BEGIN")
-        c.execute(nuevo)
-        c.execute(f"INSERT INTO entradas_nueva ({cols}) SELECT {cols} FROM entradas")
-        c.execute("DROP TABLE entradas")
-        c.execute("ALTER TABLE entradas_nueva RENAME TO entradas")
-        c.execute("COMMIT")
-        c.execute("PRAGMA foreign_keys = ON")
+    _reconstruir(c, "entradas", "'reservado','eliminado')", "'reservado','eliminado','clasificado')")
+    _reconstruir(c, "movimientos", "('saldo','efectivo','ventanilla')",
+                 "('saldo','efectivo','ventanilla','datafono','transferencia')")
 
 
 class ErrorNegocio(Exception):

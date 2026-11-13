@@ -243,7 +243,7 @@ def traspasar_ticket(db, personal_id, ticket_id, comprador, documento, codigo) -
     if not k or k["estado"] != "disponible":
         raise ErrorNegocio("Solo se traspasa un ticket disponible")
     dueno = caja.jugador(db, k["jugador_id"])
-    if seg.hash_documento(documento or "") != dueno["doc_hash"]:
+    if seg.hash_documento(documento or "", dueno.get("tipo_doc") or "CC") != dueno["doc_hash"]:
         raise ErrorNegocio("El documento no corresponde al dueño del ticket")
     texto = str(comprador or "").strip().upper()
     nuevo = db.uno("SELECT * FROM jugadores WHERE numero_caja = ? OR id = ?",

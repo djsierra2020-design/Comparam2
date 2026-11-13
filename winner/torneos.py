@@ -186,7 +186,11 @@ def opciones_jugador(db, t: dict, jugador_id: int) -> dict:
     }
 
 
-def _cobrar(db, jugador_id, t, tipo, monto, *, origen, personal_id, pago, descripcion, entrada_id=None):
+PAGOS_VENTANILLA = {"efectivo": "efectivo", "datafono": "datáfono", "transferencia": "transferencia"}
+
+
+def _cobrar(db, jugador_id, t, tipo, monto, *, origen, personal_id, pago, descripcion, entrada_id=None,
+            referencia=None):
     """Cobra una compra de torneo. ``pago``: 'saldo' (de la caja), 'efectivo' (en ventanilla) o 'ticket'."""
     if pago == "ticket":
         if tipo not in ("inscripcion", "reentrada"):
@@ -198,11 +202,12 @@ def _cobrar(db, jugador_id, t, tipo, monto, *, origen, personal_id, pago, descri
         if not db.ajuste("compras_desde_celular"):
             raise ErrorNegocio("Las compras desde el celular aún no están habilitadas; acérquese a la caja", 403)
         caja.verificar_topes_app(db, jugador_id, t, monto)
-    if pago == "efectivo":
+    if pago in PAGOS_VENTANILLA:
         caja.registrar_movimiento(db, jugador_id, "deposito", monto, origen="caja", personal_id=personal_id,
-                                  medio="efectivo", descripcion=f"Pago en ventanilla: {descripcion}")
+                                  medio=pago, descripcion=f"Pago en ventanilla ({PAGOS_VENTANILLA[pago]}"
+                                  + (f", comprobante {referencia}" if referencia else "") + f"): {descripcion}")
     return caja.registrar_movimiento(db, jugador_id, tipo, -monto, origen=origen, personal_id=personal_id,
-                                     torneo_id=t["id"], medio="ventanilla" if pago == "efectivo" else "saldo",
+                                     torneo_id=t["id"], medio="ventanilla" if pago in PAGOS_VENTANILLA else "saldo",
                                      descripcion=descripcion)
 
 
@@ -224,12 +229,12 @@ def _nueva_entrada(db, t, jugador_id, numero, origen) -> int:
 
 
 def inscribir(db, torneo_id, jugador_id, *, origen, personal_id=None, pago="saldo", pin=None,
-              sentar_ya=False) -> dict:
+              sentar_ya=False, referencia=None) -> dict:
     """Inscripción única por jugador y torneo. Desde la app exige PIN y paga con el saldo de caja."""
     if origen == "app":
         if pago != "saldo":
             raise ErrorNegocio("Desde el celular solo se paga con el saldo de caja")
-    elif pago not in ("saldo", "efectivo", "ticket"):
+    elif pago not in ("saldo", "ticket", *PAGOS_VENTANILLA):
         raise ErrorNegocio("Medio de pago inválido")
     with db.transaccion():
         vencer_reservas(db)
@@ -265,7 +270,7 @@ def inscribir(db, torneo_id, jugador_id, *, origen, personal_id=None, pago="sald
         nombre = "Inscripción" if tipo == "inscripcion" else f"Re-entrada #{numero - 1}"
         eid = _nueva_entrada(db, t, jugador_id, numero, origen)
         _cobrar(db, jugador_id, t, tipo, t["buyin"], origen=origen, personal_id=personal_id, pago=pago,
-                descripcion=f"{nombre} {t['nombre']}", entrada_id=eid)
+                descripcion=f"{nombre} {t['nombre']}", entrada_id=eid, referencia=referencia)
         db.conexion().execute("UPDATE entradas SET pago = ? WHERE id = ?", (pago, eid))
         db.auditar(personal_id, tipo, "entrada", eid, f"{origen}/{pago}")
         if sentar_ya or tipo == "reentrada" and origen == "app":
@@ -274,6 +279,59 @@ def inscribir(db, torneo_id, jugador_id, *, origen, personal_id=None, pago="sald
             db.notificar(jugador_id, "inscripcion", f"Inscrito: {t['nombre']}",
                          "Muestre su código QR en el ingreso para que le asignen asiento.")
         return entrada(db, eid)
+
+
+def verificar_pago_recibido(pago, pago_confirmado, referencia) -> str | None:
+    """En ventanilla no se registra nada sin que el cajero confirme que recibió el dinero."""
+    if pago not in PAGOS_VENTANILLA:
+        return None
+    if pago_confirmado is not True:
+        raise ErrorNegocio("Confirme que recibió el pago antes de registrar")
+    referencia = (referencia or "").strip()
+    if pago in ("datafono", "transferencia") and len(referencia) < 4:
+        raise ErrorNegocio("Escriba el número de comprobante del datáfono o de la transferencia")
+    return referencia or None
+
+
+def inscripcion_manual(db, personal_id, torneo_id, *, tipo_doc, documento, nombre=None, celular=None,
+                       pago="efectivo", referencia=None, pago_confirmado=False, documento_verificado=False,
+                       sentar_ya=False) -> dict:
+    """Inscripción en ventanilla con documento. Si el jugador no tiene caja, se le abre en el momento.
+
+    Nada queda registrado si el cajero no confirma que recibió el pago (o si el saldo no alcanza).
+    """
+    referencia = verificar_pago_recibido(pago, pago_confirmado, referencia)
+    if not documento_verificado:
+        raise ErrorNegocio("Verifique el documento original del jugador")
+    with db.transaccion():
+        j = caja.por_documento(db, tipo_doc, documento)
+        nuevo = j is None
+        if nuevo:
+            if not (nombre or "").strip():
+                raise ErrorNegocio("Jugador nuevo: escriba el nombre completo", 409)
+            j = caja.jugador(db, caja.abrir_caja(db, personal_id, nombre, documento, celular or None, True,
+                                                 tipo_doc=tipo_doc)["jugador"]["id"])
+        e = inscribir(db, torneo_id, j["id"], origen="caja", personal_id=personal_id, pago=pago,
+                      sentar_ya=sentar_ya, referencia=referencia)
+        asiento = db.uno("SELECT m.numero AS mesa, e.asiento, e.espera_desde IS NOT NULL AS alterno FROM entradas e "
+                         "LEFT JOIN mesas m ON m.id = e.mesa_id WHERE e.id = ?", (e["id"],))
+        return {"entrada": e, "asiento": asiento, "jugador": caja.publico(caja.jugador(db, j["id"])), "nuevo": nuevo}
+
+
+def consultar_documento(db, torneo_id, tipo_doc, documento) -> dict:
+    """Lo que el cajero necesita ver antes de cobrar: quién es, su saldo y si ya está inscrito."""
+    t = torneo(db, torneo_id)
+    j = caja.por_documento(db, tipo_doc, documento)
+    if not j:
+        return {"existe": False, "buyin": t["buyin"], "torneo": t["nombre"]}
+    op = opciones_jugador(db, t, j["id"])
+    from .eventos import ticket_para
+    viva = op["entrada_viva"]
+    return {"existe": True, "jugador": caja.publico(j), "saldo": caja.saldo(db, j["id"]), "buyin": t["buyin"],
+            "torneo": t["nombre"], "ya_inscrito": viva is not None and viva["estado"] != "reservado",
+            "puede": op["puede_inscribirse"] or op["puede_reentrar"],
+            "es_reentrada": op["puede_reentrar"] and not op["puede_inscribirse"],
+            "tiene_ticket": ticket_para(db, j["id"], t) is not None}
 
 
 # --- Asientos ------------------------------------------------------------------------------------

@@ -6,7 +6,7 @@ import sqlite3
 import pytest
 from flask import Flask
 
-from winner import caja, premios
+from winner import caja, premios, reportes
 from winner import seguridad as seg
 from winner import torneos as T
 from winner.db import BaseDatos, ErrorNegocio
@@ -726,3 +726,54 @@ def test_no_sugiere_cerrar_mesas_antes_de_empezar(db, staff):
     assert not [s for s in T.sugerencias(db, t) if s["tipo"] == "cerrar_mesa"]
     T.iniciar_torneo(db, staff["floor"], t)
     assert [s for s in T.sugerencias(db, t) if s["tipo"] == "cerrar_mesa"]  # en curso, 5 jugadores caben en 1 mesa
+
+
+def test_inscripcion_manual_con_documento_exige_confirmar_pago(db, staff):
+    t = nuevo_torneo(db, staff)
+    T.abrir_mesas(db, staff["floor"], t, 1)
+    base = dict(tipo_doc="CC", documento="1.020.304.050", documento_verificado=True)
+    # Sin confirmar el pago no se registra nada (ni la caja nueva).
+    with pytest.raises(ErrorNegocio, match="Confirme que recibió el pago"):
+        T.inscripcion_manual(db, staff["cajero"], t, nombre="Pedro Gómez", pago="efectivo", **base)
+    with pytest.raises(ErrorNegocio, match="comprobante"):
+        T.inscripcion_manual(db, staff["cajero"], t, nombre="Pedro Gómez", pago="datafono", pago_confirmado=True,
+                             referencia="", **base)
+    with pytest.raises(ErrorNegocio, match="documento original"):
+        T.inscripcion_manual(db, staff["cajero"], t, nombre="Pedro Gómez", pago="efectivo", pago_confirmado=True,
+                             tipo_doc="CC", documento="1020304050")
+    with pytest.raises(ErrorNegocio, match="nombre completo"):
+        T.inscripcion_manual(db, staff["cajero"], t, pago="efectivo", pago_confirmado=True, **base)
+    assert not db.valor("SELECT COUNT(*) FROM jugadores") and not db.valor("SELECT COUNT(*) FROM entradas")
+    # Jugador nuevo, paga con datáfono: se abre su caja y queda inscrito y sentado.
+    r = T.inscripcion_manual(db, staff["cajero"], t, nombre="Pedro Gómez", pago="datafono", pago_confirmado=True,
+                             referencia="AUT-123456", sentar_ya=True, **base)
+    assert r["nuevo"] and r["asiento"]["mesa"] == 1 and r["jugador"]["documento"] == "****4050"
+    jid = r["jugador"]["id"]
+    movs = caja.movimientos(db, jid)
+    assert [(m["tipo"], m["medio"]) for m in movs] == [("inscripcion", "ventanilla"), ("deposito", "datafono")]
+    assert "AUT-123456" in movs[1]["descripcion"] and caja.saldo(db, jid) == 0
+    cuadre = reportes.cuadre_diario(db, caja.dia_bogota())
+    assert cuadre["datafono"] == 100_000 and cuadre["efectivo_esperado"] == 0  # el datáfono no es efectivo en caja
+    # Segunda vez con el mismo documento: lo encuentra y no lo deja inscribirse dos veces.
+    info = T.consultar_documento(db, t, "CC", "1020304050")
+    assert info["existe"] and info["ya_inscrito"]
+    with pytest.raises(ErrorNegocio, match="ya está inscrito"):
+        T.inscripcion_manual(db, staff["cajero"], t, pago="efectivo", pago_confirmado=True, **base)
+    # Pasaporte con letras.
+    r2 = T.inscripcion_manual(db, staff["cajero"], t, tipo_doc="PA", documento="ab-123456", nombre="John Smith",
+                              pago="efectivo", pago_confirmado=True, documento_verificado=True)
+    assert r2["jugador"]["tipo_doc"] == "PA" and T.consultar_documento(db, t, "PA", "AB123456")["existe"]
+    # Con saldo de su caja no hace falta confirmar efectivo, pero el saldo debe alcanzar.
+    caja.depositar(db, staff["cajero"], jid, 50_000)
+    otro = nuevo_torneo(db, staff, nombre="Otro")
+    with pytest.raises(ErrorNegocio, match="Saldo insuficiente"):
+        T.inscripcion_manual(db, staff["cajero"], otro, pago="saldo", **base)
+
+
+def test_api_cobro_en_ventanilla_exige_confirmacion(cliente):
+    cliente.post("/winner/api/personal/ingresar", json={"usuario": "cajero", "clave": "winner2026"}, headers=H)
+    jugador = cliente.get("/winner/api/jugadores?q=Andr", headers=H).get_json()[0]["id"]
+    r = cliente.post("/winner/api/torneos/4/inscribir", json={"jugador_id": jugador, "pago": "efectivo"}, headers=H)
+    assert r.status_code == 400 and "Confirme" in r.get_json()["error"]
+    info = cliente.get("/winner/api/torneos/7/documento?tipo=CC&numero=99999999", headers=H).get_json()
+    assert info["existe"] is False and info["buyin"] == 200_000

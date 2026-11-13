@@ -177,7 +177,7 @@ def api_buscar_jugadores():
 def api_abrir_caja():
     d = _datos()
     r = caja.abrir_caja(db(), _pid(), d.get("nombre"), d.get("documento") or "", d.get("celular") or None,
-                        bool(d.get("documento_verificado")))
+                        bool(d.get("documento_verificado")), tipo_doc=d.get("tipo_doc") or "CC")
     r.pop("_codigo", None)
     return jsonify(r)
 
@@ -327,9 +327,28 @@ def api_sentar_alternos(tid):
 @personal("caja")
 def api_inscribir(tid):
     d = _datos()
+    pago = d.get("pago", "efectivo")
+    referencia = T.verificar_pago_recibido(pago, d.get("pago_confirmado"), d.get("referencia"))
     e = T.inscribir(db(), tid, int(d.get("jugador_id")), origen="caja", personal_id=_pid(),
-                    pago=d.get("pago", "efectivo"), sentar_ya=bool(d.get("sentar_ya")))
+                    pago=pago, sentar_ya=bool(d.get("sentar_ya")), referencia=referencia)
     return jsonify(entrada=e, asiento=_asiento(e["id"]))
+
+
+@bp.get("/api/torneos/<int:tid>/documento")
+@personal("caja")
+def api_consultar_documento(tid):
+    return jsonify(T.consultar_documento(db(), tid, request.args.get("tipo", "CC"), request.args.get("numero", "")))
+
+
+@bp.post("/api/torneos/<int:tid>/inscripcion-manual")
+@personal("caja")
+def api_inscripcion_manual(tid):
+    d = _datos()
+    return jsonify(T.inscripcion_manual(
+        db(), _pid(), tid, tipo_doc=d.get("tipo_doc", "CC"), documento=d.get("documento", ""), nombre=d.get("nombre"),
+        celular=d.get("celular"), pago=d.get("pago", "efectivo"), referencia=d.get("referencia"),
+        pago_confirmado=d.get("pago_confirmado") is True, documento_verificado=d.get("documento_verificado") is True,
+        sentar_ya=bool(d.get("sentar_ya"))))
 
 
 @bp.post("/api/qr")
@@ -357,23 +376,30 @@ def api_fichas(eid):
     return jsonify(ok=True)
 
 
+def _pago_ventanilla() -> str:
+    d = _datos()
+    pago = d.get("pago", "efectivo")
+    T.verificar_pago_recibido(pago, d.get("pago_confirmado"), d.get("referencia"))
+    return pago
+
+
 @bp.post("/api/entradas/<int:eid>/recompra")
 @personal("caja")
 def api_recompra_ventanilla(eid):
-    return jsonify(T.recomprar(db(), eid, origen="caja", personal_id=_pid(), pago=_datos().get("pago", "efectivo")))
+    return jsonify(T.recomprar(db(), eid, origen="caja", personal_id=_pid(), pago=_pago_ventanilla()))
 
 
 @bp.post("/api/entradas/<int:eid>/reentrada")
 @personal("caja")
 def api_reentrada_ventanilla(eid):
-    e = T.reentrar(db(), eid, origen="caja", personal_id=_pid(), pago=_datos().get("pago", "efectivo"))
+    e = T.reentrar(db(), eid, origen="caja", personal_id=_pid(), pago=_pago_ventanilla())
     return jsonify(entrada=e, asiento=_asiento(e["id"]))
 
 
 @bp.post("/api/entradas/<int:eid>/addon")
 @personal("caja")
 def api_addon_ventanilla(eid):
-    return jsonify(T.addon(db(), eid, origen="caja", personal_id=_pid(), pago=_datos().get("pago", "efectivo")))
+    return jsonify(T.addon(db(), eid, origen="caja", personal_id=_pid(), pago=_pago_ventanilla()))
 
 
 @bp.get("/api/torneos/<int:tid>/fichas")

@@ -11,7 +11,10 @@ def cuadre_diario(db, dia: str) -> dict:
                         "WHERE fecha >= ? AND fecha < ? GROUP BY tipo, medio ORDER BY tipo", (inicio, fin))
     efectivo = db.valor("SELECT COALESCE(SUM(monto), 0) FROM movimientos WHERE medio = 'efectivo' "
                         "AND fecha >= ? AND fecha < ?", (inicio, fin))
-    return {"dia": dia, "por_tipo": por_tipo, "efectivo_esperado": efectivo,
+    otros = {m: db.valor("SELECT COALESCE(SUM(monto), 0) FROM movimientos WHERE medio = ? AND fecha >= ? AND fecha < ?",
+                         (m, inicio, fin)) for m in ("datafono", "transferencia")}
+    return {"dia": dia, "por_tipo": por_tipo, "efectivo_esperado": efectivo, "datafono": otros["datafono"],
+            "transferencia": otros["transferencia"],
             "saldos_jugadores": db.valor("SELECT COALESCE(SUM(monto), 0) FROM movimientos WHERE fecha < ?", (fin,)),
             "arqueos": db.todos("SELECT a.*, p.nombre FROM arqueos a JOIN personal p ON p.id = a.personal_id "
                                 "WHERE dia = ? ORDER BY a.id", (dia,))}

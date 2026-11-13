@@ -70,12 +70,26 @@ def verificar_clave(clave: str, guardado: str | None) -> bool:
     return hmac.compare_digest(calc.hex(), h)
 
 
-def hash_documento(documento: str) -> str:
-    """El número de documento no se guarda en claro: solo su HMAC (para buscar) y los últimos 4."""
-    limpio = re.sub(r"\D", "", documento)
-    if len(limpio) < 5:
+TIPOS_DOCUMENTO = {"CC": "Cédula de ciudadanía", "CE": "Cédula de extranjería", "PA": "Pasaporte",
+                   "PPT": "Permiso por protección temporal"}
+
+
+def limpiar_documento(documento: str, tipo: str = "CC") -> str:
+    """Cédulas y PPT: solo dígitos. Pasaporte: letras y dígitos en mayúscula."""
+    if tipo not in TIPOS_DOCUMENTO:
+        raise ErrorNegocio("Tipo de documento inválido")
+    if tipo == "PA":
+        limpio = re.sub(r"[^0-9A-Za-z]", "", documento or "").upper()
+    else:
+        limpio = re.sub(r"\D", "", documento or "")
+    if not 5 <= len(limpio) <= 15:
         raise ErrorNegocio("Número de documento inválido")
-    return hmac.new(_secreto(), limpio.encode(), hashlib.sha256).hexdigest()
+    return limpio
+
+
+def hash_documento(documento: str, tipo: str = "CC") -> str:
+    """El número de documento no se guarda en claro: solo su HMAC (para buscar) y los últimos 4."""
+    return hmac.new(_secreto(), limpiar_documento(documento, tipo).encode(), hashlib.sha256).hexdigest()
 
 
 def normalizar_celular(celular: str) -> str:

@@ -60,7 +60,7 @@ def jugador(db: BaseDatos, jugador_id: int) -> dict:
 def publico(j: dict) -> dict:
     """Datos del jugador que se pueden mostrar (sin hashes)."""
     return {"id": j["id"], "numero_caja": j["numero_caja"], "nombre": j["nombre"],
-            "documento": "****" + j["doc_ultimos"], "celular": seg.enmascarar(j["celular"]),
+            "documento": "****" + j["doc_ultimos"], "tipo_doc": j.get("tipo_doc", "CC"), "celular": seg.enmascarar(j["celular"]),
             "celular_verificado": bool(j["celular_verificado"]), "tiene_pin": j["pin_hash"] is not None,
             "estado": j["estado"], "motivo_bloqueo": j["motivo_bloqueo"], "tope_diario": j["tope_diario"]}
 
@@ -89,25 +89,25 @@ def _siguiente_numero_caja(db) -> str:
     return f"W{n:06d}"
 
 
-def abrir_caja(db, personal_id, nombre, documento, celular=None, documento_verificado=False) -> dict:
+def abrir_caja(db, personal_id, nombre, documento, celular=None, documento_verificado=False, tipo_doc="CC") -> dict:
     """Apertura en persona en el casino. El celular se vincula con un código enviado a ese número."""
     if not documento_verificado:
         raise ErrorNegocio("Debe verificar el documento original del jugador antes de abrir la caja")
     nombre = (nombre or "").strip()
     if len(nombre) < 3:
         raise ErrorNegocio("Escriba el nombre completo")
-    doc_hash = seg.hash_documento(documento)
+    doc_hash = seg.hash_documento(documento, tipo_doc)
+    limpio = seg.limpiar_documento(documento, tipo_doc)
     cel = seg.normalizar_celular(celular) if celular else None
     with db.transaccion() as c:
         if c.execute("SELECT 1 FROM jugadores WHERE doc_hash = ?", (doc_hash,)).fetchone():
             raise ErrorNegocio("Ya existe una caja con ese documento")
         if cel and c.execute("SELECT 1 FROM jugadores WHERE celular = ?", (cel,)).fetchone():
             raise ErrorNegocio("Ese celular ya está vinculado a otra caja")
-        digitos = "".join(ch for ch in documento if ch.isdigit())
         cur = c.execute(
-            "INSERT INTO jugadores (numero_caja, nombre, doc_hash, doc_ultimos, celular, creado_en, creado_por) "
-            "VALUES (?,?,?,?,?,?,?)",
-            (_siguiente_numero_caja(db), nombre, doc_hash, digitos[-4:], cel, ahora(), personal_id))
+            "INSERT INTO jugadores (numero_caja, nombre, tipo_doc, doc_hash, doc_ultimos, celular, creado_en, creado_por) "
+            "VALUES (?,?,?,?,?,?,?,?)",
+            (_siguiente_numero_caja(db), nombre, tipo_doc, doc_hash, limpio[-4:], cel, ahora(), personal_id))
         jid = cur.lastrowid
         db.auditar(personal_id, "abrir_caja", "jugador", jid, "documento verificado en persona")
         j = jugador(db, jid)
@@ -164,6 +164,11 @@ def buscar_jugadores(db, texto) -> list[dict]:
     return salida
 
 
+def por_documento(db, tipo, documento) -> dict | None:
+    j = db.uno("SELECT * FROM jugadores WHERE doc_hash = ?", (seg.hash_documento(documento, tipo),))
+    return j
+
+
 def depositar(db, personal_id, jugador_id, monto, descripcion=None) -> int:
     m = monto_valido(monto)
     with db.transaccion():
@@ -194,7 +199,7 @@ def retirar(db, personal_id, jugador_id, monto, documento, codigo,
     j = jugador(db, jugador_id)
     if j["estado"] != "activo":
         raise ErrorNegocio("La cuenta está bloqueada")
-    if seg.hash_documento(documento) != j["doc_hash"]:
+    if seg.hash_documento(documento, j.get("tipo_doc") or "CC") != j["doc_hash"]:
         with db.transaccion():
             db.auditar(personal_id, "retiro_rechazado", "jugador", jugador_id, "documento no coincide")
         raise ErrorNegocio("El documento no corresponde al dueño de la cuenta")

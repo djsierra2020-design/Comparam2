@@ -12,6 +12,12 @@ dentro de esta misma app Flask.
 
 ## Fase 1 (lista)
 
+- **Inscripción manual en ventanilla**: el cajero pide tipo de documento (cédula, cédula de extranjería, pasaporte o
+  PPT) y número. Si el jugador ya tiene caja aparece con su saldo; si no, se le abre en el momento con su nombre. Antes
+  de registrar, el cajero confirma que vio el documento original y que **recibió el pago** (efectivo, datáfono o
+  transferencia con número de comprobante, o saldo de su caja). Sin esa confirmación no se registra nada; lo exige el
+  servidor, no solo la pantalla. Lo mismo aplica a recompras, re-entradas y add-ons pagados en ventanilla. El cuadre
+  diario separa el efectivo de lo cobrado por datáfono y transferencia.
 - **Inscripción única**: la base de datos no deja tener dos inscripciones vivas del mismo jugador en un torneo.
 - **Sentado automático**: se escanea el QR del jugador (o se escribe el código) y queda en un asiento al azar de la mesa con menos jugadores.
 - **Tablero en vivo**: cada mesa con sus asientos, nombre, fichas y estado. Se actualiza cada 4 s.

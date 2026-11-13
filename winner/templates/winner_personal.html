@@ -51,6 +51,7 @@
           <div data-perm="floor"><label>Código QR del jugador (escanear o escribir)</label>
             <input id="qr" placeholder="Ej. 3FA9C21B0D" autocomplete="off"></div>
           <button class="auto" id="b-qr" data-perm="floor">Sentar</button>
+          <button class="auto oro" id="b-inscribir" data-perm="caja">+ Inscribir jugador</button>
           <button class="auto sec" id="b-camara" data-perm="floor">📷 Cámara</button>
           <button class="auto sec" id="b-abrir-mesa" data-perm="floor">+ Abrir mesa</button>
           <button class="auto sec" id="b-sentar-todos" data-perm="floor">Sentar inscritos</button>
@@ -83,6 +84,7 @@
   <section id="v-jugadores" class="oculto">
     <div class="dos">
       <div class="tarjeta">
+        <div data-perm="caja" style="margin-bottom:12px"><button class="oro" onclick="inscripcionManual()">+ Inscribir jugador con documento</button></div>
         <h2>Buscar jugador</h2>
         <div class="fila"><input id="q" placeholder="Nombre, documento, celular o número de caja"><button class="auto" id="b-buscar">Buscar</button></div>
         <div id="resultados" style="margin-top:10px"></div>
@@ -390,7 +392,9 @@ window.abrirAsiento = async (entradaId) => {
       cargarTablero();
     });
   } else {
-    const p = await pedir("Medio de pago", [{n: "pago", l: "Pago", tipo: "select", opciones: [["efectivo", "Efectivo en ventanilla"], ["saldo", "Saldo de su caja"]]}], "Cobrar");
+    const precio = {recompra: t.recompra_precio, reentrada: t.buyin, addon: t.addon_precio}[d.op];
+    const nombreOp = {recompra: "Recompra", reentrada: "Re-entrada", addon: "Add-on"}[d.op];
+    const p = await cobrar(precio, `${nombreOp} · ${asiento.nombre}`, false);
     if (p) accion(async () => {
       const r = await api(`/entradas/${entradaId}/${d.op}`, "POST", p);
       aviso(r.asiento ? `Re-entrada: mesa ${r.asiento.mesa}, asiento ${r.asiento.asiento}` : "Listo");
@@ -464,11 +468,13 @@ window.inscribirJugador = async (id) => {
   const abiertos = torneos.filter(t => t.estado === "programado" || t.estado === "en_curso");
   const d = await pedir("Inscribir a torneo", [
     {n: "torneo", l: "Torneo", tipo: "select", opciones: abiertos.map(t => [t.id, `${t.nombre} · ${pesos(t.buyin)}`])},
-    {n: "pago", l: "Pago", tipo: "select", opciones: [["efectivo", "Efectivo en ventanilla"], ["saldo", "Saldo de su caja"], ["ticket", "Ticket de satélite"]]},
-    {n: "sentar_ya", l: "Sentarlo ya (el jugador está en la sala)", tipo: "check"}], "Inscribir");
-  if (d) accion(async () => {
-    const r = await api(`/torneos/${d.torneo}/inscribir`, "POST", {jugador_id: id, pago: d.pago, sentar_ya: d.sentar_ya});
-    pedir("Inscrito", [], "Listo", r.asiento && r.asiento.alterno ? `<p class="grande" style="color:var(--oro)">Sala llena: lista de alternos</p>` : r.asiento && r.asiento.mesa ? `<p class="grande">Mesa ${r.asiento.mesa} · Asiento ${r.asiento.asiento}</p>` : `<p>Código QR: <b>${r.entrada.codigo_qr}</b><br><span class="suave">El jugador lo ve en su app; el floor lo escanea para sentarlo.</span></p>`);
+    {n: "sentar_ya", l: "Sentarlo ya (el jugador está en la sala)", tipo: "check"}], "Siguiente");
+  if (!d) return;
+  const t = torneos.find(x => x.id === +d.torneo);
+  const p = await cobrar(t.buyin, `Inscripción · ${t.nombre}`, true);
+  if (p) accion(async () => {
+    const r = await api(`/torneos/${d.torneo}/inscribir`, "POST", {jugador_id: id, ...p, sentar_ya: d.sentar_ya});
+    mostrarInscrito(r);
     verJugador(id);
   });
 };
@@ -485,6 +491,87 @@ window.anularTicket = async (kid, jid) => {
   const d = await pedir("Anular ticket", [{n: "motivo", l: "Motivo"}], "Anular");
   if (d) accion(async () => { await api(`/tickets/${kid}/anular`, "POST", d); verJugador(jid); });
 };
+// ---------- Cobro en ventanilla: no se registra nada sin confirmar que se recibió el pago ----------
+const MEDIOS = {efectivo: "Efectivo", datafono: "Datáfono (tarjeta)", transferencia: "Transferencia / Nequi / Daviplata",
+  saldo: "Saldo de su caja Winner", ticket: "Ticket de satélite"};
+async function cobrar(monto, concepto, conTicket, quien = "") {
+  const medios = ["efectivo", "datafono", "transferencia", "saldo"].concat(conTicket ? ["ticket"] : []);
+  const m = await pedir("¿Cómo paga?", [
+    {n: "pago", l: "Medio de pago", tipo: "select", opciones: medios.map(x => [x, MEDIOS[x]])},
+    {n: "referencia", l: "N.º de comprobante (obligatorio en datáfono y transferencia)"}], "Siguiente",
+    `<p><b>${esc(concepto)}</b>${quien ? `<br>${quien}` : ""}<br><span class="grande">${pesos(monto)}</span></p>`);
+  if (!m) return null;
+  if (["datafono", "transferencia"].includes(m.pago) && m.referencia.trim().length < 4) {
+    aviso("Escriba el número de comprobante del datáfono o de la transferencia", true); return null;
+  }
+  if (m.pago === "saldo" || m.pago === "ticket") {
+    const ok = await confirmar("Confirmar cobro", `${esc(concepto)}${quien ? "<br>" + quien : ""}<br>Se descuenta <b>${m.pago === "saldo" ? pesos(monto) + " del saldo de su caja" : "un ticket de satélite"}</b>.`, "Registrar");
+    return ok ? {pago: m.pago} : null;
+  }
+  const c = await pedir("Confirme que recibió el pago", [
+    {n: "ok", l: `Confirmo que recibí ${pesos(monto)} en ${MEDIOS[m.pago].toLowerCase()}${m.referencia ? " (comprobante " + m.referencia + ")" : ""}`, tipo: "check"}],
+    "Registrar", `<p><b>${esc(concepto)}</b>${quien ? `<br>${quien}` : ""}</p><div class="aviso">⚠️ No registre hasta tener el dinero en la mano o el comprobante aprobado.</div>`);
+  if (!c) return null;
+  if (!c.ok) { aviso("No se registró: marque que recibió el pago", true); return null; }
+  return {pago: m.pago, referencia: m.referencia.trim(), pago_confirmado: true};
+}
+
+function mostrarInscrito(r) {
+  const quien = r.jugador ? `<p>${esc(r.jugador.nombre)} · ${r.jugador.numero_caja}${r.nuevo ? ' <span class="chip verde">caja nueva</span>' : ""}</p>` : "";
+  pedir("Inscrito ✅", [], "Listo", quien + (r.asiento && r.asiento.alterno ? `<p class="grande" style="color:var(--oro)">Mesas llenas: lista de alternos</p>`
+    : r.asiento && r.asiento.mesa ? `<p class="grande">Mesa ${r.asiento.mesa} · Asiento ${r.asiento.asiento}</p>`
+    : `<p>Código QR: <b>${r.entrada.codigo_qr}</b><br><span class="suave">El jugador lo ve en su app; el floor lo escanea para sentarlo.</span></p>`));
+}
+
+const TIPOS_DOC = [["CC", "Cédula de ciudadanía"], ["CE", "Cédula de extranjería"], ["PA", "Pasaporte"], ["PPT", "Permiso por protección temporal (PPT)"]];
+window.inscripcionManual = async () => {
+  const abiertos = torneos.filter(t => ["programado", "en_curso"].includes(t.estado) && t.registro_abierto && t.tipo !== "final");
+  if (!abiertos.length) return aviso("No hay torneos con inscripción abierta", true);
+  const d = await pedir("Inscribir jugador", [
+    {n: "torneo", l: "Torneo", tipo: "select", opciones: abiertos.map(t => [t.id, `${t.nombre} · ${pesos(t.buyin)}`])},
+    {n: "tipo_doc", l: "Tipo de documento", tipo: "select", opciones: TIPOS_DOC},
+    {n: "documento", l: "Número de documento", tipo: "text"}], "Buscar");
+  if (!d) return;
+  if (abiertos.some(t => t.id === +d.torneo)) $("#sel-torneo").value = d.torneo;
+  const info = await accion(() => api(`/torneos/${d.torneo}/documento?tipo=${d.tipo_doc}&numero=${encodeURIComponent(d.documento)}`));
+  if (!info) return;
+  let datos = {tipo_doc: d.tipo_doc, documento: d.documento};
+  let quien;
+  if (info.existe) {
+    const j = info.jugador;
+    if (j.estado !== "activo") return aviso(`La cuenta de ${j.nombre} está bloqueada`, true);
+    if (info.ya_inscrito) return aviso(`${j.nombre} ya está inscrito en ${info.torneo}`, true);
+    if (!info.puede) return aviso(`${j.nombre} no puede inscribirse ahora (inscripción cerrada o sin re-entradas)`, true);
+    quien = `${esc(j.nombre)} · ${d.tipo_doc} ****${j.documento.slice(-4)} · caja ${j.numero_caja} · saldo ${pesos(info.saldo)}`;
+    const v = await pedir("Jugador encontrado", [
+      {n: "documento_verificado", l: "Verifiqué el documento original y es la misma persona", tipo: "check"},
+      {n: "sentar_ya", l: "Sentarlo ya (está en la sala)", tipo: "check"}], "Siguiente",
+      `<p><b>${esc(j.nombre)}</b><br><span class="suave">${j.numero_caja} · saldo ${pesos(info.saldo)}</span>${info.es_reentrada ? '<br><span class="chip oro">Re-entrada</span>' : ""}${info.tiene_ticket ? '<br><span class="chip verde">Tiene ticket de satélite</span>' : ""}</p>`);
+    if (!v) return;
+    if (!v.documento_verificado) return aviso("Verifique el documento original antes de inscribir", true);
+    datos = {...datos, documento_verificado: true, sentar_ya: v.sentar_ya};
+  } else {
+    const n = await pedir("Jugador nuevo: abrir caja", [
+      {n: "nombre", l: "Nombre completo"}, {n: "celular", l: "Celular (opcional, para la app)"},
+      {n: "documento_verificado", l: "Verifiqué el documento original", tipo: "check"},
+      {n: "sentar_ya", l: "Sentarlo ya (está en la sala)", tipo: "check"}], "Siguiente",
+      `<p class="suave">No hay caja con ${d.tipo_doc} ${esc(d.documento)}. Se le abre una ahora.</p>`);
+    if (!n) return;
+    if (!n.documento_verificado) return aviso("Verifique el documento original antes de inscribir", true);
+    if (n.nombre.trim().length < 3) return aviso("Escriba el nombre completo", true);
+    quien = `${esc(n.nombre)} · ${d.tipo_doc} ${esc(d.documento)} · caja nueva`;
+    datos = {...datos, nombre: n.nombre, celular: n.celular, documento_verificado: true, sentar_ya: n.sentar_ya};
+  }
+  const p = await cobrar(info.buyin, `${info.es_reentrada ? "Re-entrada" : "Inscripción"} · ${info.torneo}`, info.tiene_ticket, quien);
+  if (!p) return;
+  accion(async () => {
+    const r = await api(`/torneos/${d.torneo}/inscripcion-manual`, "POST", {...datos, ...p});
+    mostrarInscrito(r);
+    if (pestana === "mesas") cargarTablero();
+  });
+};
+$("#b-inscribir").onclick = () => window.inscripcionManual();
+
 window.depositar = async (id) => {
   const d = await pedir("Depósito en efectivo", [{n: "monto", l: "Monto ($)", tipo: "number"}], "Registrar");
   if (d) accion(async () => { await api(`/jugadores/${id}/deposito`, "POST", d); aviso("Depósito registrado"); verJugador(id); });
@@ -517,7 +604,8 @@ window.corregir = async (mid, jid) => {
 };
 $("#b-abrir-caja").onclick = async () => {
   const d = await pedir("Abrir caja (en persona)", [
-    {n: "nombre", l: "Nombre completo"}, {n: "documento", l: "Número de documento"}, {n: "celular", l: "Celular"},
+    {n: "nombre", l: "Nombre completo"}, {n: "tipo_doc", l: "Tipo de documento", tipo: "select", opciones: TIPOS_DOC},
+    {n: "documento", l: "Número de documento"}, {n: "celular", l: "Celular"},
     {n: "documento_verificado", l: "Verifiqué el documento original", tipo: "check"}], "Abrir caja");
   if (!d) return;
   const r = await accion(() => api("/jugadores", "POST", d));
@@ -591,6 +679,8 @@ async function verCuadre() {
   const r = await accion(() => api("/reportes/cuadre?dia=" + $("#dia").value));
   if (!r) return;
   $("#cuadre").innerHTML = `<div class="kpis"><div class="kpi"><div class="e">Efectivo esperado en caja (depósitos − retiros)</div><div class="v">${pesos(r.efectivo_esperado)}</div></div>
+    <div class="kpi"><div class="e">Cobrado por datáfono</div><div class="v">${pesos(r.datafono)}</div></div>
+    <div class="kpi"><div class="e">Cobrado por transferencia</div><div class="v">${pesos(r.transferencia)}</div></div>
     <div class="kpi"><div class="e">Total saldos de jugadores al cierre</div><div class="v">${pesos(r.saldos_jugadores)}</div></div></div>
     <table><tr><th>Tipo</th><th>Medio</th><th class="n">Cantidad</th><th class="n">Total</th></tr>${r.por_tipo.map(f => `<tr><td>${TIPOS[f.tipo]}</td><td>${f.medio}</td><td class="n">${f.cantidad}</td><td class="n">${pesos(f.total)}</td></tr>`).join("") || `<tr><td colspan="4" class="suave">Sin movimientos.</td></tr>`}</table>
     ${r.arqueos.length ? `<h3 style="margin-top:12px">Arqueos</h3><table><tr><th>Hora</th><th>Cajero</th><th class="n">Contado</th><th class="n">Esperado</th><th class="n">Diferencia</th></tr>${r.arqueos.map(a => `<tr><td>${hora(a.fecha)}</td><td>${esc(a.nombre)}</td><td class="n">${pesos(a.efectivo_contado)}</td><td class="n">${pesos(a.efectivo_esperado)}</td><td class="n" style="color:${a.diferencia ? "var(--rojo)" : "var(--verde)"}">${pesos(a.diferencia)}</td></tr>`).join("")}</table>` : ""}`;
