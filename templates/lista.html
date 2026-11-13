@@ -42,6 +42,7 @@
     <label>Operación<select name="operacion"><option value="arriendo" {% if p.operacion == 'arriendo' %}selected{% endif %}>Arriendo</option><option value="venta" {% if p.operacion == 'venta' %}selected{% endif %}>Venta</option></select></label>
     <label>Precio máximo<input name="precio_max" inputmode="numeric" value="{{ args.precio_max or '' }}" placeholder="Sin límite"></label>
     <label>Habitaciones mín.<select name="hab_min"><option value="">Cualquiera</option>{% for n in range(1,5) %}<option value="{{ n }}" {% if hab_min == n %}selected{% endif %}>{{ n }}+</option>{% endfor %}</select></label>
+    <label>Parqueadero<select name="parq"><option value="">Cualquiera</option><option value="si" {% if parq == 'si' %}selected{% endif %}>Con parqueadero</option><option value="no" {% if parq == 'no' %}selected{% endif %}>Sin parqueadero</option></select></label>
     <label>Nombre del cliente<input name="cliente" value="{{ cliente }}" placeholder="Opcional"></label>
     <input type="hidden" name="area_min" value="{{ args.area_min or '' }}">
     <button type="submit">Actualizar</button>
@@ -56,7 +57,7 @@
   <div class="datos">
     {% if cliente %}<div>Para: <b>{{ cliente }}</b></div>{% endif %}
     <div>Barrio: <b>{{ barrio }}</b></div>
-    <div>{{ 'Arriendo' if p.operacion == 'arriendo' else 'Venta' }}{% if p.precio_max %} · hasta <b>{{ p.precio_max|pesos }}</b>{% endif %}{% if hab_min %} · <b>{{ hab_min }}+</b> hab{% endif %}</div>
+    <div>{{ 'Arriendo' if p.operacion == 'arriendo' else 'Venta' }}{% if p.precio_max %} · hasta <b>{{ p.precio_max|pesos }}</b>{% endif %}{% if hab_min %} · <b>{{ hab_min }}+</b> hab{% endif %}{% if parq == 'si' %} · con parqueadero{% elif parq == 'no' %} · sin parqueadero{% endif %}</div>
     <div>Fecha: <b>{{ fecha }}</b></div>
   </div>
   {% if r and r.zona %}
@@ -69,7 +70,7 @@
     <div class="t">{{ a.precio|pesos }}{% if p.operacion == 'arriendo' %}/mes{% endif %} · {{ '%g'|format(a.area_m2) }} m²
       {% if r.zona %}{% set d = r.zona.diferencia(a.precio_m2) %}<span class="tag {{ 'bajo' if d < 0 else 'alto' }}">{{ '%.0f'|format(d|abs) }}% {{ 'bajo' if d < 0 else 'sobre' }} el barrio</span>{% endif %}
       {% if h and h.baja_pct %}<span class="tag baja">Bajó {{ h.baja_pct }}%</span>{% endif %}</div>
-    <div class="m">{{ a.precio_m2|pesos }}/m²{% if a.habitaciones %} · <b>{{ a.habitaciones }}</b> hab{% endif %}{% if a.banos %} · <b>{{ a.banos }}</b> baños{% endif %}{% if a.barrio %} · {{ a.barrio }}{% endif %}{% if h and h.dias is not none %} · {{ h.texto }}{% endif %}</div>
+    <div class="m">{{ a.precio_m2|pesos }}/m²{% if a.habitaciones %} · <b>{{ a.habitaciones }}</b> hab{% endif %}{% if a.banos %} · <b>{{ a.banos }}</b> baños{% endif %}{% if a.parqueaderos %} · 🚗 <b>{{ a.parqueaderos }}</b> parq.{% elif a.parqueaderos == 0 %} · sin parqueadero{% endif %}{% if a.barrio %} · {{ a.barrio }}{% endif %}{% if h and h.dias is not none %} · {{ h.texto }}{% endif %}</div>
     <div class="tel">📞 {{ a.telefonos|join(' · ') }}</div>
   </div>
   {% else %}

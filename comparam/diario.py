@@ -85,7 +85,7 @@ def registrar(historial: dict, a: Listing, operacion: str, zona: str, dia: str, 
         historial[k] = {
             "operacion": operacion, "zona": zona, "fuente": a.fuente, "titulo": a.titulo[:120],
             "barrio": a.barrio[:60], "url": a.url, "precio": round(a.precio), "area_m2": a.area_m2,
-            "habitaciones": a.habitaciones, "banos": a.banos, "dueno_directo": a.es_dueno_directo,
+            "habitaciones": a.habitaciones, "banos": a.banos, "parqueaderos": a.parqueaderos, "dueno_directo": a.es_dueno_directo,
             "verificar": a.verificar, "anunciante": categoria(a), "publicado": a.publicado, "primera_vez": dia, "ultima_vez": dia, "base": base,
             "precios": [[dia, round(a.precio)]],
         }
@@ -104,6 +104,8 @@ def registrar(historial: dict, a: Listing, operacion: str, zona: str, dia: str, 
         e.pop("ciudad", None)  # también está en las zonas del cliente
     e["dueno_directo"] = e["dueno_directo"] or a.es_dueno_directo
     e["verificar"] = a.verificar and not e["dueno_directo"]
+    if a.parqueaderos is not None:
+        e["parqueaderos"] = a.parqueaderos
     if a.publicado and not e.get("publicado"):
         e["publicado"] = a.publicado
     if round(a.precio) != e["precios"][-1][1]:  # cambió el precio

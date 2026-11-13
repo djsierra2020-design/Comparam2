@@ -100,3 +100,27 @@ def clasificar_anunciante(publicado_por: str = "", nombre: str = "", descripcion
     if descripcion and _INMOBILIARIA.search(descripcion):
         return "inmobiliaria", False
     return "", False
+
+
+_SIN_PARQ = re.compile(r"\b(?:sin|no\s+(?:tiene|incluye|cuenta\s+con|hay))\s+(?:parqueaderos?|garajes?|parking)\b", re.I)
+_N_PARQ = re.compile(r"(?<![\d.,])(\d{1,2})\s*(?:parqueaderos?|parq\.?|garajes?|garages?|parking|estacionamientos?)\b"
+                     r"(?!\s+(?:de\s+)?(?:visitantes|comunal))", re.I)
+_UN_PARQ = re.compile(r"\b(?:con|incluye|tiene|cuenta\s+con|m[aá]s|y)\s+(?:un\s+|su\s+)?(?:parqueadero|garaje|garage)"
+                      r"(?!\s+(?:de\s+)?(?:visitantes|comunal))|\b(?:parqueadero|garaje)\s+(?:privado|propio|cubierto|"
+                      r"independiente|asignado|exclusivo|incluido|doble|sencillo)\b", re.I)
+
+
+def parqueaderos_en_texto(*textos: str) -> int | None:
+    """Parqueaderos que menciona el texto del anuncio: «2 parqueaderos», «incluye parqueadero» (1),
+    «sin parqueadero» (0). None si no lo menciona (no se ignoran los de visitantes o comunales)."""
+    t = " ".join(x for x in textos if x)
+    if not t:
+        return None
+    if _SIN_PARQ.search(t):
+        return 0
+    if m := _N_PARQ.search(t):
+        n = int(m.group(1))
+        return n if n <= 10 else None
+    if _UN_PARQ.search(t):
+        return 1
+    return None

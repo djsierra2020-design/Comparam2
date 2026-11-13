@@ -17,7 +17,7 @@ from urllib.parse import urljoin
 from bs4 import BeautifulSoup
 
 from ..models import Listing
-from ..parsing import clasificar_anunciante, extract_phones, parece_persona, parse_number
+from ..parsing import clasificar_anunciante, extract_phones, parece_persona, parqueaderos_en_texto, parse_number
 
 K_PRECIO_VENTA = ("salePrice", "sale_price", "precioVenta", "mvalorventa", "valorVenta")
 K_PRECIO_ARRIENDO = ("rentPrice", "rent_price", "precioArriendo", "mvalorarriendo", "valorArriendo", "canon")
@@ -29,6 +29,8 @@ K_DESC = ("description", "descripcion", "mdescripcion", "comment", "comentario")
 K_URL = ("link", "url", "permalink", "slug", "path", "detailUrl", "linkDetalle")
 K_BARRIO = ("neighborhood", "neighbourhood", "barrio", "mbarrio", "sector", "commonNeighborhood")
 K_HAB = ("rooms", "bedrooms", "habitaciones", "mnrocuartos", "numberOfRooms")
+K_PARQ = ("parkingLots", "parkingSpaces", "parkings", "parking", "garages", "garage", "garajes", "garaje",
+          "parqueaderos", "parqueadero", "mnroparqueaderos", "numberOfParkingSpaces", "parkingCount")
 K_BANOS = ("bathrooms", "banos", "baños", "mnrobanos", "numberOfBathroomsTotal")
 K_FECHA = ("publicationDate", "publication_date", "publishedAt", "published_at", "datePublished", "createdAt",
            "created_at", "creationDate", "fechaPublicacion", "fecha_publicacion", "fechaCreacion", "date_created",
@@ -54,6 +56,36 @@ def _num(v) -> float | None:
     if isinstance(v, list) and v:
         v = v[0]
     return parse_number(v)
+
+
+def _parqueaderos(d: dict, *textos: str) -> int | None:
+    """Parqueaderos del anuncio: campo numérico o sí/no, ficha técnica [{"field": "garage", "value": 1}]
+    o, si no, lo que diga el título o la descripción."""
+    v = _primero(d, K_PARQ)
+    if isinstance(v, bool):
+        return int(v)
+    if isinstance(v, str) and v.strip().lower() in ("si", "sí", "yes", "true"):
+        return 1
+    if isinstance(v, str) and v.strip().lower() in ("no", "false", "0", "ninguno"):
+        return 0
+    n = _num(v) if v is not None else None
+    if n is not None and 0 <= n <= 10:
+        return int(n)
+    for lista in d.values():  # fichas técnicas: lista de {nombre, valor}
+        if isinstance(lista, list) and lista and isinstance(lista[0], dict):
+            for it in lista:
+                nombre = _texto(_primero(it, ("field", "name", "label", "key", "nombre", "id", "title")))
+                if re.search(r"parque|garaj|garage|parking", nombre, re.I):
+                    val = _primero(it, ("value", "valor", "text", "data"))
+                    if isinstance(val, bool):
+                        return int(val)
+                    if (n := _num(val)) is not None and 0 <= n <= 10:
+                        return int(n)
+                    if isinstance(val, str) and val.strip().lower() in ("si", "sí", "yes"):
+                        return 1
+                    if isinstance(val, str) and val.strip().lower() in ("no", "ninguno"):
+                        return 0
+    return parqueaderos_en_texto(*textos)
 
 
 def _texto(v) -> str:
@@ -346,7 +378,7 @@ def extraer_de_tarjetas(html: str, fuente: str, base_url: str, operacion: str = 
             area_m2=area, url=url, telefonos=extract_phones(texto) if _TELEFONO_TXT.search(texto) else [],
             publicado_por=etiqueta, es_dueno_directo=dueno,
             habitaciones=int(hab.group(1)) if hab else None, banos=int(ban.group(1)) if ban else None,
-            descripcion=texto[:500],
+            parqueaderos=parqueaderos_en_texto(texto), descripcion=texto[:500],
         ))
     return anuncios
 
@@ -439,6 +471,7 @@ def extraer_de_json(bloques: list, fuente: str, base_url: str, operacion: str = 
                 verificar=verificar,
                 habitaciones=int(h) if (h := _num(_primero(d, K_HAB))) else None,
                 banos=int(b) if (b := _num(_primero(d, K_BANOS))) else None,
+                parqueaderos=_parqueaderos(d, titulo, descripcion),
                 descripcion=descripcion[:500],
                 publicado=_fecha(d),
             ))

@@ -109,6 +109,8 @@ class PortalWeb(Source):
         detalle = extraer_anuncios(html, self.nombre, self.base_url, operacion)
         for d in detalle:
             tels += d.telefonos
+            if anuncio.parqueaderos is None and d.parqueaderos is not None:
+                anuncio.parqueaderos = d.parqueaderos
             if d.publicado_por and not anuncio.publicado_por:
                 anuncio.publicado_por, anuncio.es_dueno_directo = d.publicado_por, d.es_dueno_directo
         anuncio.telefonos = extract_phones(*tels)
