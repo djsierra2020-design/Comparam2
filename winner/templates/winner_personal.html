@@ -61,8 +61,9 @@
           <button class="auto oro oculto" id="b-cerrar-dia" data-perm="director">Cerrar día y clasificar</button>
         </div>
         <video id="video" class="oculto" style="width:100%;max-width:360px;margin-top:10px;border-radius:10px" playsinline muted></video>
+        <div id="reloj-panel" style="margin-top:14px"></div>
         <div class="fila" style="margin-top:12px" data-perm="floor">
-          <div class="auto"><label>Nivel</label>
+          <div class="auto" id="nivel-manual"><label>Nivel</label>
             <div class="fila"><button class="sec auto" id="b-nivel-menos">−</button><span id="nivel" class="grande auto" style="min-width:48px;text-align:center"></span><button class="sec auto" id="b-nivel-mas">+</button></div></div>
           <div class="auto"><label>Inscripción / re-entrada</label><button class="sec auto" id="t-registro"></button></div>
           <div class="auto"><label>Recompras</label><button class="sec auto" id="t-recompras"></button></div>
@@ -237,6 +238,9 @@ async function cargarTablero() {
       : s.tipo === "cerrar_dia" ? (puede("director") ? `<button class="oro" onclick="cerrarDia()">Cerrar día</button>` : "")
       : `<button class="oro" onclick="balancear()">Balancear ahora</button>`) : ""}</div>`).join("");
   $("#nivel").textContent = t.nivel;
+  relojPanel = tablero.reloj; desfasePanel = relojPanel ? Date.parse(relojPanel.ahora) - Date.now() : 0;
+  $("#nivel-manual").classList.toggle("oculto", !!relojPanel);
+  pintarRelojPanel();
   const tog = (id, v) => { $(id).textContent = v ? "Abierta ✓" : "Cerrada"; $(id).className = v ? "auto" : "sec auto"; };
   tog("#t-registro", t.registro_abierto); tog("#t-recompras", t.recompras_abiertas); tog("#t-addon", t.addon_abierto);
   $("#b-iniciar").classList.toggle("oculto", t.estado !== "programado" || !puede("floor"));
@@ -308,6 +312,63 @@ window.abrirYSentar = cantidad => accion(async () => {
   const r = await api(`/torneos/${torneoId}/sentar-alternos`, "POST", {});
   await cargarTablero(); mostrarMovimientos("Alternos sentados", r.movimientos);
 });
+// ---------- Reloj del torneo ----------
+let relojPanel = null, desfasePanel = 0;
+function pintarRelojPanel() {
+  const el = $("#reloj-panel");
+  if (!el || !tablero) return;
+  const t = tablero.torneo, rl = relojPanel;
+  const editar = puede("director") ? `<button class="sec auto" onclick="editarEstructura()">Estructura de ciegas</button>` : "";
+  if (!rl) {
+    el.innerHTML = `<div class="aviso" style="margin:0">⏱️ Este torneo no tiene estructura de ciegas: sin ella no hay reloj en pantalla. ${editar}</div>`;
+    return;
+  }
+  const s = segundosJugados(rl, desfasePanel), p = calcularReloj(rl.estructura, s);
+  const descanso = p.actual.tipo === "descanso";
+  const control = puede("floor") && t.estado === "en_curso";
+  el.innerHTML = `<div class="fila" style="align-items:center">
+    <div class="auto"><div class="suave" style="font-size:12px">${descanso ? "DESCANSO" : "NIVEL " + p.nivel}${rl.corriendo ? "" : " · PAUSADO"}</div>
+      <div class="grande" style="color:${rl.corriendo ? "var(--texto)" : "var(--oro)"}">${formatoReloj(p.restante)}</div></div>
+    <div class="auto"><div class="suave" style="font-size:12px">Ciegas</div><div style="font-size:20px;font-weight:800">${descanso ? "—" : miles(p.actual.ciega_chica) + " / " + miles(p.actual.ciega_grande) + (p.actual.ante ? " · ante " + miles(p.actual.ante) : "")}</div></div>
+    <div class="auto suave" style="font-size:13px">Próximo descanso: ${descanso ? "ahora" : p.hastaDescanso === null ? "—" : formatoReloj(p.hastaDescanso)}<br>Tiempo total: ${formatoReloj(s)}</div>
+    ${control ? `<span class="auto" style="display:flex;gap:6px;flex-wrap:wrap">
+      ${rl.corriendo ? `<button class="sec" onclick="relojAccion('pausar')">⏸ Pausar</button>` : `<button class="oro" onclick="relojAccion('iniciar')">▶ ${s > 0 ? "Reanudar" : "Iniciar reloj"}</button>`}
+      <button class="sec" onclick="relojAccion('anterior')" title="Nivel anterior">⏮</button>
+      <button class="sec" onclick="relojAccion('siguiente')" title="Siguiente nivel">⏭</button>
+      <button class="sec" onclick="relojAccion('ajustar', -60)">−1 min</button>
+      <button class="sec" onclick="relojAccion('ajustar', 60)">+1 min</button></span>` : t.estado === "programado" ? `<span class="auto suave">El reloj se activa al iniciar el torneo</span>` : ""}
+    ${editar}</div>`;
+}
+setInterval(() => { if (pestana === "mesas" && relojPanel) pintarRelojPanel(); }, 1000);
+window.relojAccion = (accion, segundos = 0) => accion === "siguiente" || accion === "anterior"
+  ? confirmar(accion === "siguiente" ? "¿Pasar al siguiente nivel?" : "¿Volver al nivel anterior?", "Cambia en todas las pantallas de la sala.").then(ok => ok && relojEnviar(accion, segundos))
+  : relojEnviar(accion, segundos);
+function relojEnviar(accion, segundos) {
+  return api(`/torneos/${torneoId}/reloj`, "POST", {accion, segundos})
+    .then(r => { relojPanel = r; desfasePanel = Date.parse(r.ahora) - Date.now(); pintarRelojPanel(); })
+    .catch(e => aviso(e.message, true));
+}
+window.editarEstructura = async () => {
+  const actual = await accion(() => api(`/torneos/${torneoId}/estructura`));
+  if (!actual) return;
+  const modo = await pedir("Estructura de ciegas", [{n: "modo", l: "¿Qué quiere hacer?", tipo: "select", opciones: [
+    ["plantilla", "Usar la plantilla estándar (elijo minutos y descansos)"], ["texto", "Escribir o corregir los niveles a mano"]]}], "Siguiente");
+  if (!modo) return;
+  if (modo.modo === "plantilla") {
+    const d = await pedir("Plantilla estándar", [
+      {n: "minutos", l: "Minutos por nivel", tipo: "number", valor: 20},
+      {n: "niveles", l: "Cantidad de niveles", tipo: "number", valor: 20},
+      {n: "descanso_cada", l: "Descanso cada cuántos niveles (0 = sin descansos)", tipo: "number", valor: 4},
+      {n: "minutos_descanso", l: "Minutos de cada descanso", tipo: "number", valor: 10}], "Guardar",
+      `<p class="suave">Ciegas 100/200, 150/300, 200/400… con ante de ciega grande desde el nivel 4. Después la puede corregir a mano.</p>`);
+    if (d) accion(async () => { await api(`/torneos/${torneoId}/estructura`, "PUT", {plantilla: true, ...d}); aviso("Estructura guardada"); cargarTablero(); });
+  } else {
+    const d = await pedir("Niveles (uno por línea)", [{n: "texto", l: "chica/grande[/ante] minutos  ·  descanso minutos", tipo: "textarea", filas: 14,
+      valor: actual.texto || "100/200 20\n150/300 20\n200/400 20\n250/500/500 20\ndescanso 10\n300/600/600 20"}], "Guardar",
+      `<p class="suave">Ejemplos: <code>100/200 20</code> (ciegas y minutos) · <code>500/1000/1000 25</code> (con ante) · <code>descanso 15</code></p>`);
+    if (d) accion(async () => { await api(`/torneos/${torneoId}/estructura`, "PUT", {texto: d.texto}); aviso("Estructura guardada"); cargarTablero(); });
+  }
+};
 window.sentarAlternos = () => accion(async () => { const r = await api(`/torneos/${torneoId}/sentar-alternos`, "POST", {}); await cargarTablero(); mostrarMovimientos("Alternos sentados", r.movimientos); });
 window.balancear = () => accion(async () => { const r = await api(`/torneos/${torneoId}/balancear`, "POST", {}); await cargarTablero(); mostrarMovimientos("Balanceo", r.movimientos); });
 $("#b-balancear").onclick = () => window.balancear();

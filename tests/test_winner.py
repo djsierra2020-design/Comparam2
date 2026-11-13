@@ -777,3 +777,73 @@ def test_api_cobro_en_ventanilla_exige_confirmacion(cliente):
     assert r.status_code == 400 and "Confirme" in r.get_json()["error"]
     info = cliente.get("/winner/api/torneos/7/documento?tipo=CC&numero=99999999", headers=H).get_json()
     assert info["existe"] is False and info["buyin"] == 200_000
+
+
+# --- Reloj del torneo y estructura de ciegas -------------------------------------------------------
+
+from winner import reloj  # noqa: E402
+
+
+def test_estructura_de_ciegas_en_texto():
+    filas = reloj.leer_texto("100/200 20\n150/300 20\n# comentario\n\n200/400/400 25 min\ndescanso 15\n1.000/2.000/2.000 30")
+    assert [f["tipo"] for f in filas] == ["nivel", "nivel", "nivel", "descanso", "nivel"]
+    assert filas[2] == {"tipo": "nivel", "ciega_chica": 200, "ciega_grande": 400, "ante": 400, "minutos": 25}
+    assert filas[4]["ciega_grande"] == 2000
+    assert reloj.leer_texto(reloj.a_texto(filas)) == filas
+    with pytest.raises(ErrorNegocio, match="Línea 2"):
+        reloj.leer_texto("100/200 20\nciegas raras")
+
+
+def test_calculo_del_reloj():
+    filas = reloj.leer_texto("100/200 20\n200/400 20\ndescanso 10\n300/600/600 20")
+    p = reloj.calcular(filas, 0)
+    assert p["nivel"] == 1 and p["restante"] == 1200 and p["hasta_descanso"] == 2400
+    p = reloj.calcular(filas, 25 * 60)
+    assert p["nivel"] == 2 and p["restante"] == 15 * 60 and p["proximo_nivel"]["ciega_grande"] == 600
+    p = reloj.calcular(filas, 45 * 60)
+    assert p["actual"]["tipo"] == "descanso" and p["nivel"] == 2 and p["restante"] == 5 * 60 and p["hasta_descanso"] is None
+    p = reloj.calcular(filas, 99 * 60)
+    assert p["nivel"] == 3 and p["restante"] == 0 and p["terminado"]
+
+
+def test_controles_del_reloj(db, staff):
+    t = nuevo_torneo(db, staff)
+    with pytest.raises(ErrorNegocio, match="estructura"):
+        reloj.controlar(db, staff["floor"], t, "iniciar")
+    reloj.definir_estructura(db, staff["director"], t, reloj.plantilla_estandar(minutos=20, descanso_cada=2))
+    with pytest.raises(ErrorNegocio, match="Inicie el torneo"):
+        reloj.controlar(db, staff["floor"], t, "iniciar")
+    T.abrir_mesas(db, staff["floor"], t, 1)
+    T.iniciar_torneo(db, staff["floor"], t)
+    e = reloj.controlar(db, staff["floor"], t, "iniciar")
+    assert e["corriendo"] and e["nivel"] == 1
+    # Simula 25 minutos jugados: va en el nivel 2 y el torneo lo sabe (para la regla de nivel fijo).
+    db.conexion().execute("UPDATE torneos SET reloj_desde = NULL, reloj_acumulado = 1500 WHERE id = ?", (t,))
+    e = reloj.estado(db, t)
+    assert e["nivel"] == 2 and not e["corriendo"] and T.torneo(db, t)["nivel"] == 2
+    e = reloj.controlar(db, staff["floor"], t, "siguiente")  # pasa al descanso (cada 2 niveles)
+    assert e["actual"]["tipo"] == "descanso" and e["restante"] == 600
+    e = reloj.controlar(db, staff["floor"], t, "siguiente")
+    assert e["nivel"] == 3 and e["restante"] == 1200
+    e = reloj.controlar(db, staff["floor"], t, "ajustar", 60)  # al empezar el nivel no puede pasarse del tiempo completo
+    assert e["nivel"] == 3 and e["restante"] == 1200
+    e = reloj.controlar(db, staff["floor"], t, "ajustar", -180)  # −3 min
+    assert e["restante"] == 1020
+    e = reloj.controlar(db, staff["floor"], t, "ajustar", 60)  # +1 min
+    assert e["restante"] == 1080
+    e = reloj.controlar(db, staff["floor"], t, "anterior")
+    assert e["actual"]["tipo"] == "descanso"
+    e = reloj.controlar(db, staff["floor"], t, "pausar")
+    assert not e["corriendo"]
+    assert db.valor("SELECT COUNT(*) FROM auditoria WHERE accion = 'reloj'") == 8
+
+
+def test_pantalla_publica_con_reloj_y_premios(cliente):
+    r = cliente.get("/winner/api/publico/7").get_json()  # torneo diario de la demo completa
+    assert r["reloj"]["corriendo"] and r["reloj"]["nivel"] == 3
+    assert r["bolsa"] == 7_200_000 and len(r["premios"]) == 5
+    assert r["fichas_totales"] == 45 * 20_000 and r["promedio"] == 20_000 and r["vivos"] == 45
+    assert "saldo" not in str(r) and "documento" not in str(r)  # la pantalla no muestra datos privados
+    cliente.post("/winner/api/personal/ingresar", json={"usuario": "floor", "clave": "winner2026"}, headers=H)
+    assert cliente.post("/winner/api/torneos/7/reloj", json={"accion": "pausar"}, headers=H).get_json()["corriendo"] is False
+    assert cliente.put("/winner/api/torneos/7/estructura", json={"texto": "100/200 20"}, headers=H).status_code == 403

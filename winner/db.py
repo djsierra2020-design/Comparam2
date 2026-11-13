@@ -119,6 +119,9 @@ CREATE TABLE IF NOT EXISTS torneos (
     addon_abierto INTEGER NOT NULL DEFAULT 0,
     tope_compra INTEGER,
     nivel INTEGER NOT NULL DEFAULT 1,
+    -- Reloj: segundos de juego acumulados hasta reloj_desde; si reloj_desde tiene fecha, el reloj está corriendo.
+    reloj_acumulado REAL NOT NULL DEFAULT 0,
+    reloj_desde TEXT,
     -- normal · dia1 (clasificatorio, pertenece a una final) · final (Día 2) · satelite (premia tickets)
     tipo TEXT NOT NULL DEFAULT 'normal',
     principal_id INTEGER REFERENCES torneos(id),
@@ -308,6 +311,18 @@ CREATE TABLE IF NOT EXISTS traspasos_ticket (
     fecha TEXT NOT NULL
 );
 
+-- Estructura de ciegas: niveles y descansos en orden. Un descanso tiene tipo 'descanso' y ciegas en 0.
+CREATE TABLE IF NOT EXISTS estructura (
+    torneo_id INTEGER NOT NULL REFERENCES torneos(id),
+    orden INTEGER NOT NULL,
+    tipo TEXT NOT NULL CHECK (tipo IN ('nivel','descanso')),
+    ciega_chica INTEGER NOT NULL DEFAULT 0,
+    ciega_grande INTEGER NOT NULL DEFAULT 0,
+    ante INTEGER NOT NULL DEFAULT 0,
+    minutos INTEGER NOT NULL CHECK (minutos > 0),
+    PRIMARY KEY (torneo_id, orden)
+);
+
 CREATE TABLE IF NOT EXISTS mesas_cash (
     id INTEGER PRIMARY KEY,
     nombre TEXT NOT NULL,
@@ -382,7 +397,7 @@ COLUMNAS_NUEVAS = {
     "entradas": {"espera_desde": "TEXT", "fichas_iniciales": "INTEGER", "pago": "TEXT"},
     "torneos": {"tipo": "TEXT NOT NULL DEFAULT 'normal'", "principal_id": "INTEGER REFERENCES torneos(id)",
                 "satelite_de": "INTEGER REFERENCES torneos(id)", "modo_clasifica": "TEXT",
-                "clasifica_valor": "INTEGER"},
+                "clasifica_valor": "INTEGER", "reloj_acumulado": "REAL NOT NULL DEFAULT 0", "reloj_desde": "TEXT"},
     "premios_tabla": {"tipo": "TEXT NOT NULL DEFAULT 'dinero'"},
     "premiacion_detalle": {"tipo": "TEXT NOT NULL DEFAULT 'dinero'", "ticket_id": "INTEGER"},
     "jugadores": {"tipo_doc": "TEXT NOT NULL DEFAULT 'CC'"},

@@ -3,42 +3,183 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Winner · Pantalla de sala</title>
+<title>Winner · Reloj del torneo</title>
 <link rel="stylesheet" href="{{ url_for('winner.static', filename='winner.css') }}">
 <style>
-body{font-size:18px}
-.cab{display:flex;gap:24px;align-items:baseline;flex-wrap:wrap;padding:18px 24px;background:#0a100d;border-bottom:1px solid var(--borde)}
-.cab h1{margin:0;color:var(--oro);font-size:30px}
-.dato{font-size:15px;color:var(--suave)}.dato b{display:block;color:var(--texto);font-size:28px}
-.lista{columns:4 260px;column-gap:28px;padding:18px 24px}
-.lista div{break-inside:avoid;padding:5px 0;border-bottom:1px solid var(--borde);display:flex;justify-content:space-between;gap:10px}
-.lista span.m{color:var(--oro);font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
-.cambios{padding:0 24px 18px}
-.cambio{display:inline-block;background:#3d3112;border:1px solid #7a6220;border-radius:10px;padding:6px 12px;margin:4px}
+html,body{height:100%}
+body{overflow:hidden;font-size:clamp(14px,1.25vw,26px)}
+.reloj{display:grid;grid-template-rows:auto 1fr auto;height:100vh}
+.cab{display:flex;align-items:center;gap:2vw;padding:1.2vh 2vw;background:#0a100d;border-bottom:1px solid var(--borde)}
+.cab h1{margin:0;color:var(--oro);font-size:2.1em;letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cab .hora{margin-left:auto;font-size:1.6em;font-variant-numeric:tabular-nums;color:var(--suave)}
+.controles{display:flex;gap:.5em}
+.controles button{font-size:.65em;padding:.4em .8em}
+.cuerpo{display:grid;grid-template-columns:1fr 2.1fr 1fr;gap:1.5vw;padding:2vh 2vw;min-height:0}
+.lado{display:flex;flex-direction:column;gap:1.5vh;min-height:0}
+.dato{background:var(--panel);border:1px solid var(--borde);border-radius:14px;padding:1.4vh 1.2vw}
+.dato .e{color:var(--suave);font-size:.85em;text-transform:uppercase;letter-spacing:1px}
+.dato .v{font-size:2.2em;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.15}
+.dato .v small{font-size:.5em;color:var(--suave);font-weight:600}
+.centro{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+  background:radial-gradient(ellipse at center,#1d5a3b 0%,#0f2c1f 75%);border:2px solid #2c6a4a;border-radius:24px;padding:2vh 2vw;position:relative}
+.centro .nivel{font-size:2.4em;font-weight:800;letter-spacing:3px;color:var(--oro)}
+.centro .tiempo{font-size:11em;font-weight:800;font-variant-numeric:tabular-nums;line-height:1;margin:1vh 0}
+.centro .tiempo.alerta{color:#ffcf5c}
+.centro .ciegas{font-size:4.2em;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}
+.centro .ante{font-size:2em;color:#cfe9da;font-variant-numeric:tabular-nums}
+.centro .proximo{margin-top:2vh;font-size:1.5em;color:var(--suave)}
+.centro .proximo b{color:var(--texto)}
+.sello{position:absolute;top:2vh;right:2vw;font-size:1.3em;font-weight:800;padding:.2em .8em;border-radius:99px}
+.sello.pausa{background:#8e2b2b;color:#fff}
+.sello.descanso{background:var(--oro);color:#1b1405}
+.premios{flex:1;min-height:0;overflow:hidden}
+.premios table{font-size:1.05em}
+.premios td{padding:.35em .4em}
+.pie{display:flex;gap:3vw;align-items:center;padding:1.2vh 2vw;background:#0a100d;border-top:1px solid var(--borde);font-size:1.25em;flex-wrap:wrap}
+.pie b{font-variant-numeric:tabular-nums}
+.pie .cambios{margin-left:auto;color:var(--oro);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:45vw}
+.sin-reloj{font-size:1.6em;color:var(--suave)}
+/* Vista de asientos */
+.asientos-vista{display:none;height:100vh;overflow:hidden}
+.asientos-vista .lista{columns:4 18vw;column-gap:2vw;padding:2vh 2vw}
+.asientos-vista .lista div{break-inside:avoid;padding:.3em 0;border-bottom:1px solid var(--borde);display:flex;justify-content:space-between;gap:1em}
+.asientos-vista .m{color:var(--oro);font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+body.ver-asientos .reloj{display:none}
+body.ver-asientos .asientos-vista{display:block}
+@media (max-width:900px){body{overflow:auto;font-size:14px}.reloj{height:auto}.cuerpo{grid-template-columns:1fr}.centro .tiempo{font-size:6em}}
 </style>
 </head>
 <body>
-<div class="cab"><h1 id="nombre">Cargando…</h1>
-  <div class="dato">Nivel<b id="nivel"></b></div><div class="dato">Jugadores<b id="vivos"></b></div>
-  <div class="dato">Entradas<b id="entradas"></b></div><div class="dato">Mesas<b id="mesas"></b></div>
-  <div class="dato">Stack promedio<b id="promedio"></b></div></div>
-<div class="cambios" id="cambios"></div>
-<div class="lista" id="lista"></div>
+<div class="reloj">
+  <div class="cab">
+    <h1 id="nombre">Cargando…</h1>
+    <div class="controles">
+      <button class="sec" id="b-sonido">🔇 Activar sonido</button>
+      <button class="sec" id="b-vista">Ver asientos</button>
+      <button class="sec" id="b-completa">⛶ Pantalla completa</button>
+    </div>
+    <div class="hora" id="hora"></div>
+  </div>
+  <div class="cuerpo">
+    <div class="lado">
+      <div class="dato"><div class="e">Jugadores</div><div class="v"><span id="vivos">–</span> <small>de <span id="entradas">–</span> entradas</small></div></div>
+      <div class="dato"><div class="e">Promedio de fichas</div><div class="v" id="promedio">–</div></div>
+      <div class="dato"><div class="e">Fichas totales</div><div class="v" id="fichas">–</div></div>
+      <div class="dato"><div class="e">Re-entradas · recompras · add-ons</div><div class="v" id="extras">–</div></div>
+      <div class="dato"><div class="e">Inscripción</div><div class="v" id="registro" style="font-size:1.5em">–</div></div>
+    </div>
+    <div class="centro" id="centro">
+      <div class="sello" id="sello" style="display:none"></div>
+      <div class="nivel" id="nivel">NIVEL –</div>
+      <div class="tiempo" id="tiempo">--:--</div>
+      <div class="ciegas" id="ciegas"></div>
+      <div class="ante" id="ante"></div>
+      <div class="proximo" id="proximo"></div>
+    </div>
+    <div class="lado">
+      <div class="dato"><div class="e">Bolsa de premios</div><div class="v" id="bolsa">–</div></div>
+      <div class="dato premios"><div class="e">Premios</div><table id="premios"></table></div>
+    </div>
+  </div>
+  <div class="pie">
+    <span>Próximo descanso: <b id="descanso">–</b></span>
+    <span>Tiempo total: <b id="total">–</b></span>
+    <span>Mesas: <b id="mesas">–</b></span>
+    <span class="cambios" id="cambios"></span>
+  </div>
+</div>
+<div class="asientos-vista">
+  <div class="cab"><h1 id="nombre2"></h1><div class="hora">Busque su nombre: mesa · asiento</div></div>
+  <div class="lista" id="lista"></div>
+</div>
 <script src="{{ url_for('winner.static', filename='comun.js') }}"></script>
 <script>
+const TORNEO = {{ torneo_id }};
+const params = new URLSearchParams(location.search);
+let datos = null, desfase = 0, sonido = false, ultimoIndice = null, avisoMinuto = null;
+
+let ctxAudio = null;
+function pitar(veces = 1, tono = 880) {
+  if (!sonido) return;
+  ctxAudio = ctxAudio || new (window.AudioContext || window.webkitAudioContext)();
+  for (let i = 0; i < veces; i++) {
+    const o = ctxAudio.createOscillator(), g = ctxAudio.createGain();
+    o.frequency.value = tono; o.connect(g); g.connect(ctxAudio.destination);
+    const t0 = ctxAudio.currentTime + i * 0.45;
+    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(0.4, t0 + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.35);
+    o.start(t0); o.stop(t0 + 0.4);
+  }
+}
+$("#b-sonido").onclick = () => { sonido = !sonido; $("#b-sonido").textContent = sonido ? "🔊 Sonido activo" : "🔇 Activar sonido"; if (sonido) pitar(1, 660); };
+$("#b-completa").onclick = () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+$("#b-vista").onclick = () => document.body.classList.add("ver-asientos");
+document.querySelector(".asientos-vista").onclick = () => document.body.classList.remove("ver-asientos");
+
 async function cargar() {
   try {
-    const r = await api("/publico/{{ torneo_id }}");
-    $("#nombre").textContent = r.torneo.nombre;
-    $("#nivel").textContent = r.torneo.nivel; $("#vivos").textContent = r.vivos; $("#entradas").textContent = r.entradas;
-    $("#mesas").textContent = r.mesas; $("#promedio").textContent = miles(r.promedio);
+    const t0 = Date.now();
+    const r = await api("/publico/" + TORNEO);
+    datos = r;
+    if (r.reloj) desfase = Date.parse(r.reloj.ahora) - (t0 + Date.now()) / 2;
+    $("#nombre").textContent = $("#nombre2").textContent = r.torneo.nombre;
+    $("#vivos").textContent = miles(r.vivos); $("#entradas").textContent = miles(r.entradas);
+    $("#promedio").textContent = miles(r.promedio); $("#fichas").textContent = miles(r.fichas_totales);
+    $("#extras").textContent = `${r.reentradas} · ${r.recompras} · ${r.addons}`;
+    $("#registro").textContent = r.torneo.registro_abierto ? "Abierta" : "Cerrada";
+    $("#registro").style.color = r.torneo.registro_abierto ? "var(--verde)" : "var(--suave)";
+    $("#mesas").textContent = r.mesas;
+    $("#bolsa").textContent = r.bolsa ? pesos(r.bolsa) : "Por definir";
+    $("#premios").innerHTML = r.premios.slice(0, 12).map(p => `<tr><td>${p.posicion}°</td><td class="n">${p.tipo === "ticket" ? "🎟️ Cupo" : pesos(p.monto)}</td></tr>`).join("")
+      + (r.premios.length > 12 ? `<tr><td colspan="2" class="suave">y ${r.premios.length - 12} puestos más</td></tr>` : "");
     const recientes = r.cambios.filter(c => Date.now() - new Date(c.fecha) < 10 * 60 * 1000);
-    $("#cambios").innerHTML = recientes.length ? `<div class="dato" style="margin:10px 0 4px">Cambios de mesa recientes</div>` + recientes.map(c => `<span class="cambio">${esc(c.nombre)} → <b>Mesa ${c.a_mesa} · ${c.a_asiento}</b></span>`).join("") : "";
+    $("#cambios").textContent = recientes.length ? "Cambios de mesa: " + recientes.map(c => `${c.nombre} → M${c.a_mesa}·${c.a_asiento}`).join("  ·  ") : "";
     $("#lista").innerHTML = r.sentados.map(s => `<div><span>${esc(s.nombre)}</span><span class="m">${s.mesa} · ${s.asiento}</span></div>`).join("");
   } catch (e) { $("#nombre").textContent = "Torneo no disponible"; }
 }
+
+function pintar() {
+  $("#hora").textContent = new Date().toLocaleTimeString("es-CO", {hour: "2-digit", minute: "2-digit"});
+  if (!datos) return;
+  const rl = datos.reloj;
+  const sello = $("#sello");
+  if (!rl) {
+    $("#nivel").textContent = `NIVEL ${datos.torneo.nivel}`;
+    $("#tiempo").innerHTML = `<span class="sin-reloj">Sin estructura de ciegas</span>`;
+    $("#ciegas").textContent = ""; $("#ante").textContent = ""; $("#proximo").textContent = "";
+    $("#descanso").textContent = "–"; $("#total").textContent = "–"; sello.style.display = "none";
+    return;
+  }
+  const t = segundosJugados(rl, desfase);
+  const p = calcularReloj(rl.estructura, t);
+  const descanso = p.actual.tipo === "descanso";
+  $("#nivel").textContent = descanso ? "DESCANSO" : `NIVEL ${p.nivel}`;
+  $("#tiempo").textContent = formatoReloj(p.restante);
+  $("#tiempo").classList.toggle("alerta", p.restante <= 60 && rl.corriendo);
+  $("#ciegas").textContent = descanso ? "" : `${miles(p.actual.ciega_chica)} / ${miles(p.actual.ciega_grande)}`;
+  $("#ante").textContent = descanso ? "" : (p.actual.ante ? `Ante ${miles(p.actual.ante)}` : "Sin ante");
+  $("#proximo").innerHTML = p.proximo ? `Próximo nivel: <b>${miles(p.proximo.ciega_chica)} / ${miles(p.proximo.ciega_grande)}${p.proximo.ante ? " · ante " + miles(p.proximo.ante) : ""}</b>` : "Último nivel";
+  $("#descanso").textContent = descanso ? "ahora" : p.hastaDescanso === null ? "no hay más" : formatoReloj(p.hastaDescanso);
+  $("#total").textContent = formatoReloj(t);
+  if (!rl.corriendo) { sello.textContent = datos.torneo.estado === "en_curso" ? "PAUSADO" : "SIN INICIAR"; sello.className = "sello pausa"; sello.style.display = ""; }
+  else if (descanso) { sello.textContent = "DESCANSO"; sello.className = "sello descanso"; sello.style.display = ""; }
+  else sello.style.display = "none";
+  if (rl.corriendo) {
+    if (ultimoIndice !== null && p.indice !== ultimoIndice) pitar(3);
+    if (p.restante <= 60 && p.restante > 59 && avisoMinuto !== p.indice) { avisoMinuto = p.indice; pitar(1, 520); }
+  }
+  ultimoIndice = p.indice;
+}
+
+// ?vista=asientos: solo la lista de asientos · ?alternar=1: alterna reloj (40 s) y asientos (20 s)
+if (params.get("vista") === "asientos") document.body.classList.add("ver-asientos");
+if (params.get("alternar") === "1") {
+  let enAsientos = false;
+  const cambiar = () => { enAsientos = !enAsientos; document.body.classList.toggle("ver-asientos", enAsientos); setTimeout(cambiar, enAsientos ? 20000 : 40000); };
+  setTimeout(cambiar, 40000);
+}
 cargar();
 setInterval(cargar, 8000);
+setInterval(pintar, 250);
 </script>
 </body>
 </html>

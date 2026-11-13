@@ -46,6 +46,7 @@ function pedir(titulo, campos, textoBoton = "Aceptar", detalle = "") {
     const d = document.createElement("dialog");
     d.innerHTML = `<h3>${esc(titulo)}</h3>${detalle}<form method="dialog">` + campos.map(c => c.tipo === "select"
       ? `<label>${esc(c.l)}</label><select name="${c.n}">${c.opciones.map(o => `<option value="${esc(o[0])}">${esc(o[1])}</option>`).join("")}</select>`
+      : c.tipo === "textarea" ? `<label>${esc(c.l)}</label><textarea name="${c.n}" rows="${c.filas || 10}" style="font-family:ui-monospace,monospace">${esc(c.valor ?? "")}</textarea>`
       : c.tipo === "check" ? `<label style="display:flex;gap:8px;align-items:center;color:var(--texto)"><input type="checkbox" name="${c.n}" style="width:auto"> ${esc(c.l)}</label>`
       : `<label>${esc(c.l)}</label><input name="${c.n}" type="${c.tipo || "text"}" value="${esc(c.valor ?? "")}" ${c.tipo === "number" ? 'inputmode="numeric"' : ""} autocomplete="off">`
     ).join("") + `<div class="fila" style="margin-top:14px;justify-content:flex-end"><button value="no" class="sec" formnovalidate>Cancelar</button><button value="si">${esc(textoBoton)}</button></div></form>`;
@@ -64,4 +65,34 @@ function pedir(titulo, campos, textoBoton = "Aceptar", detalle = "") {
 
 async function confirmar(titulo, detalle = "", textoBoton = "Confirmar") {
   return (await pedir(titulo, [], textoBoton, detalle ? `<p>${detalle}</p>` : "")) !== null;
+}
+
+// --- Reloj del torneo (misma cuenta que winner/reloj.py: calcular) ---
+function dosDig(n) { return String(n).padStart(2, "0"); }
+function formatoReloj(seg) {
+  seg = Math.max(0, Math.floor(seg));
+  const h = Math.floor(seg / 3600), m = Math.floor(seg % 3600 / 60), s = seg % 60;
+  return h ? `${h}:${dosDig(m)}:${dosDig(s)}` : `${dosDig(m)}:${dosDig(s)}`;
+}
+function calcularReloj(filas, t) {
+  let inicio = 0, indice = filas.length - 1, encontrado = false;
+  for (let i = 0; i < filas.length; i++) {
+    if (t < inicio + filas[i].minutos * 60) { indice = i; encontrado = true; break; }
+    inicio += filas[i].minutos * 60;
+  }
+  if (!encontrado) inicio -= filas[filas.length - 1].minutos * 60;
+  const actual = filas[indice];
+  const restante = Math.max(0, inicio + actual.minutos * 60 - t);
+  const nivel = Math.max(1, filas.slice(0, indice + 1).filter(f => f.tipo === "nivel").length);
+  const proximo = filas.slice(indice + 1).find(f => f.tipo === "nivel") || null;
+  let hastaDescanso = null;
+  if (actual.tipo !== "descanso") {
+    let acc = restante;
+    for (const f of filas.slice(indice + 1)) { if (f.tipo === "descanso") { hastaDescanso = acc; break; } acc += f.minutos * 60; }
+  }
+  return {indice, actual, restante, nivel, proximo, hastaDescanso};
+}
+// Segundos de juego transcurridos según el estado del reloj recibido del servidor (con corrección de hora).
+function segundosJugados(rl, desfase) {
+  return Math.max(0, rl.acumulado + (rl.corriendo && rl.desde ? (Date.now() + desfase - Date.parse(rl.desde)) / 1000 : 0));
 }

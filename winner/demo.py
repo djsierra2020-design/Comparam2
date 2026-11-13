@@ -55,6 +55,24 @@ def sembrar(db, escenario: str = "completo") -> None:
     _evento_demo(db, director, cajero, jugadores)
 
 
+def _poner_reloj(db, director, torneo_id, minutos=20, en_nivel=None, minutos_dentro=0) -> None:
+    """Estructura estándar y, si se indica, el reloj corriendo en ese nivel (para que la demo se vea viva)."""
+    from . import reloj
+    filas = reloj.plantilla_estandar(minutos=minutos)
+    reloj.definir_estructura(db, director, torneo_id, filas)
+    if en_nivel:
+        segundos, vistos = 0, 0
+        for f in filas:
+            if f["tipo"] == "nivel":
+                vistos += 1
+                if vistos == en_nivel:
+                    break
+            segundos += f["minutos"] * 60
+        from .db import ahora
+        db.conexion().execute("UPDATE torneos SET reloj_acumulado = ?, reloj_desde = ?, nivel = ? WHERE id = ?",
+                              (segundos + minutos_dentro * 60, ahora(), en_nivel, torneo_id))
+
+
 def reiniciar(db, escenario: str) -> None:
     """Borra todo y vuelve a cargar el escenario elegido (solo en modo demo)."""
     if escenario not in ("practica", "completo"):
@@ -80,6 +98,7 @@ def _practica(db) -> None:
     from .premios import definir_tabla
     definir_tabla(db, director, t, [{"posicion": 1, "monto": 1_200_000}, {"posicion": 2, "monto": 700_000},
                                     {"posicion": 3, "monto": 400_000}])
+    _poner_reloj(db, director, t, minutos=20)  # el reloj arranca cuando el floor lo inicie
 
 
 def _evento_demo(db, director, cajero, jugadores) -> None:
@@ -143,7 +162,7 @@ def _evento_demo(db, director, cajero, jugadores) -> None:
     T.sentar_inscritos(db, director, sencillo)
     definir_tabla(db, director, sencillo, [{"posicion": p, "monto": m} for p, m in enumerate(
         [2_900_000, 1_800_000, 1_200_000, 800_000, 500_000], 1)])
-    db.conexion().execute("UPDATE torneos SET nivel = 3 WHERE id = ?", (sencillo,))
+    _poner_reloj(db, director, sencillo, minutos=20, en_nivel=3, minutos_dentro=7)
     for e in db.todos("SELECT id FROM entradas WHERE torneo_id = ? AND estado = 'sentado' ORDER BY id LIMIT 12",
                       (sencillo,)):
         T.registrar_conteo(db, director, e["id"], rnd.randrange(8, 45) * 1_000)
@@ -158,6 +177,7 @@ def _evento_demo(db, director, cajero, jugadores) -> None:
     T.sentar_inscritos(db, director, sat)
     definir_tabla(db, director, sat, [{"posicion": 1, "tipo": "ticket"}, {"posicion": 2, "tipo": "ticket"},
                                       {"posicion": 3, "tipo": "ticket"}, {"posicion": 4, "monto": 300_000}])
+    _poner_reloj(db, director, sat, minutos=15, en_nivel=2, minutos_dentro=4)
 
     # Día 1B (hoy, en curso): 180 jugadores nuevos + 20 que re-entran tras caer en el 1A, en las 21 mesas que
     # quedan de la sala (189 asientos) → 11 alternos.
@@ -167,4 +187,4 @@ def _evento_demo(db, director, cajero, jugadores) -> None:
         T.inscribir(db, d1b, j, origen="caja", personal_id=cajero, pago="saldo")
     T.iniciar_torneo(db, director, d1b)
     T.sentar_inscritos(db, director, d1b)  # 189 sentados, el resto queda en la lista de alternos
-    db.conexion().execute("UPDATE torneos SET nivel = 4 WHERE id = ?", (d1b,))
+    _poner_reloj(db, director, d1b, minutos=40, en_nivel=4, minutos_dentro=12)

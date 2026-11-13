@@ -5,7 +5,7 @@ import functools
 
 from flask import Blueprint, current_app, g, jsonify, make_response, render_template, request
 
-from . import caja, eventos, premios, reportes
+from . import caja, eventos, premios, reloj, reportes
 from . import seguridad as seg
 from . import torneos as T
 from .db import BaseDatos, ErrorNegocio
@@ -120,7 +120,10 @@ def pantalla_publica(torneo_id):
 
 @bp.get("/api/publico/<int:torneo_id>")
 def api_publico(torneo_id):
-    """Pantalla de la sala: dónde está sentado cada jugador (solo nombre, mesa y asiento)."""
+    """Pantalla de la sala (TV): reloj, ciegas, jugadores, fichas, premios y dónde está sentado cada jugador.
+
+    Solo datos públicos del torneo: nombres, mesa y asiento; nada de saldos ni documentos.
+    """
     tb = T.tablero(db(), torneo_id)
     t = tb["torneo"]
     sentados = sorted(({"nombre": a["nombre"], "mesa": m["numero"], "asiento": a["asiento"]}
@@ -129,9 +132,52 @@ def api_publico(torneo_id):
     cambios = [{"nombre": c["nombre"], "de_mesa": c["de_mesa"], "a_mesa": c["a_mesa"], "a_asiento": c["a_asiento"],
                 "motivo": c["motivo"], "fecha": c["fecha"]}
                for c in T.historial_asientos(db(), torneo_id, 12) if c["motivo"] in ("balanceo", "cierre_mesa")]
-    return jsonify(torneo={"nombre": t["nombre"], "estado": t["estado"], "nivel": t["nivel"]},
-                   vivos=tb["vivos"], entradas=tb["entradas_totales"], mesas=len(tb["mesas"]),
-                   promedio=T.resumen_fichas(db(), torneo_id)["promedio"], sentados=sentados, cambios=cambios)
+    fichas = T.resumen_fichas(db(), torneo_id)
+    vivos = tb["vivos"]
+    tabla = premios.tabla(db(), torneo_id)
+    with db().transaccion():
+        estado_reloj = reloj.estado(db(), torneo_id)
+    jugadores = db().valor("SELECT COUNT(DISTINCT jugador_id) FROM entradas WHERE torneo_id = ?", (torneo_id,))
+    return jsonify(torneo={"nombre": t["nombre"], "estado": t["estado"], "nivel": t["nivel"], "tipo": t["tipo"],
+                           "buyin": t["buyin"], "stack_inicial": t["stack_inicial"],
+                           "registro_abierto": bool(t["registro_abierto"]), "recompras_abiertas": bool(t["recompras_abiertas"]),
+                           "addon_abierto": bool(t["addon_abierto"])},
+                   vivos=vivos, entradas=tb["entradas_totales"], jugadores=jugadores,
+                   reentradas=tb["entradas_totales"] - jugadores, recompras=fichas["recompras"], addons=fichas["addons"],
+                   mesas=len(tb["mesas"]), fichas_totales=fichas["esperado"],
+                   promedio=fichas["esperado"] // vivos if vivos else 0,
+                   premios=[{"posicion": f["posicion"], "monto": f["monto"], "tipo": f["tipo"]} for f in tabla],
+                   bolsa=sum(f["monto"] for f in tabla), reloj=estado_reloj, sentados=sentados, cambios=cambios)
+
+
+# --- Reloj y estructura de ciegas ---------------------------------------------------------------
+
+@bp.get("/api/torneos/<int:tid>/estructura")
+@personal()
+def api_estructura(tid):
+    filas = reloj.estructura(db(), tid)
+    return jsonify(filas=filas, texto=reloj.a_texto(filas))
+
+
+@bp.put("/api/torneos/<int:tid>/estructura")
+@personal("director")
+def api_definir_estructura(tid):
+    d = _datos()
+    if d.get("plantilla"):
+        num = lambda k, v: int(d.get(k) or v)  # noqa: E731
+        filas = reloj.plantilla_estandar(minutos=num("minutos", 20), descanso_cada=num("descanso_cada", 4),
+                                         minutos_descanso=num("minutos_descanso", 10), niveles=num("niveles", 20))
+    else:
+        filas = reloj.leer_texto(d.get("texto", ""))
+    reloj.definir_estructura(db(), _pid(), tid, filas)
+    return jsonify(filas=reloj.estructura(db(), tid))
+
+
+@bp.post("/api/torneos/<int:tid>/reloj")
+@personal("floor")
+def api_reloj(tid):
+    d = _datos()
+    return jsonify(reloj.controlar(db(), _pid(), tid, d.get("accion"), d.get("segundos") or 0))
 
 
 # --- Personal: sesión ----------------------------------------------------------------------------
@@ -290,7 +336,11 @@ def api_iniciar(tid):
 @bp.get("/api/torneos/<int:tid>/tablero")
 @personal()
 def api_tablero(tid):
-    return jsonify(T.tablero(db(), tid))
+    tb = T.tablero(db(), tid)
+    with db().transaccion():
+        tb["reloj"] = reloj.estado(db(), tid)
+    tb["torneo"] = T.torneo(db(), tid)
+    return jsonify(tb)
 
 
 @bp.post("/api/torneos/<int:tid>/mesas")

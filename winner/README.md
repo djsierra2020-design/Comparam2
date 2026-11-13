@@ -12,6 +12,14 @@ dentro de esta misma app Flask.
 
 ## Fase 1 (lista)
 
+- **Reloj del torneo en pantalla (TV)**: `/winner/pantalla/<torneo>` muestra en grande el nivel, el tiempo que queda,
+  las ciegas y el ante, el próximo nivel, el próximo descanso, el tiempo total, los jugadores (vivos y entradas),
+  re-entradas/recompras/add-ons, fichas totales, promedio, bolsa y tabla de premios, y los cambios de mesa recientes.
+  Suena una alarma al cambiar de nivel y un aviso al faltar un minuto («Activar sonido»). «Ver asientos» muestra a cada
+  jugador con su mesa y asiento; con `?alternar=1` alterna sola entre reloj y asientos. El floor lo controla desde el
+  panel (iniciar, pausar, nivel siguiente/anterior, ±1 minuto) y todas las pantallas cambian a la vez. El director
+  define la **estructura de ciegas** con una plantilla (minutos por nivel y descansos) o escribiéndola
+  («100/200 20», «200/400/400 20», «descanso 15»). El nivel del reloj es el que usa la regla de clasificación por nivel fijo.
 - **Inscripción manual en ventanilla**: el cajero pide tipo de documento (cédula, cédula de extranjería, pasaporte o
   PPT) y número. Si el jugador ya tiene caja aparece con su saldo; si no, se le abre en el momento con su nombre. Antes
   de registrar, el cajero confirma que vio el documento original y que **recibió el pago** (efectivo, datáfono o
