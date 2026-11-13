@@ -21,17 +21,17 @@
   {% if demo %}
   <div class="tarjeta">
     <h3>Modo demostración</h3>
-    <p class="suave">Datos ficticios de una semana de evento en la sala de 30 mesas de 9:</p>
+    <p class="suave">Datos ficticios en la sala de 30 mesas de 9:</p>
     <ul class="suave">
-      <li><b>Main Event</b> con 5 días clasificatorios (1A–1E) y final (Día 2). Cada día termina al acabar el nivel 12 (regla elegida por el administrador).</li>
-      <li>Día 1A ya jugado: 18 clasificados con sus fichas.</li>
-      <li>Día 1B en curso en 24 mesas: 230 entradas (incluye re-entradas de jugadores del 1A), 14 alternos.</li>
-      <li>Al mismo tiempo, un <b>satélite</b> al Main Event en 4 mesas: premia 3 tickets y el 4° cobra en dinero.</li>
+      <li><b>Para empezar: Torneo diario Winner</b> (un solo día) en curso en las mesas 1 a 5, con 45 jugadores. El panel lo abre primero.</li>
+      <li>Al mismo tiempo, un <b>satélite</b> al Main Event en las mesas 6 a 9: premia 3 tickets y el 4° cobra en dinero.</li>
+      <li><b>Main Event</b> con 5 días clasificatorios (1A–1E) y final (Día 2); cada día termina al acabar el nivel 12.
+        El Día 1A ya se jugó (18 clasificados) y el Día 1B está en curso en las mesas 10 a 30, con 11 alternos.</li>
     </ul>
     <ul class="suave">
       <li>Personal: usuarios <b>admin</b>, <b>director</b>, <b>floor</b>, <b>crupier</b>, <b>cajero</b>, <b>supervisor</b> · clave <b>winner2026</b>.</li>
       <li>Jugador: celulares <b>3000000000</b> a <b>3000000299</b> . El código SMS aparece en la misma pantalla.</li>
-      {% if torneo_en_curso %}<li>Pantalla de sala: <a href="{{ url_for('winner.pantalla_publica', torneo_id=torneo_en_curso) }}">Día 1B</a>.</li>{% endif %}
+      {% if torneo_en_curso %}<li>Pantalla de sala: <a href="{{ url_for('winner.pantalla_publica', torneo_id=torneo_en_curso) }}">Torneo diario</a>.</li>{% endif %}
     </ul>
   </div>
   {% endif %}

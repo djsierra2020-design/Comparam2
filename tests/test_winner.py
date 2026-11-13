@@ -382,10 +382,13 @@ def test_api_roles_y_tablero(cliente):
     assert cliente.post("/winner/api/personal/ingresar", json={"usuario": "crupier", "clave": "x"}, headers=H).status_code == 401
     assert cliente.post("/winner/api/personal/ingresar", json={"usuario": "crupier", "clave": "winner2026"}).status_code == 403
     assert cliente.post("/winner/api/personal/ingresar", json={"usuario": "crupier", "clave": "winner2026"}, headers=H).status_code == 200
-    # Demo: Día 1B en curso (id 3) con 230 entradas en 24 mesas y el satélite en otras 4 mesas.
+    # Demo: torneo sencillo (id 7) en las mesas 1-5, satélite en 6-9 y Día 1B (id 3) en las 21 restantes.
+    sencillo = cliente.get("/winner/api/torneos/7/tablero", headers=H).get_json()
+    assert sencillo["torneo"]["tipo"] == "normal" and sencillo["vivos"] == 45
+    assert [m["numero"] for m in sencillo["mesas"]] == [1, 2, 3, 4, 5]
     tb = cliente.get("/winner/api/torneos/3/tablero", headers=H).get_json()
-    assert tb["vivos"] == 230 and len(tb["mesas"]) == 24 and len(tb["alternos"]) == 14
-    assert tb["mesas_sala_abiertas"] == 28 and tb["sugerencias"][0]["tipo"] == "abrir_mesa"
+    assert tb["vivos"] == 200 and len(tb["mesas"]) == 21 and len(tb["alternos"]) == 11
+    assert tb["mesas_sala_abiertas"] == 30
     assert cliente.post("/winner/api/torneos", json={"nombre": "x"}, headers=H).status_code == 403
     entrada = next(a for m in tb["mesas"] for a in m["asientos"] if a["entrada_id"])["entrada_id"]
     assert cliente.post(f"/winner/api/entradas/{entrada}/eliminar", json={}, headers=H).get_json()["estado"] == "reservado"
@@ -402,12 +405,13 @@ def test_api_jugador_ingreso_y_saldo(cliente):
     inicio = cliente.get("/winner/api/jugador/inicio", headers=H).get_json()
     assert inicio["saldo"] > 0 and inicio["torneos"][0]["estado"] == "sentado"
     assert cliente.get("/winner/api/torneos", headers=H).status_code == 401  # la sesión de jugador no sirve para el panel
-    assert cliente.get("/winner/api/publico/3").get_json()["vivos"] == 230
+    assert cliente.get("/winner/api/publico/3").get_json()["vivos"] == 200
 
 
 def test_pantallas_cargan(cliente):
     for ruta in ("/winner/", "/winner/personal", "/winner/app", "/winner/pantalla/3"):
         assert cliente.get(ruta).status_code == 200
+    assert "/winner/pantalla/7" in cliente.get("/winner/").get_data(as_text=True)  # inicio enlaza al torneo sencillo
 
 
 def test_no_finaliza_con_mas_vivos_que_premios(db, staff):

@@ -189,7 +189,9 @@ function ir(p) {
 async function cargarTorneos() {
   torneos = await api("/torneos");
   if (!torneoId || !torneos.find(t => t.id === torneoId)) {
-    const activo = torneos.find(t => t.estado === "en_curso") || torneos.find(t => t.estado === "programado") || torneos[0];
+    // Primero un torneo normal en curso (lo más sencillo), luego cualquier otro en curso o programado.
+    const activo = torneos.find(t => t.estado === "en_curso" && t.tipo === "normal") || torneos.find(t => t.estado === "en_curso")
+      || torneos.find(t => t.estado === "programado") || torneos[0];
     torneoId = activo ? activo.id : null;
   }
   const ops = torneos.map(t => `<option value="${t.id}">${t.tipo !== "normal" ? TIPOS_T[t.tipo] + ": " : ""}${esc(t.nombre)} · ${esc(t.fecha)} · ${ESTADOS_T[t.estado]}</option>`).join("");

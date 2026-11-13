@@ -98,7 +98,7 @@ def _pid():
 
 @bp.get("/")
 def inicio():
-    en_curso = db().valor("SELECT id FROM torneos WHERE estado = 'en_curso' ORDER BY (tipo = 'dia1') DESC, id LIMIT 1")
+    en_curso = db().valor("SELECT id FROM torneos WHERE estado = 'en_curso' ORDER BY (tipo = 'normal') DESC, id LIMIT 1")
     return render_template("winner_inicio.html", demo=seg.demo(), torneo_en_curso=en_curso)
 
 

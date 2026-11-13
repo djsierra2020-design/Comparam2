@@ -59,12 +59,10 @@ pero está **apagada** hasta que el área jurídica de Winner la apruebe. Se enc
 
 ## Demo
 
-Con `WINNER_DEMO=1` (así está en `render.yaml`) la app arranca con datos ficticios de una semana de evento: 300 cajas,
-Main Event con 5 días clasificatorios (cada uno termina al acabar el nivel 12) y final; el Día 1A ya cerrado
-(18 clasificados); el Día 1B en curso en 24 mesas
-(230 entradas, 14 alternos) y, al mismo tiempo, un satélite al Main Event en otras 4 mesas.
-- Personal: `admin`, `director`, `floor`, `crupier`, `cajero` y `supervisor`, todos con la clave `winner2026`.
-- Jugador: celulares `3000000000` a `3000000299`. El código SMS aparece en la misma pantalla.
+Con `WINNER_DEMO=1` (así está en `render.yaml`) la app arranca con datos ficticios: 300 cajas y la sala de 30 mesas
+ocupada por tres torneos simultáneos. **Torneo diario Winner** (sencillo, un día, mesas 1 a 5, 45 jugadores), que el
+panel abre primero; un **satélite** al Main Event (mesas 6 a 9); y el **Main Event** con 5 días clasificatorios y final:
+el Día 1A ya cerrado (18 clasificados) y el Día 1B en curso en las mesas 10 a 30 con 11 alternos.
 
 En el plan gratis de Render el disco se borra con cada despliegue, así que la demo vuelve a empezar desde cero.
 

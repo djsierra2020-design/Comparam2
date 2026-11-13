@@ -55,8 +55,9 @@ def _evento_demo(db, director, cajero, jugadores) -> None:
 
     - Final «Main Event Día 2» con 5 días clasificatorios (1A a 1E); cada día termina al acabar el nivel 12.
     - Día 1A ya jugado y cerrado (sus sobrevivientes ya están clasificados).
-    - Día 1B en curso en 24 mesas, con lista de alternos.
-    - Satélite al Main Event en curso, al mismo tiempo, en 4 mesas (premia 3 tickets).
+    - Torneo diario sencillo (un solo día) en curso en las mesas 1 a 5: el ejemplo para empezar.
+    - Satélite al Main Event en curso, al mismo tiempo, en las mesas 6 a 9 (premia 3 tickets).
+    - Día 1B en curso en las 21 mesas restantes, con lista de alternos (sala llena).
     """
     import random
     from datetime import date, timedelta
@@ -99,6 +100,22 @@ def _evento_demo(db, director, cajero, jugadores) -> None:
     eliminados_1a = [r["jugador_id"] for r in db.todos(
         "SELECT DISTINCT jugador_id FROM entradas WHERE torneo_id = ? AND estado = 'eliminado'", (d1a,))]
 
+    # Torneo sencillo de un día (hoy, en curso): el ejemplo para empezar. 45 jugadores en las mesas 1 a 5.
+    sencillo = T.crear_torneo(db, director, {
+        "nombre": "Torneo diario Winner", "fecha": dia(0), "buyin": 200_000, "stack_inicial": 20_000,
+        "asientos_por_mesa": 9, "reentrada_max": 1})
+    T.abrir_mesas(db, director, sencillo, 5)
+    for j in eliminados_1a[30:75]:
+        T.inscribir(db, sencillo, j, origen="caja", personal_id=cajero, pago="saldo")
+    T.iniciar_torneo(db, director, sencillo)
+    T.sentar_inscritos(db, director, sencillo)
+    definir_tabla(db, director, sencillo, [{"posicion": p, "monto": m} for p, m in enumerate(
+        [2_900_000, 1_800_000, 1_200_000, 800_000, 500_000], 1)])
+    db.conexion().execute("UPDATE torneos SET nivel = 3 WHERE id = ?", (sencillo,))
+    for e in db.todos("SELECT id FROM entradas WHERE torneo_id = ? AND estado = 'sentado' ORDER BY id LIMIT 12",
+                      (sencillo,)):
+        T.registrar_conteo(db, director, e["id"], rnd.randrange(8, 45) * 1_000)
+
     # Satélite (hoy, simultáneo): 30 jugadores en 4 mesas; 3 tickets al Main Event y el 4° cobra.
     sat = T.crear_torneo(db, director, {"nombre": "Satélite al Main Event", "fecha": dia(0), "buyin": 150_000,
                                         "stack_inicial": 15_000, "tipo": "satelite", "satelite_de": final})
@@ -110,11 +127,12 @@ def _evento_demo(db, director, cajero, jugadores) -> None:
     definir_tabla(db, director, sat, [{"posicion": 1, "tipo": "ticket"}, {"posicion": 2, "tipo": "ticket"},
                                       {"posicion": 3, "tipo": "ticket"}, {"posicion": 4, "monto": 300_000}])
 
-    # Día 1B (hoy, en curso): 180 jugadores nuevos + 50 que re-entran tras caer en el 1A, en 24 mesas → alternos.
+    # Día 1B (hoy, en curso): 180 jugadores nuevos + 20 que re-entran tras caer en el 1A, en las 21 mesas que
+    # quedan de la sala (189 asientos) → 11 alternos.
     d1b = dias[1]
-    T.abrir_mesas(db, director, d1b, 24)
-    for j in jugadores[120:] + eliminados_1a[30:80]:
+    T.abrir_mesas(db, director, d1b, 21)
+    for j in jugadores[120:] + eliminados_1a[75:95]:
         T.inscribir(db, d1b, j, origen="caja", personal_id=cajero, pago="saldo")
     T.iniciar_torneo(db, director, d1b)
-    T.sentar_inscritos(db, director, d1b)  # 216 sentados, el resto queda en la lista de alternos
+    T.sentar_inscritos(db, director, d1b)  # 189 sentados, el resto queda en la lista de alternos
     db.conexion().execute("UPDATE torneos SET nivel = 4 WHERE id = ?", (d1b,))
