@@ -8,7 +8,8 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: "3.12.7"
-      # Winner Poker (/winner): demo con datos ficticios. En producción quitar WINNER_DEMO y definir
+      # Winner Poker (/winner): demo con datos ficticios («1» = práctica desde cero con 3 mesas;
+      # «completo» = sala de 30 mesas con evento y satélite). En producción quitar WINNER_DEMO y definir
       # WINNER_SECRET, WINNER_SMS_WEBHOOK y una base de datos en disco persistente (WINNER_DB).
       - key: WINNER_DEMO
         value: "1"

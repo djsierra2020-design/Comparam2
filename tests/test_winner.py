@@ -368,7 +368,7 @@ def test_premios_confirmar_ajustar_y_acreditar(db, staff):
 
 @pytest.fixture
 def cliente(monkeypatch, tmp_path):
-    monkeypatch.setenv("WINNER_DEMO", "1")
+    monkeypatch.setenv("WINNER_DEMO", "completo")
     from winner.web import iniciar
     app = Flask(__name__)
     iniciar(app, str(tmp_path / "w.db"))
@@ -654,3 +654,75 @@ def test_ticket_repetido_no_se_devuelve_pero_se_puede_vender(db, staff):
     with pytest.raises(ErrorNegocio, match="disponible"):  # ya usado: no se puede volver a traspasar
         eventos.solicitar_codigo_traspaso(db, staff["cajero"], kid)
     assert db.valor("SELECT COUNT(*) FROM auditoria WHERE accion = 'traspaso_ticket'") == 1
+
+
+def test_demo_practica_desde_cero_y_reinicio(monkeypatch, tmp_path):
+    monkeypatch.setenv("WINNER_DEMO", "1")  # «1» = práctica desde cero
+    from winner.web import iniciar
+    app = Flask(__name__)
+    base = iniciar(app, str(tmp_path / "p.db"))
+    c = app.test_client()
+    assert base.valor("SELECT COUNT(*) FROM jugadores") == 30
+    t = base.uno("SELECT * FROM torneos")
+    assert t["estado"] == "programado" and not base.valor("SELECT COUNT(*) FROM mesas")
+    assert not base.valor("SELECT COUNT(*) FROM entradas")
+    assert "Práctica desde cero" in c.get("/winner/").get_data(as_text=True)
+    c.post("/winner/api/personal/ingresar", json={"usuario": "floor", "clave": "winner2026"}, headers=H)
+    assert c.post(f"/winner/api/torneos/{t['id']}/mesas", json={"cantidad": 3}, headers=H).status_code == 200
+    assert c.post("/winner/api/demo/reiniciar", json={}, headers=H).status_code == 403  # solo el admin
+    c.post("/winner/api/personal/ingresar", json={"usuario": "admin", "clave": "winner2026"}, headers=H)
+    assert c.post("/winner/api/demo/reiniciar", json={"escenario": "practica"}, headers=H).status_code == 200
+    assert not base.valor("SELECT COUNT(*) FROM mesas") and base.valor("SELECT COUNT(*) FROM jugadores") == 30
+    assert c.get("/winner/api/torneos", headers=H).status_code == 401  # el reinicio cierra las sesiones
+    c.post("/winner/api/personal/ingresar", json={"usuario": "admin", "clave": "winner2026"}, headers=H)
+    assert c.post("/winner/api/demo/reiniciar", json={"escenario": "completo"}, headers=H).status_code == 200
+    assert base.valor("SELECT COUNT(*) FROM jugadores") == 300
+
+
+def test_recorrido_completo_de_practica(db, staff):
+    """El recorrido de la guía: 3 mesas, 30 inscritos (3 alternos), eliminaciones, cierre de mesa y premios."""
+    from winner.demo import _practica
+    db2 = BaseDatos(":memory:")
+    _practica(db2)
+    t = db2.valor("SELECT id FROM torneos")
+    floor = db2.valor("SELECT id FROM personal WHERE usuario = 'floor'")
+    director = db2.valor("SELECT id FROM personal WHERE usuario = 'director'")
+    cajero = db2.valor("SELECT id FROM personal WHERE usuario = 'cajero'")
+    T.abrir_mesas(db2, floor, t, 3)
+    jugadores = [r["id"] for r in db2.todos("SELECT id FROM jugadores ORDER BY id")]
+    e = T.inscribir(db2, t, jugadores[0], origen="caja", personal_id=cajero, pago="saldo")
+    assert T.sentar_por_qr(db2, e["codigo_qr"], floor)["a_mesa"] in (1, 2, 3)
+    for j in jugadores[1:]:
+        T.inscribir(db2, t, j, origen="caja", personal_id=cajero, pago="saldo")
+    r = T.sentar_inscritos(db2, floor, t)
+    assert sum(1 for m in r if m.get("alterno")) == 3
+    T.iniciar_torneo(db2, floor, t)
+    rnd = random.Random(5)
+    while True:
+        vivos = db2.todos("SELECT id FROM entradas WHERE torneo_id = ? AND estado = 'sentado'", (t,))
+        if len(vivos) + len(T.alternos(db2, t)) <= 1:
+            break
+        T.eliminar(db2, floor, rnd.choice(vivos)["id"])
+        vencer_todo(db2)
+        T.sentar_alternos(db2, floor, t)
+        for s in T.sugerencias(db2, t):
+            if s["tipo"] == "cerrar_mesa":
+                T.cerrar_mesa(db2, floor, t, s["mesa_id"])
+        T.balancear(db2, floor, t)
+    p = premios.finalizar(db2, director, t)
+    premios.confirmar(db2, director, t)
+    premios.acreditar(db2, director, t)
+    ganador = p["detalle"][0]["jugador_id"]
+    assert caja.saldo(db2, ganador) == 1_000_000 - 100_000 + 1_200_000
+
+
+def test_no_sugiere_cerrar_mesas_antes_de_empezar(db, staff):
+    t = nuevo_torneo(db, staff)
+    T.abrir_mesas(db, staff["floor"], t, 3)
+    assert not [s for s in T.sugerencias(db, t) if s["tipo"] == "cerrar_mesa"]
+    for i in range(5):
+        T.inscribir(db, t, nuevo_jugador(db, staff, i, celular=False), origen="caja", personal_id=staff["cajero"],
+                    pago="efectivo", sentar_ya=True)
+    assert not [s for s in T.sugerencias(db, t) if s["tipo"] == "cerrar_mesa"]
+    T.iniciar_torneo(db, staff["floor"], t)
+    assert [s for s in T.sugerencias(db, t) if s["tipo"] == "cerrar_mesa"]  # en curso, 5 jugadores caben en 1 mesa

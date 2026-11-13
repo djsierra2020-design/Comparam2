@@ -31,7 +31,17 @@ PERMISOS = {
 
 
 def demo() -> bool:
-    return os.environ.get("WINNER_DEMO") == "1"
+    return escenario_demo() is not None
+
+
+def escenario_demo() -> str | None:
+    """WINNER_DEMO: «1» o «practica» = práctica desde cero (3 mesas); «completo» = semana de evento."""
+    valor = (os.environ.get("WINNER_DEMO") or "").strip().lower()
+    if valor in ("1", "practica", "práctica"):
+        return "practica"
+    if valor == "completo":
+        return "completo"
+    return None
 
 
 def _secreto() -> bytes:

@@ -127,6 +127,16 @@
         <button class="sec" id="b-nuevo-personal" style="margin-top:10px">+ Nuevo usuario</button></div>
       <div class="tarjeta"><h2>Ajustes y topes</h2><div id="ajustes"></div></div>
     </div>
+    {% if demo %}
+    <div class="tarjeta">
+      <h2>Demo: volver a empezar</h2>
+      <p class="suave">Borra todo lo que se haya hecho y carga los datos de nuevo. Todos tendrán que volver a ingresar.</p>
+      <div class="fila">
+        <button class="auto oro" onclick="reiniciarDemo('practica')">Práctica desde cero (3 mesas)</button>
+        <button class="auto sec" onclick="reiniciarDemo('completo')">Demo completa (sala de 30 mesas, evento y satélite)</button>
+      </div>
+    </div>
+    {% endif %}
   </section>
 </main>
 <div id="toast"></div>
@@ -615,6 +625,12 @@ async function cargarAdmin() {
   $("#ajustes").innerHTML = `<form id="f-ajustes">${Object.entries(NOMBRES_AJUSTE).map(([k, l]) => `<label>${l}</label><input name="${k}" value="${esc(aj[k])}" inputmode="numeric">`).join("")}<button style="margin-top:12px">Guardar ajustes</button></form>`;
   $("#f-ajustes").onsubmit = ev => { ev.preventDefault(); accion(async () => { await api("/ajustes", "PUT", Object.fromEntries(new FormData(ev.target))); aviso("Ajustes guardados"); }); };
 }
+window.reiniciarDemo = async escenario => {
+  if (!await confirmar("¿Reiniciar la demo?", escenario === "practica"
+      ? "Queda un torneo vacío y 30 jugadores con $1.000.000 de saldo, listo para practicar desde cero."
+      : "Se carga la sala completa con el evento de varios días y el satélite.", "Reiniciar")) return;
+  accion(async () => { await api("/demo/reiniciar", "POST", {escenario}); location.reload(); });
+};
 window.activarPersonal = (id, activo) => accion(async () => { await api(`/personal/${id}/activo`, "POST", {activo}); cargarAdmin(); });
 $("#b-nuevo-personal").onclick = async () => {
   const d = await pedir("Nuevo usuario del personal", [{n: "usuario", l: "Usuario"}, {n: "nombre", l: "Nombre"},

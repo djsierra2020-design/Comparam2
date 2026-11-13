@@ -442,13 +442,26 @@ class BaseDatos:
         self._bloqueo = threading.RLock()
         self._memoria = None
         with self._bloqueo:
+            self._crear_esquema(self.conexion())
+
+    def _crear_esquema(self, c) -> None:
+        c.executescript(ESQUEMA)
+        _migrar(c)
+        c.executescript(ESQUEMA)  # vuelve a crear índices de tablas reconstruidas
+        for k, v in AJUSTES_POR_DEFECTO.items():
+            c.execute("INSERT OR IGNORE INTO ajustes (clave, valor) VALUES (?, ?)", (k, v))
+        c.commit()
+
+    def borrar_todo(self) -> None:
+        """Solo para la demo: deja la base vacía (borra también el libro y la auditoría)."""
+        with self._bloqueo:
             c = self.conexion()
-            c.executescript(ESQUEMA)
-            _migrar(c)
-            c.executescript(ESQUEMA)  # vuelve a crear índices de tablas reconstruidas
-            for k, v in AJUSTES_POR_DEFECTO.items():
-                c.execute("INSERT OR IGNORE INTO ajustes (clave, valor) VALUES (?, ?)", (k, v))
-            c.commit()
+            c.execute("PRAGMA foreign_keys = OFF")
+            for (tabla,) in c.execute("SELECT name FROM sqlite_master WHERE type = 'table' "
+                                      "AND name NOT LIKE 'sqlite_%'").fetchall():
+                c.execute(f"DROP TABLE IF EXISTS {tabla}")
+            c.execute("PRAGMA foreign_keys = ON")
+            self._crear_esquema(c)
 
     def conexion(self) -> sqlite3.Connection:
         if self.ruta == ":memory:":

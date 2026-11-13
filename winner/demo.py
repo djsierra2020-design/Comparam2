@@ -35,9 +35,14 @@ def nombre_demo(i: int) -> str:
     return f"{nombre} {APELLIDOS[i % len(APELLIDOS)]} {APELLIDOS[(i // len(APELLIDOS)) % len(APELLIDOS)]}"
 
 
-def sembrar(db) -> None:
+JUGADORES_PRACTICA = 30  # 3 mesas de 9 = 27 asientos: sobran 3 para practicar la lista de alternos
+
+
+def sembrar(db, escenario: str = "completo") -> None:
     if db.valor("SELECT COUNT(*) FROM personal"):
         return
+    if escenario == "practica":
+        return _practica(db)
     ids = {u: seg.crear_personal(db, u, n, r, CLAVE_DEMO) for u, n, r in USUARIOS_DEMO}
     cajero, director = ids["cajero"], ids["director"]
     jugadores = []
@@ -48,6 +53,33 @@ def sembrar(db) -> None:
         caja.depositar(db, cajero, r["jugador"]["id"], 2_000_000 + 100_000 * (i % 5))
         jugadores.append(r["jugador"]["id"])
     _evento_demo(db, director, cajero, jugadores)
+
+
+def reiniciar(db, escenario: str) -> None:
+    """Borra todo y vuelve a cargar el escenario elegido (solo en modo demo)."""
+    if escenario not in ("practica", "completo"):
+        raise ValueError("Escenario inválido")
+    db.borrar_todo()
+    sembrar(db, escenario)
+
+
+def _practica(db) -> None:
+    """Práctica desde cero: personal, 30 jugadores con saldo y un torneo vacío (sin mesas ni inscritos).
+
+    Se practica todo el recorrido: abrir 3 mesas, inscribir, sentar por QR, iniciar, eliminar, balancear,
+    cerrar una mesa, finalizar y pagar los premios.
+    """
+    ids = {u: seg.crear_personal(db, u, n, r, CLAVE_DEMO) for u, n, r in USUARIOS_DEMO}
+    cajero, director = ids["cajero"], ids["director"]
+    for i in range(JUGADORES_PRACTICA):
+        r = caja.abrir_caja(db, cajero, NOMBRES[i], f"79{i:06d}", f"300000{i:04d}", True)
+        caja.vincular_celular(db, cajero, r["jugador"]["id"], r["_codigo"])
+        caja.depositar(db, cajero, r["jugador"]["id"], 1_000_000)
+    t = T.crear_torneo(db, director, {"nombre": "Torneo de práctica", "fecha": caja.dia_bogota(), "buyin": 100_000,
+                                      "stack_inicial": 20_000, "asientos_por_mesa": 9, "reentrada_max": 1})
+    from .premios import definir_tabla
+    definir_tabla(db, director, t, [{"posicion": 1, "monto": 1_200_000}, {"posicion": 2, "monto": 700_000},
+                                    {"posicion": 3, "monto": 400_000}])
 
 
 def _evento_demo(db, director, cajero, jugadores) -> None:

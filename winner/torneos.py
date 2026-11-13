@@ -466,7 +466,8 @@ def sugerencias(db, torneo_id) -> list[dict]:
     vivos = sum(conteo) + en_espera
     asientos = mesas[0]["asientos"]
     necesarias = max(1, math.ceil(vivos / asientos))
-    if len(mesas) > necesarias:
+    en_curso = torneo(db, torneo_id)["estado"] == "en_curso"
+    if en_curso and vivos and len(mesas) > necesarias:  # antes de empezar se arman las mesas, no se rompen
         menor = min(mesas, key=lambda m: (len(m["ocupados"]), -m["numero"]))
         salida.append({"tipo": "cerrar_mesa", "mesa_id": menor["id"], "mesa": menor["numero"],
                        "texto": f"Quedan {vivos} jugadores: caben en {necesarias} mesa(s). "

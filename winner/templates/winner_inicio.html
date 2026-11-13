@@ -18,7 +18,34 @@
       <a class="boton sec auto" href="{{ url_for('winner.pantalla_jugador') }}">App del jugador</a>
     </div>
   </div>
-  {% if demo %}
+  {% if demo and practica %}
+  <div class="tarjeta">
+    <h3>Práctica desde cero: torneo de 3 mesas</h3>
+    <p class="suave">Hay 30 jugadores con $1.000.000 de saldo cada uno y un «Torneo de práctica» vacío
+      (buy-in $100.000, 20.000 fichas, 1 re-entrada, premios para 3 puestos). Sigue los pasos en orden:</p>
+    <ol>
+      <li><b>Abrir las mesas</b> · entra como <b>floor</b> → Mesas → «+ Abrir mesa» → cantidad <b>3</b>.</li>
+      <li><b>Inscribir</b> · entra como <b>cajero</b> → Jugadores y caja → busca a «Andrés» → «Inscribir a torneo»
+        → pago «Saldo de su caja». Sale su <b>código QR</b>.</li>
+      <li><b>Sentar por QR</b> · como <b>floor</b>, escribe ese código en «Código QR» y pulsa «Sentar»: le asigna mesa y asiento.
+        (El jugador ve el mismo QR en su app.)</li>
+      <li><b>Inscribir a varios más</b> · repite el paso 2 con otros jugadores. Para ir rápido, como floor pulsa
+        «Sentar inscritos» y los sienta a todos. Con más de 27, los que no caben quedan como <b>alternos</b>.</li>
+      <li><b>Iniciar</b> · como floor pulsa «Iniciar torneo».</li>
+      <li><b>Eliminar</b> · como <b>crupier</b> o floor, toca un asiento → «Confirmar eliminación». Elimina varios de la misma mesa
+        y verás el aviso <b>«Balancear»</b>.</li>
+      <li><b>Cerrar una mesa</b> · cuando queden 18 o menos, el sistema avisa <b>«Cierre la mesa X»</b>: sus jugadores se reparten solos.</li>
+      <li><b>Pantalla de sala</b> · botón «Pantalla de sala ↗»: cada jugador con su mesa y asiento.</li>
+      <li><b>Premios</b> · cuando quede uno, entra como <b>director</b> → Premios → «Finalizar torneo», «Confirmar posiciones»
+        y «Acreditar premios». El dinero aparece en la caja de los ganadores.</li>
+    </ol>
+    <p class="suave">Para volver a empezar: entra como <b>admin</b> → Administración → «Práctica desde cero».</p>
+    <ul class="suave">
+      <li>Personal: usuarios <b>admin</b>, <b>director</b>, <b>floor</b>, <b>crupier</b>, <b>cajero</b>, <b>supervisor</b> · clave <b>winner2026</b>.</li>
+      <li>App del jugador: celulares <b>3000000000</b> a <b>3000000029</b>. El código SMS aparece en la misma pantalla.</li>
+    </ul>
+  </div>
+  {% elif demo %}
   <div class="tarjeta">
     <h3>Modo demostración</h3>
     <p class="suave">Datos ficticios en la sala de 30 mesas de 9:</p>

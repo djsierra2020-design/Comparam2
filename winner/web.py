@@ -24,7 +24,7 @@ def iniciar(app, ruta_db=None) -> BaseDatos:
     app.extensions["winner_db"] = base
     if seg.demo():
         from .demo import sembrar
-        sembrar(base)
+        sembrar(base, seg.escenario_demo())
     app.register_blueprint(bp)
     return base
 
@@ -99,7 +99,8 @@ def _pid():
 @bp.get("/")
 def inicio():
     en_curso = db().valor("SELECT id FROM torneos WHERE estado = 'en_curso' ORDER BY (tipo = 'normal') DESC, id LIMIT 1")
-    return render_template("winner_inicio.html", demo=seg.demo(), torneo_en_curso=en_curso)
+    return render_template("winner_inicio.html", demo=seg.demo(), torneo_en_curso=en_curso,
+                           practica=db().valor("SELECT COUNT(*) FROM jugadores") <= 30)
 
 
 @bp.get("/personal")
@@ -552,6 +553,22 @@ def api_guardar_ajustes():
                 c.execute("UPDATE ajustes SET valor = ? WHERE clave = ?", (str(int(v)), k))
                 db().auditar(_pid(), "ajuste", "ajustes", None, f"{k}={int(v)}")
     return api_ajustes.__wrapped__()
+
+
+@bp.post("/api/demo/reiniciar")
+@personal("admin")
+def api_demo_reiniciar():
+    """Solo en modo demo: borra todo y carga el escenario elegido (práctica o completo)."""
+    if not seg.demo():
+        raise ErrorNegocio("No disponible", 404)
+    from .demo import reiniciar
+    try:
+        reiniciar(db(), _datos().get("escenario", "practica"))
+    except ValueError as e:
+        raise ErrorNegocio(str(e)) from None
+    resp = make_response(jsonify(ok=True))
+    resp.delete_cookie(COOKIE_PERSONAL, path="/winner")
+    return resp
 
 
 @bp.get("/api/demo/sms")
