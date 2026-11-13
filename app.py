@@ -152,16 +152,18 @@ def lista_cliente():
     params = {**_params(), "solo_dueno": True, "con_telefono": True}
     hab_min = int(request.args["hab_min"]) if request.args.get("hab_min", "").isdigit() else None
     cliente = request.args.get("cliente", "").strip()[:60]
+    parq = request.args.get("parq", "") if request.args.get("parq") in ("si", "no") else ""
     elegidas = [f for f in request.args.getlist("fuente") if f in FUENTES] or list(PORTALES)
     resultado = buscar(barrio, crear_fuentes(elegidas), **params) if barrio else None
     anuncios = []
     if resultado:
         anuncios = [a for a in resultado.anuncios if a.telefonos and a.es_dueno_directo and not a.verificar
-                    and (not hab_min or (a.habitaciones or 0) >= hab_min)]
+                    and (not hab_min or (a.habitaciones or 0) >= hab_min)
+                    and (parq != "si" or (a.parqueaderos or 0) > 0) and (parq != "no" or a.parqueaderos == 0)]
         anuncios.sort(key=lambda a: a.precio_m2)
     from comparam import diario
     return render_template("lista.html", barrio=barrio, p=params, r=resultado, anuncios=anuncios,
-                           cliente=cliente, hab_min=hab_min, fecha=diario.hoy().strftime("%d/%m/%Y"),
+                           cliente=cliente, hab_min=hab_min, parq=parq, fecha=diario.hoy().strftime("%d/%m/%Y"),
                            args=request.args)
 
 

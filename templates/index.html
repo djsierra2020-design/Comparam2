@@ -264,11 +264,11 @@
   <ol class="lista" id="lista">
   {% for o in rc.oportunidades %}{% set a = o.anuncio %}{% set h = hist(a, p.operacion) %}
     <li class="item" data-pos="{{ loop.index }}" data-m2="{{ a.precio_m2|round|int }}" data-precio="{{ a.precio|int }}"
-        data-area="{{ a.area_m2 }}" data-hab="{{ a.habitaciones or 0 }}" data-vs="{{ o.diferencia|round(1) }}"
+        data-area="{{ a.area_m2 }}" data-hab="{{ a.habitaciones or 0 }}" data-parq="{{ '' if a.parqueaderos is none else a.parqueaderos }}" data-vs="{{ o.diferencia|round(1) }}"
         data-dias="{{ h.dias if h and h.dias is not none else -1 }}" data-baja="{{ h.baja_pct if h else 0 }}" data-verificar="{{ 1 if a.verificar else 0 }}">
       <div class="top"><span class="pos">{{ loop.index }}</span><span class="tag portal">{{ a.fuente|portal }}</span><span class="tag {{ 'verificar' if a.verificar }}">{{ a.publicado_por or 'anunciante desconocido' }}</span></div>
       <div class="tit">{% if a.url %}<a href="{{ a.url }}" target="_blank" rel="noopener">{{ a.titulo }}</a>{% else %}{{ a.titulo }}{% endif %}</div>
-      <div class="meta"><b>{{ o.zona }}</b> · {{ a.precio|pesos }} · {{ '%g'|format(a.area_m2) }} m²{% if a.habitaciones %} · {{ a.habitaciones }} hab{% endif %}{% if a.banos %} · {{ a.banos }} baños{% endif %}</div>
+      <div class="meta"><b>{{ o.zona }}</b> · {{ a.precio|pesos }} · {{ '%g'|format(a.area_m2) }} m²{% if a.habitaciones %} · {{ a.habitaciones }} hab{% endif %}{% if a.banos %} · {{ a.banos }} baños{% endif %}{% if a.parqueaderos %} · 🚗 {{ a.parqueaderos }} parq.{% elif a.parqueaderos == 0 %} · sin parqueadero{% endif %}</div>
       <div class="precio">
         <div class="m2">{{ a.precio_m2|pesos }} <small>/m²</small></div>
         {% set d = o.diferencia %}<span class="vs {{ 'bajo' if d < 0 else 'alto' }}">{{ '%.0f'|format(d|abs) }}% {{ 'bajo' if d < 0 else 'sobre' }} su {{ o.nivel }}</span>
@@ -319,19 +319,19 @@
   </section>
   {% endif %}
   {% if r.anuncios %}
-  <a class="btn-lista" href="/lista?barrio={{ barrio|urlencode }}&operacion={{ p.operacion }}{% if args.precio_max %}&precio_max={{ args.precio_max|urlencode }}{% endif %}{% if args.area_min %}&area_min={{ args.area_min|urlencode }}{% endif %}" onclick="document.getElementById('cargando-txt').textContent='Armando la lista para el cliente…';document.getElementById('cargando').style.display='grid'">📄 Lista para cliente (PDF)</a>
+  <a class="btn-lista" href="/lista?barrio={{ barrio|urlencode }}&operacion={{ p.operacion }}{% if args.precio_max %}&precio_max={{ args.precio_max|urlencode }}{% endif %}{% if args.area_min %}&area_min={{ args.area_min|urlencode }}{% endif %}" onclick="var q=document.querySelector('#f-parq .on');if(q&&q.dataset.v)this.href+='&parq='+q.dataset.v;document.getElementById('cargando-txt').textContent='Armando la lista para el cliente…';document.getElementById('cargando').style.display='grid'">📄 Lista para cliente (PDF)</a>
   <div class="titulo-lista">{{ r.anuncios|length }} resultado(s) en {{ barrio }} <span class="meta">· {{ r.total_encontrados }} anuncios revisados</span></div>
   {% if r.ocultos %}<div class="ocultos">{% set nd = r.anuncios|selectattr('es_dueno_directo')|list|length %}{% set nv = r.anuncios|selectattr('verificar')|list|length %}{{ nd }} de dueño directo{% if nv %} · {{ nv }} por verificar{% endif %} · {{ r.ocultos }} de inmobiliarias ocultos · <a href="{{ url_con_inmobiliarias() }}">Ver todos</a></div>{% endif %}
   <div class="barra-filtros"><button type="button" id="abrir-filtros">⚙ Filtros</button><span class="meta" id="conteo"></span></div>
   <ol class="lista" id="lista">
   {% for a in r.anuncios %}{% set h = hist(a, p.operacion) %}
     <li class="item" data-pos="{{ loop.index }}" data-m2="{{ a.precio_m2|round|int }}" data-precio="{{ a.precio|int }}"
-        data-area="{{ a.area_m2 }}" data-hab="{{ a.habitaciones or 0 }}"
+        data-area="{{ a.area_m2 }}" data-hab="{{ a.habitaciones or 0 }}" data-parq="{{ '' if a.parqueaderos is none else a.parqueaderos }}"
         data-vs="{{ r.zona.diferencia(a.precio_m2)|round(1) if r.zona else 0 }}"
         data-dias="{{ h.dias if h and h.dias is not none else -1 }}" data-baja="{{ h.baja_pct if h else 0 }}" data-verificar="{{ 1 if a.verificar else 0 }}">
       <div class="top"><span class="pos">{{ loop.index }}</span><span class="tag portal">{{ a.fuente|portal }}</span><span class="tag {{ 'verificar' if a.verificar }}">{{ a.publicado_por or 'anunciante desconocido' }}</span></div>
       <div class="tit">{% if a.url %}<a href="{{ a.url }}" target="_blank" rel="noopener">{{ a.titulo }}</a>{% else %}{{ a.titulo }}{% endif %}</div>
-      <div class="meta">{{ a.precio|pesos }} · {{ '%g'|format(a.area_m2) }} m²{% if a.habitaciones %} · {{ a.habitaciones }} hab{% endif %}{% if a.banos %} · {{ a.banos }} baños{% endif %} · {{ a.barrio }}</div>
+      <div class="meta">{{ a.precio|pesos }} · {{ '%g'|format(a.area_m2) }} m²{% if a.habitaciones %} · {{ a.habitaciones }} hab{% endif %}{% if a.banos %} · {{ a.banos }} baños{% endif %}{% if a.parqueaderos %} · 🚗 {{ a.parqueaderos }} parq.{% elif a.parqueaderos == 0 %} · sin parqueadero{% endif %} · {{ a.barrio }}</div>
       <div class="precio">
         <div class="m2">{{ a.precio_m2|pesos }} <small>/m²</small></div>
         {% if r.zona %}{% set d = r.zona.diferencia(a.precio_m2) %}<span class="vs {{ 'bajo' if d < 0 else 'alto' }}">{{ '%.0f'|format(d|abs) }}% {{ 'bajo' if d < 0 else 'sobre' }} la zona</span>{% endif %}
@@ -383,6 +383,11 @@
     <button type="button" data-v="0" class="on">Todas</button><button type="button" data-v="1">1+</button><button type="button" data-v="2">2+</button>
     <button type="button" data-v="3">3+</button><button type="button" data-v="4">4+</button>
   </div>
+  <h4>Parqueadero</h4>
+  <div class="op" id="f-parq">
+    <button type="button" data-v="" class="on">Cualquiera</button><button type="button" data-v="si">Con parqueadero</button><button type="button" data-v="no">Sin parqueadero</button>
+  </div>
+  <p class="meta" id="f-parq-nota" style="display:none"></p>
   <h4>Área mínima (m²)</h4>
   <input type="text" id="f-area" inputmode="numeric" placeholder="Ej: 50">
   <h4>Para captar</h4>
@@ -427,7 +432,7 @@ btn.addEventListener('click', function () { if (aviso) { aviso.prompt(); aviso =
   var items = Array.prototype.slice.call(lista.querySelectorAll('.item'));
   var $ = function (id) { return document.getElementById(id); };
   var hoja = $('hoja'), fondo = $('hoja-fondo'), pie = $('hoja-pie'), boton = $('abrir-filtros');
-  var hab = 0;
+  var hab = 0, parq = '';
   function num(v) { v = String(v || '').replace(/[^0-9]/g, ''); return v ? Number(v) : null; }
   function abrir(si) { [hoja, fondo, pie].forEach(function (e) { e.classList.toggle('abierta', si); }); }
   function pasa(it) {
@@ -435,6 +440,8 @@ btn.addEventListener('click', function () { if (aviso) { aviso.prompt(); aviso =
     if (mn !== null && p < mn) return false;
     if (mx !== null && p > mx) return false;
     if (hab && Number(d.hab) < hab) return false;
+    if (parq === 'si' && !(Number(d.parq) > 0)) return false;
+    if (parq === 'no' && d.parq !== '0') return false;
     if (a !== null && Number(d.area) < a) return false;
     if ($('f-sobre').checked && !(Number(d.vs) > 0)) return false;
     if ($('f-bajo').checked && !(Number(d.vs) < 0)) return false;
@@ -454,11 +461,15 @@ btn.addEventListener('click', function () { if (aviso) { aviso.prompt(); aviso =
     items.slice().sort(function (x, y) { return f(x.dataset) - f(y.dataset); }).forEach(function (it) {
       var ok = pasa(it); it.classList.toggle('oculto', !ok); if (ok) n++; lista.appendChild(it);
     });
-    var activos = [$('f-min').value, $('f-max').value, $('f-area').value].filter(Boolean).length + (hab ? 1 : 0) +
+    var activos = [$('f-min').value, $('f-max').value, $('f-area').value].filter(Boolean).length + (hab ? 1 : 0) + (parq ? 1 : 0) +
       ['f-sobre', 'f-bajo', 'f-30', 'f-baja'].filter(function (id) { return $(id).checked; }).length + ($('f-verif').checked ? 0 : 1) +
       ($('f-orden').value !== 'pos' ? 1 : 0);
     boton.textContent = '⚙ Filtros' + (activos ? ' (' + activos + ')' : ''); boton.classList.toggle('on', activos > 0);
     $('conteo').textContent = 'Mostrando ' + n + ' de ' + items.length;
+    var sinDato = parq ? items.filter(function (it) { return it.dataset.parq === ''; }).length : 0;
+    $('f-parq-nota').style.display = sinDato ? 'block' : 'none';
+    $('f-parq-nota').textContent = sinDato + ' anuncio' + (sinDato === 1 ? '' : 's') + ' no dice' + (sinDato === 1 ? '' : 'n') + ' si tiene' + (sinDato === 1 ? '' : 'n') + ' parqueadero y no se muestra' + (sinDato === 1 ? '' : 'n') + '.';
+    if (sinDato) $('conteo').textContent += ' · ' + sinDato + ' sin dato de parqueadero';
     $('ver').textContent = 'Ver ' + n + ' resultado' + (n === 1 ? '' : 's');
   }
   boton.addEventListener('click', function () { abrir(true); });
@@ -485,10 +496,16 @@ btn.addEventListener('click', function () { if (aviso) { aviso.prompt(); aviso =
     this.querySelectorAll('button').forEach(function (x) { x.classList.remove('on'); });
     b.classList.add('on'); hab = Number(b.dataset.v); aplicar();
   });
+  $('f-parq').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    this.querySelectorAll('button').forEach(function (x) { x.classList.remove('on'); });
+    b.classList.add('on'); parq = b.dataset.v; aplicar();
+  });
   $('limpiar').addEventListener('click', function () {
     ['f-min', 'f-max', 'f-area'].forEach(function (id) { $(id).value = ''; });
     ['f-sobre', 'f-bajo', 'f-30', 'f-baja'].forEach(function (id) { $(id).checked = false; }); $('f-verif').checked = true;
-    $('f-orden').value = 'pos'; hab = 0;
+    $('f-orden').value = 'pos'; hab = 0; parq = '';
+    document.querySelectorAll('#f-parq button').forEach(function (x) { x.classList.toggle('on', x.dataset.v === ''); });
     document.querySelectorAll('#f-hab button').forEach(function (x) { x.classList.remove('on'); });
     document.querySelector('#f-hab button[data-v="0"]').classList.add('on'); marcarRango(); aplicar();
   });

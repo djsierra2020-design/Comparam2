@@ -10,7 +10,7 @@ import csv
 from pathlib import Path
 
 from ..models import Listing
-from ..parsing import clasificar_anunciante, extract_phones, parse_number, slugify
+from ..parsing import clasificar_anunciante, extract_phones, parse_number, slugify, parqueaderos_en_texto
 from .base import Source
 
 ALIAS = {
@@ -59,6 +59,6 @@ class ArchivoCSV(Source):
                 telefonos=extract_phones(f["telefonos"], f["descripcion"]),
                 publicado_por=etiqueta or f["publicado_por"], es_dueno_directo=dueno,
                 habitaciones=int(hab) if hab else None, banos=int(ban) if ban else None,
-                descripcion=f["descripcion"],
+                parqueaderos=parqueaderos_en_texto(f["titulo"], f["descripcion"]), descripcion=f["descripcion"],
             ))
         return out

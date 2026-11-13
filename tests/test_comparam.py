@@ -1069,3 +1069,35 @@ def test_busqueda_de_barrio_reutiliza_lo_traido(monkeypatch):
     r2 = busqueda.buscar("Cedritos", f, con_telefono=True)
     assert len(llamadas) == 1 and len(r1.anuncios) == len(r2.anuncios) == 1
     busqueda._CACHE_BARRIO.clear()
+
+
+def test_parqueaderos_en_texto():
+    from comparam.parsing import parqueaderos_en_texto as p
+    assert p("Apto 3 hab, 2 baños, 2 parqueaderos") == 2
+    assert p("Incluye parqueadero y depósito") == 1
+    assert p("parqueadero privado cubierto") == 1
+    assert p("Sin parqueadero, excelente ubicación") == 0
+    assert p("No tiene garaje") == 0
+    assert p("Conjunto con parqueadero de visitantes") is None
+    assert p("Apto remodelado") is None and p("") is None
+
+
+def test_parqueaderos_en_json():
+    from comparam.sources.extractor import _parqueaderos
+    assert _parqueaderos({"garage": 1}) == 1
+    assert _parqueaderos({"parking": False}) == 0
+    assert _parqueaderos({"technicalSheet": [{"field": "bedrooms", "value": 3}, {"field": "garage", "value": "2"}]}) == 2
+    assert _parqueaderos({}, "Apto con parqueadero") == 1
+    assert _parqueaderos({}) is None
+
+
+def test_lista_filtra_parqueadero(monkeypatch):
+    import app as webapp
+    from comparam import busqueda
+    from comparam.busqueda import Resultado
+    anuncios = [Listing("fincaraiz", "Con", "Cedritos", 2e6, 60, telefonos=["3001112233"], es_dueno_directo=True,
+                        parqueaderos=1),
+                Listing("fincaraiz", "Sin dato", "Cedritos", 2e6, 60, telefonos=["3004445566"], es_dueno_directo=True)]
+    monkeypatch.setattr(webapp, "buscar", lambda *a, **k: Resultado(list(anuncios)))
+    html = webapp.app.test_client().get("/lista?barrio=Cedritos&operacion=arriendo&parq=si").get_data(as_text=True)
+    assert "3001112233" in html and "3004445566" not in html and "1</b> parq." in html

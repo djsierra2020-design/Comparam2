@@ -40,6 +40,7 @@ class Guardados(Source):
                 precio=e["precio"], area_m2=e["area_m2"], url=e.get("url", ""),
                 publicado_por=e.get("anunciante", ""), es_dueno_directo=bool(e.get("dueno_directo")),
                 verificar=bool(e.get("verificar")), habitaciones=e.get("habitaciones"), banos=e.get("banos"),
+                parqueaderos=e.get("parqueaderos"),
                 publicado=e.get("publicado", ""),
             ))
         return salida

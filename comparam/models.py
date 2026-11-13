@@ -19,6 +19,7 @@ class Listing:
     verificar: bool = False
     habitaciones: int | None = None
     banos: int | None = None
+    parqueaderos: int | None = None  # 0 = el anuncio dice que no tiene; None = no lo dice
     descripcion: str = ""
     ubicacion: str = ""  # todo el texto de ubicación del anuncio (barrio, localidad, zona, ciudad)
     publicado: str = ""  # fecha de publicación AAAA-MM-DD, si el portal la indica
