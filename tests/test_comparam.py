@@ -1101,3 +1101,10 @@ def test_lista_filtra_parqueadero(monkeypatch):
     monkeypatch.setattr(webapp, "buscar", lambda *a, **k: Resultado(list(anuncios)))
     html = webapp.app.test_client().get("/lista?barrio=Cedritos&operacion=arriendo&parq=si").get_data(as_text=True)
     assert "3001112233" in html and "3004445566" not in html and "1</b> parq." in html
+
+
+def test_filtros_se_pueden_elegir_antes_de_buscar():
+    import app as webapp
+    html = webapp.app.test_client().get("/").get_data(as_text=True)
+    assert 'id="filtros-form"' in html and 'id="hoja"' in html and 'id="f-parq"' in html
+    assert 'data-op="arriendo"' in html and 'data-op="venta"' in html
