@@ -56,6 +56,9 @@
   .segmento label { text-align:center; padding:9px; border-radius:9px; font-weight:600; color:var(--mut); cursor:pointer }
   .segmento input:checked + label { background:var(--card); color:var(--tx); box-shadow:var(--sombra) }
   .chips { display:flex; flex-wrap:wrap; gap:8px }
+  .chip-filtros { font:inherit; font-size:14px; font-weight:700; padding:8px 14px; border-radius:999px; border:1.5px solid var(--marca);
+    background:transparent; color:var(--marca); cursor:pointer }
+  .chip-filtros.on { background:var(--marca); color:#fff }
   .chip input { display:none }
   .chip label { display:inline-flex; align-items:center; gap:6px; padding:8px 14px; border-radius:999px; font-size:14px;
                 border:1.5px solid var(--ln); color:var(--mut); cursor:pointer; user-select:none }
@@ -207,7 +210,9 @@
   <div class="chips">
     <span class="chip"><input type="checkbox" id="todos" name="todos" value="1" {% if not p.solo_dueno %}checked{% endif %}><label for="todos">Incluir inmobiliarias</label></span>
     <span class="chip"><input type="checkbox" id="ct" name="con_telefono" value="1" {% if p.con_telefono %}checked{% endif %}><label for="ct">Solo con teléfono</label></span>
+    <button type="button" class="chip-filtros" id="filtros-form">⚙ Filtros</button>
   </div>
+  <div id="filtros-ocultos"></div>
   {# Siempre se busca en todos los portales. ?fuente=... en la URL (p. ej. «ejemplo») se conserva oculto. #}
   {% if args.getlist('fuente') %}{% for f in elegidas %}<input type="hidden" name="fuente" value="{{ f }}">{% endfor %}{% endif %}
   <div class="botones">
@@ -319,7 +324,7 @@
   </section>
   {% endif %}
   {% if r.anuncios %}
-  <a class="btn-lista" href="/lista?barrio={{ barrio|urlencode }}&operacion={{ p.operacion }}{% if args.precio_max %}&precio_max={{ args.precio_max|urlencode }}{% endif %}{% if args.area_min %}&area_min={{ args.area_min|urlencode }}{% endif %}" onclick="var q=document.querySelector('#f-parq .on');if(q&&q.dataset.v)this.href+='&parq='+q.dataset.v;document.getElementById('cargando-txt').textContent='Armando la lista para el cliente…';document.getElementById('cargando').style.display='grid'">📄 Lista para cliente (PDF)</a>
+  <a class="btn-lista" href="/lista?barrio={{ barrio|urlencode }}&operacion={{ p.operacion }}{% if args.area_min %}&area_min={{ args.area_min|urlencode }}{% endif %}" onclick="if(window.filtrosLista)this.href+=filtrosLista();document.getElementById('cargando-txt').textContent='Armando la lista para el cliente…';document.getElementById('cargando').style.display='grid'">📄 Lista para cliente (PDF)</a>
   <div class="titulo-lista">{{ r.anuncios|length }} resultado(s) en {{ barrio }} <span class="meta">· {{ r.total_encontrados }} anuncios revisados</span></div>
   {% if r.ocultos %}<div class="ocultos">{% set nd = r.anuncios|selectattr('es_dueno_directo')|list|length %}{% set nv = r.anuncios|selectattr('verificar')|list|length %}{{ nd }} de dueño directo{% if nv %} · {{ nv }} por verificar{% endif %} · {{ r.ocultos }} de inmobiliarias ocultos · <a href="{{ url_con_inmobiliarias() }}">Ver todos</a></div>{% endif %}
   <div class="barra-filtros"><button type="button" id="abrir-filtros">⚙ Filtros</button><span class="meta" id="conteo"></span></div>
@@ -347,7 +352,6 @@
 {% endif %}
 </main>
 
-{% if (r and r.anuncios) or (rc and rc.oportunidades) %}
 <div class="hoja-fondo" id="hoja-fondo"></div>
 <section class="hoja" id="hoja" aria-label="Filtros">
   <div class="asa"></div>
@@ -366,13 +370,10 @@
   <h4>Rango de precio</h4>
   <div class="op" id="f-rangos">
     <button type="button" data-min="" data-max="" class="on">Todos</button>
-    {% if p.operacion == 'arriendo' %}
-    <button type="button" data-min="0" data-max="1500000">Hasta $1,5M</button><button type="button" data-min="1500000" data-max="3000000">$1,5-3M</button>
-    <button type="button" data-min="3000000" data-max="5000000">$3-5M</button><button type="button" data-min="5000000" data-max="">+$5M</button>
-    {% else %}
-    <button type="button" data-min="0" data-max="300000000">Hasta $300M</button><button type="button" data-min="300000000" data-max="500000000">$300-500M</button>
-    <button type="button" data-min="500000000" data-max="800000000">$500-800M</button><button type="button" data-min="800000000" data-max="">+$800M</button>
-    {% endif %}
+    <button type="button" data-op="arriendo" data-min="0" data-max="1500000">Hasta $1,5M</button><button type="button" data-op="arriendo" data-min="1500000" data-max="3000000">$1,5-3M</button>
+    <button type="button" data-op="arriendo" data-min="3000000" data-max="5000000">$3-5M</button><button type="button" data-op="arriendo" data-min="5000000" data-max="">+$5M</button>
+    <button type="button" data-op="venta" data-min="0" data-max="300000000">Hasta $300M</button><button type="button" data-op="venta" data-min="300000000" data-max="500000000">$300-500M</button>
+    <button type="button" data-op="venta" data-min="500000000" data-max="800000000">$500-800M</button><button type="button" data-op="venta" data-min="800000000" data-max="">+$800M</button>
   </div>
   <div class="rango">
     <input type="text" id="f-min" inputmode="numeric" placeholder="$ Desde (sin mínimo)">
@@ -404,7 +405,6 @@
   <button type="button" class="btn sec" id="limpiar">Limpiar</button>
   <button type="button" class="btn pri" id="ver">Ver resultados</button>
 </div>
-{% endif %}
 
 <script>
 // Buscar: valida el barrio y muestra el aviso de carga.
@@ -426,15 +426,65 @@ var aviso = null, btn = document.getElementById('instalar');
 window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); aviso = e; btn.style.display = 'block'; });
 btn.addEventListener('click', function () { if (aviso) { aviso.prompt(); aviso = null; btn.style.display = 'none'; } });
 
-// Filtros instantáneos sobre los resultados ya cargados (no vuelve a consultar los portales).
+// Filtros: se pueden elegir antes de buscar (viajan en la búsqueda como f_*) y se aplican al instante
+// sobre los resultados ya cargados (no vuelven a consultar los portales).
 (function () {
-  var lista = document.getElementById('lista'); if (!lista) return;
-  var items = Array.prototype.slice.call(lista.querySelectorAll('.item'));
   var $ = function (id) { return document.getElementById(id); };
-  var hoja = $('hoja'), fondo = $('hoja-fondo'), pie = $('hoja-pie'), boton = $('abrir-filtros');
+  var lista = $('lista');
+  var items = lista ? Array.prototype.slice.call(lista.querySelectorAll('.item')) : [];
+  var hoja = $('hoja'), fondo = $('hoja-fondo'), pie = $('hoja-pie');
+  var botones = [$('abrir-filtros'), $('filtros-form')].filter(Boolean);
   var hab = 0, parq = '';
+  var CHECKS = {sobre: 'f-sobre', bajo: 'f-bajo', d30: 'f-30', baja: 'f-baja'};
   function num(v) { v = String(v || '').replace(/[^0-9]/g, ''); return v ? Number(v) : null; }
+  function miles(n) { return n ? Number(n).toLocaleString('es-CO') : ''; }
   function abrir(si) { [hoja, fondo, pie].forEach(function (e) { e.classList.toggle('abierta', si); }); }
+  function operacion() { var r = document.querySelector('input[name="operacion"]:checked'); return r ? r.value : 'venta'; }
+  function marcar(id, v) {
+    $(id).querySelectorAll('button').forEach(function (x) { x.classList.toggle('on', x.dataset.v === String(v)); });
+  }
+  // Estado de los filtros <-> parámetros f_* de la búsqueda
+  function estado() {
+    var e = {f_min: num($('f-min').value), f_max: num($('f-max').value), f_area: num($('f-area').value),
+             f_hab: hab || null, f_parq: parq || null, f_orden: $('f-orden').value !== 'pos' ? $('f-orden').value : null,
+             f_verif: $('f-verif').checked ? null : '0'};
+    Object.keys(CHECKS).forEach(function (k) { e['f_' + k] = $(CHECKS[k]).checked ? '1' : null; });
+    return e;
+  }
+  function cargar() {
+    var q = new URLSearchParams(location.search);
+    $('f-min').value = miles(num(q.get('f_min'))); $('f-max').value = miles(num(q.get('f_max')));
+    $('f-area').value = q.get('f_area') || '';
+    hab = Number(q.get('f_hab')) || 0; marcar('f-hab', hab);
+    parq = ['si', 'no'].indexOf(q.get('f_parq')) >= 0 ? q.get('f_parq') : ''; marcar('f-parq', parq);
+    if (q.get('f_orden') && $('f-orden').querySelector('option[value="' + q.get('f_orden') + '"]')) $('f-orden').value = q.get('f_orden');
+    $('f-verif').checked = q.get('f_verif') !== '0';
+    Object.keys(CHECKS).forEach(function (k) { $(CHECKS[k]).checked = q.get('f_' + k) === '1'; });
+  }
+  function activos() {
+    var e = estado(); return Object.keys(e).filter(function (k) { return e[k] !== null && k !== 'f_min'; }).length + (e.f_min ? 1 : 0);
+  }
+  function guardarEnUrl() {
+    var q = new URLSearchParams(location.search), e = estado();
+    Object.keys(e).forEach(function (k) { if (e[k] === null) q.delete(k); else q.set(k, e[k]); });
+    history.replaceState(null, '', location.pathname + (q.toString() ? '?' + q : ''));
+  }
+  // Al buscar, los filtros elegidos viajan con la búsqueda.
+  $('f').addEventListener('submit', function () {
+    var caja = $('filtros-ocultos'), e = estado(); caja.innerHTML = '';
+    Object.keys(e).forEach(function (k) {
+      if (e[k] === null) return;
+      var i = document.createElement('input'); i.type = 'hidden'; i.name = k; i.value = e[k]; caja.appendChild(i);
+    });
+  });
+  // Para la lista del cliente: precio máximo, habitaciones y parqueadero.
+  window.filtrosLista = function () {
+    var e = estado(), s = '';
+    if (e.f_max) s += '&precio_max=' + e.f_max;
+    if (e.f_hab) s += '&hab_min=' + e.f_hab;
+    if (e.f_parq) s += '&parq=' + e.f_parq;
+    return s;
+  };
   function pasa(it) {
     var d = it.dataset, p = Number(d.precio), mn = num($('f-min').value), mx = num($('f-max').value), a = num($('f-area').value);
     if (mn !== null && p < mn) return false;
@@ -456,60 +506,60 @@ btn.addEventListener('click', function () { if (aviso) { aviso.prompt(); aviso =
     precio: function (d) { return Number(d.precio); }, 'precio-desc': function (d) { return -Number(d.precio); },
     'area-desc': function (d) { return -Number(d.area); }, 'dias-desc': function (d) { return -Number(d.dias); }
   };
-  function aplicar() {
-    var f = orden[$('f-orden').value] || orden.pos, n = 0;
+  function aplicar(guardar) {
+    var n = activos();
+    botones.forEach(function (b) { b.textContent = '⚙ Filtros' + (n ? ' (' + n + ')' : ''); b.classList.toggle('on', n > 0); });
+    if (!lista) { $('ver').textContent = n ? 'Listo · se aplican al buscar' : 'Listo'; return; }
+    var f = orden[$('f-orden').value] || orden.pos, vistos = 0;
     items.slice().sort(function (x, y) { return f(x.dataset) - f(y.dataset); }).forEach(function (it) {
-      var ok = pasa(it); it.classList.toggle('oculto', !ok); if (ok) n++; lista.appendChild(it);
+      var ok = pasa(it); it.classList.toggle('oculto', !ok); if (ok) vistos++; lista.appendChild(it);
     });
-    var activos = [$('f-min').value, $('f-max').value, $('f-area').value].filter(Boolean).length + (hab ? 1 : 0) + (parq ? 1 : 0) +
-      ['f-sobre', 'f-bajo', 'f-30', 'f-baja'].filter(function (id) { return $(id).checked; }).length + ($('f-verif').checked ? 0 : 1) +
-      ($('f-orden').value !== 'pos' ? 1 : 0);
-    boton.textContent = '⚙ Filtros' + (activos ? ' (' + activos + ')' : ''); boton.classList.toggle('on', activos > 0);
-    $('conteo').textContent = 'Mostrando ' + n + ' de ' + items.length;
+    $('conteo').textContent = 'Mostrando ' + vistos + ' de ' + items.length;
     var sinDato = parq ? items.filter(function (it) { return it.dataset.parq === ''; }).length : 0;
     $('f-parq-nota').style.display = sinDato ? 'block' : 'none';
-    $('f-parq-nota').textContent = sinDato + ' anuncio' + (sinDato === 1 ? '' : 's') + ' no dice' + (sinDato === 1 ? '' : 'n') + ' si tiene' + (sinDato === 1 ? '' : 'n') + ' parqueadero y no se muestra' + (sinDato === 1 ? '' : 'n') + '.';
+    $('f-parq-nota').textContent = sinDato + (sinDato === 1 ? ' anuncio no dice si tiene parqueadero y no se muestra.' : ' anuncios no dicen si tienen parqueadero y no se muestran.');
     if (sinDato) $('conteo').textContent += ' · ' + sinDato + ' sin dato de parqueadero';
-    $('ver').textContent = 'Ver ' + n + ' resultado' + (n === 1 ? '' : 's');
+    $('ver').textContent = 'Ver ' + vistos + ' resultado' + (vistos === 1 ? '' : 's');
+    if (guardar !== false) guardarEnUrl();
   }
-  boton.addEventListener('click', function () { abrir(true); });
+  // Rangos de precio según Comprar / Arrendar
+  function rangosOperacion() {
+    var op = operacion();
+    $('f-rangos').querySelectorAll('button[data-op]').forEach(function (b) { b.style.display = b.dataset.op === op ? '' : 'none'; });
+  }
+  function marcarRango() {
+    var cero = function (v) { var x = num(v); return x ? x : null; };
+    var mn = cero($('f-min').value), mx = cero($('f-max').value), op = operacion();
+    $('f-rangos').querySelectorAll('button').forEach(function (x) {
+      x.classList.toggle('on', (!x.dataset.op || x.dataset.op === op) && cero(x.dataset.min) === mn && cero(x.dataset.max) === mx);
+    });
+  }
+  document.querySelectorAll('input[name="operacion"]').forEach(function (r) {
+    r.addEventListener('change', function () { $('f-min').value = ''; $('f-max').value = ''; rangosOperacion(); marcarRango(); aplicar(); });
+  });
+  botones.forEach(function (b) { b.addEventListener('click', function () { abrir(true); }); });
   [$('cerrar-filtros'), fondo, $('ver')].forEach(function (e) { e.addEventListener('click', function () { abrir(false); }); });
   ['f-orden', 'f-sobre', 'f-bajo', 'f-30', 'f-baja', 'f-verif'].forEach(function (id) { $(id).addEventListener('change', aplicar); });
   ['f-min', 'f-max', 'f-area'].forEach(function (id) { $(id).addEventListener('input', aplicar); });
-  // Rango de precio: «Todos» (sin límite) o un rango. Escribir a mano marca el botón que coincida.
-  function marcarRango() {
-    var cero = function (v) { var x = num(v); return x ? x : null; };  // 0 y vacío = sin límite
-    var mn = cero($('f-min').value), mx = cero($('f-max').value);
-    $('f-rangos').querySelectorAll('button').forEach(function (x) {
-      x.classList.toggle('on', cero(x.dataset.min) === mn && cero(x.dataset.max) === mx);
-    });
-  }
   $('f-rangos').addEventListener('click', function (e) {
     var b = e.target.closest('button'); if (!b) return;
-    $('f-min').value = b.dataset.min && b.dataset.min !== '0' ? Number(b.dataset.min).toLocaleString('es-CO') : '';
-    $('f-max').value = b.dataset.max ? Number(b.dataset.max).toLocaleString('es-CO') : '';
+    $('f-min').value = b.dataset.min && b.dataset.min !== '0' ? miles(b.dataset.min) : '';
+    $('f-max').value = b.dataset.max ? miles(b.dataset.max) : '';
     marcarRango(); aplicar();
   });
   ['f-min', 'f-max'].forEach(function (id) { $(id).addEventListener('input', marcarRango); });
   $('f-hab').addEventListener('click', function (e) {
-    var b = e.target.closest('button'); if (!b) return;
-    this.querySelectorAll('button').forEach(function (x) { x.classList.remove('on'); });
-    b.classList.add('on'); hab = Number(b.dataset.v); aplicar();
+    var b = e.target.closest('button'); if (!b) return; hab = Number(b.dataset.v); marcar('f-hab', hab); aplicar();
   });
   $('f-parq').addEventListener('click', function (e) {
-    var b = e.target.closest('button'); if (!b) return;
-    this.querySelectorAll('button').forEach(function (x) { x.classList.remove('on'); });
-    b.classList.add('on'); parq = b.dataset.v; aplicar();
+    var b = e.target.closest('button'); if (!b) return; parq = b.dataset.v; marcar('f-parq', parq); aplicar();
   });
   $('limpiar').addEventListener('click', function () {
     ['f-min', 'f-max', 'f-area'].forEach(function (id) { $(id).value = ''; });
-    ['f-sobre', 'f-bajo', 'f-30', 'f-baja'].forEach(function (id) { $(id).checked = false; }); $('f-verif').checked = true;
-    $('f-orden').value = 'pos'; hab = 0; parq = '';
-    document.querySelectorAll('#f-parq button').forEach(function (x) { x.classList.toggle('on', x.dataset.v === ''); });
-    document.querySelectorAll('#f-hab button').forEach(function (x) { x.classList.remove('on'); });
-    document.querySelector('#f-hab button[data-v="0"]').classList.add('on'); marcarRango(); aplicar();
+    Object.keys(CHECKS).forEach(function (k) { $(CHECKS[k]).checked = false; }); $('f-verif').checked = true;
+    $('f-orden').value = 'pos'; hab = 0; parq = ''; marcar('f-hab', 0); marcar('f-parq', ''); marcarRango(); aplicar();
   });
-  aplicar();
+  cargar(); rangosOperacion(); marcarRango(); aplicar(false);
 })();
 </script>
 </body></html>
