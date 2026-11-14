@@ -144,27 +144,106 @@ def inicio():
                            elegidas=elegidas, p=params, r=resultado, args=request.args)
 
 
-@app.get("/lista")
-def lista_cliente():
-    """Lista para enviar a un cliente: solo dueños directos con teléfono, sin enlaces a los portales.
-    Se guarda como PDF desde el navegador (Imprimir → Guardar como PDF)."""
-    barrio = request.args.get("barrio", "").strip()
-    params = {**_params(), "solo_dueno": True, "con_telefono": True}
-    hab_min = int(request.args["hab_min"]) if request.args.get("hab_min", "").isdigit() else None
-    cliente = request.args.get("cliente", "").strip()[:60]
-    parq = request.args.get("parq", "") if request.args.get("parq") in ("si", "no") else ""
-    elegidas = [f for f in request.args.getlist("fuente") if f in FUENTES] or list(PORTALES)
-    resultado = buscar(barrio, crear_fuentes(elegidas), **params) if barrio else None
+def _anuncios_cliente(barrio: str, operacion: str, precio_max=None, hab_min=None, parq: str = "",
+                      solo_tel: bool = False, elegidas=None):
+    """Búsqueda para un cliente: solo dueños directos (sin «verificar»), con los filtros pedidos,
+    del más barato al más caro por m²."""
+    params = {"operacion": operacion, "solo_dueno": True, "con_telefono": solo_tel,
+              "area_min": None, "precio_max": precio_max}
+    resultado = buscar(barrio, crear_fuentes(elegidas or list(PORTALES)), **params) if barrio else None
     anuncios = []
     if resultado:
-        anuncios = [a for a in resultado.anuncios if a.telefonos and a.es_dueno_directo and not a.verificar
+        anuncios = [a for a in resultado.anuncios if a.es_dueno_directo and not a.verificar
+                    and (not solo_tel or a.telefonos)
                     and (not hab_min or (a.habitaciones or 0) >= hab_min)
                     and (parq != "si" or (a.parqueaderos or 0) > 0) and (parq != "no" or a.parqueaderos == 0)]
         anuncios.sort(key=lambda a: a.precio_m2)
-    from comparam import diario
-    return render_template("lista.html", barrio=barrio, p=params, r=resultado, anuncios=anuncios,
-                           cliente=cliente, hab_min=hab_min, parq=parq, fecha=diario.hoy().strftime("%d/%m/%Y"),
-                           args=request.args)
+    return params, resultado, anuncios
+
+
+def _texto_lista(barrio: str, operacion: str, anuncios, resultado, fecha: str, link: str = "") -> str:
+    """La lista como mensaje de WhatsApp (negritas con *)."""
+    arriendo = operacion == "arriendo"
+    lineas = [f"🏠 *Apartamentos en {barrio}* · {'Arriendo' if arriendo else 'Venta'}",
+              f"Directo con el dueño, sin inmobiliaria · {fecha}"]
+    if resultado and resultado.zona:
+        lineas.append(f"Precio del m² en {barrio}: {pesos(resultado.zona.mediana)}")
+    for i, a in enumerate(anuncios, 1):
+        partes = [pesos(a.precio) + ("/mes" if arriendo else ""), f"{a.area_m2:g} m²"]
+        if a.habitaciones:
+            partes.append(f"{a.habitaciones} hab")
+        if a.parqueaderos:
+            partes.append(f"🚗 {a.parqueaderos}")
+        if resultado and resultado.zona:
+            d = resultado.zona.diferencia(a.precio_m2)
+            partes.append(f"{abs(d):.0f}% {'bajo' if d < 0 else 'sobre'} el barrio")
+        lineas.append(f"\n*{i}.* " + " · ".join(partes))
+        if a.telefonos:
+            lineas.append("📞 " + " · ".join(a.telefonos))
+        if a.url:
+            lineas.append("🔗 " + a.url)
+    if link:
+        lineas.append(f"\nLista actualizada: {link}")
+    lineas.append("\nCompara m² · WhatsApp 316 398 8646")
+    return "\n".join(lineas)
+
+
+def _filtros_lista(args) -> dict:
+    return {
+        "barrio": args.get("barrio", "").strip()[:60],
+        "operacion": "arriendo" if args.get("operacion") == "arriendo" else "venta",
+        "precio_max": _float("precio_max"),
+        "hab_min": int(args["hab_min"]) if args.get("hab_min", "").isdigit() else None,
+        "parq": args.get("parq", "") if args.get("parq") in ("si", "no") else "",
+        "solo_tel": args.get("tel") == "1",
+        "cliente": args.get("cliente", "").strip()[:60],
+    }
+
+
+@app.get("/lista")
+def lista_cliente():
+    """Lista para un cliente: dueños directos con el link de cada anuncio. Se puede copiar como mensaje
+    de WhatsApp o compartir como link temporal (/c/...), que vence en los días elegidos."""
+    from comparam import diario, enlaces
+    f = _filtros_lista(request.args)
+    elegidas = [x for x in request.args.getlist("fuente") if x in FUENTES] or None
+    params, resultado, anuncios = _anuncios_cliente(f["barrio"], f["operacion"], f["precio_max"], f["hab_min"],
+                                                    f["parq"], f["solo_tel"], elegidas)
+    fecha = diario.hoy().strftime("%d/%m/%Y")
+    link = vence = None
+    dias = int(request.args.get("dias", "0")) if request.args.get("dias", "").isdigit() else 0
+    if dias in enlaces.DIAS_PERMITIDOS and f["barrio"] and enlaces.disponible():
+        token, vence = enlaces.crear({"b": f["barrio"], "o": f["operacion"], "pm": f["precio_max"], "h": f["hab_min"],
+                                      "pq": f["parq"], "t": f["solo_tel"], "c": f["cliente"]}, dias, diario.hoy())
+        link = request.host_url.rstrip("/") + "/c/" + token
+    return render_template("lista.html", barrio=f["barrio"], p=params, r=resultado, anuncios=anuncios,
+                           cliente=f["cliente"], hab_min=f["hab_min"], parq=f["parq"], solo_tel=f["solo_tel"],
+                           fecha=fecha, args=request.args, link=link, vence=vence, dias=dias,
+                           links_disponibles=enlaces.disponible(), modo_cliente=False,
+                           texto=_texto_lista(f["barrio"], f["operacion"], anuncios, resultado, fecha, link or ""))
+
+
+@app.get("/c/<token>")
+def lista_compartida(token: str):
+    """Link temporal que recibe el cliente: la lista vigente hasta la fecha de vencimiento."""
+    from comparam import diario, enlaces
+    try:
+        d, vence = enlaces.leer(token)
+    except enlaces.LinkInvalido:
+        return render_template("lista_vencida.html", vence=None), 404
+    if diario.hoy() > vence:
+        return render_template("lista_vencida.html", vence=vence.strftime("%d/%m/%Y")), 410
+    params, resultado, anuncios = _anuncios_cliente(d.get("b", ""), d.get("o", "venta"), d.get("pm"), d.get("h"),
+                                                    d.get("pq", ""), bool(d.get("t")))
+    r = render_template("lista.html", barrio=d.get("b", ""), p=params, r=resultado, anuncios=anuncios,
+                        cliente=d.get("c", ""), hab_min=d.get("h"), parq=d.get("pq", ""), solo_tel=bool(d.get("t")),
+                        fecha=diario.hoy().strftime("%d/%m/%Y"), args={}, link=None, vence=vence, dias=0,
+                        links_disponibles=False, modo_cliente=True, texto="")
+    from flask import make_response
+    resp = make_response(r)
+    resp.headers["X-Robots-Tag"] = "noindex"
+    resp.headers["Cache-Control"] = "private, no-store"
+    return resp
 
 
 def _mensaje_whatsapp(lista: list[dict], fecha: str) -> str:

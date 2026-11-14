@@ -324,7 +324,7 @@
   </section>
   {% endif %}
   {% if r.anuncios %}
-  <a class="btn-lista" href="/lista?barrio={{ barrio|urlencode }}&operacion={{ p.operacion }}{% if args.area_min %}&area_min={{ args.area_min|urlencode }}{% endif %}" onclick="if(window.filtrosLista)this.href+=filtrosLista();document.getElementById('cargando-txt').textContent='Armando la lista para el cliente…';document.getElementById('cargando').style.display='grid'">📄 Lista para cliente (PDF)</a>
+  <a class="btn-lista" href="/lista?barrio={{ barrio|urlencode }}&operacion={{ p.operacion }}{% if args.area_min %}&area_min={{ args.area_min|urlencode }}{% endif %}" onclick="if(window.filtrosLista)this.href+=filtrosLista();document.getElementById('cargando-txt').textContent='Armando la lista para el cliente…';document.getElementById('cargando').style.display='grid'">📋 Lista para cliente</a>
   <div class="titulo-lista">{{ r.anuncios|length }} resultado(s) en {{ barrio }} <span class="meta">· {{ r.total_encontrados }} anuncios revisados</span></div>
   {% if r.ocultos %}<div class="ocultos">{% set nd = r.anuncios|selectattr('es_dueno_directo')|list|length %}{% set nv = r.anuncios|selectattr('verificar')|list|length %}{{ nd }} de dueño directo{% if nv %} · {{ nv }} por verificar{% endif %} · {{ r.ocultos }} de inmobiliarias ocultos · <a href="{{ url_con_inmobiliarias() }}">Ver todos</a></div>{% endif %}
   <div class="barra-filtros"><button type="button" id="abrir-filtros">⚙ Filtros</button><span class="meta" id="conteo"></span></div>

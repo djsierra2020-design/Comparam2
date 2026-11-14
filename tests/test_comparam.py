@@ -1043,14 +1043,16 @@ def test_sitio_publico(tmp_path):
     assert "Probar la app" in (tmp_path / "index.html").read_text() and r["zonas"] == 2
 
 
-def test_lista_para_cliente_sin_enlaces_y_con_telefono():
+def test_lista_para_cliente_con_links_y_texto_whatsapp():
     import app as webapp
     c = webapp.app.test_client()
     html = c.get("/lista?barrio=Cedritos&fuente=ejemplo&operacion=venta&cliente=Ana").get_data(as_text=True)
     assert "Compara m²" in html and "Ana" in html
     assert "300 000 0001" in html          # dueño directo con teléfono
     assert "Inmobiliaria Ejemplo" not in html
-    assert "fincaraiz.com" not in html and "href=\"http" not in html  # sin enlaces a portales
+    assert "Copiar lista para WhatsApp" in html and "*Apartamentos en Cedritos*" in html
+    solo_tel = c.get("/lista?barrio=Cedritos&fuente=ejemplo&tel=1").get_data(as_text=True)
+    assert "300 000 0001" in solo_tel
     assert c.get("/lista").status_code == 200
     assert "Lista para cliente" in c.get("/?barrio=Cedritos&fuente=ejemplo").get_data(as_text=True)
 
@@ -1109,3 +1111,31 @@ def test_filtros_se_pueden_elegir_antes_de_buscar():
     assert 'id="filtros-form"' in html and 'id="hoja"' in html and 'id="f-parq"' in html
     assert 'data-op="arriendo"' in html and 'data-op="venta"' in html
     assert "Hasta $1,1M" in html
+
+
+
+def test_link_temporal_para_cliente(monkeypatch):
+    from datetime import date, timedelta
+    import app as webapp
+    from comparam import diario, enlaces
+    from comparam.busqueda import Resultado
+    monkeypatch.setenv("LINK_SECRET", "prueba")
+    a = Listing("fincaraiz", "Apto", "Cedritos", 2e6, 60, url="https://portal.co/a1", telefonos=["3001112233"],
+                es_dueno_directo=True)
+    monkeypatch.setattr(webapp, "buscar", lambda *x, **k: Resultado([a]))
+    c = webapp.app.test_client()
+    html = c.get("/lista?barrio=Cedritos&operacion=arriendo&dias=7").get_data(as_text=True)
+    assert "Link listo" in html
+    link = html.split('id="link" value="')[1].split('"')[0]
+    ruta = link[link.index("/c/"):]
+    r = c.get(ruta)
+    assert r.status_code == 200 and "https://portal.co/a1" in r.get_data(as_text=True)
+    assert "válida hasta" in r.get_data(as_text=True)
+    # alterado: inválido
+    assert c.get(ruta[:-2] + "xx").status_code == 404
+    # vencido
+    monkeypatch.setattr(diario, "hoy", lambda: date.today() + timedelta(days=30))
+    assert c.get(ruta).status_code == 410
+    # sin clave no se crean links
+    monkeypatch.delenv("LINK_SECRET"); monkeypatch.delenv("ML_CLIENT_SECRET", raising=False)
+    assert not enlaces.disponible()
