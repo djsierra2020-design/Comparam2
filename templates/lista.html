@@ -51,6 +51,7 @@
   <form method="get" action="/lista" onsubmit="this.querySelector('button[type=submit]').textContent='Buscando… (hasta 1 minuto)'">
     <label>Barrio<input name="barrio" value="{{ barrio }}" required></label>
     <label>Operación<select name="operacion"><option value="arriendo" {% if p.operacion == 'arriendo' %}selected{% endif %}>Arriendo</option><option value="venta" {% if p.operacion == 'venta' %}selected{% endif %}>Venta</option></select></label>
+    <label>Tipo<select name="tipo"><option value="apartamento">Apartamento</option><option value="casa" {% if tipo == 'casa' %}selected{% endif %}>Casa</option></select></label>
     <label>Precio máximo<input name="precio_max" inputmode="numeric" value="{{ args.precio_max or '' }}" placeholder="Sin límite"></label>
     <label>Habitaciones mín.<select name="hab_min"><option value="">Cualquiera</option>{% for n in range(1,5) %}<option value="{{ n }}" {% if hab_min == n %}selected{% endif %}>{{ n }}+</option>{% endfor %}</select></label>
     <label>Parqueadero<select name="parq"><option value="">Cualquiera</option><option value="si" {% if parq == 'si' %}selected{% endif %}>Con parqueadero</option><option value="no" {% if parq == 'no' %}selected{% endif %}>Sin parqueadero</option></select></label>
@@ -74,29 +75,29 @@
   <div class="linkbox">✅ Link listo · vence el <b>{{ vence.strftime('%d/%m/%Y') }}</b>
     <input id="link" value="{{ link }}" readonly onclick="this.select()">
     <div class="fila"><button type="button" class="amar" id="copiar-link">Copiar link</button>
-    <button type="button" class="verde-btn" onclick="location.href='https://wa.me/?text='+encodeURIComponent('🏠 Tu lista de apartamentos en {{ barrio }} directo con el dueño (válida hasta el {{ vence.strftime('%d/%m/%Y') }}): '+document.getElementById('link').value)">Enviar por WhatsApp</button></div>
+    <button type="button" class="verde-btn" onclick="location.href='https://wa.me/?text='+encodeURIComponent('🏠 Tu lista de {{ NOMBRE_TIPO[tipo][1]|lower }} en {{ barrio }} directo con el dueño (válida hasta el {{ vence.strftime('%d/%m/%Y') }}): '+document.getElementById('link').value)">Enviar por WhatsApp</button></div>
     <p>El cliente ve siempre los anuncios vigentes de ese día. Después de la fecha, el link deja de funcionar.</p>
   </div>
   {% endif %}
   <textarea id="texto" style="position:absolute;left:-9999px" readonly>{{ texto }}</textarea>
   <p>¿Prefieres un archivo? <a href="#" onclick="window.print();return false">Guardar como PDF</a></p>
   {% endif %}
-  <p><a href="/?barrio={{ barrio|urlencode }}&operacion={{ p.operacion }}">← Volver a la búsqueda</a></p>
+  <p><a href="/?barrio={{ barrio|urlencode }}&operacion={{ p.operacion }}&tipo={{ tipo }}">← Volver a la búsqueda</a></p>
 </div>
 {% endif %}
 <div class="hoja">
-  <header><img src="/static/icon-192.png" alt=""><div><b>Compara m²</b><span>Apartamentos directo con el dueño · WhatsApp 316 398 8646</span></div></header>
+  <header><img src="/static/icon-192.png" alt=""><div><b>Compara m²</b><span>{{ NOMBRE_TIPO[tipo][1] }} directo con el dueño · WhatsApp 316 398 8646</span></div></header>
   {% if barrio %}
   <div class="datos">
     {% if cliente %}<div>Para: <b>{{ cliente }}</b></div>{% endif %}
     <div>Barrio: <b>{{ barrio }}</b></div>
-    <div>{{ 'Arriendo' if p.operacion == 'arriendo' else 'Venta' }}{% if p.precio_max %} · hasta <b>{{ p.precio_max|pesos }}</b>{% endif %}{% if hab_min %} · <b>{{ hab_min }}+</b> hab{% endif %}{% if parq == 'si' %} · con parqueadero{% elif parq == 'no' %} · sin parqueadero{% endif %}</div>
+    <div>{{ NOMBRE_TIPO[tipo][1] }} en {{ 'arriendo' if p.operacion == 'arriendo' else 'venta' }}{% if p.precio_max %} · hasta <b>{{ p.precio_max|pesos }}</b>{% endif %}{% if hab_min %} · <b>{{ hab_min }}+</b> hab{% endif %}{% if parq == 'si' %} · con parqueadero{% elif parq == 'no' %} · sin parqueadero{% endif %}</div>
     <div>Fecha: <b>{{ fecha }}</b></div>
   </div>
   {% if modo_cliente and vence %}<div class="vence">⏳ Lista válida hasta el {{ vence.strftime('%d/%m/%Y') }} · se actualiza cada día</div>{% endif %}
   {% if r and r.zona %}
   <div class="zona">Precio del m² en {{ barrio }} (mediana de {{ r.zona.anuncios }} anuncios): <b>{{ r.zona.mediana|pesos }}</b><br>
-    <span class="m">Verde = el apartamento pide menos por m² que el promedio del barrio.</span></div>
+    <span class="m">Verde = {{ NOMBRE_TIPO[tipo][2] }} pide menos por m² que el promedio del barrio.</span></div>
   {% endif %}
   {% for a in anuncios %}{% set h = hist(a, p.operacion) %}
   <div class="apto">
@@ -109,9 +110,9 @@
     {% if a.url %}<div><a class="ver" href="{{ a.url }}" target="_blank" rel="noopener">🔗 Ver anuncio en {{ a.fuente|portal }}</a></div>{% endif %}
   </div>
   {% else %}
-  <div class="vacio">{% if r %}No hay apartamentos de dueño directo para esta búsqueda{% if solo_tel %} con teléfono publicado{% endif %}. Prueba otro barrio, sube el precio máximo o quita filtros.{% else %}Escribe un barrio arriba y toca Actualizar.{% endif %}</div>
+  <div class="vacio">{% if r %}No hay {{ NOMBRE_TIPO[tipo][1]|lower }} de dueño directo para esta búsqueda{% if solo_tel %} con teléfono publicado{% endif %}. Prueba otro barrio, sube el precio máximo o quita filtros.{% else %}Escribe un barrio arriba y toca Actualizar.{% endif %}</div>
   {% endfor %}
-  {% if anuncios %}<footer>{{ anuncios|length }} apartamento{{ 's' if anuncios|length != 1 }} publicados directamente por sus dueños, ordenados del más barato al más caro por m². Precios y disponibilidad según lo publicado el {{ fecha }}; confirma con el dueño antes de visitar.</footer>{% endif %}
+  {% if anuncios %}<footer>{{ anuncios|length }} {{ (NOMBRE_TIPO[tipo][1] if anuncios|length != 1 else NOMBRE_TIPO[tipo][0])|lower }} publicad{{ "a" if tipo == "casa" else "o" }}{{ 's' if anuncios|length != 1 }} directamente por sus dueños, ordenados del más barato al más caro por m². Precios y disponibilidad según lo publicado el {{ fecha }}; confirma con el dueño antes de visitar.</footer>{% endif %}
   {% if modo_cliente %}<a class="wa-pie" href="https://wa.me/573163988646?text={{ ('Hola, vi la lista de ' ~ barrio ~ ' y quiero más opciones')|urlencode }}">💬 ¿Quieres más opciones? Escríbenos</a>{% endif %}
   {% else %}
   <div class="vacio">Escribe un barrio arriba y toca Actualizar.</div>

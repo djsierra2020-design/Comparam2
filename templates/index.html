@@ -207,6 +207,10 @@
     <input type="radio" id="op-v" name="operacion" value="venta" {% if p.operacion=='venta' %}checked{% endif %}><label for="op-v">Comprar</label>
     <input type="radio" id="op-a" name="operacion" value="arriendo" {% if p.operacion=='arriendo' %}checked{% endif %}><label for="op-a">Arrendar</label>
   </div>
+  <div class="segmento">
+    <input type="radio" id="ti-a" name="tipo" value="apartamento" {% if tipo != 'casa' %}checked{% endif %}><label for="ti-a">🏢 Apartamento</label>
+    <input type="radio" id="ti-c" name="tipo" value="casa" {% if tipo == 'casa' %}checked{% endif %}><label for="ti-c">🏠 Casa</label>
+  </div>
   <div class="chips">
     <span class="chip"><input type="checkbox" id="todos" name="todos" value="1" {% if not p.solo_dueno %}checked{% endif %}><label for="todos">Incluir inmobiliarias</label></span>
     <span class="chip"><input type="checkbox" id="ct" name="con_telefono" value="1" {% if p.con_telefono %}checked{% endif %}><label for="ct">Solo con teléfono</label></span>
@@ -226,7 +230,7 @@
 
 {% if not r and not rc %}
 <section class="inicio">
-  <h2>Encuentra el apartamento más barato por m²</h2>
+  <h2>Encuentra {{ NOMBRE_TIPO[tipo][2] }} más barat{{ "a" if tipo == "casa" else "o" }} por m²</h2>
   <div>Compara los anuncios de los portales y te mostramos primero los de dueño directo, con su teléfono.</div>
   <div class="rapidos">
     {% for b in ["Cedritos", "Chapinero", "Suba", "Fontibón", "Kennedy", "Bosa", "Teusaquillo"] %}
@@ -252,7 +256,7 @@
       {% endif %}
       <div class="kpi"><div class="meta">Barrios y localidades comparables</div><b>{{ rc.zonas|length }}</b></div>
     </div>
-    <p class="meta">Cada apartamento se compara con la mediana del precio de oferta del m² de <b>su propio barrio</b> (calculada con todos los anuncios de ese barrio, incluidas inmobiliarias). Si su barrio tiene menos de 3 anuncios, se compara con su <b>localidad</b>{% if rc.zona_pequena %}; {{ rc.zona_pequena }} anuncios quedaron por fuera porque no se pudo saber su localidad o tenía muy pocos anuncios{% endif %}{% if rc.sin_zona %}, y {{ rc.sin_zona }} no indicaban su barrio{% endif %}.</p>
+    <p class="meta">Cada {{ NOMBRE_TIPO[tipo][0]|lower }} se compara con la mediana del precio de oferta del m² de <b>su propio barrio</b> (calculada con todos los anuncios de ese barrio, incluidas inmobiliarias). Si su barrio tiene menos de 3 anuncios, se compara con su <b>localidad</b>{% if rc.zona_pequena %}; {{ rc.zona_pequena }} anuncios quedaron por fuera porque no se pudo saber su localidad o tenía muy pocos anuncios{% endif %}{% if rc.sin_zona %}, y {{ rc.sin_zona }} no indicaban su barrio{% endif %}.</p>
     {% if rc.zonas %}
     <details>
       <summary>Ver precio del m² por barrio y localidad ({{ rc.zonas|length }})</summary>
@@ -285,7 +289,7 @@
   {% endfor %}
   </ol>
   {% else %}
-  <div class="aviso">No se encontraron apartamentos para comparar ({{ rc.total_encontrados }} anuncios revisados).{% if p.solo_dueno %} Prueba marcando «Incluir inmobiliarias».{% endif %}</div>
+  <div class="aviso">No se encontraron {{ NOMBRE_TIPO[tipo][1]|lower }} para comparar ({{ rc.total_encontrados }} anuncios revisados).{% if p.solo_dueno %} Prueba marcando «Incluir inmobiliarias».{% endif %}</div>
   {% endif %}
 {% endif %}
 
@@ -324,7 +328,7 @@
   </section>
   {% endif %}
   {% if r.anuncios %}
-  <a class="btn-lista" href="/lista?barrio={{ barrio|urlencode }}&operacion={{ p.operacion }}{% if args.area_min %}&area_min={{ args.area_min|urlencode }}{% endif %}" onclick="if(window.filtrosLista)this.href+=filtrosLista();document.getElementById('cargando-txt').textContent='Armando la lista para el cliente…';document.getElementById('cargando').style.display='grid'">📋 Lista para cliente</a>
+  <a class="btn-lista" href="/lista?barrio={{ barrio|urlencode }}&operacion={{ p.operacion }}&tipo={{ tipo }}{% if args.area_min %}&area_min={{ args.area_min|urlencode }}{% endif %}" onclick="if(window.filtrosLista)this.href+=filtrosLista();document.getElementById('cargando-txt').textContent='Armando la lista para el cliente…';document.getElementById('cargando').style.display='grid'">📋 Lista para cliente</a>
   <div class="titulo-lista">{{ r.anuncios|length }} resultado(s) en {{ barrio }} <span class="meta">· {{ r.total_encontrados }} anuncios revisados</span></div>
   {% if r.ocultos %}<div class="ocultos">{% set nd = r.anuncios|selectattr('es_dueno_directo')|list|length %}{% set nv = r.anuncios|selectattr('verificar')|list|length %}{{ nd }} de dueño directo{% if nv %} · {{ nv }} por verificar{% endif %} · {{ r.ocultos }} de inmobiliarias ocultos · <a href="{{ url_con_inmobiliarias() }}">Ver todos</a></div>{% endif %}
   <div class="barra-filtros"><button type="button" id="abrir-filtros">⚙ Filtros</button><span class="meta" id="conteo"></span></div>
@@ -347,7 +351,7 @@
   {% endfor %}
   </ol>
   {% else %}
-  <div class="aviso">No se encontraron apartamentos {% if p.solo_dueno %}de dueño directo {% endif %}en {{ barrio }} ({{ r.total_encontrados }} anuncios revisados).{% if p.solo_dueno %} <a href="{{ url_con_inmobiliarias() }}">Ver los de inmobiliarias</a>.{% endif %}</div>
+  <div class="aviso">No se encontraron {{ NOMBRE_TIPO[tipo][1]|lower }} {% if p.solo_dueno %}de dueño directo {% endif %}en {{ barrio }} ({{ r.total_encontrados }} anuncios revisados).{% if p.solo_dueno %} <a href="{{ url_con_inmobiliarias() }}">Ver los de inmobiliarias</a>.{% endif %}</div>
   {% endif %}
 {% endif %}
 </main>
@@ -414,8 +418,13 @@ document.getElementById('f').addEventListener('submit', function (e) {
   if (modo === 'ciudad') document.getElementById('cargando-txt').textContent = 'En toda Bogotá puede tardar hasta 1 minuto.';
   document.getElementById('cargando').style.display = 'grid';
 });
+// Barrios rápidos: buscan con lo elegido arriba (comprar/arrendar, apartamento/casa y filtros).
 document.querySelectorAll('.rapidos a').forEach(function (a) {
-  a.addEventListener('click', function () { document.getElementById('cargando').style.display = 'grid'; });
+  a.addEventListener('click', function (e) {
+    var f = document.getElementById('f'); if (!f.requestSubmit) return;
+    e.preventDefault(); f.barrio.value = a.textContent.trim();
+    f.requestSubmit(f.querySelector('button[value="barrio"]'));
+  });
 });
 // Al volver con «atrás», ocultar el aviso de carga.
 window.addEventListener('pageshow', function () { document.getElementById('cargando').style.display = 'none'; });

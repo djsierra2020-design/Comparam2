@@ -34,6 +34,8 @@ class PortalWeb(Source):
     plantilla_ciudad = ""  # URL de búsqueda en toda Bogotá
     por_pagina = 48  # para {desde} en portales que paginan por posición
     operaciones = {"venta": "venta", "arriendo": "arriendo"}
+    # Cómo nombra el portal cada tipo de inmueble en sus direcciones ({tipo} en la plantilla).
+    tipos = {"apartamento": "apartamentos", "casa": "casas"}
 
     def __init__(self, paginas: int = 2, detalle: bool = True, timeout: float = 20,
                  sesion: requests.Session | None = None, pausa: float = 1.0):
@@ -50,7 +52,8 @@ class PortalWeb(Source):
     def url_busqueda(self, barrio: str, operacion: str, pagina: int) -> str:
         plantilla = self.plantilla if barrio.strip() else self.plantilla_ciudad
         return plantilla.format(operacion=self.operaciones[operacion], barrio=slugify(barrio),
-                                pagina=pagina, desde=(pagina - 1) * self.por_pagina + 1)
+                                pagina=pagina, desde=(pagina - 1) * self.por_pagina + 1,
+                                tipo=self.tipos.get(self.tipo, self.tipos["apartamento"]))
 
     def _get(self, url: str) -> str:
         try:
@@ -74,7 +77,7 @@ class PortalWeb(Source):
                 break
             url = self.url_busqueda(barrio, operacion, pagina)
             html = self._get(url)
-            nuevos = extraer_anuncios(html, self.nombre, self.base_url, operacion) if html else []
+            nuevos = extraer_anuncios(html, self.nombre, self.base_url, operacion, tipo=self.tipo) if html else []
             if pagina == 1:
                 self.total_publicados = total_publicados(html, len(nuevos)) if html else None
             if pagina == 1 and not nuevos:
@@ -106,7 +109,7 @@ class PortalWeb(Source):
         soup = BeautifulSoup(html, "html.parser")
         tels = [a["href"][4:] for a in soup.select('a[href^="tel:"]')]
         tels += [re.sub(r"\D", "", a["href"]) for a in soup.select('a[href*="wa.me"], a[href*="whatsapp"]')]
-        detalle = extraer_anuncios(html, self.nombre, self.base_url, operacion)
+        detalle = extraer_anuncios(html, self.nombre, self.base_url, operacion, tipo=self.tipo)
         for d in detalle:
             tels += d.telefonos
             if anuncio.parqueaderos is None and d.parqueaderos is not None:
@@ -135,7 +138,7 @@ class PortalWeb(Source):
             except requests.RequestException as e:
                 return {**info, "error": f"no se pudo conectar: {e.__class__.__name__}"}
             html = r.text
-        anuncios = extraer_anuncios(html, self.nombre, self.base_url, operacion)
+        anuncios = extraer_anuncios(html, self.nombre, self.base_url, operacion, tipo=self.tipo)
         info.update(
             estado=r.status_code, url_final=r.url, bytes=len(html), titulo=_titulo(html),
             bloques_json=contar_bloques_json(html), anuncios=len(anuncios),
@@ -225,8 +228,8 @@ class ConNavegador:
 class FincaRaiz(PortalWeb):
     nombre = "fincaraiz"
     base_url = "https://www.fincaraiz.com.co"
-    plantilla = base_url + "/{operacion}/apartamentos/{barrio}/bogota/pagina{pagina}"
-    plantilla_ciudad = base_url + "/{operacion}/apartamentos/bogota-dc/pagina{pagina}"
+    plantilla = base_url + "/{operacion}/{tipo}/{barrio}/bogota/pagina{pagina}"
+    plantilla_ciudad = base_url + "/{operacion}/{tipo}/bogota-dc/pagina{pagina}"
 
 
 class Metrocuadrado(ConNavegador, PortalWeb):
@@ -240,8 +243,9 @@ class Metrocuadrado(ConNavegador, PortalWeb):
 class Ciencuadras(PortalWeb):
     nombre = "ciencuadras"
     base_url = "https://www.ciencuadras.com"
-    plantilla = base_url + "/{operacion}/bogota/apartamento/{barrio}?page={pagina}"
-    plantilla_ciudad = base_url + "/{operacion}/bogota/apartamento?page={pagina}"
+    tipos = {"apartamento": "apartamento", "casa": "casa"}
+    plantilla = base_url + "/{operacion}/bogota/{tipo}/{barrio}?page={pagina}"
+    plantilla_ciudad = base_url + "/{operacion}/bogota/{tipo}?page={pagina}"
 
 
 class PortalEmpresa(PortalWeb):
@@ -256,8 +260,10 @@ class PortalEmpresa(PortalWeb):
     def url_busqueda(self, barrio: str, operacion: str, pagina: int) -> str:
         return self.plantilla_ciudad.format(operacion=self.operaciones[operacion], barrio="", pagina=pagina)
 
+    solo_tipos = ("apartamento",)  # Habi y Houm: solo apartamentos
+
     def buscar(self, barrio: str, operacion: str = "venta") -> list[Listing]:
-        if operacion not in self.operaciones:
+        if operacion not in self.operaciones or self.tipo not in self.solo_tipos:
             return []
         self.detalle = False  # no hay teléfonos de propietarios que buscar
         objetivo = slugify(barrio)
@@ -360,7 +366,10 @@ class Rentola(PortalCiudad):
         for dominio in self.dominios:
             self.base_url, self.plantilla_ciudad = dominio, dominio + self.ruta
             try:
-                return super().buscar(barrio, operacion)
+                anuncios = super().buscar(barrio, operacion)
+                if self.tipo == "casa":  # Rentola mezcla tipos: solo los que dicen que son casa
+                    anuncios = [a for a in anuncios if re.search(r"\bcasas?\b", f"{a.titulo} {a.descripcion}", re.I)]
+                return anuncios
             except FuenteError as e:
                 if "no se pudo conectar" not in str(e):
                     raise

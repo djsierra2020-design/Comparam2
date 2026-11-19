@@ -24,6 +24,8 @@ class Guardados(Source):
     def buscar(self, barrio: str, operacion: str = "venta") -> list[Listing]:
         from .. import diario
 
+        if self.tipo != "apartamento":  # la revisión diaria solo guarda apartamentos
+            return []
         historial = diario.cargar_json(diario.HISTORIAL, {})
         desde = (diario.hoy() - timedelta(days=self.dias)).isoformat()
         objetivo = slugify(barrio)

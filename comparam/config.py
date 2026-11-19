@@ -7,10 +7,11 @@ from .sources import PORTALES, ArchivoCSV, Source, navegador
 
 RAIZ = Path(__file__).resolve().parent.parent
 EJEMPLO = RAIZ / "data" / "ejemplo.csv"
+TIPOS = ("apartamento", "casa")
 
 
 def crear_fuentes(nombres: list[str] | None = None, csv: list[str] | None = None,
-                  paginas: int = 2, detalle: bool = True) -> list[Source]:
+                  paginas: int = 2, detalle: bool = True, tipo: str = "apartamento") -> list[Source]:
     """Construye las fuentes. Por defecto: los tres portales + CSV de COMPARAM_CSV."""
     todos = nombres is None or set(nombres) >= set(PORTALES)
     nombres = nombres if nombres is not None else list(PORTALES)
@@ -36,6 +37,8 @@ def crear_fuentes(nombres: list[str] | None = None, csv: list[str] | None = None
         fuentes.append(Guardados())
     rutas = list(csv or []) + [p for p in os.environ.get("COMPARAM_CSV", "").split(os.pathsep) if p]
     fuentes += [ArchivoCSV(r) for r in rutas]
+    for f in fuentes:  # «apartamento» o «casa»: cada portal arma su búsqueda con este tipo
+        f.tipo = tipo if tipo in TIPOS else "apartamento"
     return fuentes
 
 

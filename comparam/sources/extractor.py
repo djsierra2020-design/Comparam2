@@ -226,9 +226,9 @@ def _bloques_json(html: str) -> Iterator[Any]:
 
 
 def extraer_anuncios(html: str, fuente: str, base_url: str, operacion: str = "venta",
-                     barrio_por_defecto: str = "") -> list[Listing]:
-    anuncios = extraer_de_json(list(_bloques_json(html)), fuente, base_url, operacion, barrio_por_defecto)
-    return anuncios or extraer_de_tarjetas(html, fuente, base_url, operacion, barrio_por_defecto)
+                     barrio_por_defecto: str = "", tipo: str = "apartamento") -> list[Listing]:
+    anuncios = extraer_de_json(list(_bloques_json(html)), fuente, base_url, operacion, barrio_por_defecto, tipo)
+    return anuncios or extraer_de_tarjetas(html, fuente, base_url, operacion, barrio_por_defecto, tipo)
 
 
 _PRECIO_TXT = re.compile(r"\$\s?(\d{1,3}(?:[.,]\d{3}){2,})")
@@ -317,7 +317,7 @@ def _muestra_tarjeta(el, texto: str) -> str:
 
 
 def extraer_de_tarjetas(html: str, fuente: str, base_url: str, operacion: str = "venta",
-                        barrio_por_defecto: str = "") -> list[Listing]:
+                        barrio_por_defecto: str = "", tipo: str = "apartamento") -> list[Listing]:
     """Lee los anuncios desde las tarjetas visibles de la página (precio, área y enlace), para
     portales que no incluyen los datos en JSON. Toma el elemento más pequeño que contenga un
     precio y un área, para no mezclar varios anuncios en uno."""
@@ -367,13 +367,14 @@ def extraer_de_tarjetas(html: str, fuente: str, base_url: str, operacion: str = 
             barrio_tarjeta = barrio_por_defecto
         if not anuncios:
             MUESTRAS[fuente] = "tarjeta: " + _muestra_tarjeta(el, texto)  # la más reciente
-        if _NO_APTO.search(titulo) or _NO_APTO.search(texto[:200]):
+        no_tipo = _NO_TIPO.get(tipo, _NO_APTO)
+        if no_tipo.search(titulo) or no_tipo.search(texto[:200]):
             continue
         etiqueta, dueno = clasificar_anunciante("", "", texto)
         hab = re.search(r"(\d+)\s*(?:hab|alcoba)", texto, re.I)
         ban = re.search(r"(\d+)\s*baño", texto, re.I)
         anuncios.append(Listing(
-            fuente=fuente, titulo=titulo or (f"Apartamento en {barrio_tarjeta}" if barrio_tarjeta else "Apartamento"),
+            fuente=fuente, titulo=titulo or (f"{_NOMBRE_TIPO.get(tipo, 'Apartamento')} en {barrio_tarjeta}" if barrio_tarjeta else _NOMBRE_TIPO.get(tipo, "Apartamento")),
             barrio=barrio_tarjeta, precio=precio, publicado=_fecha_hace(texto),
             area_m2=area, url=url, telefonos=extract_phones(texto) if _TELEFONO_TXT.search(texto) else [],
             publicado_por=etiqueta, es_dueno_directo=dueno,
@@ -387,12 +388,18 @@ def extraer_de_tarjetas(html: str, fuente: str, base_url: str, operacion: str = 
 # (p. ej. dos precios pegados) o no es un apartamento.
 M2_VENTA = (700_000, 35_000_000)
 M2_ARRIENDO = (5_000, 250_000)
-_NO_APTO = re.compile(r"\b(casas?|lotes?|locales?|oficinas?|bodegas?|fincas?|consultorios?|edificios?|"
-                      r"casalotes?|parqueaderos?)\s+en\s+(venta|arriendo)", re.I)
+_OTROS = r"lotes?|locales?|oficinas?|bodegas?|fincas?|consultorios?|edificios?|casalotes?|parqueaderos?"
+# Anuncios de otro tipo de inmueble («Casa en venta en …» cuando se buscan apartamentos y al revés).
+_NO_TIPO = {
+    "apartamento": re.compile(rf"\b(casas?|{_OTROS})\s+en\s+(venta|arriendo)", re.I),
+    "casa": re.compile(rf"\b(apartamentos?|apartaestudios?|aptos?|{_OTROS})\s+en\s+(venta|arriendo)", re.I),
+}
+_NO_APTO = _NO_TIPO["apartamento"]
+_NOMBRE_TIPO = {"apartamento": "Apartamento", "casa": "Casa"}
 
 
-def es_valido(titulo: str, precio: float, area: float, operacion: str) -> bool:
-    if _NO_APTO.search(titulo or ""):
+def es_valido(titulo: str, precio: float, area: float, operacion: str, tipo: str = "apartamento") -> bool:
+    if _NO_TIPO.get(tipo, _NO_APTO).search(titulo or ""):
         return False
     if not (15 <= area <= 2_000):
         return False
@@ -421,7 +428,7 @@ def _muestra(d: dict) -> str:
 
 
 def extraer_de_json(bloques: list, fuente: str, base_url: str, operacion: str = "venta",
-                    barrio_por_defecto: str = "") -> list[Listing]:
+                    barrio_por_defecto: str = "", tipo: str = "apartamento") -> list[Listing]:
     """Reconoce anuncios en cualquier estructura JSON de la página."""
     claves_precio = (K_PRECIO_ARRIENDO if operacion == "arriendo" else K_PRECIO_VENTA) + K_PRECIO
     vistos: set[tuple] = set()
@@ -437,7 +444,7 @@ def extraer_de_json(bloques: list, fuente: str, base_url: str, operacion: str = 
             if precio < minimo or not (15 <= area <= 2_000):
                 continue
             titulo = _texto(_primero(d, K_TITULO))
-            if not es_valido(titulo, precio, area, operacion):
+            if not es_valido(titulo, precio, area, operacion, tipo):
                 continue
             descripcion = _texto(_primero(d, K_DESC))
             url = _texto(_primero(d, K_URL))
@@ -459,7 +466,7 @@ def extraer_de_json(bloques: list, fuente: str, base_url: str, operacion: str = 
             telefonos = list(dict.fromkeys(_telefonos(d) + extract_phones(descripcion)))
             anuncios.append(Listing(
                 fuente=fuente,
-                titulo=titulo or (f"Apartamento en {_barrio(d)}" if _barrio(d) else "Apartamento"),
+                titulo=titulo or (f"{_NOMBRE_TIPO.get(tipo, 'Apartamento')} en {_barrio(d)}" if _barrio(d) else _NOMBRE_TIPO.get(tipo, "Apartamento")),
                 barrio=_barrio(d) or barrio_por_defecto,
                 ubicacion=_ubicacion(d),
                 precio=precio,
