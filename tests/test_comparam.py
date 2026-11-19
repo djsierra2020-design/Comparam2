@@ -1199,3 +1199,21 @@ def test_web_tiene_selector_de_casas(monkeypatch):
     vistos.clear()
     assert "Casas directo con el dueño" in c.get(ruta[ruta.index("/c/"):]).get_data(as_text=True)
     assert vistos["tipo"] == "casa"
+
+
+def test_titulo_de_casa_que_el_portal_llama_apartamento():
+    from comparam.sources.extractor import titulo_segun_tipo as f
+    url = "https://www.fincaraiz.com.co/inmueble/casa-en-arriendo/suba/bogota/123"
+    assert f("Apartamento en arriendo en Suba", url, "casa") == "Casa en arriendo en Suba"
+    assert f("Arriendo apto amplio", url, "casa") == "Arriendo casa amplio"
+    assert f("Apartamento en arriendo", url, "apartamento") == "Apartamento en arriendo"  # solo al buscar casas
+    assert f("Apartamento en arriendo", "https://p.co/inmueble/apartamento-en-arriendo/1", "casa") == "Apartamento en arriendo"
+    assert f("Casa esquinera", url, "casa") == "Casa esquinera"
+
+
+def test_casa_titulada_apartamento_no_se_descarta():
+    from comparam.sources.extractor import extraer_de_json
+    bloque = [{"listings": [{"title": "Apartamento en arriendo en Suba", "price": 2_500_000, "area": 120,
+                             "link": "/inmueble/casa-en-arriendo/suba/bogota/9"}]}]
+    a = extraer_de_json(bloque, "fincaraiz", "https://www.fincaraiz.com.co", "arriendo", tipo="casa")
+    assert len(a) == 1 and a[0].titulo == "Casa en arriendo en Suba"
