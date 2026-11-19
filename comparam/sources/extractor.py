@@ -228,7 +228,28 @@ def _bloques_json(html: str) -> Iterator[Any]:
 def extraer_anuncios(html: str, fuente: str, base_url: str, operacion: str = "venta",
                      barrio_por_defecto: str = "", tipo: str = "apartamento") -> list[Listing]:
     anuncios = extraer_de_json(list(_bloques_json(html)), fuente, base_url, operacion, barrio_por_defecto, tipo)
-    return anuncios or extraer_de_tarjetas(html, fuente, base_url, operacion, barrio_por_defecto, tipo)
+    anuncios = anuncios or extraer_de_tarjetas(html, fuente, base_url, operacion, barrio_por_defecto, tipo)
+    for a in anuncios:
+        a.titulo = titulo_segun_tipo(a.titulo, a.url, tipo)
+    return anuncios
+
+
+_CASA_URL = re.compile(r"(?<![a-z])casas?(?![a-z])")
+_APTO_TITULO = re.compile(r"\b(apartamentos?|aptos?|apartaestudios?)\b", re.I)
+
+
+def titulo_segun_tipo(titulo: str, url: str, tipo: str) -> str:
+    """Algunos portales titulan «Apartamento…» anuncios que su propio enlace marca como casa
+    (…/casa-en-arriendo-…). Al buscar casas, si el enlace dice casa y no apartamento, el título
+    se corrige para no confundir al cliente."""
+    ruta = (url or "").lower().split("?")[0]
+    if tipo != "casa" or not _CASA_URL.search(ruta) or "apartament" in ruta or "apto" in ruta:
+        return titulo
+    def cambio(m: re.Match) -> str:
+        plural = m.group(1).lower().endswith("s")
+        palabra = "casas" if plural else "casa"
+        return palabra.capitalize() if m.group(1)[0].isupper() else palabra
+    return _APTO_TITULO.sub(cambio, titulo or "", count=1)
 
 
 _PRECIO_TXT = re.compile(r"\$\s?(\d{1,3}(?:[.,]\d{3}){2,})")
@@ -367,8 +388,9 @@ def extraer_de_tarjetas(html: str, fuente: str, base_url: str, operacion: str = 
             barrio_tarjeta = barrio_por_defecto
         if not anuncios:
             MUESTRAS[fuente] = "tarjeta: " + _muestra_tarjeta(el, texto)  # la más reciente
+        titulo = titulo_segun_tipo(titulo, url, tipo)
         no_tipo = _NO_TIPO.get(tipo, _NO_APTO)
-        if no_tipo.search(titulo) or no_tipo.search(texto[:200]):
+        if no_tipo.search(titulo) or (no_tipo.search(texto[:200]) and titulo_segun_tipo(texto[:200], url, tipo) == texto[:200]):
             continue
         etiqueta, dueno = clasificar_anunciante("", "", texto)
         hab = re.search(r"(\d+)\s*(?:hab|alcoba)", texto, re.I)
@@ -443,13 +465,13 @@ def extraer_de_json(bloques: list, fuente: str, base_url: str, operacion: str = 
             minimo = 300_000 if operacion == "arriendo" else 20_000_000
             if precio < minimo or not (15 <= area <= 2_000):
                 continue
-            titulo = _texto(_primero(d, K_TITULO))
-            if not es_valido(titulo, precio, area, operacion, tipo):
-                continue
-            descripcion = _texto(_primero(d, K_DESC))
             url = _texto(_primero(d, K_URL))
             if url and not url.startswith("http"):
                 url = urljoin(base_url, url)
+            titulo = titulo_segun_tipo(_texto(_primero(d, K_TITULO)), url, tipo)
+            if not es_valido(titulo, precio, area, operacion, tipo):
+                continue
+            descripcion = _texto(_primero(d, K_DESC))
             clave = (url or titulo, precio, area)
             if clave in vistos:
                 continue
