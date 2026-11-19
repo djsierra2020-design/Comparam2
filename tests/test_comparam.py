@@ -1139,3 +1139,63 @@ def test_link_temporal_para_cliente(monkeypatch):
     # sin clave no se crean links
     monkeypatch.delenv("LINK_SECRET"); monkeypatch.delenv("ML_CLIENT_SECRET", raising=False)
     assert not enlaces.disponible()
+
+
+def test_casas_urls_y_filtro_de_tipo():
+    from comparam.config import crear_fuentes
+    from comparam.sources.extractor import es_valido
+    fr, cc = crear_fuentes(["fincaraiz", "ciencuadras"], tipo="casa")
+    assert fr.tipo == "casa" and "/arriendo/casas/cedritos/bogota" in fr.url_busqueda("Cedritos", "arriendo", 1)
+    assert "/venta/bogota/casa/cedritos" in cc.url_busqueda("Cedritos", "venta", 1)
+    apto = crear_fuentes(["fincaraiz"])[0]
+    assert "/venta/apartamentos/cedritos/bogota" in apto.url_busqueda("Cedritos", "venta", 1)
+    # cada búsqueda descarta el otro tipo
+    assert es_valido("Casa en venta en Suba", 400e6, 100, "venta", "casa")
+    assert not es_valido("Apartamento en venta en Suba", 400e6, 100, "venta", "casa")
+    assert not es_valido("Casa en venta en Suba", 400e6, 100, "venta", "apartamento")
+
+
+def test_casas_habi_houm_y_guardados_no_aplican():
+    from comparam.config import crear_fuentes
+    from comparam.sources import PORTALES
+    from comparam.sources.guardados import Guardados
+    h = PORTALES["habi"](paginas=1); h.tipo = "casa"
+    assert h.buscar("Cedritos", "venta") == []
+    g = Guardados(); g.tipo = "casa"
+    assert g.buscar("Cedritos", "venta") == []
+
+
+def test_cache_separa_casas_de_apartamentos(monkeypatch):
+    from comparam import busqueda
+    from comparam.sources import PORTALES
+    cls = PORTALES["fincaraiz"]
+    monkeypatch.setattr(cls, "buscar", lambda self, b, op="venta": [
+        Listing("fincaraiz", f"{self.tipo} en Cedritos, Bogotá", "Cedritos", 300e6, 60, es_dueno_directo=True,
+                url=f"u-{self.tipo}")])
+    busqueda._CACHE_BARRIO.clear()
+    a, c = cls(paginas=1), cls(paginas=1)
+    c.tipo = "casa"
+    assert busqueda.buscar("Cedritos", [a]).anuncios[0].url == "u-apartamento"
+    assert busqueda.buscar("Cedritos", [c]).anuncios[0].url == "u-casa"
+    busqueda._CACHE_BARRIO.clear()
+
+
+def test_web_tiene_selector_de_casas(monkeypatch):
+    import app as webapp
+    from comparam.busqueda import Resultado
+    c = webapp.app.test_client()
+    html = c.get("/").get_data(as_text=True)
+    assert 'name="tipo" value="casa"' in html and "Encuentra el apartamento" in html
+    assert "Encuentra la casa más barata" in c.get("/?tipo=casa").get_data(as_text=True)
+    vistos = {}
+    def falso(barrio, fuentes, **k):
+        vistos["tipo"] = fuentes[0].tipo
+        return Resultado([Listing("fincaraiz", "Casa", "Suba", 500e6, 120, url="https://p.co/c", es_dueno_directo=True)])
+    monkeypatch.setattr(webapp, "buscar", falso)
+    monkeypatch.setenv("LINK_SECRET", "x")
+    html = c.get("/lista?barrio=Suba&tipo=casa&dias=7").get_data(as_text=True)
+    assert vistos["tipo"] == "casa" and "*Casas en Suba*" in html
+    ruta = html.split('id="link" value="')[1].split('"')[0]
+    vistos.clear()
+    assert "Casas directo con el dueño" in c.get(ruta[ruta.index("/c/"):]).get_data(as_text=True)
+    assert vistos["tipo"] == "casa"

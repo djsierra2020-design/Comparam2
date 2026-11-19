@@ -87,7 +87,7 @@ class MercadoLibreAPI(Source):
 
     # --- búsqueda ---------------------------------------------------------------------------
     def buscar(self, barrio: str, operacion: str = "venta") -> list[Listing]:
-        texto = " ".join(x for x in ("apartamento", operacion, barrio, "bogota") if x)
+        texto = " ".join(x for x in (self.tipo, operacion, barrio, "bogota") if x)
         objetivo = slugify(barrio)
         salida: list[Listing] = []
         for pagina in range(self.paginas):
@@ -110,7 +110,7 @@ class MercadoLibreAPI(Source):
                 not (operacion == "arriendo" and "alquiler" in op):
             return None
         tipo = str(_atributo(r, "PROPERTY_TYPE") or "").lower()
-        if tipo and "apartamento" not in tipo:
+        if tipo and self.tipo not in tipo:
             return None
         if (r.get("currency_id") or "COP") != "COP":
             return None

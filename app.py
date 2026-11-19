@@ -49,8 +49,17 @@ def _consulta():
     barrio = request.args.get("barrio", "").strip()
     elegidas = [f for f in request.args.getlist("fuente") if f in FUENTES] or list(PORTALES)
     params = _params()
-    resultado = buscar(barrio, crear_fuentes(elegidas), **params) if barrio else None
+    resultado = buscar(barrio, crear_fuentes(elegidas, tipo=_tipo()), **params) if barrio else None
     return barrio, elegidas, params, resultado
+
+
+def _tipo() -> str:
+    """Tipo de inmueble pedido: «apartamento» (por defecto) o «casa»."""
+    return "casa" if request.args.get("tipo") == "casa" else "apartamento"
+
+
+app.jinja_env.globals["NOMBRE_TIPO"] = {"apartamento": ("Apartamento", "Apartamentos", "el apartamento"),
+                                        "casa": ("Casa", "Casas", "la casa")}
 
 
 def _params():
@@ -64,7 +73,7 @@ def _params():
 
 def _consulta_ciudad():
     elegidas = [f for f in request.args.getlist("fuente") if f in FUENTES] or list(PORTALES)
-    fuentes = crear_fuentes(elegidas, paginas=PAGINAS_CIUDAD, detalle=False)
+    fuentes = crear_fuentes(elegidas, paginas=PAGINAS_CIUDAD, detalle=False, tipo=_tipo())
     return elegidas, buscar_ciudad(fuentes, **_params())
 
 
@@ -137,20 +146,20 @@ def inicio():
         return _ml_regreso()
     if _es_ciudad():
         elegidas, rc = _consulta_ciudad()
-        return render_template("index.html", barrio="", barrios=BARRIOS, fuentes=FUENTES, elegidas=elegidas,
+        return render_template("index.html", barrio="", barrios=BARRIOS, fuentes=FUENTES, elegidas=elegidas, tipo=_tipo(),
                                p=_params(), r=None, rc=rc, args=request.args)
     barrio, elegidas, params, resultado = _consulta()
-    return render_template("index.html", barrio=barrio, barrios=BARRIOS, fuentes=FUENTES,
+    return render_template("index.html", barrio=barrio, barrios=BARRIOS, fuentes=FUENTES, tipo=_tipo(),
                            elegidas=elegidas, p=params, r=resultado, args=request.args)
 
 
 def _anuncios_cliente(barrio: str, operacion: str, precio_max=None, hab_min=None, parq: str = "",
-                      solo_tel: bool = False, elegidas=None):
+                      solo_tel: bool = False, elegidas=None, tipo: str = "apartamento"):
     """Búsqueda para un cliente: solo dueños directos (sin «verificar»), con los filtros pedidos,
     del más barato al más caro por m²."""
     params = {"operacion": operacion, "solo_dueno": True, "con_telefono": solo_tel,
               "area_min": None, "precio_max": precio_max}
-    resultado = buscar(barrio, crear_fuentes(elegidas or list(PORTALES)), **params) if barrio else None
+    resultado = buscar(barrio, crear_fuentes(elegidas or list(PORTALES), tipo=tipo), **params) if barrio else None
     anuncios = []
     if resultado:
         anuncios = [a for a in resultado.anuncios if a.es_dueno_directo and not a.verificar
@@ -161,10 +170,11 @@ def _anuncios_cliente(barrio: str, operacion: str, precio_max=None, hab_min=None
     return params, resultado, anuncios
 
 
-def _texto_lista(barrio: str, operacion: str, anuncios, resultado, fecha: str, link: str = "") -> str:
+def _texto_lista(barrio: str, operacion: str, anuncios, resultado, fecha: str, link: str = "",
+                 tipo: str = "apartamento") -> str:
     """La lista como mensaje de WhatsApp (negritas con *)."""
     arriendo = operacion == "arriendo"
-    lineas = [f"🏠 *Apartamentos en {barrio}* · {'Arriendo' if arriendo else 'Venta'}",
+    lineas = [f"🏠 *{'Casas' if tipo == 'casa' else 'Apartamentos'} en {barrio}* · {'Arriendo' if arriendo else 'Venta'}",
               f"Directo con el dueño, sin inmobiliaria · {fecha}"]
     if resultado and resultado.zona:
         lineas.append(f"Precio del m² en {barrio}: {pesos(resultado.zona.mediana)}")
@@ -197,6 +207,7 @@ def _filtros_lista(args) -> dict:
         "parq": args.get("parq", "") if args.get("parq") in ("si", "no") else "",
         "solo_tel": args.get("tel") == "1",
         "cliente": args.get("cliente", "").strip()[:60],
+        "tipo": "casa" if args.get("tipo") == "casa" else "apartamento",
     }
 
 
@@ -208,19 +219,21 @@ def lista_cliente():
     f = _filtros_lista(request.args)
     elegidas = [x for x in request.args.getlist("fuente") if x in FUENTES] or None
     params, resultado, anuncios = _anuncios_cliente(f["barrio"], f["operacion"], f["precio_max"], f["hab_min"],
-                                                    f["parq"], f["solo_tel"], elegidas)
+                                                    f["parq"], f["solo_tel"], elegidas, f["tipo"])
     fecha = diario.hoy().strftime("%d/%m/%Y")
     link = vence = None
     dias = int(request.args.get("dias", "0")) if request.args.get("dias", "").isdigit() else 0
     if dias in enlaces.DIAS_PERMITIDOS and f["barrio"] and enlaces.disponible():
         token, vence = enlaces.crear({"b": f["barrio"], "o": f["operacion"], "pm": f["precio_max"], "h": f["hab_min"],
-                                      "pq": f["parq"], "t": f["solo_tel"], "c": f["cliente"]}, dias, diario.hoy())
+                                      "pq": f["parq"], "t": f["solo_tel"], "c": f["cliente"],
+                                      "ti": "c" if f["tipo"] == "casa" else ""}, dias, diario.hoy())
         link = request.host_url.rstrip("/") + "/c/" + token
     return render_template("lista.html", barrio=f["barrio"], p=params, r=resultado, anuncios=anuncios,
                            cliente=f["cliente"], hab_min=f["hab_min"], parq=f["parq"], solo_tel=f["solo_tel"],
-                           fecha=fecha, args=request.args, link=link, vence=vence, dias=dias,
+                           fecha=fecha, args=request.args, link=link, vence=vence, dias=dias, tipo=f["tipo"],
                            links_disponibles=enlaces.disponible(), modo_cliente=False,
-                           texto=_texto_lista(f["barrio"], f["operacion"], anuncios, resultado, fecha, link or ""))
+                           texto=_texto_lista(f["barrio"], f["operacion"], anuncios, resultado, fecha, link or "",
+                                              f["tipo"]))
 
 
 @app.get("/c/<token>")
@@ -233,11 +246,12 @@ def lista_compartida(token: str):
         return render_template("lista_vencida.html", vence=None), 404
     if diario.hoy() > vence:
         return render_template("lista_vencida.html", vence=vence.strftime("%d/%m/%Y")), 410
+    tipo = "casa" if d.get("ti") == "c" else "apartamento"
     params, resultado, anuncios = _anuncios_cliente(d.get("b", ""), d.get("o", "venta"), d.get("pm"), d.get("h"),
-                                                    d.get("pq", ""), bool(d.get("t")))
+                                                    d.get("pq", ""), bool(d.get("t")), tipo=tipo)
     r = render_template("lista.html", barrio=d.get("b", ""), p=params, r=resultado, anuncios=anuncios,
                         cliente=d.get("c", ""), hab_min=d.get("h"), parq=d.get("pq", ""), solo_tel=bool(d.get("t")),
-                        fecha=diario.hoy().strftime("%d/%m/%Y"), args={}, link=None, vence=vence, dias=0,
+                        fecha=diario.hoy().strftime("%d/%m/%Y"), args={}, link=None, vence=vence, dias=0, tipo=tipo,
                         links_disponibles=False, modo_cliente=True, texto="")
     from flask import make_response
     resp = make_response(r)
@@ -302,6 +316,8 @@ def diagnostico():
     barrio = request.args.get("barrio", "").strip()
     operacion = "arriendo" if request.args.get("operacion") == "arriendo" else "venta"
     portales = [cls(paginas=1, detalle=False) for cls in PORTALES.values()]
+    for p in portales:
+        p.tipo = _tipo()
     from comparam.sources import mercadolibre_api
     portales.append(mercadolibre_api.MercadoLibreAPI(paginas=1))  # muestra si faltan las credenciales
     def una(p):
@@ -312,7 +328,8 @@ def diagnostico():
             app.logger.exception("diagnóstico de %s", p.nombre)
             return {"portal": p.nombre, "url": "—", "error": f"falla de la app: {e.__class__.__name__}: {str(e)[:200]}"}
 
-    return render_template("diagnostico.html", barrio=barrio, operacion=operacion, filas=[una(p) for p in portales])
+    return render_template("diagnostico.html", barrio=barrio, operacion=operacion, tipo=_tipo(),
+                           filas=[una(p) for p in portales])
 
 
 # Portales que /api/sonda puede consultar (no es un proxy abierto).

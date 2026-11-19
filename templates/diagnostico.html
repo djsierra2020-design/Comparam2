@@ -13,6 +13,7 @@
 <p>Primera página de búsqueda de cada portal{% if barrio %} para <b>{{ barrio }}</b>{% else %} para toda Bogotá{% endif %}. Toma una captura de esta página.</p>
 <form><input name="barrio" value="{{ barrio }}" placeholder="barrio (opcional)">
 <select name="operacion"><option value="venta">Venta</option><option value="arriendo" {% if operacion == 'arriendo' %}selected{% endif %}>Arriendo</option></select>
+<select name="tipo"><option value="apartamento">Apartamentos</option><option value="casa" {% if tipo == 'casa' %}selected{% endif %}>Casas</option></select>
 <button>Probar</button> · <a href="/">volver</a></form>
 {% for f in filas %}
 <div class="card">

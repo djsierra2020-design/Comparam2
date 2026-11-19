@@ -165,7 +165,7 @@ def _recolectar_barrio(fuentes: list[Source], barrio: str, operacion: str):
     cliente (o un cambio de filtro) usa los mismos anuncios que se acaban de ver y abre al instante."""
     from .sources import PORTALES
     cacheable = all(type(f) is PORTALES.get(getattr(f, "nombre", "")) for f in fuentes) and fuentes
-    clave = (tuple(sorted(f"{f.nombre}:{getattr(f, 'paginas', '')}" for f in fuentes)), slugify(barrio),
+    clave = (tuple(sorted(f"{f.nombre}:{getattr(f, 'paginas', '')}:{getattr(f, 'tipo', '')}" for f in fuentes)), slugify(barrio),
              operacion) if cacheable else None
     guardado = _CACHE_BARRIO.get(clave) if cacheable else None
     if guardado and time.time() - guardado[0] < CACHE_SEGUNDOS:
@@ -279,7 +279,8 @@ def buscar_ciudad(fuentes: list[Source], operacion: str = "venta", solo_dueno: b
                   detalle: int = 15) -> ResultadoCiudad:
     """Busca en toda Bogotá y ordena por cuánto más barato está cada apartamento frente a la
     mediana del precio del m² de SU barrio (calculada con todos los anuncios de ese barrio)."""
-    clave = (tuple(sorted(f"{f.nombre}:{getattr(f, 'paginas', '')}:{getattr(f, 'ruta', '')}" for f in fuentes)),
+    clave = (tuple(sorted(f"{f.nombre}:{getattr(f, 'paginas', '')}:{getattr(f, 'ruta', '')}:{getattr(f, 'tipo', '')}"
+                          for f in fuentes)),
              operacion)
     cache = _CACHE.get(clave)
     if cache and time.time() - cache[0] < CACHE_SEGUNDOS:
