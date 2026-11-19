@@ -1217,3 +1217,11 @@ def test_casa_titulada_apartamento_no_se_descarta():
                              "link": "/inmueble/casa-en-arriendo/suba/bogota/9"}]}]
     a = extraer_de_json(bloque, "fincaraiz", "https://www.fincaraiz.com.co", "arriendo", tipo="casa")
     assert len(a) == 1 and a[0].titulo == "Casa en arriendo en Suba"
+
+
+def test_barrio_descarta_anuncios_de_otra_localidad():
+    # Buscar Cedritos (Usaquén): una casa de Kennedy es relleno del portal; Santa Bárbara (Usaquén) se queda.
+    assert not es_del_barrio(Listing("fincaraiz", "Casa en arriendo", "Castilla", 2e6, 100, ubicacion="Castilla | Kennedy"), "Cedritos")
+    assert es_del_barrio(Listing("fincaraiz", "Casa en arriendo", "Santa Bárbara", 2e6, 100, ubicacion="Santa Bárbara | Usaquén"), "Cedritos")
+    assert es_del_barrio(Listing("fincaraiz", "Casa", "San Bernardino XXII", 2e6, 100), "Bosa")
+    assert es_del_barrio(Listing("fincaraiz", "Casa en arriendo", "", 2e6, 100), "Cedritos")  # sin ubicación: se confía

@@ -8,7 +8,7 @@ from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import TimeoutError as FuturesTimeout
 from dataclasses import dataclass, field
 
-from .localidades import localidad_de
+from .localidades import localidad_de, localidades_posibles
 from .models import Listing
 from .parsing import slugify
 from .sources import FuenteError, Source
@@ -192,13 +192,20 @@ def es_del_barrio(a: Listing, barrio: str) -> bool:
     explícitamente que es de otro lugar de Bogotá (p. ej. «Apartamento en venta en Chapinero,
     Bogotá» en la búsqueda de Fontibón) y ni su título ni su ubicación mencionan el barrio buscado.
     Un barrio distinto en sus datos no basta: los portales devuelven sub-barrios de la localidad
-    buscada (p. ej. «San Bernardino XXII» al buscar Bosa).
+    buscada (p. ej. «San Bernardino XXII» al buscar Bosa). Sí se descarta si es de otra localidad.
     """
     objetivo = slugify(barrio)
     if not objetivo:
         return True
     if any(objetivo in slugify(t) for t in (a.ubicacion, a.barrio, a.titulo) if t):
         return True
+    # Si su ubicación es de otra localidad (p. ej. Kennedy al buscar Cedritos, que es de Usaquén), es
+    # relleno del portal: pasa sobre todo con casas, que son pocas por barrio. Los sub-barrios de la
+    # misma localidad se conservan.
+    loc_buscada = localidad_de(barrio)
+    posibles = localidades_posibles(a.barrio, a.ubicacion, a.titulo)
+    if loc_buscada and posibles and loc_buscada not in posibles:
+        return False
     return not _LUGAR_TITULO.search(a.titulo or "")
 
 

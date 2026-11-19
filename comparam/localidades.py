@@ -93,3 +93,16 @@ def localidad_de(*textos: str) -> str:
         if f"-{s}-" in t:
             return _MAPA[s]
     return ""
+
+
+def localidades_posibles(*textos: str) -> set[str]:
+    """Todas las localidades a las que podría pertenecer la ubicación del anuncio. Un nombre corto
+    cuenta para cada barrio que empieza igual: «Salitre» puede ser Teusaquillo o Fontibón (Salitre
+    Occidental). Vacío si no se reconoce ningún lugar."""
+    t = f"-{slugify(' '.join(x for x in textos if x))}-"
+    posibles: set[str] = set()
+    for s in _ORDEN:
+        if f"-{s}-" in t:
+            posibles.add(_MAPA[s])
+            posibles.update(_MAPA[k] for k in _MAPA if k.startswith(s + "-"))
+    return posibles
