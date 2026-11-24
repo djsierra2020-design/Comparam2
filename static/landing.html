@@ -403,6 +403,7 @@ function reducirFoto(file) {
    IA
    ============================================================ */
 let notaIA = ""; // aviso de reintentos que se muestra junto al contador
+let finIA = ""; // por qué terminó la última respuesta (fin normal, cortada por larga, rechazo…)
 async function llamarIA({ sistema, texto, imagenes = [], json = false, maxTokens = 8000 }) {
   const p = $("#proveedor").value, clave = $("#clave").value.trim(), modelo = $("#modelo").value.trim() || MODELOS[p].def;
   if (!clave) throw new Error("Falta la clave de API (sección 1).");
@@ -449,6 +450,7 @@ async function llamarIA({ sistema, texto, imagenes = [], json = false, maxTokens
     if (!r.ok) throw new Error(errorAmigable("Gemini", r.status, d.error?.message));
     const c = d.candidates?.[0];
     const out = (c?.content?.parts || []).filter(x => !x.thought).map(x => x.text || "").join("");
+    finIA = c?.finishReason || "";
     if (!out) throw new Error("Gemini no devolvió texto" + (c?.finishReason ? ` (motivo: ${c.finishReason})` : "") + ".");
     return out;
   }
@@ -459,13 +461,15 @@ async function llamarIA({ sistema, texto, imagenes = [], json = false, maxTokens
   const r = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-api-key": clave, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" },
-    body: JSON.stringify({ model: modelo, max_tokens: maxTokens, system: sistema, messages: [{ role: "user", content }] })
+    // Claude piensa antes de responder y eso también cuenta en max_tokens: se le da margen.
+    body: JSON.stringify({ model: modelo, max_tokens: Math.max(maxTokens, 32000), system: sistema, messages: [{ role: "user", content }] })
   });
   const d = await r.json().catch(() => ({}));
   if (!r.ok) throw new Error(errorAmigable("Claude", r.status, d.error?.message));
+  finIA = d.stop_reason || "";
+  if (d.stop_reason === "refusal") throw new Error("Claude no quiso generar esta página (filtro de seguridad). Revisa las instrucciones e intenta de nuevo.");
   const out = (d.content || []).filter(b => b.type === "text").map(b => b.text).join("");
-  if (!out) throw new Error("Claude no devolvió texto.");
-  if (d.stop_reason === "max_tokens" && !json) console.warn("Respuesta cortada por max_tokens");
+  if (!out) throw new Error(d.stop_reason === "max_tokens" ? "La respuesta de Claude se cortó antes de escribir la página. Intenta de nuevo o usa «Landing corta para Google Ads»." : "Claude no devolvió texto.");
   return out;
 }
 /* OpenRouter y Groq usan el formato de OpenAI. Con «auto» se prueban varios modelos gratuitos en orden. */
@@ -507,6 +511,7 @@ async function llamarCompatible(p, clave, modelo, sistema, texto, imagenes, maxT
     const r = await pedir(m);
     const d = await r.json().catch(() => ({}));
     if (r.ok) {
+      finIA = d.choices?.[0]?.finish_reason || "";
       const out = (d.choices?.[0]?.message?.content || "").replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
       if (out) { notaIA = ""; return out; }
       ultimo = { status: 200, msg: "respuesta vacía" };
@@ -1355,8 +1360,17 @@ async function generar(ajusteTexto) {
       nuevo = { tipo: "kit", frag, datos: d, html: ensamblar(frag, d, ctx) };
     } else {
       const pr = promptKit(c, p, ctx, ajusteTexto ? { texto: ajusteTexto, frag: fragActual() } : null);
-      const r = separarRespuesta(await llamarIA({ ...pr, maxTokens: 16000 }));
-      if (!/<section/i.test(r.frag)) throw new Error("La IA no devolvió secciones válidas. Intenta de nuevo.");
+      let bruto = await llamarIA({ ...pr, maxTokens: 16000 });
+      let r = separarRespuesta(bruto);
+      if (!/<section/i.test(r.frag)) {
+        // A veces el modelo responde con otra cosa (una pregunta, markdown) o se corta: se reintenta una vez recordándole el formato.
+        console.warn("Respuesta sin secciones (fin: " + finIA + "):", bruto.slice(0, 500));
+        notaIA = " · la respuesta no vino en el formato esperado, reintentando…";
+        bruto = await llamarIA({ ...pr, maxTokens: 16000, texto: pr.texto + `\n\nIMPORTANTE: responde SOLO con el HTML de las secciones, empezando exactamente por <section class="lp-hero">. Sin explicaciones, sin preguntas y sin markdown. Sé conciso para no quedarte sin espacio.` });
+        notaIA = "";
+        r = separarRespuesta(bruto);
+        if (!/<section/i.test(r.frag)) throw new Error(motivoSinPagina(bruto));
+      }
       const datos = r.datos || (ajusteTexto ? estado.datos : {});
       nuevo = { tipo: "kit", frag: r.frag, datos, html: ensamblar(r.frag, datos, ctx) };
     }
@@ -1372,6 +1386,12 @@ async function generar(ajusteTexto) {
     btns.forEach(b => b.disabled = false);
     $("#btnAjustar").disabled = $("#btnRegen").disabled = !estado;
   }
+}
+function motivoSinPagina(bruto) {
+  if (/^(max_tokens|MAX_TOKENS|length)$/.test(finIA)) return "La respuesta de la IA se cortó por larga antes de terminar la página. Prueba con «Landing corta para Google Ads» o con otro modelo.";
+  if (/^(SAFETY|refusal|content_filter|PROHIBITED_CONTENT)$/.test(finIA)) return "La IA no quiso generar esta página (filtro de seguridad). Revisa las instrucciones e intenta de nuevo.";
+  const txt = String(bruto).replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 180);
+  return `La IA no devolvió la página después de 2 intentos.${txt ? ` Respondió: «${txt}…»` : ""} Intenta de nuevo o cambia de modelo en ⚙.`;
 }
 function quitarScripts(h) { return h.replace(/<script\b[\s\S]*?<\/script\s*>/gi, ""); }
 
