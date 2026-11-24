@@ -38,6 +38,40 @@ de inicio** (se instala como una app aparte, con su propio ícono).
   copia de seguridad de vez en cuando (Ajustes); también se puede exportar a Excel (CSV).
 - Funciona sin internet después de abrirla una vez.
 
+## Landings IA (`/landing`)
+
+Herramienta para crear landing pages de **Google Ads** listas para **WordPress**, con IA.
+Ábrela en `https://<tu-app>.onrender.com/landing` (se puede instalar como app: botón «Instalar app»).
+
+**Cómo se trabaja**
+
+1. **⚙ IA**: elige **Google Gemini** (clave gratis en <https://aistudio.google.com/apikey>) o **Claude**
+   (cobra por uso). La clave queda solo en tu navegador. «Demostración» funciona sin clave.
+2. **Cliente y Playbook**: «+ Nuevo cliente» guarda todo lo que la IA debe saber de ese negocio:
+   servicios (también llenan el desplegable del formulario), zonas, **datos reales** (años, reseñas,
+   licencias: la IA solo usa esas cifras), tono, teléfono/WhatsApp, logo, colores, estilo
+   predeterminado, medición de Google Ads, a dónde llegan los formularios y reglas fijas para la IA.
+3. **Nueva landing**: nombre, H1 (opcional), **enfoque** (de marca, servicio específico, urgencia,
+   ciudad/zona, oferta), **tipo** (completa SEO local con diagnóstico, servicios, 3 pasos, beneficios,
+   mapa y 8–10 preguntas · corta para Google Ads · captura mínima), servicio, ciudad, palabras clave,
+   foto principal, fotos de trabajos, posición del formulario, barra fija en celular e instrucciones extra.
+4. **Estilo visual**: la IA decide la estructura y los textos, pero con el sistema de diseño de una
+   referencia (tipografía, colores, botones, íconos, anclas `#lp-form`/`tel:` y barra fija):
+   - *Ref. 1 · Presupuesto*: azul marino + rojo, Montserrat, formulario en tarjeta, franja de confianza.
+   - *Ref. 2 · Reparación urgente*: negro + rojo, Oswald en mayúsculas, ciudad resaltada, señales
+     numeradas y barra roja «Llama al…».
+   - *Desde mis capturas*: la IA copia el diseño completo de las capturas guardadas en el Playbook.
+   La cabecera, el formulario, el mapa, el pie y la barra fija los arma la app, así siempre quedan bien.
+5. Revisa en **Vista previa** (escritorio/celular), edita textos sobre la página o pide cambios con
+   «Pedir cambios a la IA», y **guarda** la landing en el cliente.
+
+Cada landing registra la conversión de Google Ads (formulario, WhatsApp, llamadas), guarda
+`gclid`/UTM en el formulario y cambia el H1 si la URL final lleva `?kw={keyword}`. También genera
+los **textos del anuncio** (15 títulos, 4 descripciones, palabras clave y negativas, CSV para Ads Editor).
+
+**Exportar**: `⬇ HTML` o `⬇ WordPress` (bloque para «HTML personalizado»/Elementor y plantilla de
+página PHP). Los clientes y landings se guardan en el navegador del equipo donde se crean.
+
 ## Instalación
 
 ```bash
