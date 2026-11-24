@@ -396,6 +396,7 @@ function reducirFoto(file) {
 /* ============================================================
    IA
    ============================================================ */
+let notaIA = ""; // aviso de reintentos que se muestra junto al contador
 async function llamarIA({ sistema, texto, imagenes = [], json = false, maxTokens = 8000 }) {
   const p = $("#proveedor").value, clave = $("#clave").value.trim(), modelo = $("#modelo").value.trim() || MODELOS[p].def;
   if (!clave) throw new Error("Falta la clave de API (sección 1).");
@@ -410,17 +411,35 @@ async function llamarIA({ sistema, texto, imagenes = [], json = false, maxTokens
     const pedir = m => fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(m)}:generateContent`, {
       method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": clave }, body: JSON.stringify(body)
     });
-    let r = await pedir(modelo);
-    let d = await r.json().catch(() => ({}));
+    let r, d;
+    const intentar = async m => { r = await pedir(m); d = await r.json().catch(() => ({})); };
+    await intentar(modelo);
     if (r.status === 404 || (r.status === 400 && /not (found|supported)/i.test(d.error?.message || ""))) {
       // Google retira modelos con el tiempo: se pregunta cuáles tiene esta clave y se usa el Flash más nuevo.
       const otro = await mejorModeloGemini(clave, modelo);
       if (otro) {
         $("#modelo").value = otro;
         const g = LS.get("lp_modelos", {}); g.gemini = otro; LS.set("lp_modelos", g);
-        r = await pedir(otro); d = await r.json().catch(() => ({}));
+        await intentar(otro);
       }
     }
+    // Saturación temporal de Google (500/503/504): reintentar con pausas y, si sigue, probar otro modelo.
+    const temporal = st => st === 500 || st === 503 || st === 504;
+    for (const espera of [5, 12]) {
+      if (!temporal(r.status)) break;
+      notaIA = ` · Gemini está saturado, reintento en ${espera} s…`;
+      await new Promise(ok => setTimeout(ok, espera * 1000));
+      await intentar($("#modelo").value.trim() || modelo);
+    }
+    if (temporal(r.status) || r.status === 429) {
+      const usado = $("#modelo").value.trim() || modelo;
+      for (const alt of ["gemini-flash-lite-latest", "gemini-flash-latest", "gemini-pro-latest"].filter(x => x !== usado)) {
+        notaIA = ` · probando con ${alt}…`;
+        await intentar(alt);
+        if (r.ok || !(temporal(r.status) || r.status === 429 || r.status === 404)) break;
+      }
+    }
+    notaIA = "";
     if (!r.ok) throw new Error(errorAmigable("Gemini", r.status, d.error?.message));
     const c = d.candidates?.[0];
     const out = (c?.content?.parts || []).filter(x => !x.thought).map(x => x.text || "").join("");
@@ -463,6 +482,7 @@ function errorAmigable(prov, status, msg) {
   if (status === 400 && /api key|API_KEY/i.test(msg || "")) return `${prov}: la clave de API no es válida.`;
   if (status === 401 || status === 403) return `${prov}: clave rechazada (${status}). Revisa que esté bien copiada.`;
   if (status === 404) return `${prov}: el modelo «${$("#modelo").value}» no existe o no está disponible. Elige otro de la lista.`;
+  if (status === 500 || status === 503 || status === 504) return `${prov} está saturado en este momento (${status}); ya se reintentó varias veces. Espera un par de minutos y vuelve a intentar.`;
   if (status === 429) return `${prov}: llegaste al límite de uso gratuito por minuto/día. Espera un momento y reintenta.`;
   return `${prov} respondió ${status}: ${msg || "error desconocido"}`;
 }
@@ -1255,7 +1275,7 @@ async function generar(ajusteTexto) {
   estadoH1 = p.h1 || "";
   const btns = [$("#btnGenerar"), $("#btnAjustar"), $("#btnRegen")];
   btns.forEach(b => b.disabled = true);
-  const t0 = Date.now(), tic = setInterval(() => avisar(`⏳ ${ajusteTexto ? "Ajustando" : "Diseñando"} con IA… ${Math.round((Date.now() - t0) / 1000)} s (puede tardar 1–2 min)`), 1000);
+  const t0 = Date.now(), tic = setInterval(() => avisar(`⏳ ${ajusteTexto ? "Ajustando" : "Diseñando"} con IA… ${Math.round((Date.now() - t0) / 1000)} s (puede tardar 1–2 min)${notaIA}`), 1000);
   try {
     let nuevo;
     if (ctx.est.libre) {
