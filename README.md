@@ -50,8 +50,14 @@ como app con el botón «Instalar app». También sigue disponible en `https://<
 
 **Cómo se trabaja**
 
-1. **⚙ IA**: elige **Google Gemini** (clave gratis en <https://aistudio.google.com/apikey>) o **Claude**
-   (cobra por uso). La clave queda solo en tu navegador. «Demostración» funciona sin clave.
+1. **⚙ IA**: elige el proveedor y pega su clave (queda solo en tu navegador):
+   - **Google Gemini**: clave en <https://aistudio.google.com/apikey>. El nivel gratuito tiene límites
+     bajos y se satura en horas pico; la suscripción Gemini Advanced **no** incluye la API (para quitar
+     límites, «Configurar la facturación» en AI Studio).
+   - **OpenRouter** (gratis): clave en <https://openrouter.ai/keys>; con modelo «auto» usa solo modelos
+     gratuitos (DeepSeek, Llama, Qwen…) y salta al siguiente si uno está ocupado.
+   - **Groq** (gratis y muy rápido): clave en <https://console.groq.com/keys>.
+   - **Claude**: de pago, el más estable. «Demostración» funciona sin clave.
 2. **Cliente y Playbook**: «+ Nuevo cliente» guarda todo lo que la IA debe saber de ese negocio:
    servicios (también llenan el desplegable del formulario), zonas, **datos reales** (años, reseñas,
    licencias: la IA solo usa esas cifras), tono, teléfono/WhatsApp, logo, colores, estilo

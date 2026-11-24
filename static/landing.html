@@ -311,6 +311,8 @@
       <label class="l" for="proveedor">Proveedor</label>
       <select id="proveedor">
         <option value="gemini">Google Gemini (tiene nivel gratis)</option>
+        <option value="openrouter">OpenRouter (modelos gratis: DeepSeek, Llama, Qwen…)</option>
+        <option value="groq">Groq (gratis y muy rápido)</option>
         <option value="claude">Claude (Anthropic)</option>
         <option value="demo">Demostración sin IA (contenido de ejemplo)</option>
       </select>
@@ -344,6 +346,10 @@ const LS = {
 const MODELOS = {
   gemini: { def: "gemini-flash-latest", lista: ["gemini-flash-latest", "gemini-flash-lite-latest", "gemini-pro-latest"],
     hint: 'Gratis en <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> (botón «Create API key»).' },
+  openrouter: { def: "auto", lista: ["auto"],
+    hint: 'Clave gratis en <a href="https://openrouter.ai/keys" target="_blank" rel="noopener">openrouter.ai/keys</a> (inicia sesión con Google → «Create Key»). Con «auto» la app usa solo modelos gratuitos y salta al siguiente si uno está ocupado.' },
+  groq: { def: "auto", lista: ["auto", "llama-3.3-70b-versatile", "openai/gpt-oss-120b", "qwen/qwen3-32b"],
+    hint: 'Clave gratis en <a href="https://console.groq.com/keys" target="_blank" rel="noopener">console.groq.com/keys</a> (inicia sesión → «Create API Key»). Muy rápido; con «auto» elige el mejor modelo disponible.' },
   claude: { def: "claude-sonnet-5-5", lista: ["claude-sonnet-5-5", "claude-haiku-5-5", "claude-opus-5-5"],
     hint: 'Créala en <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com</a>. Claude cobra por uso (pocos centavos por landing).' }
 };
@@ -446,6 +452,7 @@ async function llamarIA({ sistema, texto, imagenes = [], json = false, maxTokens
     if (!out) throw new Error("Gemini no devolvió texto" + (c?.finishReason ? ` (motivo: ${c.finishReason})` : "") + ".");
     return out;
   }
+  if (p === "openrouter" || p === "groq") return llamarCompatible(p, clave, modelo, sistema, texto, imagenes, maxTokens);
   // Claude
   const content = imagenes.map(r => ({ type: "image", source: { type: "base64", media_type: r.mime, data: r.data } }));
   content.push({ type: "text", text: texto });
@@ -460,6 +467,60 @@ async function llamarIA({ sistema, texto, imagenes = [], json = false, maxTokens
   if (!out) throw new Error("Claude no devolvió texto.");
   if (d.stop_reason === "max_tokens" && !json) console.warn("Respuesta cortada por max_tokens");
   return out;
+}
+/* OpenRouter y Groq usan el formato de OpenAI. Con «auto» se prueban varios modelos gratuitos en orden. */
+const BASE_COMPAT = { openrouter: "https://openrouter.ai/api/v1", groq: "https://api.groq.com/openai/v1" };
+async function modelosCompatibles(p, clave) {
+  try {
+    const r = await fetch(BASE_COMPAT[p] + "/models", { headers: { Authorization: "Bearer " + clave } });
+    if (!r.ok) return [];
+    const lista = (await r.json()).data || [];
+    let ids;
+    if (p === "openrouter") {
+      ids = lista.filter(m => /:free$/.test(m.id) && (m.context_length || 0) >= 32000 && !/(vision|-vl|image|audio|embed|guard)/i.test(m.id)).map(m => m.id);
+    } else {
+      ids = lista.map(m => m.id).filter(id => !/(whisper|guard|tts|playai|distil|prompt|compound|embed|-vl|vision)/i.test(id));
+    }
+    const fuertes = [/gpt-oss-120b/, /deepseek-(chat|v3|v4|r1)/, /qwen3-(235b|coder|next|max)/, /llama-4-maverick/, /llama-3\.3-70b/, /kimi-k2/, /glm-4/, /gemini/, /mistral-(medium|large|small-3)/, /qwen3-32b/, /gemma-3-27b/];
+    const puntaje = id => { const i = fuertes.findIndex(rx => rx.test(id)); return i < 0 ? 0 : 100 - i; };
+    ids.sort((a, b) => puntaje(b) - puntaje(a));
+    $("#modelos").innerHTML = ["auto", ...ids].map(x => `<option value="${esc(x)}">`).join("");
+    return ids;
+  } catch { return []; }
+}
+async function llamarCompatible(p, clave, modelo, sistema, texto, imagenes, maxTokens) {
+  const nombre = p === "groq" ? "Groq" : "OpenRouter";
+  const usarImg = imagenes.length && p === "openrouter";
+  const user = usarImg ? [...imagenes.map(r => ({ type: "image_url", image_url: { url: r.url } })), { type: "text", text: texto }] : texto;
+  const pedir = m => fetch(BASE_COMPAT[p] + "/chat/completions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: "Bearer " + clave, ...(p === "openrouter" ? { "X-Title": "Landings IA" } : {}) },
+    body: JSON.stringify({ model: m, temperature: 0.8, max_tokens: maxTokens, messages: [{ role: "system", content: sistema }, { role: "user", content: user }] })
+  });
+  let candidatos = modelo && modelo !== "auto" ? [modelo] : [];
+  if (!candidatos.length) candidatos = (await modelosCompatibles(p, clave)).slice(0, 5);
+  if (!candidatos.length) candidatos = p === "groq" ? ["llama-3.3-70b-versatile"] : ["openrouter/auto"];
+  let ultimo = null;
+  for (let i = 0; i < candidatos.length; i++) {
+    const m = candidatos[i];
+    if (i) notaIA = ` · probando con ${m.split("/").pop()}…`;
+    const r = await pedir(m);
+    const d = await r.json().catch(() => ({}));
+    if (r.ok) {
+      const out = (d.choices?.[0]?.message?.content || "").replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
+      if (out) { notaIA = ""; return out; }
+      ultimo = { status: 200, msg: "respuesta vacía" };
+    } else {
+      ultimo = { status: r.status, msg: d.error?.message || "" };
+      if (r.status === 401 || r.status === 403) break; // clave mala: no tiene sentido seguir
+      if (modelo && modelo !== "auto" && i === candidatos.length - 1 && [404, 429, 500, 502, 503].includes(r.status)) {
+        candidatos.push(...(await modelosCompatibles(p, clave)).filter(x => x !== modelo).slice(0, 4)); // el elegido falló: probar otros
+      }
+    }
+  }
+  notaIA = "";
+  if (ultimo?.status === 200) throw new Error(`${nombre} no devolvió texto. Intenta de nuevo.`);
+  throw new Error(errorAmigable(nombre, ultimo?.status || 0, ultimo?.msg));
 }
 /* Lista los modelos que la clave puede usar y elige el mejor «flash» (rápido y con nivel gratis). */
 async function mejorModeloGemini(clave, actual) {
