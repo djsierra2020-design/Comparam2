@@ -1235,3 +1235,4 @@ def test_app_landing():
     assert r.status_code == 200 and "text/html" in r.content_type
     assert "Generador de landing pages" in html and "generativelanguage.googleapis.com" in html
     assert "api.anthropic.com" in html and "lp-form" in html and "Template Name" in html
+    assert "Servicio local / presupuesto" in html and "Reparación urgente" in html

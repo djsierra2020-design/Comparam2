@@ -47,9 +47,13 @@ Crea landing pages para campañas de **Google Ads** listas para subir a **WordPr
    (clave en <https://console.anthropic.com>, cobra por uso). La clave se guarda solo en tu navegador
    y se envía directo a Google/Anthropic. Con «Demostración sin IA» puedes probar sin clave.
 2. **Negocio y campaña**: qué vendes, ciudad, público, oferta, palabras clave, objetivo y tono.
+   En «Datos reales» pon años de experiencia, reseñas, licencias, etc.: la IA solo usa esas cifras.
 3. **Referencias**: sube capturas de las landings que te gustan.
    - *Plantilla optimizada*: la IA escribe los textos y toma colores y tono de las referencias
-     (3 diseños: hero con formulario, centrado, oscuro/premium).
+     Diseños: **Servicio local / presupuesto** (azul marino y rojo, formulario en tarjeta, franja de
+     confianza con íconos, galería «Nuestro trabajo»), **Reparación urgente / llamadas** (titular en
+     mayúsculas con la ciudad resaltada, botón «Llama al…», tarjetas numeradas de «señales» y barra
+     roja fija para llamar), además de hero con formulario, centrado y oscuro/premium.
    - *Imitar mis referencias*: la IA diseña el HTML completo copiando el estilo de las capturas.
 4. **Contacto**: WhatsApp, teléfono y a dónde llegan los datos del formulario (webhook,
    formsubmit.co o, si se deja vacío, por WhatsApp).

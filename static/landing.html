@@ -106,6 +106,9 @@
         <input type="text" id="publico" name="publico" placeholder="Adultos de 35 a 65 años que perdieron dientes">
         <label for="oferta">Oferta o promoción (opcional)</label>
         <input type="text" id="oferta" name="oferta" placeholder="Valoración + radiografía gratis este mes">
+        <label for="hechos">Datos reales para generar confianza (opcional)</label>
+        <textarea id="hechos" name="hechos" placeholder="Ej.: 18 años de experiencia, más de 550 reseñas, financiamiento disponible, licenciados y asegurados"></textarea>
+        <div class="hint">La IA solo usa cifras que pongas aquí; no inventa años, reseñas ni premios.</div>
         <label for="keywords">Palabras clave de la campaña de Google Ads</label>
         <input type="text" id="keywords" name="keywords" placeholder="implantes dentales bogotá, precio implante dental">
         <div class="row">
@@ -142,13 +145,15 @@
         <div class="row">
           <div><label for="plantilla">Plantilla</label>
             <select id="plantilla" name="plantilla">
+              <option value="servicios">Servicio local / presupuesto</option>
+              <option value="urgente">Reparación urgente / llamadas</option>
               <option value="formulario">Hero con formulario al lado</option>
               <option value="centrada">Hero centrado + formulario abajo</option>
               <option value="oscura">Oscura / premium</option>
             </select></div>
           <div><label for="fuente">Tipografía</label>
             <select id="fuente" name="fuente">
-              <option value="Poppins">Poppins</option><option value="Montserrat">Montserrat</option>
+              <option value="auto">Automática (según plantilla)</option><option value="Poppins">Poppins</option><option value="Montserrat">Montserrat</option><option value="Oswald">Oswald</option>
               <option value="Inter">Inter</option><option value="Lato">Lato</option><option value="">Del sistema (más rápida)</option>
             </select></div>
         </div>
@@ -161,6 +166,10 @@
         <input type="url" id="logo" name="logo" placeholder="https://midominio.com/wp-content/uploads/logo.png">
         <label for="imagen">URL de la imagen principal (opcional)</label>
         <input type="url" id="imagen" name="imagen" placeholder="https://midominio.com/wp-content/uploads/hero.jpg">
+        <div class="hint">En la plantilla «Servicio local» va de fondo del encabezado, con un velo del color principal.</div>
+        <label for="fotos">Fotos de trabajos realizados (una URL por línea, opcional)</label>
+        <textarea id="fotos" name="fotos" placeholder="https://midominio.com/wp-content/uploads/trabajo1.jpg"></textarea>
+        <div class="hint">Se muestran en la galería «Nuestro trabajo». Súbelas primero a la biblioteca de medios de WordPress y copia su URL.</div>
         <label>Secciones</label>
         <div class="chk">
           <label><input type="checkbox" name="s_beneficios" checked> Beneficios</label>
@@ -185,6 +194,12 @@
           <div><label for="email">Correo</label><input type="email" id="email" name="email" placeholder="contacto@negocio.com"></div>
           <div><label for="direccion">Dirección</label><input type="text" id="direccion" name="direccion" placeholder="Calle 100 # 15-20"></div>
         </div>
+        <label for="zona">Campo de ubicación en el formulario</label>
+        <select id="zona" name="zona">
+          <option value="cp">Código postal</option>
+          <option value="barrio">Barrio / ciudad</option>
+          <option value="">No pedir ubicación</option>
+        </select>
         <label for="accion">¿A dónde llegan los datos del formulario?</label>
         <input type="url" id="accion" name="accion" placeholder="Vacío = se envían por WhatsApp">
         <div class="hint">Puedes usar un webhook (Zapier, Make, Google Apps Script) o <a href="https://formsubmit.co" target="_blank" rel="noopener">formsubmit.co/tu@correo.com</a> para recibirlos por correo. Si lo dejas vacío, el formulario abre WhatsApp con los datos.</div>
@@ -456,6 +471,7 @@ function briefing(o) {
 - Objetivo de conversión: ${o.objetivo}
 - Tono: ${o.tono}
 - Idioma de la página: ${o.idioma}
+- Datos reales del negocio (los únicos números/logros que puedes usar): ${o.hechos || "(ninguno; no inventes cifras)"}
 - Teléfono: ${o.telefono || "-"} · WhatsApp: ${o.whatsapp ? "sí" : "no"} · Dirección: ${o.direccion || "-"}
 - Secciones pedidas: ${sec.join(", ") || "solo hero y formulario"}
 ${o.refTxt ? "\nNOTAS / HTML DE REFERENCIA DEL USUARIO:\n" + o.refTxt.slice(0, 15000) : ""}`;
@@ -479,8 +495,10 @@ const ESQUEMA = `{
  "oferta": {"titulo": "...", "texto": "...", "precio": "solo si el usuario lo dio, si no ''", "precio_antes": "", "garantia": "frase de tranquilidad", "cta": "..."},
  "testimonios": {"titulo": "...", "items": [{"nombre": "[Nombre del cliente]", "detalle": "[Ciudad]", "texto": "Ejemplo de opinión — reemplazar por una real"}]},
  "faq": {"titulo": "Preguntas frecuentes", "items": [{"p": "pregunta", "r": "respuesta"}]},
- "formulario": {"titulo": "...", "subtitulo": "...", "boton": "...", "nota": "frase anti-fricción (p. ej. 'Te respondemos en minutos')", "gracias": "mensaje tras enviar"},
+ "formulario": {"titulo": "...", "subtitulo": "...", "boton": "...", "opciones": ["3-5 opciones de servicio para un desplegable «¿Qué necesitas?»"], "pregunta": "pregunta para el campo de detalles (p. ej. «¿Qué ocurre con tu puerta?»)", "ejemplo": "texto de ejemplo para ese campo", "nota": "frase anti-fricción (p. ej. 'Te respondemos en minutos')", "gracias": "mensaje tras enviar"},
  "cierre": {"titulo": "...", "texto": "...", "cta": "..."},
+ "senales": {"etiqueta": "frase corta tipo «¿Te suenan familiares estas situaciones?»", "titulo": "Señales de que necesitas el servicio", "texto": "1-2 frases", "items": [{"titulo": "síntoma o problema que el cliente reconoce", "texto": "explicación corta"}]},
+ "galeria": {"etiqueta": "NUESTRO TRABAJO", "titulo": "título sobre trabajos recientes en la zona", "texto": "1 frase"},
  "privacidad": "aviso de privacidad breve (3-4 frases) sobre el uso de los datos del formulario",
  "anuncios": {"titulos": ["15 títulos ≤30 caracteres"], "descripciones": ["4 descripciones ≤90 caracteres"], "palabras_clave": ["10-15 palabras clave"], "negativas": ["5-10 palabras clave negativas"]}
 }`;
@@ -495,7 +513,7 @@ ${o.coloresIA ? "Elige colores adecuados al rubro" + (referencias.length ? " y p
 
 ${REGLAS_ADS}
 
-Genera el contenido de la landing con exactamente esta estructura JSON (3-6 beneficios, 3-4 pasos, 2-3 testimonios, 4-6 preguntas, 3 elementos de confianza). Incluye solo las secciones pedidas (las demás déjalas como null), excepto "anuncios" que siempre va:
+Genera el contenido de la landing con exactamente esta estructura JSON (3-6 beneficios, 3-4 pasos, 4-6 señales, 2-3 testimonios, 4-6 preguntas, 3 elementos de confianza). Incluye solo las secciones pedidas (las demás déjalas como null), excepto "anuncios" que siempre va:
 ${ESQUEMA}`
   };
 }
@@ -534,7 +552,8 @@ function leerCfg(o) {
     awId: (o.awId || "").trim(), awLabel: (o.awLabel || "").trim(), ga4: (o.ga4 || "").trim(),
     plantilla: o.plantilla, fuente: o.fuente, logo: o.logo || "", imagen: o.imagen || "",
     color1: o.color1, color2: o.color2, coloresIA: o.coloresIA, flotanteWA: o.s_whatsapp && !!wa,
-    objetivo: o.objetivo, idioma: o.idioma
+    objetivo: o.objetivo, idioma: o.idioma, zona: o.zona ?? "cp",
+    fotos: (o.fotos || "").split(/\s+/).filter(u => /^https?:\/\//.test(u)).slice(0, 12)
   };
 }
 
@@ -592,11 +611,12 @@ function oscuro(hex, f) { // f<1 oscurece, f>1 aclara hacia blanco
 function textoSobre(hex) { const n = parseInt(hex.slice(1), 16); const l = (0.299 * (n >> 16) + 0.587 * (n >> 8 & 255) + 0.114 * (n & 255)); return l > 165 ? "#111827" : "#ffffff"; }
 
 function renderPlantilla(d, cfg) {
+  if (["servicios", "urgente"].includes(cfg.plantilla || "servicios")) return renderServicios(d, cfg);
   const v = cfg.plantilla || "formulario";
   const c1 = hexOk(cfg.coloresIA ? d.colores?.principal : cfg.color1, "#2563eb");
   const c2 = hexOk(cfg.coloresIA ? d.colores?.boton : cfg.color2, "#f97316");
   const oscura = v === "oscura";
-  const fuente = cfg.fuente;
+  const fuente = cfg.fuente === "auto" ? "Poppins" : cfg.fuente;
   const L = d.idioma === "en" || cfg.idioma === "Inglés" ? "en" : cfg.idioma === "Portugués" ? "pt" : "es";
   const T = {
     es: { nombre: "Nombre", tel: "Teléfono / WhatsApp", email: "Correo electrónico", msg: "¿En qué te podemos ayudar?", acepto: "Acepto la", pol: "política de privacidad", priv: "Política de privacidad", llamar: "Llamar", der: "Todos los derechos reservados." },
@@ -798,6 +818,312 @@ ${scriptLanding(cfg, f.gracias)}
 </html>`;
 }
 
+/* ------------------------------------------------------------
+   Plantilla «Servicio local / presupuesto»
+   (barra con teléfono, hero con foto y velo, formulario en tarjeta,
+   franja de confianza con íconos, galería y barra fija «Llamar ahora»)
+   ------------------------------------------------------------ */
+const ICONOS = {
+  escudo: '<path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="m8.5 12 2.5 2.5 4.5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+  estrella: '<path d="m12 2.5 2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5-4.8-4.6 6.6-.9z" fill="currentColor"/>',
+  estrella2: '<path d="m12 2.5 2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5-4.8-4.6 6.6-.9z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
+  dinero: '<circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15 9.2c-.6-1-1.7-1.5-3-1.5-1.7 0-3 .9-3 2.2 0 3 6 1.6 6 4.4 0 1.3-1.3 2.2-3 2.2-1.4 0-2.6-.6-3.1-1.6M12 6v1.7m0 8.6V18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+  reloj: '<circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+  herramienta: '<path d="M14.7 6.3a4 4 0 0 0 5 5L21 13l-8 8-3-3 1.3-1.3a4 4 0 0 1-5-5L3 8.4 8.4 3l3.3 3.3a4 4 0 0 1 3-.1z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
+  pincel: '<path d="M18.4 2.6a2 2 0 0 1 2.9 2.9L12 14.8 9.2 12zM9 12.5c-2.5 0-4 1.6-4 3.6 0 1.4-1 2.4-2 2.9 1 .6 2.4 1 3.5 1 3 0 4.9-2 4.9-4.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
+  checkf: '<circle cx="12" cy="12" r="11" fill="currentColor"/><path d="m7 12.5 3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>',
+  rayo: '<path d="M13 2 4 14h7l-1 8 9-12h-7z" fill="currentColor"/>',
+  check: '<circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m7.5 12 3 3 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+  tel: '<path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1z" fill="currentColor"/>'
+};
+function icono(n, cls = "") { return `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">${ICONOS[n] || ICONOS.check}</svg>`; }
+function iconoPara(t, i) {
+  t = String(t).toLowerCase();
+  if (/año|experien|garant|licenc|asegur|certific|confian|segur|year|warrant|licens|insur/.test(t)) return "escudo";
+  if (/reseñ|opini|calific|estrell|cliente|review|rating/.test(t)) return "estrella";
+  if (/financ|precio|pago|cuota|\$|presupuesto|cost|price|financ/.test(t)) return "dinero";
+  if (/rápid|mismo día|hora|24|urgen|fast|same.day/.test(t)) return "reloj";
+  if (/diseñ|estilo|personaliz|design|style|custom/.test(t)) return "pincel";
+  if (/instal|repar|servicio|mantenim|install|repair/.test(t)) return "herramienta";
+  return ["escudo", "estrella", "dinero", "check", "estrella2"][i % 5];
+}
+
+/* Pone la ciudad del titular en el color del botón (estilo de la referencia 2). */
+function resaltar(t, ciudad) {
+  t = String(t || ""); const c = String(ciudad || "").split(",")[0].trim();
+  const i = c ? t.toLowerCase().lastIndexOf(c.toLowerCase()) : -1;
+  return i < 0 ? esc(t) : esc(t.slice(0, i)) + `<span class="lp-hl">${esc(t.slice(i, i + c.length))}</span>` + esc(t.slice(i + c.length));
+}
+function renderServicios(d, cfg) {
+  const u = cfg.plantilla === "urgente"; // variante «Reparación urgente»
+  const c1 = hexOk(cfg.coloresIA ? d.colores?.principal : cfg.color1, u ? "#1c1c1e" : "#232f5e");
+  const c2 = hexOk(cfg.coloresIA ? d.colores?.boton : cfg.color2, u ? "#d0202a" : "#f04a4a");
+  const L = cfg.idioma === "Inglés" ? "en" : cfg.idioma === "Portugués" ? "pt" : "es";
+  const T = {
+    es: { nombre: "Nombre completo", tel: "Número de teléfono", email: "Correo electrónico", opc: "(opcional)", cp: "Código postal", barrio: "Barrio o ciudad", det: "Agregar detalles del proyecto", nec: "¿Qué necesitas?", elige: "Elige uno…", llamaAl: "Llama al", msg: "Cuéntanos sobre tu proyecto", acepto: "Acepto la", pol: "política de privacidad", priv: "Política de privacidad", llamarA: "Llamar al", llamar: "Llamar ahora", der: "Todos los derechos reservados.", porque: "Por qué elegirnos", como: "Cómo funciona", opin: "Opiniones", preg: "Preguntas frecuentes", ph: ["Ej.: Juan Pérez", "(300) 555-0100", "06457", "Ej.: Chapinero", "nombre@correo.com"] },
+    en: { nombre: "Full name", tel: "Phone number", email: "Email", opc: "(optional)", cp: "ZIP code", barrio: "City / area", det: "Add project details", nec: "What do you need?", elige: "Choose one…", llamaAl: "Call", msg: "Tell us about your project", acepto: "I accept the", pol: "privacy policy", priv: "Privacy policy", llamarA: "Call", llamar: "Call now", der: "All rights reserved.", porque: "Why choose us", como: "How it works", opin: "Reviews", preg: "FAQ", ph: ["Jane Smith", "(203) 555-0100", "06457", "New Haven", "jane@email.com"] },
+    pt: { nombre: "Nome completo", tel: "Telefone", email: "E-mail", opc: "(opcional)", cp: "CEP", barrio: "Bairro ou cidade", det: "Adicionar detalhes do projeto", nec: "Do que você precisa?", elige: "Escolha…", llamaAl: "Ligue", msg: "Conte sobre seu projeto", acepto: "Aceito a", pol: "política de privacidade", priv: "Política de privacidade", llamarA: "Ligar para", llamar: "Ligar agora", der: "Todos os direitos reservados.", porque: "Por que nos escolher", como: "Como funciona", opin: "Avaliações", preg: "Perguntas frequentes", ph: ["Maria Silva", "(11) 95555-0100", "01000-000", "Centro", "maria@email.com"] }
+  }[L];
+  const h = d.hero || {}, f = d.formulario || {};
+  const negocio = cfg.negocio || d.negocio || "";
+  const privUrl = cfg.privacidad || "#privacidad";
+  const tel = cfg.telefono ? cfg.telefono.replace(/[^\d+]/g, "") : "";
+  const lista = x => Array.isArray(x?.items) ? x.items.filter(Boolean) : [];
+  const cta = h.cta || f.boton || "Solicitar presupuesto";
+  const ceja = t => t ? `<p class="lp-eyebrow">${esc(t)}</p>` : "";
+  const ff = cfg.fuente && cfg.fuente !== "auto" ? cfg.fuente : (u ? "Oswald" : "Montserrat");
+
+  const zona = cfg.zona === "cp" ? `<label><span>${T.cp} *</span><input name="codigo_postal" type="text" required inputmode="numeric" autocomplete="postal-code" placeholder="${T.ph[2]}"></label>`
+    : cfg.zona === "barrio" ? `<label><span>${T.barrio} *</span><input name="zona" type="text" required placeholder="${T.ph[3]}"></label>` : "";
+  const formulario = `
+  <form id="lp-form" class="lp-form" novalidate>
+    <h2 class="lp-form-t">${esc(f.titulo || "Solicite su presupuesto")}</h2>
+    ${f.subtitulo ? `<p class="lp-form-s">${esc(f.subtitulo)}</p>` : ""}
+    <label><span>${T.nombre} *</span><input name="nombre" type="text" required autocomplete="name" placeholder="${T.ph[0]}"></label>
+    <label><span>${T.tel} *</span><input name="telefono" type="tel" required autocomplete="tel" inputmode="tel" placeholder="${T.ph[1]}"></label>
+    ${zona}
+    <label><span>${T.email} <small>${T.opc}</small></span><input name="email" type="email" autocomplete="email" placeholder="${T.ph[4]}"></label>
+    ${(f.opciones || []).length ? `<label><span>${T.nec}</span><select name="servicio"><option value="">${T.elige}</option>${f.opciones.map(x => `<option>${esc(x)}</option>`).join("")}</select></label>` : ""}
+    ${u ? `<label><span>${esc(f.pregunta || T.msg)}</span><textarea name="mensaje" rows="3" placeholder="${esc(f.ejemplo || "")}"></textarea></label>`
+        : `<details class="lp-det"><summary>+ <u>${T.det}</u></summary><label><span>${esc(f.pregunta || T.msg)}</span><textarea name="mensaje" rows="3" placeholder="${esc(f.ejemplo || "")}"></textarea></label></details>`}
+    <label class="lp-acepto"><input type="checkbox" required checked> <span>${T.acepto} <a href="${esc(privUrl)}" target="${cfg.privacidad ? "_blank" : "_self"}">${T.pol}</a></span></label>
+    <button type="submit" class="lp-btn lp-btn-full">${esc(f.boton || cta)}</button>
+    ${f.nota ? `<p class="lp-form-n">🔒 ${esc(f.nota)}</p>` : ""}
+    <div class="lp-gracias" hidden>✅ ${esc(f.gracias || "¡Gracias! Te contactaremos muy pronto.")}</div>
+  </form>`;
+
+  const puntos = (h.puntos || []).filter(Boolean);
+  const franja = [...puntos, ...(d.confianza || []).map(x => [x.valor, x.texto].filter(Boolean).join(" · "))].filter(Boolean).slice(0, 6);
+
+  const sec = [];
+  if (franja.length) sec.push(`<section class="lp-trust"><div class="lp-wrap"><ul>${franja.map((t, i) => `<li>${u ? icono("checkf", "lp-ck") : `<span class="lp-ic">${icono(iconoPara(t, i))}</span>`}${esc(t)}</li>`).join("")}</ul></div></section>`);
+  if (d.problema?.titulo) sec.push(`<section class="lp-sec"><div class="lp-wrap lp-narrow lp-c"><h2>${esc(d.problema.titulo)}</h2><p class="lp-lead">${esc(d.problema.texto)}</p></div></section>`);
+  if (lista(d.senales).length) sec.push(`<section class="lp-sec"><div class="lp-wrap">${ceja(d.senales.etiqueta)}<h2 class="lp-c">${esc(d.senales.titulo)}</h2>${d.senales.texto ? `<p class="lp-lead lp-c lp-narrow" style="margin-left:auto;margin-right:auto">${esc(d.senales.texto)}</p>` : ""}
+    <div class="lp-sig">${lista(d.senales).map((x, i) => `<div><b>${String(i + 1).padStart(2, "0")}</b><h3>${esc(x.titulo)}</h3><p>${esc(x.texto)}</p></div>`).join("")}</div>
+    <p class="lp-c">${tel ? `<a href="tel:${esc(tel)}" class="lp-btn lp-tel">${icono("tel", "lp-i")} ${T.llamaAl} ${esc(cfg.telefono)}</a>` : `<a href="#lp-form" class="lp-btn lp-cta">${esc(cta)}</a>`}</p></div></section>`);
+  if (d.galeria?.titulo && cfg.fotos?.length) sec.push(`<section class="lp-sec lp-dark"><div class="lp-wrap lp-c">${ceja(d.galeria.etiqueta || "Nuestro trabajo")}<h2>${esc(d.galeria.titulo)}</h2>${d.galeria.texto ? `<p class="lp-lead">${esc(d.galeria.texto)}</p>` : ""}
+    <div class="lp-gal">${cfg.fotos.map((u, i) => `<img src="${esc(u)}" alt="${esc(d.galeria.titulo)} ${i + 1}" loading="lazy">`).join("")}</div>
+    <a href="#lp-form" class="lp-btn lp-cta">${esc(cta)}</a></div></section>`);
+  if (lista(d.beneficios).length) sec.push(`<section class="lp-sec lp-alt"><div class="lp-wrap">${ceja(T.porque)}<h2 class="lp-c">${esc(d.beneficios.titulo)}</h2><div class="lp-grid">${lista(d.beneficios).map(b => `<div class="lp-card"><div class="lp-ico">${esc(b.icono || "✔️")}</div><h3>${esc(b.titulo)}</h3><p>${esc(b.texto)}</p></div>`).join("")}</div><p class="lp-c"><a href="#lp-form" class="lp-btn lp-cta">${esc(cta)}</a></p></div></section>`);
+  if (lista(d.pasos).length) sec.push(`<section class="lp-sec"><div class="lp-wrap">${ceja(T.como)}<h2 class="lp-c">${esc(d.pasos.titulo)}</h2><ol class="lp-steps">${lista(d.pasos).map(p => `<li><h3>${esc(p.titulo)}</h3><p>${esc(p.texto)}</p></li>`).join("")}</ol></div></section>`);
+  if (d.oferta?.titulo) { const o = d.oferta; sec.push(`<section class="lp-sec lp-dark"><div class="lp-wrap lp-narrow lp-c">${ceja(h.etiqueta ? "" : "")}<h2>${esc(o.titulo)}</h2><p class="lp-lead">${esc(o.texto)}</p>${o.precio ? `<p class="lp-price">${o.precio_antes ? `<s>${esc(o.precio_antes)}</s> ` : ""}<b>${esc(o.precio)}</b></p>` : ""}<a href="#lp-form" class="lp-btn lp-cta">${esc(o.cta || cta)}</a>${o.garantia ? `<p class="lp-guar">${icono("escudo", "lp-i")} ${esc(o.garantia)}</p>` : ""}</div></section>`); }
+  if (lista(d.testimonios).length) sec.push(`<section class="lp-sec lp-alt"><div class="lp-wrap">${ceja(T.opin)}<h2 class="lp-c">${esc(d.testimonios.titulo)}</h2><div class="lp-grid">${lista(d.testimonios).map(t => `<figure class="lp-card lp-testi"><div class="lp-stars">★★★★★</div><blockquote>“${esc(t.texto)}”</blockquote><figcaption><b>${esc(t.nombre)}</b> ${t.detalle ? `· ${esc(t.detalle)}` : ""}</figcaption></figure>`).join("")}</div></div></section>`);
+  if (lista(d.faq).length) sec.push(`<section class="lp-sec"><div class="lp-wrap lp-narrow">${ceja(T.preg)}<h2 class="lp-c">${esc(d.faq.titulo || T.preg)}</h2>${lista(d.faq).map(q => `<details class="lp-faq"><summary>${esc(q.p)}</summary><p>${esc(q.r)}</p></details>`).join("")}</div></section>`);
+  if (d.cierre?.titulo) sec.push(`<section class="lp-sec lp-dark lp-final"><div class="lp-wrap lp-narrow lp-c"><h2>${esc(d.cierre.titulo)}</h2>${d.cierre.texto ? `<p class="lp-lead">${esc(d.cierre.texto)}</p>` : ""}<div class="lp-ctas lp-ctas-c"><a href="#lp-form" class="lp-btn lp-cta">${esc(d.cierre.cta || cta)}</a>${tel ? `<a href="tel:${esc(tel)}" class="lp-btn lp-btn-ghost lp-tel">${icono("tel", "lp-i")} ${esc(cfg.telefono)}</a>` : ""}</div></div></section>`);
+
+  const contacto = [cfg.direccion && `${esc(cfg.direccion)}${cfg.ciudad ? ", " + esc(cfg.ciudad) : ""}`, cfg.telefono && `<a href="tel:${esc(tel)}" class="lp-tel">${esc(cfg.telefono)}</a>`, cfg.email && `<a href="mailto:${esc(cfg.email)}">${esc(cfg.email)}</a>`].filter(Boolean);
+  const navy2 = oscuro(c1, .72);
+  const heroBg = cfg.imagen
+    ? `linear-gradient(180deg, ${c1}${u ? "b8" : "d9"} 0%, ${navy2}f2 100%), url('${String(cfg.imagen).replace(/['"()\\\s]/g, encodeURIComponent)}') center/cover no-repeat`
+    : u ? `radial-gradient(900px 500px at 90% 30%, ${oscuro(c1, 1.45)} 0%, transparent 70%), linear-gradient(160deg, ${c1} 0%, ${oscuro(c1, 1.25)} 100%)`
+    : `radial-gradient(900px 420px at 15% 0%, ${oscuro(c1, 1.25)} 0%, transparent 70%), linear-gradient(180deg, ${c1} 0%, ${navy2} 100%)`;
+
+  const css = `
+.lp{--p:${c1};--p2:${navy2};--b:${c2};--bt:${textoSobre(c2)};--tx:#1f2a44;--mut:#5b6476;--ln:#e3e6ee;--soft:#eef0f5;font-family:${u ? "'Roboto'" : "'Open Sans'"},system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:var(--tx);background:#fff;line-height:1.6;font-size:17px;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.lp *,.lp *::before,.lp *::after{box-sizing:border-box}
+.lp img{max-width:100%;height:auto;display:block}
+.lp h1,.lp h2,.lp h3,.lp-btn,.lp-eyebrow,.lp-trust li,.lp-form-t,.lp-phone{font-family:'${ff}',system-ui,sans-serif}
+.lp h1,.lp h2,.lp h3{line-height:1.15;margin:0 0 .5em;font-weight:800;color:var(--p)}
+.lp h2{font-size:clamp(28px,4.2vw,44px)} .lp h3{font-size:19px;font-weight:700}
+.lp p{margin:0 0 1em}
+.lp a{color:var(--b)}
+.lp-i{width:1.1em;height:1.1em;flex:none;vertical-align:-.15em}
+.lp-wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+.lp-narrow{max-width:820px}
+.lp-c{text-align:center}
+.lp-eyebrow{color:var(--b);text-transform:uppercase;letter-spacing:.18em;font-size:14px;font-weight:600;margin:0 0 12px;text-align:center}
+.lp-topbar{background:var(--p);color:#fff;font-size:14px;border-bottom:1px solid rgba(255,255,255,.08)}
+.lp-topbar .lp-wrap{display:flex;gap:16px;justify-content:space-between;align-items:center;min-height:40px}
+.lp-topbar a{color:#fff;text-decoration:none;display:inline-flex;gap:8px;align-items:center}
+.lp-head{background:var(--p);position:sticky;top:0;z-index:30;box-shadow:0 6px 20px -12px rgba(0,0,0,.5)}
+.lp-head .lp-wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:76px}
+.lp-logo{font-family:'${ff}',sans-serif;font-weight:800;font-size:21px;color:#fff!important;text-decoration:none}
+.lp-logo img{max-height:52px;width:auto}
+.lp-head-r{display:flex;align-items:center;gap:22px}
+.lp-phone{color:#fff!important;text-decoration:none;font-weight:800;font-size:20px;display:inline-flex;gap:8px;align-items:center}
+.lp-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;background:var(--b);color:var(--bt)!important;font-weight:700;font-size:18px;padding:16px 30px;border-radius:8px;text-decoration:none;border:0;cursor:pointer;transition:transform .15s,filter .15s;text-align:center;line-height:1.2}
+.lp-btn:hover{transform:translateY(-2px);filter:brightness(1.07)}
+.lp-btn-full{width:100%;font-size:20px;padding:18px}
+.lp-btn-ghost{background:transparent;color:#fff!important;border:2px solid rgba(255,255,255,.55)}
+.lp-hero{background:${heroBg};color:#fff;padding:60px 0 70px}
+.lp-hero-g{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:start}
+.lp-badge{display:inline-block;border:1.5px solid var(--b);background:${c2}26;color:${oscuro(c2, 1.35)};border-radius:18px;padding:10px 18px;text-transform:uppercase;letter-spacing:.14em;font-size:14px;font-weight:600;line-height:1.7;margin-bottom:22px}
+.lp-hero h1{color:#fff;font-size:clamp(36px,5.4vw,60px);line-height:1.08}
+.lp-sub{font-size:clamp(18px,2vw,21px);color:#dfe3ee}
+.lp-hero ul{list-style:none;padding:0;margin:26px 0 28px}
+.lp-hero li{display:flex;gap:12px;align-items:flex-start;margin:12px 0;font-size:18px;color:#eef1f7}
+.lp-hero li svg{width:22px;height:22px;color:var(--b);flex:none;margin-top:3px}
+.lp-call{display:inline-flex;align-items:center;gap:14px;color:#fff!important;text-decoration:none;font-family:'${ff}',sans-serif;font-weight:700;font-size:20px;margin-bottom:8px}
+.lp-call span{width:54px;height:54px;border-radius:50%;background:var(--b);display:grid;place-items:center;color:var(--bt)}
+.lp-call svg{width:24px;height:24px}
+.lp-form{background:#fff;color:var(--tx);padding:34px 32px;border-radius:22px;box-shadow:0 30px 60px -25px rgba(0,0,0,.55)}
+.lp-form-t{color:var(--p);font-size:26px;font-weight:800;line-height:1.3;margin:0 0 10px}
+.lp-form-s{color:var(--mut);font-size:16px}
+.lp-form label{display:block;margin:0 0 18px;font-size:16px;font-weight:500}
+.lp-form label span{display:block;margin-bottom:8px}
+.lp-form small{color:var(--mut);font-size:15px;font-weight:400}
+.lp-form input[type=text],.lp-form input[type=tel],.lp-form input[type=email],.lp-form textarea,.lp-form select{width:100%;padding:15px 16px;border:1.5px solid var(--ln);border-radius:8px;font:inherit;font-size:17px;background:#fff;color:var(--tx)}
+.lp-form input::placeholder,.lp-form textarea::placeholder{color:#9aa1b1}
+.lp-form input:focus,.lp-form textarea:focus{outline:none;border-color:var(--p);box-shadow:0 0 0 3px ${c1}26}
+.lp-det{margin:0 0 18px}
+.lp-det summary{cursor:pointer;color:var(--p);font-size:17px;list-style:none;margin-bottom:12px}
+.lp-det summary::-webkit-details-marker{display:none}
+.lp-form .lp-acepto{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:var(--mut)}
+.lp-form .lp-acepto span{display:inline;margin:0}
+.lp-form .lp-acepto a{color:var(--p)}
+.lp-form-n{font-size:14px;color:var(--mut);text-align:center;margin:14px 0 0}
+.lp-gracias{background:#ecfdf3;color:#067647;border-radius:10px;padding:14px;margin-top:12px;font-weight:600}
+.lp-trust{border-top:5px solid var(--b);background:#fff;padding:36px 0}
+.lp-trust ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;justify-content:center;gap:18px 40px}
+.lp-trust li{display:flex;align-items:center;gap:18px;font-weight:700;font-size:18px;color:var(--p)}
+.lp-ic{width:62px;height:62px;border-radius:50%;background:var(--soft);display:grid;place-items:center;flex:none}
+.lp-ic svg{width:26px;height:26px;color:var(--b)}
+.lp-sec{padding:84px 0}
+.lp-alt{background:#f6f7fa}
+.lp-dark{background:var(--p);color:#fff}
+.lp-dark h2{color:#fff}
+.lp-lead{font-size:clamp(18px,2vw,21px);color:var(--mut)}
+.lp-dark .lp-lead{color:#c9cfdd}
+.lp-gal{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin:36px 0}
+.lp-gal img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:12px}
+.lp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:22px;margin:30px 0 34px}
+.lp-card{background:#fff;border:1px solid var(--ln);border-radius:16px;padding:28px;margin:0;box-shadow:0 6px 18px -12px rgba(16,24,40,.25)}
+.lp-card p{color:var(--mut);margin:0}
+.lp-ico{font-size:28px;width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:var(--soft);margin-bottom:14px}
+.lp-steps{list-style:none;padding:0;margin:34px 0 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:26px;counter-reset:s}
+.lp-steps li{counter-increment:s;position:relative;padding-top:70px}
+.lp-steps li::before{content:counter(s);position:absolute;top:0;left:0;width:52px;height:52px;border-radius:50%;background:var(--b);color:var(--bt);display:grid;place-items:center;font-weight:800;font-size:22px;font-family:'${ff}',sans-serif}
+.lp-steps p{color:var(--mut)}
+.lp-price{font-size:22px} .lp-price b{font-size:42px} .lp-price s{opacity:.7}
+.lp-guar{font-size:15px;color:#c9cfdd;margin:18px 0 0}
+.lp-testi blockquote{margin:0 0 14px;font-style:italic}
+.lp-stars{color:#f5a623;letter-spacing:2px;margin-bottom:8px}
+.lp-testi figcaption{font-size:14px;color:var(--mut)}
+.lp-faq{background:#fff;border:1px solid var(--ln);border-radius:12px;margin:12px 0;padding:0 22px}
+.lp-faq summary{cursor:pointer;font-weight:700;padding:20px 30px 20px 0;list-style:none;position:relative;color:var(--p)}
+.lp-faq summary::-webkit-details-marker{display:none}
+.lp-faq summary::after{content:"+";position:absolute;right:0;top:15px;font-size:26px;color:var(--b)}
+.lp-faq[open] summary::after{content:"−"}
+.lp-faq p{color:var(--mut);padding-bottom:18px;margin:0}
+.lp-ctas{display:flex;flex-wrap:wrap;gap:14px}
+.lp-ctas-c{justify-content:center}
+.lp-foot{background:${oscuro(c1, .55)};color:#aab1c3;padding:40px 0 100px;font-size:14px}
+.lp-foot a{color:#dfe3ee}
+.lp-foot-g{display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px}
+.lp-foot p{margin:4px 0}
+.lp-priv{max-width:820px;margin:22px auto 0;font-size:13px}
+.lp-priv h3{font-size:15px;color:#fff}
+.lp-sig{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px;margin:34px 0 38px;text-align:left}
+.lp-sig>div{background:#f4f4f5;border-left:6px solid var(--b);border-radius:8px;padding:30px 28px}
+.lp-sig b{display:block;font-family:'${ff}',sans-serif;font-size:36px;font-weight:700;color:var(--b);line-height:1;margin-bottom:16px}
+.lp-sig h3{color:#111}
+.lp-sig p{color:var(--mut);margin:0}
+.lp-bar{display:none}
+${u ? `
+.lp{--tx:#26272b}
+.lp h1,.lp h2,.lp h3,.lp-form-t{text-transform:uppercase;letter-spacing:.01em;color:#111;font-weight:700}
+.lp h3{text-transform:none;font-size:22px}
+.lp-sig h3{text-transform:none}
+.lp-btn{text-transform:uppercase;letter-spacing:.08em;border-radius:6px;font-size:19px}
+.lp-head{background:#fff;border-bottom:5px solid var(--b)}
+.lp-logo{color:#111!important}
+.lp-round{width:60px;height:60px;border-radius:50%;background:var(--b);display:grid;place-items:center;color:var(--bt)!important}
+.lp-round svg{width:26px;height:26px}
+.lp-badge{background:var(--b);border:0;color:var(--bt);border-radius:99px;font-family:'${ff}',sans-serif;font-size:17px;letter-spacing:.12em;font-weight:600;padding:12px 26px}
+.lp-badge svg{width:18px;height:18px;color:#facc15;vertical-align:-3px;margin-right:10px}
+.lp-hero h1{color:#fff;font-size:clamp(42px,6.4vw,76px);line-height:1.02;font-weight:700}
+.lp-hl{color:var(--b)}
+.lp-hero ul{display:flex;flex-wrap:wrap;gap:4px 30px}
+.lp-hero li{align-items:center}
+.lp-hero li::before{content:"";width:12px;height:12px;border-radius:50%;background:var(--b);flex:none}
+.lp-btn-out{background:transparent;border:3px solid #fff;color:#fff!important}
+.lp-form{border-radius:10px;border-top:8px solid var(--b)}
+.lp-form label>span{text-transform:uppercase;letter-spacing:.06em;font-weight:600;font-size:15px}
+.lp-form input[type=text],.lp-form input[type=tel],.lp-form input[type=email],.lp-form textarea,.lp-form select{background:#f7f7f8}
+.lp-trust{border-top:0;background:#f4f4f5;border-bottom:1px solid var(--ln)}
+.lp-trust li{color:#111;gap:14px}
+.lp-ck{width:44px;height:44px;color:var(--b);flex:none}
+.lp-dark{background:#18181b}
+.lp-foot{background:#111}
+` : ""}
+@media (max-width:900px){
+ .lp{font-size:16px}
+ .lp-hero{padding:34px 0 44px}
+ .lp-hero-g{grid-template-columns:1fr;gap:30px}
+ .lp-head .lp-wrap{min-height:64px}
+ .lp-head .lp-phone{display:none}
+ .lp-head .lp-btn{padding:12px 16px;font-size:15px}
+ .lp-form{padding:26px 22px}
+ .lp-sec{padding:60px 0}
+ .lp-trust ul{flex-direction:column;align-items:center}
+ .lp-bar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:40;box-shadow:0 -6px 20px -10px rgba(0,0,0,.4)}
+ .lp-bar a{display:flex;align-items:center;justify-content:center;gap:12px;text-decoration:none;font-family:'${ff}',sans-serif;font-weight:700;font-size:19px;min-height:62px}
+ .lp-bar .lp-bar-tel{flex:1;background:var(--p);color:#fff}
+ .lp-bar .lp-bar-tel{${u ? "background:var(--b);color:var(--bt);font-size:22px" : ""}}
+ .lp-trust ul{${u ? "align-items:flex-start" : ""}}
+ .lp-hero h1{${u ? "font-size:clamp(40px,11vw,60px)" : ""}}
+ .lp-bar .lp-bar-f{width:${tel ? "26%" : "100%"};background:var(--b);color:var(--bt)}
+ .lp-bar svg{width:24px;height:24px}
+}`;
+
+  const fontLink = `<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=${encodeURIComponent(ff)}:wght@600;700;800&family=${u ? "Roboto:wght@400;500;700" : "Open+Sans:wght@400;500;600"}&display=swap" rel="stylesheet">`;
+
+  return `<!doctype html>
+<html lang="${L}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${esc(d.meta?.title || h.titulo || negocio)}</title>
+<meta name="description" content="${esc(d.meta?.description || h.subtitulo || "")}">
+<meta name="theme-color" content="${c1}">
+<meta property="og:title" content="${esc(d.meta?.title || h.titulo || "")}">
+<meta property="og:description" content="${esc(d.meta?.description || "")}">
+${cfg.imagen ? `<meta property="og:image" content="${esc(cfg.imagen)}">\n` : ""}${fontLink}
+<style id="lp-css">${css}
+body{margin:0}
+</style>
+</head>
+<body>
+<div class="lp">
+${tel && !u ? `<div class="lp-topbar"><div class="lp-wrap"><a href="tel:${esc(tel)}" class="lp-tel">${icono("tel", "lp-i")} ${esc(cfg.telefono)}</a>${cfg.ciudad ? `<span>${esc(cfg.ciudad)}</span>` : ""}</div></div>` : ""}
+<header class="lp-head"><div class="lp-wrap">
+  <a href="#" class="lp-logo">${cfg.logo ? `<img src="${esc(cfg.logo)}" alt="${esc(negocio)}">` : esc(negocio || "Inicio")}</a>
+  ${u && tel ? `<a href="tel:${esc(tel)}" class="lp-round lp-tel" aria-label="${T.llamar}">${icono("tel")}</a>` : `<div class="lp-head-r">
+    ${tel ? `<a href="tel:${esc(tel)}" class="lp-phone lp-tel">${icono("tel", "lp-i")} ${esc(cfg.telefono)}</a>` : ""}
+    <a href="#lp-form" class="lp-btn lp-cta">${esc(cta)}</a>
+  </div>`}
+</div></header>
+<section class="lp-hero"><div class="lp-wrap lp-hero-g">
+  <div class="lp-hero-txt">
+    ${h.etiqueta ? `<span class="lp-badge">${u ? icono("rayo") : ""}${esc(h.etiqueta.replace(/^[^\p{L}\p{N}]+/u, ""))}</span>` : ""}
+    <h1 data-kw>${resaltar(h.titulo || negocio, u ? cfg.ciudad : "")}</h1>
+    ${h.subtitulo ? `<p class="lp-sub">${esc(h.subtitulo)}</p>` : ""}
+    ${u ? `<div class="lp-ctas">${tel ? `<a href="tel:${esc(tel)}" class="lp-btn lp-tel">${icono("tel", "lp-i")} ${T.llamaAl} ${esc(cfg.telefono)}</a>` : ""}<a href="#lp-form" class="lp-btn lp-btn-out lp-cta">${esc(cta)}</a></div>` : ""}
+    ${puntos.length ? `<ul>${puntos.map((p, i) => `<li>${u ? "" : icono(iconoPara(p, i))}<span>${esc(p)}</span></li>`).join("")}</ul>` : ""}
+    ${tel && !u ? `<a href="tel:${esc(tel)}" class="lp-call lp-tel"><span>${icono("tel")}</span>${T.llamarA} ${esc(cfg.telefono)}</a>` : ""}
+    ${cfg.whatsapp ? `<p><a href="https://wa.me/${cfg.whatsapp}" class="lp-btn lp-btn-ghost lp-wa" target="_blank" rel="noopener">💬 WhatsApp</a></p>` : ""}
+  </div>
+  ${formulario}
+</div></section>
+${sec.join("\n")}
+<footer class="lp-foot"><div class="lp-wrap">
+  <div class="lp-foot-g">
+    <div><p><b style="color:#fff">${esc(negocio)}</b></p>${contacto.map(x => `<p>${x}</p>`).join("")}</div>
+    <div><p><a href="${esc(privUrl)}">${T.priv}</a></p><p>© ${new Date().getFullYear()} ${esc(negocio)}. ${T.der}</p></div>
+  </div>
+  ${!cfg.privacidad && d.privacidad ? `<div class="lp-priv" id="privacidad"><h3>${T.priv}</h3><p>${esc(d.privacidad)}</p></div>` : ""}
+</div></footer>
+<div class="lp-bar">
+  ${tel ? `<a href="tel:${esc(tel)}" class="lp-bar-tel lp-tel">${icono("tel")} ${u ? `${T.llamaAl} ${esc(cfg.telefono)}` : T.llamar}</a>` : ""}
+  ${u && tel ? "" : `<a href="#lp-form" class="lp-bar-f lp-cta" aria-label="${esc(cta)}">${icono("check")}${tel ? "" : " " + esc(cta)}</a>`}
+</div>
+</div>
+${scriptLanding(cfg, f.gracias)}
+</body>
+</html>`;
+}
+
 /* En modo «libre» la IA escribe el HTML: se le quitan los scripts y se agrega el nuestro. */
 function prepararLibre(html, cfg) {
   html = html.replace(/<script\b[\s\S]*?<\/script\s*>/gi, "").replace(/\son\w+\s*=\s*("[^"]*"|'[^']*')/gi, "").replace(/(href|src|action)\s*=\s*(["'])\s*javascript:[^"']*\2/gi, '$1="#"');
@@ -820,7 +1146,9 @@ function demo(o) {
   return {
     negocio: n,
     meta: { title: `${K} en ${c} | ${n}`.slice(0, 60), description: `${s} en ${c}. Agenda tu valoración y recibe atención personalizada.` },
-    colores: { principal: "#0f766e", boton: "#f59e0b" },
+    colores: { principal: "#232f5e", boton: "#f04a4a" },
+    senales: { etiqueta: "¿Te suena familiar?", titulo: "Señales de que necesitas ayuda", texto: "Si te pasa alguna de estas cosas, no esperes a que empeore.", items: [{ titulo: "Dolor al masticar", texto: "Molestia constante que no desaparece." }, { titulo: "Dientes flojos", texto: "Movilidad que avanza con el tiempo." }, { titulo: "Prótesis incómoda", texto: "Se mueve, lastima o no ajusta bien." }, { titulo: "Pena al sonreír", texto: "Evitas fotos o reuniones por tu sonrisa." }] },
+    galeria: { etiqueta: "Nuestro trabajo", titulo: `Trabajos recientes en ${c}`, texto: "Cada proyecto refleja la visión del cliente y nuestro compromiso de hacerlo bien." },
     hero: { etiqueta: `⭐ Atención en ${c}`, titulo: `${K} en ${c}`, subtitulo: `${s} con atención personalizada, resultados naturales y acompañamiento en cada paso.`, puntos: ["Valoración inicial sin costo", "Profesionales certificados", "Facilidades de pago"], cta: "Agendar valoración" },
     confianza: [{ valor: "Rápido", texto: "Respuesta el mismo día" }, { valor: "Seguro", texto: "Protocolos certificados" }, { valor: c, texto: "Cerca de ti" }],
     problema: { titulo: "¿Te cuesta sonreír con confianza?", texto: "Sabemos lo incómodo que es evitar fotos o elegir qué comer. Te ayudamos a recuperar la tranquilidad con un plan claro desde la primera cita." },
@@ -829,7 +1157,7 @@ function demo(o) {
     oferta: o.s_oferta ? { titulo: o.oferta || "Valoración gratis este mes", texto: "Cupos limitados por agenda. Reserva el tuyo hoy.", precio: "", precio_antes: "", garantia: "Sin compromiso: decides después de la valoración.", cta: "Reservar mi cupo" } : null,
     testimonios: o.s_testimonios ? { titulo: "Lo que dicen nuestros pacientes", items: [{ nombre: "[Nombre del cliente]", detalle: "[Ciudad]", texto: "Ejemplo de opinión — reemplazar por un testimonio real." }, { nombre: "[Nombre del cliente]", detalle: "[Ciudad]", texto: "Ejemplo de opinión — reemplazar por un testimonio real." }] } : null,
     faq: o.s_faq ? { titulo: "Preguntas frecuentes", items: [{ p: "¿La valoración tiene costo?", r: "La primera valoración es sin costo y sin compromiso." }, { p: "¿Cuánto tarda el tratamiento?", r: "Depende de cada caso; en la valoración te damos un tiempo estimado." }, { p: "¿Tienen financiación?", r: "Sí, contamos con diferentes opciones de pago." }] } : null,
-    formulario: { titulo: "Agenda tu valoración", subtitulo: "Déjanos tus datos y te contactamos hoy.", boton: "Quiero mi valoración", nota: "Tus datos están seguros. Te respondemos en minutos.", gracias: "¡Gracias! Un asesor te contactará muy pronto." },
+    formulario: { titulo: "Agenda tu valoración", subtitulo: "Déjanos tus datos y te contactamos hoy.", opciones: ["Implantes", "Diseño de sonrisa", "Ortodoncia", "Otro"], pregunta: "¿Qué te gustaría mejorar?", ejemplo: "Por ejemplo: me falta una muela, quiero cambiar mi prótesis…", boton: "Quiero mi valoración", nota: "Tus datos están seguros. Te respondemos en minutos.", gracias: "¡Gracias! Un asesor te contactará muy pronto." },
     cierre: { titulo: "Da el primer paso hoy", texto: "Agenda tu valoración y recibe tu plan personalizado.", cta: "Agendar ahora" },
     privacidad: `${n} usa los datos que envías en este formulario únicamente para contactarte sobre tu solicitud. No los compartimos con terceros. Puedes pedir su eliminación escribiéndonos en cualquier momento.`,
     anuncios: { titulos: [`${K} ${c}`.slice(0, 30), "Valoración Sin Costo", "Agenda Tu Cita Hoy", "Especialistas Certificados", "Facilidades De Pago", `${n}`.slice(0, 30), "Resultados Naturales", "Atención Personalizada", "Respuesta El Mismo Día", "Cupos Limitados", "Escríbenos Por WhatsApp", "Plan Claro Desde El Inicio", "Cerca De Ti", "Pide Información Ya", "Profesionales Expertos"], descripciones: [`${s} en ${c}. Agenda tu valoración sin costo y recibe un plan claro.`, "Equipo certificado, opciones de pago y atención el mismo día. ¡Escríbenos!", "Resultados naturales con acompañamiento en cada paso. Reserva tu cupo hoy.", "Déjanos tus datos y un asesor te contacta en minutos. Sin compromiso."], palabras_clave: [kw, `${kw} ${c}`, `${kw} precio`, `mejor ${kw}`], negativas: ["gratis", "curso", "empleo", "pdf"] }
