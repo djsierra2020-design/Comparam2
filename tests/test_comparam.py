@@ -1233,6 +1233,11 @@ def test_app_landing():
     r = c.get("/landing")
     html = r.get_data(as_text=True)
     assert r.status_code == 200 and "text/html" in r.content_type
-    assert "Generador de landing pages" in html and "generativelanguage.googleapis.com" in html
+    assert "Landings IA" in html and "generativelanguage.googleapis.com" in html
     assert "api.anthropic.com" in html and "lp-form" in html and "Template Name" in html
-    assert "Servicio local / presupuesto" in html and "Reparación urgente" in html
+    assert "Playbook" in html and "Landing page completa" in html and "lp-sig" in html
+    import json
+    m = json.loads(c.get("/static/landing.webmanifest").get_data(as_text=True))
+    assert m["start_url"] == "/landing" and m["display"] == "standalone"
+    for i in m["icons"]:
+        assert c.get(i["src"]).status_code == 200, i["src"]
