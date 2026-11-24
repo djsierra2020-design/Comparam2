@@ -41,7 +41,12 @@ de inicio** (se instala como una app aparte, con su propio ícono).
 ## Landings IA (`/landing`)
 
 Herramienta para crear landing pages de **Google Ads** listas para **WordPress**, con IA.
-Ábrela en `https://<tu-app>.onrender.com/landing` (se puede instalar como app: botón «Instalar app»).
+
+**Dirección propia (sin el nombre de Comparam):** `render.yaml` incluye el sitio estático
+**landings-ia** (gratis y no se «duerme»). En Render: *Blueprints* → el blueprint de este repositorio →
+**Sync** (o *New → Blueprint* con este repositorio) y aprueba el servicio nuevo `landings-ia`. Queda en
+`https://landings-ia.onrender.com` (si el nombre está ocupado, Render agrega unas letras). Se instala
+como app con el botón «Instalar app». También sigue disponible en `https://<tu-app>.onrender.com/landing`.
 
 **Cómo se trabaja**
 

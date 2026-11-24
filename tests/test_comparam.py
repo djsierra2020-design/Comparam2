@@ -1241,3 +1241,21 @@ def test_app_landing():
     assert m["start_url"] == "/landing" and m["display"] == "standalone"
     for i in m["icons"]:
         assert c.get(i["src"]).status_code == 200, i["src"]
+
+
+def test_landing_sitio_propio(tmp_path):
+    """«Landings IA» se publica también como sitio estático aparte (sin el nombre de Comparam)."""
+    import shutil, subprocess
+    from pathlib import Path
+    raiz = Path(__file__).resolve().parent.parent
+    assert "name: landings-ia" in (raiz / "render.yaml").read_text()
+    for f in ("build_landing.sh", "static/landing.html", "static/landing.webmanifest", "static/landing-sw.js",
+              "static/landing-192.png", "static/landing-512.png"):
+        destino = tmp_path / f
+        destino.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy(raiz / f, destino)
+    subprocess.run(["bash", "build_landing.sh"], cwd=tmp_path, check=True, capture_output=True)
+    dist = tmp_path / "landing_dist"
+    assert "Landings IA" in (dist / "index.html").read_text()
+    assert '"start_url": "/"' in (dist / "static/landing.webmanifest").read_text()
+    assert (dist / "sw.js").exists() and (dist / "static/landing-192.png").exists()
