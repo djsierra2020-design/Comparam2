@@ -104,8 +104,8 @@
   <h1>Landings IA <small>v2</small></h1>
   <button class="b" id="btnInstalar" hidden title="Instalar como app">⬇ <span class="txt">Instalar app</span></button>
   <button class="b ico" id="btnRegen" title="Generar otra versión con los mismos datos" disabled>⟳</button>
-  <button class="b pri" id="btnNuevo" title="Nueva landing">＋ <span class="txt">Nuevo</span></button>
-  <button class="b ico gris" id="btnAjustesIA" title="Ajustes de IA">⚙</button>
+  <button class="b pri" id="btnNuevo" title="Nueva landing: limpia el formulario y la vista previa">＋ <span class="txt">Nuevo</span></button>
+  <button class="b ico gris" id="btnAjustesIA" title="Ajustes: IA, historial y reinicio">⚙</button>
 </header>
 <nav class="app-tabs" id="appTabs"><button data-t="form" class="on">Formulario</button><button data-t="prev">Vista previa</button></nav>
 
@@ -309,7 +309,7 @@
 <!-- ===================== AJUSTES DE IA ===================== -->
 <dialog id="dlgIA">
   <form method="dialog" id="iaForm" autocomplete="off">
-    <div class="dh"><h2>Inteligencia artificial</h2><button class="b gris ico" value="cancel">✕</button></div>
+    <div class="dh"><h2>Ajustes</h2><button class="b gris ico" value="cancel">✕</button></div>
     <div class="db">
       <label class="l" for="proveedor">Proveedor</label>
       <select id="proveedor">
@@ -327,6 +327,14 @@
         <input type="text" id="modelo" list="modelos"><datalist id="modelos"></datalist>
         <div class="hint">La clave se guarda solo en este navegador y va directo a Google/Anthropic, nunca a nuestro servidor.</div>
       </div>
+      <h3 class="grp" style="margin-top:24px">Historial y datos de este navegador</h3>
+      <p class="hint" id="infoDatos"></p>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+        <button type="button" class="b gris" id="btnBorrarHistorial">🗑 Borrar historial de landings guardadas</button>
+        <button type="button" class="b gris" id="btnBorrarClaves">🔑 Quitar las claves de IA de este navegador</button>
+        <button type="button" class="b gris peligro" id="btnReiniciar">⟲ Reiniciar la app (borra clientes, landings, borrador y claves)</button>
+      </div>
+      <p class="hint">Antes de borrar, descarga (⬇ HTML / ⬇ WordPress) las landings que quieras conservar.</p>
     </div>
     <div class="df"><span></span><button class="b pri" value="ok">Listo</button></div>
   </form>
@@ -763,7 +771,32 @@ function actualizarProveedor(cambio) {
 $("#proveedor").onchange = () => actualizarProveedor(true);
 $("#clave").oninput = () => { const c = LS.get("lp_claves", {}); c[$("#proveedor").value] = $("#clave").value.trim(); LS.set("lp_claves", c); };
 $("#modelo").oninput = () => { const c = LS.get("lp_modelos", {}); c[$("#proveedor").value] = $("#modelo").value.trim(); LS.set("lp_modelos", c); };
-$("#btnAjustesIA").onclick = () => $("#dlgIA").showModal();
+$("#btnAjustesIA").onclick = () => { pintarInfoDatos(); $("#dlgIA").showModal(); };
+
+/* Historial y reinicio */
+function pintarInfoDatos() {
+  const n = LS.get("lp_proyectos", []).length, c = clientes.length;
+  const claves = Object.values(LS.get("lp_claves", {})).filter(Boolean).length;
+  $("#infoDatos").textContent = `Guardado aquí: ${c} cliente${c === 1 ? "" : "s"}, ${n} landing${n === 1 ? "" : "s"} y ${claves} clave${claves === 1 ? "" : "s"} de IA.`;
+}
+$("#btnBorrarHistorial").onclick = () => {
+  const n = LS.get("lp_proyectos", []).length;
+  if (!n) { alert("No hay landings guardadas."); return; }
+  if (!confirm(`¿Borrar las ${n} landings guardadas de todos los clientes? No se puede deshacer.`)) return;
+  try { localStorage.removeItem("lp_proyectos"); } catch {}
+  pintarProyectos(); pintarInfoDatos(); avisar("Historial de landings borrado.", "ok");
+};
+$("#btnBorrarClaves").onclick = () => {
+  if (!confirm("¿Quitar las claves de IA de este navegador? Tendrás que pegarlas de nuevo para generar.")) return;
+  try { localStorage.removeItem("lp_claves"); } catch {}
+  $("#clave").value = ""; pintarInfoDatos(); avisar("Claves quitadas de este navegador.", "ok");
+};
+$("#btnReiniciar").onclick = () => {
+  if (!confirm("¿Reiniciar la app? Se borran TODOS los clientes, landings guardadas, el borrador y las claves de este navegador.")) return;
+  if (!confirm("Última confirmación: esto no se puede deshacer. ¿Borrar todo?")) return;
+  try { Object.keys(localStorage).filter(k => k.startsWith("lp_")).forEach(k => localStorage.removeItem(k)); } catch {}
+  location.reload();
+};
 
 /* ============================================================
    Contexto de una landing (cliente + parámetros)
