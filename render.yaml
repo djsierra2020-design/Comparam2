@@ -8,3 +8,18 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: "3.12.7"
+
+  # «Landings IA»: sitio estático propio (gratis y sin «dormirse»), con su dirección aparte.
+  - type: web
+    name: landings-ia
+    runtime: static
+    buildCommand: bash build_landing.sh
+    staticPublishPath: ./landing_dist
+    routes:
+      - type: rewrite
+        source: /landing
+        destination: /index.html
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: no-cache
