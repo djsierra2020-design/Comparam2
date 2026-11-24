@@ -38,6 +38,33 @@ de inicio** (se instala como una app aparte, con su propio ícono).
   copia de seguridad de vez en cuando (Ajustes); también se puede exportar a Excel (CSV).
 - Funciona sin internet después de abrirla una vez.
 
+## Generador de landing pages (`/landing`)
+
+Crea landing pages para campañas de **Google Ads** listas para subir a **WordPress**, con IA.
+Ábrelo en `https://<tu-app>.onrender.com/landing`.
+
+1. **IA**: elige **Google Gemini** (clave gratis en <https://aistudio.google.com/apikey>) o **Claude**
+   (clave en <https://console.anthropic.com>, cobra por uso). La clave se guarda solo en tu navegador
+   y se envía directo a Google/Anthropic. Con «Demostración sin IA» puedes probar sin clave.
+2. **Negocio y campaña**: qué vendes, ciudad, público, oferta, palabras clave, objetivo y tono.
+3. **Referencias**: sube capturas de las landings que te gustan.
+   - *Plantilla optimizada*: la IA escribe los textos y toma colores y tono de las referencias
+     (3 diseños: hero con formulario, centrado, oscuro/premium).
+   - *Imitar mis referencias*: la IA diseña el HTML completo copiando el estilo de las capturas.
+4. **Contacto**: WhatsApp, teléfono y a dónde llegan los datos del formulario (webhook,
+   formsubmit.co o, si se deja vacío, por WhatsApp).
+5. **Google Ads**: ID y etiqueta de conversión (y GA4 opcional). La página registra la conversión
+   al enviar el formulario o tocar WhatsApp/llamar, guarda `gclid`/UTM en campos ocultos y cambia
+   el titular con la palabra clave si la URL final lleva `?kw={keyword}`.
+
+Además genera los **textos del anuncio** (15 títulos ≤30 caracteres, 4 descripciones ≤90,
+palabras clave y negativas) con CSV para Google Ads Editor. Puedes editar los textos sobre la vista
+previa, pedir cambios con «Ajustar con IA» y guardar tus landings en el navegador.
+
+**Exportar**: `⬇️ HTML` (página completa) o `⬇️ WordPress`, que descarga un *bloque HTML* para pegar
+en un bloque «HTML personalizado» (o widget HTML de Elementor) y una *plantilla de página PHP* para
+subir al tema.
+
 ## Instalación
 
 ```bash

@@ -310,6 +310,15 @@ def gastos():
     return r
 
 
+@app.get("/landing")
+def landing():
+    """Generador de landing pages para Google Ads y WordPress. Funciona en el navegador:
+    la IA (Gemini o Claude) se llama directo desde ahí con la clave del usuario."""
+    r = send_from_directory(app.static_folder, "landing.html")
+    r.headers["Cache-Control"] = "no-cache"
+    return r
+
+
 @app.get("/diagnostico")
 def diagnostico():
     """Muestra qué responde cada portal a la primera página de búsqueda."""

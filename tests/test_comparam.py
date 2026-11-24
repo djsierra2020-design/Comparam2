@@ -1225,3 +1225,13 @@ def test_barrio_descarta_anuncios_de_otra_localidad():
     assert es_del_barrio(Listing("fincaraiz", "Casa en arriendo", "Santa Bárbara", 2e6, 100, ubicacion="Santa Bárbara | Usaquén"), "Cedritos")
     assert es_del_barrio(Listing("fincaraiz", "Casa", "San Bernardino XXII", 2e6, 100), "Bosa")
     assert es_del_barrio(Listing("fincaraiz", "Casa en arriendo", "", 2e6, 100), "Cedritos")  # sin ubicación: se confía
+
+
+def test_app_landing():
+    import app as webapp
+    c = webapp.app.test_client()
+    r = c.get("/landing")
+    html = r.get_data(as_text=True)
+    assert r.status_code == 200 and "text/html" in r.content_type
+    assert "Generador de landing pages" in html and "generativelanguage.googleapis.com" in html
+    assert "api.anthropic.com" in html and "lp-form" in html and "Template Name" in html
