@@ -164,8 +164,11 @@
       <input type="file" id="fotoFile" accept="image/*">
       <input type="url" id="fotoUrl" name="fotoUrl" placeholder="…o pega la URL de la foto" style="margin-top:8px">
       <div class="refs" id="fotoPrev"></div>
-      <label class="l" for="fotos">Fotos de trabajos <small>(URLs, una por línea — galería)</small></label>
-      <textarea id="fotos" name="fotos" placeholder="https://cliente.com/wp-content/uploads/trabajo1.jpg"></textarea>
+      <label class="l" for="galeriaFile">Fotos de trabajos <small>(galería — hasta 12: súbelas desde tu equipo o pega URLs)</small></label>
+      <input type="file" id="galeriaFile" accept="image/*" multiple>
+      <div class="refs" id="galeriaPrev"></div>
+      <textarea id="fotos" name="fotos" placeholder="…o pega URLs, una por línea: https://cliente.com/wp-content/uploads/trabajo1.jpg" style="margin-top:8px;min-height:56px"></textarea>
+      <div class="hint" id="hintGaleria">Las fotos subidas se comprimen y van dentro de la página. Para WordPress con muchas fotos, las URLs de la biblioteca de medios hacen la página más liviana.</div>
       <div class="fila">
         <div><label class="l" for="formPos">Formulario</label>
           <select id="formPos" name="formPos"><option value="hero">En el encabezado (al lado)</option><option value="abajo">En su propia sección</option></select></div>
@@ -386,14 +389,14 @@ function reducirLogo(file, max = 360) {
   });
 }
 /* Foto de fondo: JPG de 1600 px como máximo. */
-function reducirFoto(file) {
+function reducirFoto(file, ancho = 1600, calidad = 0.78) {
   return new Promise((ok, mal) => {
     const img = new Image();
     img.onload = () => {
-      const k = Math.min(1, 1600 / img.width);
+      const k = Math.min(1, ancho / img.width);
       const c = document.createElement("canvas"); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
       c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
-      URL.revokeObjectURL(img.src); ok(c.toDataURL("image/jpeg", 0.78));
+      URL.revokeObjectURL(img.src); ok(c.toDataURL("image/jpeg", calidad));
     };
     img.onerror = mal; img.src = URL.createObjectURL(file);
   });
@@ -624,7 +627,8 @@ Marcadores que yo reemplazo: <!--FORM--> formulario de contacto · <!--MAPA--> m
 let clientes = LS.get("lp_clientes", []);
 let cliId = LS.get("lp_cliente_actual", null);
 let estado = null; // { tipo:'kit'|'libre', frag, datos, html, ctx, params, nombre, cliId }
-let logoLanding = null, fotoLanding = null;
+let logoLanding = null, fotoLanding = null, galeria = []; // galeria: fotos de trabajos subidas (dataURL)
+const MAX_FOTOS = 12;
 const cli = () => clientes.find(c => c.id === cliId) || null;
 function guardarClientes() {
   if (!LS.set("lp_clientes", clientes)) avisar("No hay espacio en el navegador: borra capturas o clientes viejos.", "err");
@@ -714,7 +718,11 @@ function ponerParams(o) {
     else if (el.type === "checkbox") el.checked = !!o[el.name]; else el.value = o[el.name];
   }
 }
-function guardarBorrador() { LS.set("lp_borrador", { ...leerParams(), _logo: logoLanding, _foto: fotoLanding }); }
+function guardarBorrador() {
+  if (!LS.set("lp_borrador", { ...leerParams(), _logo: logoLanding, _foto: fotoLanding, _galeria: galeria }))
+    avisar("Las fotos ocupan mucho para el navegador: se usan en esta landing, pero si recargas la página se pierden. Usa menos fotos o URLs.", "err");
+}
+const urlsGaleria = () => (form.elements.fotos.value || "").split(/\s+/).filter(x => /^https?:\/\//.test(x));
 form.addEventListener("input", guardarBorrador);
 form.addEventListener("change", guardarBorrador);
 $("#logoFile").addEventListener("change", async e => { const f = e.target.files[0]; if (f) { logoLanding = await reducirLogo(f); pintarImgsLanding(); guardarBorrador(); } e.target.value = ""; });
@@ -722,9 +730,22 @@ $("#fotoFile").addEventListener("change", async e => { const f = e.target.files[
 function pintarImgsLanding() {
   $("#logoPrev").innerHTML = logoLanding ? `<figure><img src="${logoLanding}" alt="Logo"><button type="button" data-q="logo">×</button></figure>` : "";
   $("#fotoPrev").innerHTML = fotoLanding ? `<figure><img src="${fotoLanding}" alt="Foto"><button type="button" data-q="foto">×</button></figure>` : "";
+  $("#galeriaPrev").innerHTML = galeria.map((g, i) => `<figure><img src="${g}" alt="Foto de trabajo ${i + 1}"><button type="button" data-g="${i}" title="Quitar">×</button></figure>`).join("");
+  const n = galeria.length + urlsGaleria().length;
+  $("#galeriaFile").disabled = n >= MAX_FOTOS;
+  $("#galeriaFile").title = n >= MAX_FOTOS ? `Ya tienes ${MAX_FOTOS} fotos` : "";
 }
 $("#logoPrev").onclick = e => { if (e.target.dataset.q) { logoLanding = null; pintarImgsLanding(); guardarBorrador(); } };
 $("#fotoPrev").onclick = e => { if (e.target.dataset.q) { fotoLanding = null; pintarImgsLanding(); guardarBorrador(); } };
+$("#galeriaFile").addEventListener("change", async e => {
+  for (const f of e.target.files) {
+    if (galeria.length + urlsGaleria().length >= MAX_FOTOS) { avisar(`Máximo ${MAX_FOTOS} fotos de trabajos por landing.`, "err"); break; }
+    try { galeria.push(await reducirFoto(f, 1000, 0.72)); } catch { avisar("No se pudo leer " + f.name, "err"); }
+  }
+  e.target.value = ""; pintarImgsLanding(); guardarBorrador();
+});
+$("#fotos").addEventListener("input", () => pintarImgsLanding());
+$("#galeriaPrev").onclick = e => { const i = e.target.dataset.g; if (i != null) { galeria.splice(+i, 1); pintarImgsLanding(); guardarBorrador(); } };
 
 /* Ajustes de IA */
 function actualizarProveedor(cambio) {
@@ -764,7 +785,7 @@ function construirCtx(c, p) {
     estilo: p.estilo, est, u: base.u, ff: base.ff,
     c1: hexOk(c.colorEstilo === false ? c.c1 : base.c1, base.c1), c2: hexOk(c.colorEstilo === false ? c.c2 : base.c2, base.c2),
     L, T: TXT[L], idioma, negocio: c.nombre, logo: logoLanding || c.logo || "", imagen: fotoLanding || p.fotoUrl || "",
-    fotos: (p.fotos || "").split(/\s+/).filter(x => /^https?:\/\//.test(x)).slice(0, 12),
+    fotos: [...galeria, ...(p.fotos || "").split(/\s+/).filter(x => /^https?:\/\//.test(x))].slice(0, MAX_FOTOS),
     tel, telTxt: c.telefono || "", whatsapp: wa, email: c.email || "", direccion: c.direccion || "",
     ciudad: p.ciudad || (c.zonas || "").split(",")[0].trim(), zonas: c.zonas || "",
     servicios: (c.servicios || "").split("\n").map(s => s.trim()).filter(Boolean),
@@ -1374,7 +1395,7 @@ async function generar(ajusteTexto) {
       const datos = r.datos || (ajusteTexto ? estado.datos : {});
       nuevo = { tipo: "kit", frag: r.frag, datos, html: ensamblar(r.frag, datos, ctx) };
     }
-    estado = { ...nuevo, ctx, params: p, nombre: p.nombre, cliId: c.id };
+    estado = { ...nuevo, ctx, params: p, nombre: p.nombre, cliId: c.id, galeria: [...galeria] };
     pintar();
     avisar(`✅ Listo en ${Math.round((Date.now() - t0) / 1000)} s. Revisa, edita y descarga.`, "ok");
     verTab("prev");
@@ -1522,7 +1543,7 @@ function pintarProyectos() {
 }
 $("#btnGuardar").onclick = () => {
   const L = LS.get("lp_proyectos", []);
-  const p = { id: estado.id || uid(), cliId: estado.cliId, nombre: estado.nombre, fecha: Date.now(), params: estado.params, tipo: estado.tipo, frag: estado.frag, datos: estado.datos, html: htmlActual() };
+  const p = { id: estado.id || uid(), cliId: estado.cliId, nombre: estado.nombre, fecha: Date.now(), params: estado.params, tipo: estado.tipo, frag: estado.frag, datos: estado.datos, galeria: estado.galeria || [], html: htmlActual() };
   estado.id = p.id;
   const i = L.findIndex(x => x.id === p.id); if (i >= 0) L.splice(i, 1);
   L.unshift(p);
@@ -1536,7 +1557,7 @@ $("#tProy").addEventListener("click", e => {
     LS.set("lp_proyectos", L.filter(p => p.id !== e.target.dataset.borrar)); pintarProyectos();
   } else if (e.target.dataset.abrir) {
     const p = L.find(x => x.id === e.target.dataset.abrir); if (!p) return;
-    ponerParams(p.params); estadoH1 = p.params.h1 || "";
+    ponerParams(p.params); estadoH1 = p.params.h1 || ""; galeria = p.galeria || []; pintarImgsLanding();
     estado = { id: p.id, tipo: p.tipo, frag: p.frag, datos: p.datos, html: p.html, ctx: construirCtx(cli(), p.params), params: p.params, nombre: p.nombre, cliId: p.cliId };
     pintar(p.html); verTab("prev"); avisar(`Abierta «${p.nombre}».`, "ok");
   }
@@ -1559,7 +1580,7 @@ $("#editar").onchange = e => { const d = $("#prev").contentDocument; if (d) d.de
 $("#btnNuevo").onclick = () => {
   if (estado && !confirm("¿Empezar una landing nueva? Lo que no guardaste se pierde.")) return;
   for (const n of ["nombre", "h1", "servicio", "oferta", "keywords", "instrucciones", "fotos", "fotoUrl"]) form.elements[n].value = "";
-  logoLanding = fotoLanding = null; pintarImgsLanding(); guardarBorrador();
+  logoLanding = fotoLanding = null; galeria = []; pintarImgsLanding(); guardarBorrador();
   estado = null; $("#prev").hidden = true; $("#vacio").hidden = false;
   ["#btnHtml", "#btnWp", "#btnGuardar", "#btnAbrir", "#btnAjustar", "#btnRegen"].forEach(s => $(s).disabled = true);
   verTab("form"); $("#nombre").focus(); avisar("");
@@ -1576,7 +1597,7 @@ opcionesEstilo($("#estilo")); opcionesEstilo($("#pb_estilo"));
 $("#proveedor").value = LS.get("lp_proveedor", "gemini");
 actualizarProveedor(false);
 const borr = LS.get("lp_borrador", null);
-if (borr) { ponerParams(borr); logoLanding = borr._logo || null; fotoLanding = borr._foto || null; pintarImgsLanding(); if (borr.estilo) $("#estilo").dataset.tocado = "1"; }
+if (borr) { ponerParams(borr); logoLanding = borr._logo || null; fotoLanding = borr._foto || null; galeria = borr._galeria || []; pintarImgsLanding(); if (borr.estilo) $("#estilo").dataset.tocado = "1"; }
 if (!cliId && clientes[0]) cliId = clientes[0].id;
 pintarClientes();
 if (!clientes.length) avisar("Empieza creando un cliente: «+ Nuevo cliente».");
