@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% block titulo %}Comparam – Precio del metro cuadrado por barrio en Bogotá y dueños directos{% endblock %}
+{% block titulo %}Compara m² – Precio del metro cuadrado por barrio en Bogotá y dueños directos{% endblock %}
 {% block descripcion %}Comparamos a diario los anuncios de 5 portales inmobiliarios de Bogotá: precio del m² por barrio, dueños directos y días publicados. Para inmobiliarias, compradores y arrendatarios.{% endblock %}
 {% block ruta %}{% endblock %}
-{% block datos %}<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Comparam","url":"{{ SITIO_URL }}/"}</script>{% endblock %}
+{% block datos %}<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Compara m²","url":"{{ SITIO_URL }}/"}</script>{% endblock %}
 {% block contenido %}
 <h1>Encuentra cada mañana los dueños que venden o arriendan solos en tus barrios</h1>
-<p class="sub">Comparam compara a diario los anuncios de Finca Raíz, Ciencuadras, Rentola, Habi y Houm, y te muestra el precio real del metro cuadrado de cada barrio de Bogotá.</p>
+<p class="sub">Compara m² compara a diario los anuncios de Finca Raíz, Ciencuadras, Rentola, Habi y Houm, y te muestra el precio real del metro cuadrado de cada barrio de Bogotá.</p>
 <div class="kpis">
   <div class="kpi d"><div class="t">Anuncios analizados (últimos días)</div><b>{{ total|miles }}</b></div>
   {% if ciudad.venta %}<div class="kpi"><div class="t">m² en venta, Bogotá</div><b>{{ ciudad.venta.mediana|pesos }}</b></div>{% endif %}
