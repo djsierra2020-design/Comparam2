@@ -2,7 +2,7 @@
 // Las búsquedas siempre van a la red (los precios cambian); solo se guardan los íconos y la
 // página de «sin conexión».
 // «Mis gastos» (/gastos) sí funciona sin internet: se usa la última versión guardada.
-const CACHE = "comparam-v2";
+const CACHE = "comparam-v3";
 const BASICOS = ["/static/offline.html", "/static/icon-192.png", "/static/manifest.webmanifest",
                  "/gastos", "/static/gastos.webmanifest", "/static/gastos-192.png"];
 

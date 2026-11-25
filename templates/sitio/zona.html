@@ -1,15 +1,15 @@
 {% extends "base.html" %}
 {% set que = "venta" if op == "venta" else "arriendo" %}
 {% set lugar = ("localidad de " ~ nombre) if tipo == "localidad" else nombre %}
-{% block titulo %}Precio del metro cuadrado en {{ nombre }}, Bogotá ({{ que }}) – {{ fecha_txt }} | Comparam{% endblock %}
+{% block titulo %}Precio del metro cuadrado en {{ nombre }}, Bogotá ({{ que }}) – {{ fecha_txt }} | Compara m²{% endblock %}
 {% block descripcion %}Precio de oferta del m² de apartamentos en {{ que }} en {{ lugar }}, Bogotá: {{ st.mediana|pesos }} por m² (mediana de {{ st.anuncios }} anuncios), {{ st.duenos }} de dueño directo. Actualizado el {{ dia_txt }}.{% endblock %}
 {% block ruta %}{{ ruta }}{% endblock %}
 {% block datos %}<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
-{"@type":"ListItem","position":1,"name":"Comparam","item":"{{ SITIO_URL }}/"},
+{"@type":"ListItem","position":1,"name":"Compara m²","item":"{{ SITIO_URL }}/"},
 {"@type":"ListItem","position":2,"name":"Precio m² {{ que }}","item":"{{ SITIO_URL }}/precio-m2/{{ op }}/"},
 {"@type":"ListItem","position":3,"name":"{{ nombre }}","item":"{{ SITIO_URL }}/{{ ruta }}"}]}</script>{% endblock %}
 {% block contenido %}
-<nav class="migas"><a href="{{ raiz }}">Comparam</a> › <a href="{{ raiz }}precio-m2/{{ op }}/">Precio del m² en {{ que }}</a> › {{ nombre }}</nav>
+<nav class="migas"><a href="{{ raiz }}">Compara m²</a> › <a href="{{ raiz }}precio-m2/{{ op }}/">Precio del m² en {{ que }}</a> › {{ nombre }}</nav>
 <h1>Precio del metro cuadrado en {{ nombre }}{% if tipo == "localidad" %} (localidad){% endif %}, Bogotá – {{ que }}</h1>
 <p class="sub">Apartamentos en {{ que }} · {{ fecha_txt }} · calculado con {{ st.anuncios }} anuncios publicados en los últimos días</p>
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{% block titulo %}Comparam{% endblock %}</title>
+<title>{% block titulo %}Compara m²{% endblock %}</title>
 <meta name="description" content="{% block descripcion %}{% endblock %}">
 <link rel="canonical" href="{{ SITIO_URL }}/{% block ruta %}{% endblock %}">
 <meta property="og:type" content="website">
@@ -51,12 +51,12 @@
 </head>
 <body>
 <header class="barra"><div class="in">
-  <a class="marca" href="{{ raiz }}"><img src="{{ raiz }}icon-192.png" alt="" width="36" height="36"><b>Comparam</b></a>
+  <a class="marca" href="{{ raiz }}"><img src="{{ raiz }}icon-192.png" alt="" width="36" height="36"><b>Compara m²</b></a>
   <a class="app" href="{{ APP_URL }}">Abrir la app</a>
 </div></header>
 <main>{% block contenido %}{% endblock %}</main>
 <footer>
-  <p>Comparam analiza a diario anuncios públicos de portales inmobiliarios (Finca Raíz, Ciencuadras, Rentola, Habi, Houm) y calcula
+  <p>Compara m² analiza a diario anuncios públicos de portales inmobiliarios (Finca Raíz, Ciencuadras, Rentola, Habi, Houm) y calcula
   el precio de oferta del metro cuadrado por barrio. Son precios pedidos en los anuncios, no avalúos. Actualizado el {{ dia_txt }}.</p>
   <p>No publicamos nombres ni teléfonos de anunciantes: cada anuncio enlaza a su publicación original.
   · <a href="{{ raiz }}precio-m2/venta/">Precios de venta</a> · <a href="{{ raiz }}precio-m2/arriendo/">Precios de arriendo</a>
