@@ -104,8 +104,8 @@
   <h1>Landings IA <small>v2</small></h1>
   <button class="b" id="btnInstalar" hidden title="Instalar como app">⬇ <span class="txt">Instalar app</span></button>
   <button class="b ico" id="btnRegen" title="Generar otra versión con los mismos datos" disabled>⟳</button>
-  <button class="b pri" id="btnNuevo" title="Nueva landing">＋ <span class="txt">Nuevo</span></button>
-  <button class="b ico gris" id="btnAjustesIA" title="Ajustes de IA">⚙</button>
+  <button class="b pri" id="btnNuevo" title="Nueva landing: limpia el formulario y la vista previa">＋ <span class="txt">Nuevo</span></button>
+  <button class="b ico gris" id="btnAjustesIA" title="Ajustes: IA, historial y reinicio">⚙</button>
 </header>
 <nav class="app-tabs" id="appTabs"><button data-t="form" class="on">Formulario</button><button data-t="prev">Vista previa</button></nav>
 
@@ -137,9 +137,9 @@
       <input type="file" id="logoFile" accept="image/*">
       <div class="refs" id="logoPrev"></div>
       <div class="tipos" id="tipos">
-        <label class="tipo"><input type="radio" name="tipo" value="completa" checked><div><b>Landing page completa</b><span>Página SEO local completa con diagnóstico, desglose de servicios, proceso en 3 pasos, beneficios, mapa y 8–10 preguntas frecuentes.</span></div></label>
-        <label class="tipo"><input type="radio" name="tipo" value="ads"><div><b>Landing corta para Google Ads</b><span>Una sola acción: hero con formulario, confianza, señales del problema, 3–5 preguntas y llamado final.</span></div></label>
-        <label class="tipo"><input type="radio" name="tipo" value="captura"><div><b>Página de captura mínima</b><span>Hero, formulario y franja de confianza. Carga muy rápido; ideal para campañas de llamadas.</span></div></label>
+        <label class="tipo"><input type="radio" name="tipo" value="completa" checked><div><b>Landing page completa</b><span>Página SEO local con diagnóstico, servicios, proceso en 3 pasos, beneficios, reseñas, mapa y 4–5 preguntas frecuentes.</span></div></label>
+        <label class="tipo"><input type="radio" name="tipo" value="ads"><div><b>Landing corta para Google Ads</b><span>Una sola acción: hero con formulario, confianza, señales del problema, reseñas, 4–5 preguntas y llamado final.</span></div></label>
+        <label class="tipo"><input type="radio" name="tipo" value="captura"><div><b>Página de captura mínima</b><span>Hero, formulario, franja de confianza y reseñas. Carga muy rápido; ideal para campañas de llamadas.</span></div></label>
       </div>
     </div>
 
@@ -153,6 +153,8 @@
       </div>
       <label class="l" for="keywords">Palabras clave del anuncio</label>
       <input type="text" id="keywords" name="keywords" placeholder="ej. reparación puertas automáticas okc, gate repair">
+      <label class="l" for="refUrl">LP de referencia <small>(URL opcional — la IA toma su estructura y argumentos, no sus textos)</small></label>
+      <input type="url" id="refUrl" name="refUrl" placeholder="https://landing-que-te-gusta.com">
     </div>
 
     <div class="sec">
@@ -183,7 +185,6 @@
       </div>
       <div class="chk">
         <label><input type="checkbox" name="desplegable" checked> Desplegable «¿Qué necesitas?»</label>
-        <label><input type="checkbox" name="testimonios"> Testimonios (para reemplazar)</label>
         <label><input type="checkbox" name="mapa" checked> Mapa</label>
       </div>
     </div>
@@ -259,6 +260,17 @@
       <textarea id="pb_datos" name="datos" placeholder="ej. 18 años de experiencia; más de 550 reseñas de 5 estrellas; capacitados en fábrica por USAutomatic; repuestos LiftMaster en stock; licenciados y asegurados"></textarea>
       <label class="l" for="pb_marca">Diferenciadores y tono de marca</label>
       <textarea id="pb_marca" name="marca" placeholder="ej. Equipo local, servicio el mismo día, trato directo con el dueño. Tono cercano y directo."></textarea>
+      <label class="l" for="pb_web">Sitio web del cliente</label>
+      <div class="fila" style="grid-template-columns:1fr auto"><input type="url" id="pb_web" name="web" placeholder="https://cliente.com"><button type="button" class="b" id="pbLeerWeb">Leer sitio</button></div>
+      <div class="hint" id="pbWebInfo">La app lee el sitio y la IA usa sus servicios, datos y reseñas reales. Sus fotos pueden ir en la galería.</div>
+      <div class="refs" id="pbWebFotos"></div>
+      <div class="chk"><label><input type="checkbox" id="pb_usarFotosWeb" name="usarFotosWeb" checked> Usar fotos del sitio en las landings</label></div>
+      <label class="l" for="pb_resenas">Reseñas reales <small>(una por línea: «texto de la reseña — Nombre»; se muestran tal cual, máx. 3)</small></label>
+      <textarea id="pb_resenas" name="resenas" placeholder="Llegaron el mismo día y el portón quedó como nuevo. — María G.&#10;Muy profesionales y buen precio. — Carlos R."></textarea>
+      <div class="fila">
+        <div><label class="l" for="pb_calif">Calificación <small>(opcional)</small></label><input type="text" id="pb_calif" name="calificacion" placeholder="4.9 en Google · 550 reseñas"></div>
+        <div><label class="l" for="pb_resUrl">Enlace a las reseñas</label><input type="url" id="pb_resUrl" name="resenasUrl" placeholder="https://g.page/r/…"></div>
+      </div>
       <div class="fila">
         <div><label class="l" for="pb_tel">Teléfono</label><input type="tel" id="pb_tel" name="telefono" placeholder="(405) 933-1182"></div>
         <div><label class="l" for="pb_wa">WhatsApp <small>(con indicativo)</small></label><input type="tel" id="pb_wa" name="whatsapp" placeholder="14059331182"></div>
@@ -309,7 +321,7 @@
 <!-- ===================== AJUSTES DE IA ===================== -->
 <dialog id="dlgIA">
   <form method="dialog" id="iaForm" autocomplete="off">
-    <div class="dh"><h2>Inteligencia artificial</h2><button class="b gris ico" value="cancel">✕</button></div>
+    <div class="dh"><h2>Ajustes</h2><button class="b gris ico" value="cancel">✕</button></div>
     <div class="db">
       <label class="l" for="proveedor">Proveedor</label>
       <select id="proveedor">
@@ -327,6 +339,14 @@
         <input type="text" id="modelo" list="modelos"><datalist id="modelos"></datalist>
         <div class="hint">La clave se guarda solo en este navegador y va directo a Google/Anthropic, nunca a nuestro servidor.</div>
       </div>
+      <h3 class="grp" style="margin-top:24px">Historial y datos de este navegador</h3>
+      <p class="hint" id="infoDatos"></p>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+        <button type="button" class="b gris" id="btnBorrarHistorial">🗑 Borrar historial de landings guardadas</button>
+        <button type="button" class="b gris" id="btnBorrarClaves">🔑 Quitar las claves de IA de este navegador</button>
+        <button type="button" class="b gris peligro" id="btnReiniciar">⟲ Reiniciar la app (borra clientes, landings, borrador y claves)</button>
+      </div>
+      <p class="hint">Antes de borrar, descarga (⬇ HTML / ⬇ WordPress) las landings que quieras conservar.</p>
     </div>
     <div class="df"><span></span><button class="b pri" value="ok">Listo</button></div>
   </form>
@@ -374,6 +394,37 @@ function reducirImagen(file) {
     img.onerror = mal;
     img.src = URL.createObjectURL(file);
   });
+}
+/* Leer una página pública (sitio del cliente o LP de referencia): primero por nuestro
+   servidor o el lector público r.jina.ai, el que responda; el navegador solo no puede (CORS). */
+const API_LECTOR = /comparam|localhost|127\.0\.0\.1/.test(location.hostname) ? "" : "https://comparam2.onrender.com";
+const cacheURL = {};
+const fotoValida = u => /\.(jpe?g|png|webp)(\?|#|$)/i.test(u) && !/(logo|icon|sprite|favicon|avatar|badge|pixel|spinner|placeholder)/i.test(u);
+async function leerURL(url) {
+  url = String(url || "").trim();
+  if (!/^https?:\/\//i.test(url)) url = "https://" + url;
+  if (cacheURL[url]) return cacheURL[url];
+  const porServidor = async () => {
+    const r = await fetch(`${API_LECTOR}/api/leer-url?url=${encodeURIComponent(url)}`);
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok || !d.texto) throw new Error(d.error || `el lector respondió ${r.status}`);
+    return d;
+  };
+  const porJina = async () => {
+    const r = await fetch("https://r.jina.ai/" + url, { headers: { Accept: "text/plain" } });
+    if (!r.ok) throw new Error(`r.jina.ai respondió ${r.status}`);
+    const md = await r.text();
+    const imagenes = [...new Set([...md.matchAll(/!\[[^\]]*\]\((https?:[^)\s]+)\)/g)].map(m => m[1]))].filter(fotoValida).slice(0, 16);
+    const texto = md.replace(/!\[[^\]]*\]\([^)]*\)/g, "").replace(/\[([^\]]*)\]\([^)]*\)/g, "$1").replace(/\n{3,}/g, "\n\n").trim().slice(0, 12000);
+    if (texto.length < 80) throw new Error("la página no tiene texto legible");
+    return { url, titulo: (md.match(/^Title:\s*(.+)$/m) || [])[1] || "", texto, imagenes };
+  };
+  const orden = API_LECTOR ? [porJina, porServidor] : [porServidor, porJina];
+  let ultimo = "";
+  for (const f of orden) {
+    try { return cacheURL[url] = await f(); } catch (e) { ultimo = e.message; }
+  }
+  throw new Error(`No se pudo leer ${url} (${ultimo}). Revisa la dirección o intenta más tarde.`);
 }
 /* Logo: PNG pequeño (conserva transparencia). */
 function reducirLogo(file, max = 360) {
@@ -617,9 +668,21 @@ Pasos: <ol class="lp-steps"><li><h3>…</h3><p>…</p></li>…</ol>
 Dos columnas: <div class="lp-cols"><div>texto</div><div>…</div></div>
 Zonas atendidas: <ul class="lp-areas"><li>Ciudad</li>…</ul>
 Preguntas: <details class="lp-faq"><summary>Pregunta</summary><p>Respuesta</p></details>
-Testimonios (solo si se piden, con texto «[Reemplazar por testimonio real]»): <figure class="lp-card lp-testi"><div class="lp-stars">★★★★★</div><blockquote>…</blockquote><figcaption><b>[Nombre]</b></figcaption></figure>
+Tarjeta con foto (para categorías o tipos de producto, solo si hay fotos de trabajos): <div class="lp-card lp-card-foto"><img data-foto="1" alt="…"><h3>…</h3><p>…</p></div> (data-foto = número de la foto: 1, 2, 3…)
+Reseñas: NO escribas reseñas ni testimonios. Pon el marcador <!--RESENAS--> donde va esa sección; yo la armo solo con reseñas reales.
 Precio/oferta: <p class="lp-price"><s>antes</s> <b>ahora</b></p>
-Marcadores que yo reemplazo: <!--FORM--> formulario de contacto · <!--MAPA--> mapa de Google · <!--GALERIA--> fotos de trabajos`;
+Marcadores que yo reemplazo: <!--FORM--> formulario de contacto · <!--RESENAS--> reseñas reales · <!--MAPA--> mapa de Google · <!--GALERIA--> fotos de trabajos`;
+
+/* Criterios fijos del builder (proporción, nada de relleno ni repeticiones, coherencia). */
+const CRITERIOS = `CRITERIOS DEL BUILDER (obligatorios en toda página):
+- Títulos cortos: H1 de máximo 9 palabras; títulos de sección de máximo 7; subtítulo del hero de 1–2 frases.
+- Cada lista o grupo de tarjetas tiene 3 o 4 elementos, nunca más: viñetas del hero 3; franja de confianza 3–4; señales/problemas 3–4; servicios o categorías 3–4; beneficios 3–4; pasos 3.
+- Preguntas frecuentes: 4 o 5, las que de verdad frenan la compra.
+- Nada se repite: cada dato o beneficio aparece en UN solo lugar. Si está en las viñetas del hero, no lo pongas en la franja de confianza ni en «por qué elegirnos». Cada sección aporta algo nuevo.
+- Coherencia total con el SERVICIO PRINCIPAL de esta landing: títulos, textos, preguntas, CTA y las opciones del formulario (DATOS.formulario.opciones) hablan de ese servicio y no de otros del cliente.
+- Incluye siempre el marcador <!--RESENAS-->, después de los beneficios o del proceso.
+- Categorías o tipos de producto: 3 o 4 tarjetas con foto (lp-card-foto) si hay fotos de trabajos; si no, tarjetas con ícono.
+- Mejor corto y concreto que largo: es una landing de Google Ads, no un artículo.`;
 
 /* ============================================================
    Clientes (Playbook) y borrador
@@ -653,7 +716,7 @@ function pintarHintEstilo() {
 }
 
 /* Playbook */
-const PB_CAMPOS = ["nombre", "rubro", "servicios", "zonas", "datos", "marca", "telefono", "whatsapp", "email", "direccion", "idioma", "estilo", "c1", "c2", "colorEstilo", "awId", "awLabel", "ga4", "accion", "gracias", "privacidad", "notas"];
+const PB_CAMPOS = ["nombre", "rubro", "servicios", "zonas", "datos", "marca", "web", "usarFotosWeb", "resenas", "calificacion", "resenasUrl", "telefono", "whatsapp", "email", "direccion", "idioma", "estilo", "c1", "c2", "colorEstilo", "awId", "awLabel", "ga4", "accion", "gracias", "privacidad", "notas"];
 let pbTmp = null;
 function abrirPlaybook(nuevo) {
   pbTmp = nuevo ? { id: uid(), nombre: "", idioma: "Español", estilo: "presupuesto", colorEstilo: true, c1: "#232f5e", c2: "#f04a4a", refs: [], logo: null } : structuredClone(cli());
@@ -661,9 +724,24 @@ function abrirPlaybook(nuevo) {
   const f = $("#pbForm");
   for (const k of PB_CAMPOS) { const el = f.elements[k]; if (!el) continue; if (el.type === "checkbox") el.checked = !!pbTmp[k]; else el.value = pbTmp[k] ?? (el.tagName === "SELECT" ? el.options[0].value : ""); }
   $("#pbBorrar").hidden = nuevo;
-  pintarPbImgs();
+  pintarPbImgs(); pintarPbWeb();
   $("#dlgPlaybook").showModal();
 }
+function pintarPbWeb() {
+  const st = pbTmp?.sitio;
+  $("#pbWebInfo").textContent = st?.texto
+    ? `Sitio leído el ${new Date(st.fecha).toLocaleDateString()}: ${st.texto.length.toLocaleString()} caracteres de texto y ${st.imagenes.length} fotos. La IA lo usa como fuente.`
+    : "La app lee el sitio y la IA usa sus servicios, datos y reseñas reales. Sus fotos pueden ir en la galería.";
+  $("#pbWebFotos").innerHTML = (st?.imagenes || []).slice(0, 12).map(u => `<figure><img src="${esc(u)}" alt="" loading="lazy" referrerpolicy="no-referrer"></figure>`).join("");
+}
+$("#pbLeerWeb").onclick = async () => {
+  const url = $("#pb_web").value.trim();
+  if (!url) { alert("Escribe la dirección del sitio del cliente."); return; }
+  const b = $("#pbLeerWeb"); b.disabled = true; b.textContent = "Leyendo…";
+  try { pbTmp.sitio = { ...(await leerURL(url)), fecha: Date.now(), web: url }; pintarPbWeb(); }
+  catch (e) { $("#pbWebInfo").textContent = "⚠️ " + e.message; }
+  finally { b.disabled = false; b.textContent = "Leer sitio"; }
+};
 function pintarPbImgs() {
   $("#pbLogoPrev").innerHTML = pbTmp.logo ? `<figure><img src="${pbTmp.logo}" alt="Logo"><button type="button" data-q="logo">×</button></figure>` : "";
   $("#pbRefs").innerHTML = (pbTmp.refs || []).map((r, i) => `<figure><img src="${r.url}" alt="Referencia ${i + 1}"><button type="button" data-q="${i}">×</button></figure>`).join("");
@@ -683,6 +761,7 @@ $("#dlgPlaybook").addEventListener("close", () => {
   const f = $("#pbForm");
   for (const k of PB_CAMPOS) { const el = f.elements[k]; if (!el) continue; pbTmp[k] = el.type === "checkbox" ? el.checked : el.value.trim(); }
   if (!pbTmp.nombre) return;
+  if (pbTmp.sitio && pbTmp.sitio.web && pbTmp.sitio.web !== pbTmp.web) delete pbTmp.sitio; // cambió la dirección: se vuelve a leer
   const i = clientes.findIndex(c => c.id === pbTmp.id);
   if (i >= 0) clientes[i] = pbTmp; else clientes.push(pbTmp);
   cliId = pbTmp.id; delete $("#estilo").dataset.tocado;
@@ -763,16 +842,51 @@ function actualizarProveedor(cambio) {
 $("#proveedor").onchange = () => actualizarProveedor(true);
 $("#clave").oninput = () => { const c = LS.get("lp_claves", {}); c[$("#proveedor").value] = $("#clave").value.trim(); LS.set("lp_claves", c); };
 $("#modelo").oninput = () => { const c = LS.get("lp_modelos", {}); c[$("#proveedor").value] = $("#modelo").value.trim(); LS.set("lp_modelos", c); };
-$("#btnAjustesIA").onclick = () => $("#dlgIA").showModal();
+$("#btnAjustesIA").onclick = () => { pintarInfoDatos(); $("#dlgIA").showModal(); };
+
+/* Historial y reinicio */
+function pintarInfoDatos() {
+  const n = LS.get("lp_proyectos", []).length, c = clientes.length;
+  const claves = Object.values(LS.get("lp_claves", {})).filter(Boolean).length;
+  $("#infoDatos").textContent = `Guardado aquí: ${c} cliente${c === 1 ? "" : "s"}, ${n} landing${n === 1 ? "" : "s"} y ${claves} clave${claves === 1 ? "" : "s"} de IA.`;
+}
+$("#btnBorrarHistorial").onclick = () => {
+  const n = LS.get("lp_proyectos", []).length;
+  if (!n) { alert("No hay landings guardadas."); return; }
+  if (!confirm(`¿Borrar las ${n} landings guardadas de todos los clientes? No se puede deshacer.`)) return;
+  try { localStorage.removeItem("lp_proyectos"); } catch {}
+  pintarProyectos(); pintarInfoDatos(); avisar("Historial de landings borrado.", "ok");
+};
+$("#btnBorrarClaves").onclick = () => {
+  if (!confirm("¿Quitar las claves de IA de este navegador? Tendrás que pegarlas de nuevo para generar.")) return;
+  try { localStorage.removeItem("lp_claves"); } catch {}
+  $("#clave").value = ""; pintarInfoDatos(); avisar("Claves quitadas de este navegador.", "ok");
+};
+$("#btnReiniciar").onclick = () => {
+  if (!confirm("¿Reiniciar la app? Se borran TODOS los clientes, landings guardadas, el borrador y las claves de este navegador.")) return;
+  if (!confirm("Última confirmación: esto no se puede deshacer. ¿Borrar todo?")) return;
+  try { Object.keys(localStorage).filter(k => k.startsWith("lp_")).forEach(k => localStorage.removeItem(k)); } catch {}
+  location.reload();
+};
 
 /* ============================================================
    Contexto de una landing (cliente + parámetros)
    ============================================================ */
 const TXT = {
-  es: { nombre: "Nombre completo", tel: "Número de teléfono", email: "Correo electrónico", opc: "(opcional)", cp: "Código postal", barrio: "Barrio o ciudad", det: "Agregar detalles del proyecto", nec: "¿Qué necesitas?", elige: "Elige uno…", llamaAl: "Llama al", msg: "Cuéntanos qué necesitas", acepto: "Acepto la", pol: "política de privacidad", priv: "Política de privacidad", llamar: "Llamar ahora", der: "Todos los derechos reservados.", mapa: "Dónde estamos", ph: ["Ej.: Juan Pérez", "(405) 555-0100", "73101", "Ej.: Edmond", "nombre@correo.com"] },
-  en: { nombre: "Full name", tel: "Phone number", email: "Email", opc: "(optional)", cp: "ZIP code", barrio: "City / area", det: "Add project details", nec: "What do you need?", elige: "Choose one…", llamaAl: "Call", msg: "Tell us what you need", acepto: "I accept the", pol: "privacy policy", priv: "Privacy policy", llamar: "Call now", der: "All rights reserved.", mapa: "Where we are", ph: ["Jane Smith", "(405) 555-0100", "73101", "Edmond", "jane@email.com"] },
-  pt: { nombre: "Nome completo", tel: "Telefone", email: "E-mail", opc: "(opcional)", cp: "CEP", barrio: "Bairro ou cidade", det: "Adicionar detalhes", nec: "Do que você precisa?", elige: "Escolha…", llamaAl: "Ligue", msg: "Conte o que você precisa", acepto: "Aceito a", pol: "política de privacidade", priv: "Política de privacidade", llamar: "Ligar agora", der: "Todos os direitos reservados.", mapa: "Onde estamos", ph: ["Maria Silva", "(11) 95555-0100", "01000-000", "Centro", "maria@email.com"] }
+  es: { nombre: "Nombre completo", tel: "Número de teléfono", email: "Correo electrónico", opc: "(opcional)", cp: "Código postal", barrio: "Barrio o ciudad", det: "Agregar detalles del proyecto", nec: "¿Qué necesitas?", elige: "Elige uno…", otro: "Otro / no estoy seguro", llamaAl: "Llama al", msg: "Cuéntanos qué necesitas", acepto: "Acepto la", pol: "política de privacidad", priv: "Política de privacidad", llamar: "Llamar ahora", cotizar: "Cotizar", der: "Todos los derechos reservados.", mapa: "Dónde estamos", opin: "Opiniones", resTit: "Lo que dicen nuestros clientes", verRes: "Ver todas las reseñas", ph: ["Tu nombre", "Tu teléfono", "Tu código postal", "Tu barrio o ciudad", "Tu correo"],
+    privTxt: "{n} usa los datos de este formulario solo para responder tu solicitud y no los comparte con terceros.", fErr: "Revisa los campos marcados en rojo.", fFallo: "No pudimos enviar tu solicitud. Intenta de nuevo en un momento.", fWa: "Te abrimos WhatsApp con tus datos: solo toca Enviar.", fSin: "Este formulario todavía no tiene a dónde enviar los datos." },
+  en: { nombre: "Full name", tel: "Phone number", email: "Email", opc: "(optional)", cp: "ZIP code", barrio: "City / area", det: "Add project details", nec: "What do you need?", elige: "Choose one…", otro: "Other / not sure", llamaAl: "Call", msg: "Tell us what you need", acepto: "I accept the", pol: "privacy policy", priv: "Privacy policy", llamar: "Call now", cotizar: "Get a Quote", der: "All rights reserved.", mapa: "Where we are", opin: "Reviews", resTit: "What our customers say", verRes: "See all reviews", ph: ["Your name", "Your phone number", "Your ZIP code", "Your city or area", "Your email"],
+    privTxt: "{n} uses the information in this form only to respond to your request and does not share it with third parties.", fErr: "Please check the fields marked in red.", fFallo: "We couldn't send your request. Please try again in a moment.", fWa: "We opened WhatsApp with your details: just tap Send.", fSin: "This form doesn't have a destination for the data yet." },
+  pt: { nombre: "Nome completo", tel: "Telefone", email: "E-mail", opc: "(opcional)", cp: "CEP", barrio: "Bairro ou cidade", det: "Adicionar detalhes", nec: "Do que você precisa?", elige: "Escolha…", otro: "Outro / não tenho certeza", llamaAl: "Ligue", msg: "Conte o que você precisa", acepto: "Aceito a", pol: "política de privacidade", priv: "Política de privacidade", llamar: "Ligar agora", cotizar: "Orçamento", der: "Todos os direitos reservados.", mapa: "Onde estamos", opin: "Avaliações", resTit: "O que dizem nossos clientes", verRes: "Ver todas as avaliações", ph: ["Seu nome", "Seu telefone", "Seu CEP", "Seu bairro ou cidade", "Seu e-mail"],
+    privTxt: "{n} usa os dados deste formulário apenas para responder à sua solicitação e não os compartilha com terceiros.", fErr: "Revise os campos marcados em vermelho.", fFallo: "Não conseguimos enviar sua solicitação. Tente novamente.", fWa: "Abrimos o WhatsApp com seus dados: é só tocar em Enviar.", fSin: "Este formulário ainda não tem para onde enviar os dados." }
 };
+/* Reseñas reales del Playbook: una por línea, «texto — Nombre». */
+function parseResenas(txt) {
+  return String(txt || "").split("\n").map(l => l.trim()).filter(l => l.length > 8).map(l => {
+    const m = l.match(/^(.*\S)\s+[—–-]\s+([^—–-]{2,60})$/);
+    return { texto: (m ? m[1] : l).replace(/^["“«]|["”»]$/g, "").trim(), nombre: m ? m[2].trim() : "" };
+  });
+}
 function construirCtx(c, p) {
   const est = ESTILOS[p.estilo] || ESTILOS.presupuesto;
   const base = est.libre ? ESTILOS.presupuesto : est;
@@ -785,7 +899,11 @@ function construirCtx(c, p) {
     estilo: p.estilo, est, u: base.u, ff: base.ff,
     c1: hexOk(c.colorEstilo === false ? c.c1 : base.c1, base.c1), c2: hexOk(c.colorEstilo === false ? c.c2 : base.c2, base.c2),
     L, T: TXT[L], idioma, negocio: c.nombre, logo: logoLanding || c.logo || "", imagen: fotoLanding || p.fotoUrl || "",
-    fotos: [...galeria, ...(p.fotos || "").split(/\s+/).filter(x => /^https?:\/\//.test(x))].slice(0, MAX_FOTOS),
+    fotos: [...new Set([...galeria, ...(p.fotos || "").split(/\s+/).filter(x => /^https?:\/\//.test(x)),
+      ...(c.usarFotosWeb !== false ? c.sitio?.imagenes || [] : [])])].slice(0, MAX_FOTOS),
+    servicioPrincipal: (p.servicio || "").trim(),
+    resenas: parseResenas(c.resenas), calificacion: (c.calificacion || "").trim(), resenasUrl: (c.resenasUrl || "").trim(),
+    sitioTexto: c.sitio?.texto || "", refTexto: "",
     tel, telTxt: c.telefono || "", whatsapp: wa, email: c.email || "", direccion: c.direccion || "",
     ciudad: p.ciudad || (c.zonas || "").split(",")[0].trim(), zonas: c.zonas || "",
     servicios: (c.servicios || "").split("\n").map(s => s.trim()).filter(Boolean),
@@ -798,8 +916,8 @@ function construirCtx(c, p) {
 /* ============================================================
    Script de medición que viaja dentro de la landing
    ============================================================ */
-function scriptLanding(cfg, gracias) {
-  const C = { aw: cfg.awId, label: cfg.awLabel, wa: cfg.whatsapp, accion: cfg.accion, thanks: cfg.gracias, msg: gracias || "", negocio: cfg.negocio };
+function scriptLanding(cfg, gracias, textos) {
+  const C = { aw: cfg.awId, label: cfg.awLabel, wa: cfg.whatsapp, accion: cfg.accion, thanks: cfg.gracias, msg: gracias || "", negocio: cfg.negocio, t: textos || TXT.es };
   const tags = [cfg.awId, cfg.ga4].filter(x => /^(AW|G)-[\w-]+$/i.test(x));
   const gtag = tags.length ? `<script async src="https://www.googletagmanager.com/gtag/js?id=${esc(tags[0])}"><\/script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());${tags.map(t => `gtag('config','${t}');`).join("")}<\/script>\n` : "";
@@ -818,18 +936,32 @@ window.lpConversion=conv;
 document.addEventListener("click",function(e){var a=e.target.closest&&e.target.closest("a");if(!a)return;var h=a.getAttribute("href")||"";if(/wa\\.me|whatsapp/.test(h))conv("whatsapp");else if(h.indexOf("tel:")===0)conv("llamada")});
 document.querySelectorAll("form#lp-form,form.lp-form").forEach(function(f){
   K.forEach(function(k){if(!T[k])return;var i=f.querySelector('[name="'+k+'"]');if(!i){i=document.createElement("input");i.type="hidden";i.name=k;f.appendChild(i)}i.value=T[k]});
+  function valida(){var bad=null;Array.prototype.forEach.call(f.querySelectorAll("input,select,textarea"),function(i){if(i.type==="hidden"||i.disabled)return;
+    var v=i.type==="checkbox"?i.checked:String(i.value||"").trim(),ok=!(i.required&&!v);
+    if(ok&&v&&i.type==="tel")ok=String(i.value).replace(/\\D/g,"").length>=7;
+    if(ok&&v&&i.type==="email")ok=/^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$/.test(String(i.value).trim());
+    i.classList.toggle("lp-err",!ok);if(!ok&&!bad)bad=i});return bad}
+  f.addEventListener("input",function(e){if(e.target.classList)e.target.classList.remove("lp-err")});
+  f.addEventListener("change",function(e){if(e.target.classList)e.target.classList.remove("lp-err")});
   f.addEventListener("submit",function(e){
-    e.preventDefault();if(f.dataset.enviando)return;f.dataset.enviando="1";
+    e.preventDefault();if(f.dataset.enviando)return;
+    var msg=f.querySelector(".lp-form-msg");function aviso(t){if(msg){msg.textContent=t||"";msg.hidden=!t}else if(t)alert(t)}
+    var bad=valida();if(bad){aviso(C.t.fErr);try{bad.focus()}catch(x){}return}
+    aviso("");f.dataset.enviando="1";
     var fd=new FormData(f),btn=f.querySelector('[type="submit"]');if(btn)btn.disabled=true;
     fd.append("pagina",location.href.split("?")[0]);
-    function fin(){conv("formulario");var g=f.querySelector(".lp-gracias");
-      if(C.thanks){setTimeout(function(){location.href=C.thanks},400);return}
+    function exito(texto){conv("formulario");if(C.thanks){setTimeout(function(){location.href=C.thanks},400);return}
       Array.prototype.forEach.call(f.elements,function(x){if(x.type!=="hidden")x.disabled=true});
-      if(g){g.hidden=false;g.style.display="block"}else{alert(C.msg||"¡Gracias! Te contactaremos pronto.")}}
-    if(C.accion){fetch(C.accion,{method:"POST",body:fd,headers:{Accept:"application/json"}}).catch(function(){}).then(fin);}
-    else if(C.wa){var t="Hola"+(C.negocio?" "+C.negocio:"")+", quiero información.\\n";fd.forEach(function(v,k){if(v&&K.indexOf(k)<0&&k!=="pagina")t+="\\n"+k.charAt(0).toUpperCase()+k.slice(1)+": "+v});
-      window.open("https://wa.me/"+C.wa+"?text="+encodeURIComponent(t),"_blank");fin();}
-    else fin();
+      var g=f.querySelector(".lp-gracias");if(g){if(texto)g.textContent="✅ "+texto;g.hidden=false;g.style.display="block"}else alert(texto||C.msg||"¡Gracias!")}
+    function fallo(t){delete f.dataset.enviando;if(btn)btn.disabled=false;aviso(t||C.t.fFallo)}
+    if(C.accion){
+      fetch(C.accion,{method:"POST",body:fd,headers:{Accept:"application/json"}})
+        .then(function(r){if(!r.ok)throw new Error("http "+r.status);return r},
+              function(){return fetch(C.accion,{method:"POST",body:fd,mode:"no-cors"})})
+        .then(function(){exito()}).catch(function(){fallo()});
+    }else if(C.wa){var t="Hola"+(C.negocio?" "+C.negocio:"")+", quiero información.\\n";fd.forEach(function(v,k){if(v&&K.indexOf(k)<0&&k!=="pagina")t+="\\n"+k.charAt(0).toUpperCase()+k.slice(1)+": "+v});
+      var url="https://wa.me/"+C.wa+"?text="+encodeURIComponent(t),w=window.open(url,"_blank");if(!w)location.href=url;exito(C.t.fWa);}
+    else fallo(C.t.fSin);
   });
 });
 })();
@@ -1038,6 +1170,65 @@ ${u ? `
 .lp-dark{background:#18181b}
 .lp-foot{background:#111}
 ` : ""}
+/* Proporciones del builder: títulos contenidos, menos aire, botones de 48–52 px */
+.lp h2{font-size:clamp(25px,2.6vw,32px);margin-bottom:.4em}
+.lp h3{font-size:18px}
+.lp-hero{padding:44px 0 52px}
+.lp-hero-g{gap:40px}
+.lp-hero h1{font-size:clamp(32px,3.6vw,46px);line-height:1.1}
+.lp-sub{font-size:clamp(17px,1.5vw,19px)}
+.lp-badge{font-size:13px;padding:7px 14px;margin-bottom:16px}
+.lp-hero ul{margin:18px 0 20px}
+.lp-hero li{font-size:17px;margin:8px 0}
+.lp-call{font-size:18px}
+.lp-call span{width:46px;height:46px}
+.lp-btn{font-size:17px;padding:14px 26px;min-height:50px}
+.lp-btn-full{font-size:17px;padding:14px}
+.lp-sec{padding:56px 0}
+.lp-trust{padding:22px 0}
+.lp-trust ul{gap:14px 34px}
+.lp-trust li{font-size:16px;gap:12px}
+.lp-ic{width:46px;height:46px}
+.lp-ic svg{width:22px;height:22px}
+.lp-ck{width:34px;height:34px}
+.lp-lead{font-size:17px}
+.lp-grid{gap:18px;margin:24px 0 26px}
+.lp-card{padding:22px}
+.lp-ico{width:48px;height:48px;margin-bottom:10px}
+.lp-sig{grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin:24px 0 28px}
+.lp-sig>div{padding:20px}
+.lp-sig b{font-size:26px;margin-bottom:10px}
+.lp-steps{margin-top:24px;gap:20px}
+.lp-steps li{padding-top:58px}
+.lp-steps li::before{width:44px;height:44px;font-size:19px}
+.lp-faq{margin:8px 0}
+.lp-faq summary{padding:15px 30px 15px 0}
+.lp-faq summary::after{top:10px}
+.lp-gal{margin:24px 0}
+.lp-form{padding:26px}
+.lp-form-t{font-size:22px;margin-bottom:6px}
+.lp-form-s{font-size:15px;margin-bottom:14px}
+.lp-form label{margin:0 0 12px;font-size:15px}
+.lp-form label span{margin-bottom:5px}
+.lp-form input[type=text],.lp-form input[type=tel],.lp-form input[type=email],.lp-form textarea,.lp-form select{padding:12px 14px;font-size:16px}
+.lp-f2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.lp-det{margin:0 0 12px}
+.lp-det summary{font-size:15px}
+.lp-form .lp-err{border-color:#dc2626;box-shadow:0 0 0 3px #dc262622}
+.lp-form .lp-acepto input.lp-err{outline:2px solid #dc2626}
+.lp-form-msg{background:#fef3f2;color:#b42318;border-radius:8px;padding:10px 12px;font-size:14px;font-weight:600;margin:0 0 12px}
+.lp-card-foto{padding:0;overflow:hidden}
+.lp-card-foto img{width:100%;aspect-ratio:4/3;object-fit:cover}
+.lp-card-foto>:not(img){margin-left:20px;margin-right:20px}
+.lp-card-foto>h3{margin-top:16px}
+.lp-card-foto>:last-child{margin-bottom:20px}
+.lp-rev-top{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 4px;color:var(--mut);font-weight:600}
+.lp-rev-top .lp-stars{margin:0}
+.lp-testi blockquote{font-style:normal}
+${u ? `.lp h3{font-size:19px}
+.lp-btn{font-size:16px;letter-spacing:.06em}
+.lp-badge{font-size:14px;padding:9px 18px}
+.lp-hero h1{font-size:clamp(34px,4vw,48px);line-height:1.04}` : ""}
 @media (max-width:900px){
  .lp{font-size:16px}
  .lp-hero{padding:34px 0 44px}
@@ -1059,6 +1250,19 @@ ${u ? `
  .lp-map iframe{height:300px}
  .lp-bar .lp-bar-f{flex:0 0 26%;background:var(--b);color:var(--bt)}
  .lp-bar svg{width:24px;height:24px}
+}
+@media (max-width:900px){
+ .lp-hero{padding:26px 0 34px}
+ .lp-hero h1{font-size:clamp(30px,8.4vw,34px)}
+ .lp h2{font-size:clamp(25px,6.8vw,28px)}
+ .lp-sec{padding:36px 0}
+ .lp-trust{padding:18px 0}
+ .lp-f2{grid-template-columns:1fr}
+ .lp-form{padding:22px 18px}
+ .lp-bar a{font-size:17px;min-height:56px}
+ .lp-bar .lp-bar-f{flex:0 0 auto;padding:0 18px}
+ .lp-bar .lp-bar-f:only-child{flex:1}
+ .lp-bar svg{width:22px;height:22px}
 }`;
 
   const fontLink = `<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1075,23 +1279,72 @@ function htmlFormulario(ctx, f = {}) {
   const T = ctx.T;
   const zona = ctx.zona === "cp" ? `<label><span>${T.cp} *</span><input name="codigo_postal" type="text" required inputmode="numeric" autocomplete="postal-code" placeholder="${T.ph[2]}"></label>`
     : ctx.zona === "barrio" ? `<label><span>${T.barrio} *</span><input name="zona" type="text" required placeholder="${T.ph[3]}"></label>` : "";
-  const ops = ctx.desplegable ? (ctx.servicios.length ? ctx.servicios : f.opciones || []) : [];
+  // Opciones coherentes con ESTA landing: las que escribió la IA para su servicio; si no hay, el servicio principal.
+  const opsIA = (f.opciones || []).map(x => String(x).trim()).filter(Boolean).slice(0, 6);
+  const ops = !ctx.desplegable ? [] : opsIA.length ? opsIA
+    : ctx.servicioPrincipal ? [ctx.servicioPrincipal, T.otro] : ctx.servicios.length ? [...ctx.servicios, T.otro] : [];
   const priv = ctx.privacidad || "#privacidad";
   const det = `<label><span>${esc(f.pregunta || T.msg)}</span><textarea name="mensaje" rows="3" placeholder="${esc(f.ejemplo || "")}"></textarea></label>`;
   return `<form id="lp-form" class="lp-form" data-lp="form" novalidate>
     <h2 class="lp-form-t">${esc(f.titulo || "Solicita tu presupuesto")}</h2>
     ${f.subtitulo ? `<p class="lp-form-s">${esc(f.subtitulo)}</p>` : ""}
-    <label><span>${T.nombre} *</span><input name="nombre" type="text" required autocomplete="name" placeholder="${T.ph[0]}"></label>
-    <label><span>${T.tel} *</span><input name="telefono" type="tel" required autocomplete="tel" inputmode="tel" placeholder="${T.ph[1]}"></label>
+    <div class="lp-f2">
+      <label><span>${T.nombre} *</span><input name="nombre" type="text" required autocomplete="name" placeholder="${T.ph[0]}"></label>
+      <label><span>${T.tel} *</span><input name="telefono" type="tel" required autocomplete="tel" inputmode="tel" placeholder="${T.ph[1]}"></label>
+    </div>
     ${zona}
     ${ops.length ? `<label><span>${T.nec}</span><select name="servicio"><option value="">${T.elige}</option>${ops.map(x => `<option>${esc(x)}</option>`).join("")}</select></label>` : ""}
     <label><span>${T.email} <small>${T.opc}</small></span><input name="email" type="email" autocomplete="email" placeholder="${T.ph[4]}"></label>
     ${ctx.u ? det : `<details class="lp-det"><summary>+ <u>${T.det}</u></summary>${det}</details>`}
     <label class="lp-acepto"><input type="checkbox" required checked> <span>${T.acepto} <a href="${esc(priv)}" target="${ctx.privacidad ? "_blank" : "_self"}">${T.pol}</a></span></label>
+    <p class="lp-form-msg" role="alert" hidden></p>
     <button type="submit" class="lp-btn lp-btn-full">${esc(f.boton || "Enviar")}</button>
     ${f.nota ? `<p class="lp-form-n">🔒 ${esc(f.nota)}</p>` : ""}
     <div class="lp-gracias" hidden>✅ ${esc(f.gracias || "¡Gracias! Te contactaremos muy pronto.")}</div>
   </form>`;
+}
+/* Criterio del builder: nunca más de 3–4 puntos por sección ni más de 5 preguntas,
+   aunque la IA se pase. */
+function recortar(frag) {
+  const t = document.createElement("template"); t.innerHTML = frag;
+  const lim = (sel, n) => t.content.querySelectorAll(sel).forEach(el => [...el.children].slice(n).forEach(x => x.remove()));
+  lim(".lp-hero-txt > ul", 4); lim(".lp-trust ul", 4); lim(".lp-sig", 4); lim(".lp-grid", 4); lim(".lp-steps", 4);
+  lim(".lp-ul", 3); lim(".lp-areas", 8);
+  [...t.content.querySelectorAll("details.lp-faq")].slice(5).forEach(x => x.remove());
+  return t.innerHTML;
+}
+/* Sección de reseñas: solo reseñas reales. Las del Playbook van tal cual; las que la IA tome del
+   sitio del cliente solo se aceptan si el texto aparece de verdad en el sitio. */
+function resenasValidas(ctx, datos) {
+  if (ctx.resenas.length) return ctx.resenas;
+  const norm = x => String(x || "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+  const sitio = norm(ctx.sitioTexto);
+  return (datos.resenas_sitio || []).filter(r => r && r.texto && norm(r.texto).length > 15 && sitio.includes(norm(r.texto).slice(0, 60)))
+    .map(r => ({ texto: String(r.texto).trim(), nombre: String(r.nombre || "").trim() }));
+}
+/* Tarjetas con foto parejas: si en un grupo faltan fotos, se quitan las tarjetas sin foto
+   (quedan al menos 2 con foto) o, si casi ninguna tiene, todas pasan a tarjetas normales. */
+function parejoConFotos(frag) {
+  const t = document.createElement("template"); t.innerHTML = frag;
+  t.content.querySelectorAll(".lp-grid").forEach(g => {
+    const cards = [...g.querySelectorAll(":scope > .lp-card-foto")];
+    if (!cards.length) return;
+    const sin = cards.filter(c => !c.querySelector("img[src]"));
+    if (!sin.length) return;
+    if (cards.length - sin.length >= 2) sin.forEach(c => c.remove());
+    else cards.forEach(c => { c.classList.remove("lp-card-foto"); c.querySelectorAll("img[data-foto]").forEach(i => i.remove()); });
+  });
+  return t.innerHTML;
+}
+function htmlResenas(ctx, datos) {
+  const T = ctx.T, lista = resenasValidas(ctx, datos || {}).slice(0, 3);
+  if (!lista.length && !ctx.calificacion && !ctx.resenasUrl) return "";
+  return `<section class="lp-sec lp-alt" data-lp="resenas"><div class="lp-wrap"><p class="lp-eyebrow">${T.opin}</p>
+<h2 class="lp-c">${esc(datos?.resenas_titulo || T.resTit)}</h2>
+${ctx.calificacion ? `<p class="lp-rev-top"><span class="lp-stars">★★★★★</span> ${esc(ctx.calificacion)}</p>` : ""}
+${lista.length ? `<div class="lp-grid">${lista.map(r => `<figure class="lp-card lp-testi"><div class="lp-stars">★★★★★</div><blockquote>“${esc(r.texto)}”</blockquote>${r.nombre ? `<figcaption><b>${esc(r.nombre)}</b></figcaption>` : ""}</figure>`).join("")}</div>` : ""}
+${ctx.resenasUrl ? `<p class="lp-c"><a class="lp-btn lp-btn-out" href="${esc(ctx.resenasUrl)}" target="_blank" rel="noopener">${T.verRes}</a></p>` : ""}
+</div></section>`;
 }
 function limpiarFragmento(h) {
   return String(h)
@@ -1116,6 +1369,7 @@ function ensamblar(frag, datos, ctx) {
   const { css, fontLink } = cssKit({ u, c1: ctx.c1, c2: ctx.c2, ff: ctx.ff, imagen: ctx.imagen });
   let extra = "";
   frag = frag.replace(/<style\b[^>]*>([\s\S]*?)<\/style>/gi, (_, c) => { extra += c + "\n"; return ""; });
+  frag = recortar(frag);
   // Íconos
   frag = frag.replace(/<i\s+([^>]*?)data-icon=["']([\w-]+)["']([^>]*)>\s*<\/i>/gi, (_, a, n, b) => {
     const cls = ((a + b).match(/class=["']([^"']*)["']/) || [])[1] || "";
@@ -1137,6 +1391,17 @@ function ensamblar(frag, datos, ctx) {
   // Galería
   const gal = ctx.fotos.length ? `<div class="lp-gal" data-lp="galeria">${ctx.fotos.map((x, i) => `<img src="${esc(x)}" alt="${esc(ctx.negocio)} ${i + 1}" loading="lazy">`).join("")}</div>` : "";
   frag = frag.replace(/<!--\s*GALERIA\s*-->/, gal).replace(/<!--\s*GALERIA\s*-->/g, "");
+  // Tarjetas con foto: <img data-foto="N"> toma la foto N de trabajos; sin foto, se quita la imagen.
+  frag = frag.replace(/<img\b([^>]*?)\sdata-foto=["'](\d+)["']([^>]*)>/gi, (_, a, n, b) => {
+    const src = ctx.fotos[+n - 1];
+    const resto = (a + b).replace(/\s(src|loading)=["'][^"']*["']/gi, "").replace(/\/\s*$/, "");
+    return src ? `<img${resto} data-foto="${n}" src="${esc(src)}" loading="lazy">` : "";
+  });
+  frag = parejoConFotos(frag);
+  // Reseñas reales (Playbook o copiadas textualmente del sitio del cliente)
+  const res = htmlResenas(ctx, datos);
+  if (/<!--\s*RESENAS\s*-->/.test(frag)) frag = frag.replace(/<!--\s*RESENAS\s*-->/, res).replace(/<!--\s*RESENAS\s*-->/g, "");
+  else if (res) { const i = frag.lastIndexOf("<section"); frag = i > 0 ? frag.slice(0, i) + res + "\n" + frag.slice(i) : frag + res; }
   // El H1 que escribió el usuario manda
   if (estadoH1) frag = frag.replace(/<h1\b([^>]*)>[\s\S]*?<\/h1>/i, (_, a) => `<h1${/data-kw/.test(a) ? a : a + " data-kw"}>${resaltar(estadoH1, u ? ctx.ciudad : "")}</h1>`);
   else frag = frag.replace(/<h1(?![^>]*data-kw)/i, "<h1 data-kw");
@@ -1151,11 +1416,11 @@ function ensamblar(frag, datos, ctx) {
   const foot = `<footer class="lp-foot" data-lp="chrome"><div class="lp-wrap"><div class="lp-foot-g">
     <div><p><b style="color:#fff">${esc(ctx.negocio)}</b></p>${contacto.map(x => `<p>${x}</p>`).join("")}${ctx.zonas ? `<p>${esc(ctx.zonas)}</p>` : ""}</div>
     <div><p><a href="${esc(privUrl)}">${T.priv}</a></p><p>© ${new Date().getFullYear()} ${esc(ctx.negocio)}. ${T.der}</p></div></div>
-    ${!ctx.privacidad ? `<div class="lp-priv" id="privacidad"><h3>${T.priv}</h3><p>${esc(datos.privacidad || `${ctx.negocio} usa los datos de este formulario solo para responder tu solicitud y no los comparte con terceros.`)}</p></div>` : ""}
+    ${!ctx.privacidad ? `<div class="lp-priv" id="privacidad"><h3>${T.priv}</h3><p>${esc(datos.privacidad || T.privTxt.replace("{n}", ctx.negocio))}</p></div>` : ""}
   </div></footer>`;
   const b = ctx.barra, wa = ctx.whatsapp;
   const aTel = tel ? `<a href="tel:${esc(tel)}" class="lp-bar-tel lp-tel">${icono("tel")} ${u ? `${T.llamaAl} ${esc(ctx.telTxt)}` : T.llamar}</a>` : "";
-  const aForm = (solo) => `<a href="#lp-form" class="lp-bar-f lp-cta" aria-label="${esc(cta)}">${icono("check")}${solo ? " " + esc(cta) : ""}</a>`;
+  const aForm = (solo) => `<a href="#lp-form" class="lp-bar-f lp-cta" aria-label="${esc(cta)}">${icono("check")} ${solo ? esc(cta) : T.cotizar}</a>`;
   const bar = b === "ninguna" ? "" : `<div class="lp-bar" data-lp="chrome">${
     b === "whatsapp" && wa ? `<a href="https://wa.me/${wa}" class="lp-bar-tel lp-wa" target="_blank" rel="noopener" style="background:#25d366;color:#fff">💬 WhatsApp</a>`
     : b === "form" || !tel ? aForm(true)
@@ -1187,7 +1452,7 @@ ${frag}
 ${foot}
 ${bar}
 </div>
-${scriptLanding({ awId: ctx.awId, awLabel: ctx.awLabel, ga4: ctx.ga4, whatsapp: ctx.whatsapp, accion: ctx.accion, gracias: ctx.gracias, negocio: ctx.negocio }, f.gracias)}
+${scriptLanding({ awId: ctx.awId, awLabel: ctx.awLabel, ga4: ctx.ga4, whatsapp: ctx.whatsapp, accion: ctx.accion, gracias: ctx.gracias, negocio: ctx.negocio }, f.gracias, { fErr: T.fErr, fFallo: T.fFallo, fWa: T.fWa, fSin: T.fSin })}
 </body>
 </html>`;
 }
@@ -1204,11 +1469,11 @@ const ENFOQUES = {
   oferta: "Oferta / promoción: la oferta indicada es el gancho principal (etiqueta, H1 o subtítulo, sección propia y botones). Urgencia honesta, sin inventar fechas límite."
 };
 const TIPOS = {
-  completa: "LANDING PAGE COMPLETA (SEO local): 1) hero con formulario, 2) franja de confianza, 3) diagnóstico: señales/problemas numerados (4–6) + botón de llamada, 4) desglose de servicios en tarjetas (cada una con lista lp-ul), 5) proceso en 3 pasos, 6) beneficios / por qué elegirnos, 7) galería «Nuestro trabajo» si hay fotos (<!--GALERIA-->), 8) zonas atendidas (lp-areas) + <!--MAPA-->, 9) 8–10 preguntas frecuentes, 10) llamado final en fondo lp-dark con botones. Textos más largos y ricos en palabras clave locales.",
-  ads: "LANDING CORTA PARA GOOGLE ADS: 1) hero con formulario, 2) franja de confianza, 3) señales del problema o beneficios (4–6), 4) 3–5 preguntas frecuentes, 5) llamado final. Un solo objetivo, textos cortos.",
-  captura: "PÁGINA DE CAPTURA MÍNIMA: 1) hero con formulario (muy claro y persuasivo), 2) franja de confianza, 3) un llamado final corto. Nada más."
+  completa: "LANDING PAGE COMPLETA (SEO local): 1) hero con formulario, 2) franja de confianza (3–4), 3) señales/problemas numerados (3–4) + botón de llamada, 4) servicio desglosado en 3–4 tarjetas (o 3–4 categorías con foto), 5) proceso en 3 pasos, 6) por qué elegirnos (3–4 puntos que no estén en el hero ni en la franja), 7) <!--RESENAS-->, 8) galería «Nuestro trabajo» si hay fotos (<!--GALERIA-->), 9) zonas atendidas (lp-areas) + <!--MAPA-->, 10) 4–5 preguntas frecuentes, 11) llamado final en fondo lp-dark con botones.",
+  ads: "LANDING CORTA PARA GOOGLE ADS: 1) hero con formulario, 2) franja de confianza (3–4), 3) señales del problema o beneficios (3–4), 4) <!--RESENAS-->, 5) 4–5 preguntas frecuentes, 6) llamado final. Un solo objetivo, textos cortos.",
+  captura: "PÁGINA DE CAPTURA MÍNIMA: 1) hero con formulario (muy claro y persuasivo), 2) franja de confianza (3–4), 3) <!--RESENAS-->, 4) un llamado final corto. Nada más."
 };
-const ESQUEMA_DATOS = `{"title":"título SEO ≤60 caracteres","description":"meta descripción ≤155","cta":"texto del botón principal (corto)","formulario":{"titulo":"…","subtitulo":"…","boton":"…","pregunta":"pregunta para el campo de detalles (p. ej. «¿Qué ocurre con tu puerta?»)","ejemplo":"ejemplo para ese campo","nota":"frase anti-fricción","gracias":"mensaje al enviar","opciones":["3–5 opciones para «¿Qué necesitas?»"]},"privacidad":"aviso de privacidad breve","anuncios":{"titulos":["15 títulos ≤30 caracteres"],"descripciones":["4 descripciones ≤90"],"palabras_clave":["10–15"],"negativas":["5–10"]}}`;
+const ESQUEMA_DATOS = `{"title":"título SEO ≤60 caracteres","description":"meta descripción ≤155","cta":"texto del botón principal (corto)","formulario":{"titulo":"…","subtitulo":"…","boton":"…","pregunta":"pregunta para el campo de detalles (p. ej. «¿Qué ocurre con tu puerta?»)","ejemplo":"ejemplo para ese campo","nota":"frase anti-fricción","gracias":"mensaje al enviar","opciones":["3–5 opciones para «¿Qué necesitas?» SOLO del servicio principal de esta landing (p. ej. para instalación: puerta nueva, reemplazo, varias puertas, no estoy seguro)"]},"resenas_titulo":"título corto para la sección de reseñas","resenas_sitio":[{"texto":"reseña copiada TEXTUAL del contenido del sitio del cliente (solo si aparece ahí; si no, deja la lista vacía)","nombre":"nombre tal como aparece"}],"privacidad":"aviso de privacidad breve","anuncios":{"titulos":["15 títulos ≤30 caracteres"],"descripciones":["4 descripciones ≤90"],"palabras_clave":["10–15"],"negativas":["5–10"]}}`;
 
 function datosCliente(c) {
   return `CLIENTE (Playbook):
@@ -1218,7 +1483,13 @@ function datosCliente(c) {
 - Datos reales (ÚNICAS cifras/logros que puedes usar): ${c.datos || "(ninguno: no inventes años, reseñas, premios ni precios)"}
 - Diferenciadores y tono: ${c.marca || "(deducir)"}
 - Teléfono: ${c.telefono || "(no tiene: no pongas enlaces tel:)"} · WhatsApp: ${c.whatsapp ? "sí" : "no"} · Dirección: ${c.direccion || "-"}
-${c.notas ? "- REGLAS DEL CLIENTE (obligatorias): " + c.notas : ""}`;
+- Reseñas reales cargadas: ${parseResenas(c.resenas).length} (las muestro yo en <!--RESENAS-->)${c.calificacion ? " · Calificación: " + c.calificacion : ""}
+${c.notas ? "- REGLAS DEL CLIENTE (obligatorias): " + c.notas : ""}${c.sitio?.texto ? `
+
+CONTENIDO REAL DEL SITIO WEB DEL CLIENTE (${c.web || c.sitio.url}). Úsalo como fuente de servicios, datos, diferenciadores, marcas y preguntas reales. No inventes nada que no esté aquí o en el Playbook:
+"""
+${c.sitio.texto.slice(0, 6000)}
+"""` : ""}`;
 }
 function datosLanding(p, ctx) {
   return `ESTA LANDING:
@@ -1230,9 +1501,14 @@ function datosLanding(p, ctx) {
 - Palabras clave: ${p.keywords || "(deducirlas)"}
 - Oferta: ${p.oferta || "(ninguna; no inventes descuentos)"}
 - Formulario: ${ctx.formPos === "abajo" ? "en su propia sección (igual pon <!--FORM--> dentro del hero; yo lo muevo)" : "en el hero, a la derecha del texto"}
-- Fotos de trabajos: ${ctx.fotos.length ? ctx.fotos.length + " (usa <!--GALERIA-->)" : "no hay (no hagas galería)"} · Mapa: ${ctx.mapa ? "sí (<!--MAPA-->)" : "no"} · Testimonios: ${p.testimonios ? "sí, como plantilla para reemplazar" : "no"}
+- Fotos de trabajos: ${ctx.fotos.length ? ctx.fotos.length + " (usa <!--GALERIA--> y/o data-foto=\"1\"…\"" + ctx.fotos.length + "\" en tarjetas)" : "no hay (no hagas galería ni tarjetas con foto)"} · Mapa: ${ctx.mapa ? "sí (<!--MAPA-->)" : "no"}
 - Idioma de la página: ${ctx.idioma}
-${p.instrucciones ? "- Instrucciones extra: " + p.instrucciones : ""}`;
+${p.instrucciones ? "- Instrucciones extra: " + p.instrucciones : ""}${ctx.refTexto ? `
+
+LP DE REFERENCIA (${p.refUrl}). Imita su estructura, el orden de sus secciones y el tipo de argumentos, adaptados a este cliente y respetando los criterios del builder. NO copies sus textos, cifras ni datos:
+"""
+${ctx.refTexto}
+"""` : ""}`;
 }
 function promptKit(c, p, ctx, ajuste) {
   const ejemplo = limpiarEjemplo(fragDesdeDatos(demoDatos(ESTILOS[p.estilo].u ? { ...c, nombre: "Ejemplo" } : { ...c, nombre: "Ejemplo" }, { ...p, tipo: "ads" }, ctx), ctx));
@@ -1242,7 +1518,7 @@ function promptKit(c, p, ctx, ajuste) {
 2. Las secciones, empezando por el HERO. NO incluyas cabecera, pie de página, barra fija, <script>, <html>, <head> ni <body>: los pongo yo. No uses imágenes externas (solo marcadores).
 3. Todos los botones de formulario con href="#lp-form" y clase lp-cta; los de llamada con href="tel:${ctx.tel || "NUMERO"}" y clase lp-tel${ctx.tel ? "" : " (el cliente no tiene teléfono: no pongas botones de llamada)"}.
 4. Al final, en una línea: <!--DATOS ${ESQUEMA_DATOS}-->`;
-  if (ajuste) return { sistema, texto: `${ESTILOS[p.estilo].guia}\n\n${KIT_DOC}\n\n${datosCliente(c)}\n\n${datosLanding(p, ctx)}\n\nESTA ES LA PÁGINA ACTUAL (fragmento):\n${ajuste.frag}\n\nCAMBIO PEDIDO: «${ajuste.texto}». Aplícalo y devuelve el fragmento COMPLETO actualizado.\n\n${REGLAS_ADS}\n\n${formato}` };
+  if (ajuste) return { sistema, texto: `${ESTILOS[p.estilo].guia}\n\n${KIT_DOC}\n\n${datosCliente(c)}\n\n${datosLanding(p, ctx)}\n\nESTA ES LA PÁGINA ACTUAL (fragmento):\n${ajuste.frag}\n\nCAMBIO PEDIDO: «${ajuste.texto}». Aplícalo y devuelve el fragmento COMPLETO actualizado.\n\n${REGLAS_ADS}\n\n${CRITERIOS}\n\n${formato}` };
   return { sistema, texto: `ESTILO VISUAL A RESPETAR:
 ${ESTILOS[p.estilo].guia}
 
@@ -1256,7 +1532,9 @@ ${datosCliente(c)}
 ${datosLanding(p, ctx)}
 
 ${REGLAS_ADS}
-- Escribe para personas: concreto, local, sin relleno. Ningún dato que no esté en el Playbook.
+- Escribe para personas: concreto, local, sin relleno. Ningún dato que no esté en el Playbook o en el sitio del cliente.
+
+${CRITERIOS}
 
 ${formato}` };
 }
@@ -1345,6 +1623,7 @@ ${!u && tel ? `<a href="tel:${esc(tel)}" class="lp-call lp-tel"><span><i data-ic
     if (ctx.fotos.length) s.push(`<section class="lp-sec lp-dark"><div class="lp-wrap lp-c">${ceja("Nuestro trabajo")}<h2>Trabajos recientes en ${esc(ctx.ciudad)}</h2><!--GALERIA--></div></section>`);
     s.push(`<section class="lp-sec lp-alt"><div class="lp-wrap lp-c">${ceja("Zonas que atendemos")}<h2>Cerca de ti en ${esc(ctx.ciudad)}</h2>${ctx.zonas ? `<ul class="lp-areas">${ctx.zonas.split(",").map(z => `<li>${esc(z.trim())}</li>`).join("")}</ul>` : ""}<!--MAPA--></div></section>`);
   }
+  s.push("<!--RESENAS-->");
   if (tipo !== "captura") s.push(`<section class="lp-sec"><div class="lp-wrap lp-narrow">${ceja("Preguntas frecuentes")}<h2 class="lp-c">Resolvemos tus dudas</h2>${d.faq.map(q => `<details class="lp-faq"><summary>${esc(q.p)}</summary><p>${esc(q.r)}</p></details>`).join("")}</div></section>`);
   s.push(`<section class="lp-sec lp-dark"><div class="lp-wrap lp-narrow lp-c"><h2>${esc(d.cierre.titulo)}</h2><p class="lp-lead">${esc(d.cierre.texto)}</p><div class="lp-ctas lp-ctas-c"><a href="#lp-form" class="lp-btn lp-cta">${esc(cta)}</a>${tel ? `<a href="tel:${esc(tel)}" class="lp-btn lp-btn-ghost lp-tel"><i data-icon="tel" class="lp-i"></i> ${esc(ctx.telTxt)}</a>` : ""}</div></div></section>`);
   return s.join("\n");
@@ -1365,6 +1644,20 @@ async function generar(ajusteTexto) {
   const t0 = Date.now(), tic = setInterval(() => avisar(`⏳ ${ajusteTexto ? "Ajustando" : "Diseñando"} con IA… ${Math.round((Date.now() - t0) / 1000)} s (puede tardar 1–2 min)${notaIA}`), 1000);
   try {
     let nuevo;
+    if (prov !== "demo" && !ajusteTexto) {
+      // Contenido real del cliente: si tiene sitio web y no se ha leído, se lee y se guarda en su Playbook.
+      if (c.web && !c.sitio?.texto) {
+        notaIA = " · leyendo el sitio del cliente…";
+        try { c.sitio = { ...(await leerURL(c.web)), fecha: Date.now(), web: c.web }; guardarClientes(); Object.assign(ctx, construirCtx(c, p)); }
+        catch (e) { console.warn(e); }
+      }
+      if (p.refUrl) {
+        notaIA = " · leyendo la LP de referencia…";
+        try { ctx.refTexto = (await leerURL(p.refUrl)).texto.slice(0, 5000); }
+        catch (e) { notaIA = ""; throw new Error("No se pudo leer la LP de referencia: " + e.message); }
+      }
+      notaIA = "";
+    }
     if (ctx.est.libre) {
       if (prov === "demo") throw new Error("El estilo «Desde mis capturas» necesita IA. Elige otro estilo o configura la clave en ⚙.");
       if (!(c.refs || []).length) throw new Error("Sube capturas de referencia en el Playbook del cliente.");
@@ -1397,7 +1690,10 @@ async function generar(ajusteTexto) {
     }
     estado = { ...nuevo, ctx, params: p, nombre: p.nombre, cliId: c.id, galeria: [...galeria] };
     pintar();
-    avisar(`✅ Listo en ${Math.round((Date.now() - t0) / 1000)} s. Revisa, edita y descarga.`, "ok");
+    const notas = [];
+    if (nuevo.tipo === "kit" && !/data-lp="resenas"/.test(nuevo.html)) notas.push("sin reseñas: agrégalas en el Playbook del cliente");
+    if (!ctx.accion && !ctx.whatsapp) notas.push("el formulario no tiene destino: pon WhatsApp o un webhook en el Playbook");
+    avisar(`✅ Listo en ${Math.round((Date.now() - t0) / 1000)} s.${notas.length ? " Ojo: " + notas.join("; ") + "." : " Revisa, edita y descarga."}`, "ok");
     verTab("prev");
   } catch (e) {
     console.error(e);
@@ -1428,6 +1724,8 @@ function fragActual() {
   if (!m.innerHTML.includes("<!--FORM-->")) { const hg = m.querySelector(".lp-hero-g"); if (hg) hg.appendChild(doc.createComment("FORM")); }
   m.querySelectorAll('[data-lp="mapa"]').forEach(x => x.replaceWith(doc.createComment("MAPA")));
   m.querySelectorAll('[data-lp="galeria"]').forEach(x => x.replaceWith(doc.createComment("GALERIA")));
+  m.querySelectorAll('[data-lp="resenas"]').forEach(x => x.replaceWith(doc.createComment("RESENAS")));
+  m.querySelectorAll("img[data-foto]").forEach(x => { x.removeAttribute("src"); x.removeAttribute("loading"); });
   m.querySelectorAll("svg[data-icon]").forEach(x => { const i = doc.createElement("i"); i.setAttribute("data-icon", x.getAttribute("data-icon")); const cl = x.getAttribute("class"); if (cl) i.setAttribute("class", cl); x.replaceWith(i); });
   const extra = doc.getElementById("lp-extra");
   return (extra ? `<style>${extra.textContent}</style>\n` : "") + m.innerHTML.trim();
@@ -1522,11 +1820,12 @@ ${(p.cuerpo + "\n" + p.scripts).replace(/<\?/g, "&lt;?")}
 </html>
 `;
 }
-$("#btnHtml").onclick = () => descargar(`${slug(estado.nombre)}.html`, htmlActual());
+const nombreArchivo = () => slug([cli()?.nombre, estado.params?.servicio || estado.nombre].filter(Boolean).join(" "));
+$("#btnHtml").onclick = () => descargar(`${nombreArchivo()}.html`, htmlActual());
 $("#btnWp").onclick = () => {
   const h = htmlActual();
-  descargar(`${slug(estado.nombre)}-bloque-wordpress.html`, bloqueWordPress(h));
-  setTimeout(() => descargar(`${slug(estado.nombre)}-plantilla-wordpress.php`, plantillaPHP(h), "application/x-php"), 600);
+  descargar(`${nombreArchivo()}-bloque-wordpress.html`, bloqueWordPress(h));
+  setTimeout(() => descargar(`${nombreArchivo()}-plantilla-wordpress.php`, plantillaPHP(h), "application/x-php"), 600);
   activarTab("tWp");
 };
 $("#btnAbrir").onclick = () => {
@@ -1579,7 +1878,7 @@ $("#btnEscr").onclick = () => $("#prev").classList.remove("movil");
 $("#editar").onchange = e => { const d = $("#prev").contentDocument; if (d) d.designMode = e.target.checked ? "on" : "off"; };
 $("#btnNuevo").onclick = () => {
   if (estado && !confirm("¿Empezar una landing nueva? Lo que no guardaste se pierde.")) return;
-  for (const n of ["nombre", "h1", "servicio", "oferta", "keywords", "instrucciones", "fotos", "fotoUrl"]) form.elements[n].value = "";
+  for (const n of ["nombre", "h1", "servicio", "oferta", "keywords", "refUrl", "instrucciones", "fotos", "fotoUrl"]) form.elements[n].value = "";
   logoLanding = fotoLanding = null; galeria = []; pintarImgsLanding(); guardarBorrador();
   estado = null; $("#prev").hidden = true; $("#vacio").hidden = false;
   ["#btnHtml", "#btnWp", "#btnGuardar", "#btnAbrir", "#btnAjustar", "#btnRegen"].forEach(s => $(s).disabled = true);
