@@ -676,12 +676,12 @@ Marcadores que yo reemplazo: <!--FORM--> formulario de contacto · <!--RESENAS--
 /* Criterios fijos del builder (proporción, nada de relleno ni repeticiones, coherencia). */
 const CRITERIOS = `CRITERIOS DEL BUILDER (obligatorios en toda página):
 - Títulos cortos: H1 de máximo 9 palabras; títulos de sección de máximo 7; subtítulo del hero de 1–2 frases.
-- Cada lista o grupo de tarjetas tiene 3 o 4 elementos, nunca más: viñetas del hero 3; franja de confianza 3–4; señales/problemas 3–4; servicios o categorías 3; beneficios 3–4; pasos 3.
+- Cada lista o grupo de tarjetas tiene 3 o 4 elementos, nunca más: viñetas del hero 3; franja de confianza 3–4; señales/problemas 3–4; servicios o categorías 3–4; beneficios 3–4; pasos 3.
 - Preguntas frecuentes: 4 o 5, las que de verdad frenan la compra.
 - Nada se repite: cada dato o beneficio aparece en UN solo lugar. Si está en las viñetas del hero, no lo pongas en la franja de confianza ni en «por qué elegirnos». Cada sección aporta algo nuevo.
 - Coherencia total con el SERVICIO PRINCIPAL de esta landing: títulos, textos, preguntas, CTA y las opciones del formulario (DATOS.formulario.opciones) hablan de ese servicio y no de otros del cliente.
 - Incluye siempre el marcador <!--RESENAS-->, después de los beneficios o del proceso.
-- Categorías o tipos de producto: 3 tarjetas con foto (lp-card-foto) si hay fotos de trabajos; si no, tarjetas con ícono.
+- Categorías o tipos de producto: 3 o 4 tarjetas con foto (lp-card-foto) si hay fotos de trabajos; si no, tarjetas con ícono.
 - Mejor corto y concreto que largo: es una landing de Google Ads, no un artículo.`;
 
 /* ============================================================
@@ -1310,7 +1310,6 @@ function recortar(frag) {
   const lim = (sel, n) => t.content.querySelectorAll(sel).forEach(el => [...el.children].slice(n).forEach(x => x.remove()));
   lim(".lp-hero-txt > ul", 4); lim(".lp-trust ul", 4); lim(".lp-sig", 4); lim(".lp-grid", 4); lim(".lp-steps", 4);
   lim(".lp-ul", 3); lim(".lp-areas", 8);
-  t.content.querySelectorAll(".lp-grid").forEach(g => { if (g.querySelector(".lp-card-foto")) [...g.children].slice(3).forEach(x => x.remove()); }); // categorías con foto: 3
   [...t.content.querySelectorAll("details.lp-faq")].slice(5).forEach(x => x.remove());
   return t.innerHTML;
 }
@@ -1322,6 +1321,20 @@ function resenasValidas(ctx, datos) {
   const sitio = norm(ctx.sitioTexto);
   return (datos.resenas_sitio || []).filter(r => r && r.texto && norm(r.texto).length > 15 && sitio.includes(norm(r.texto).slice(0, 60)))
     .map(r => ({ texto: String(r.texto).trim(), nombre: String(r.nombre || "").trim() }));
+}
+/* Tarjetas con foto parejas: si en un grupo faltan fotos, se quitan las tarjetas sin foto
+   (quedan al menos 2 con foto) o, si casi ninguna tiene, todas pasan a tarjetas normales. */
+function parejoConFotos(frag) {
+  const t = document.createElement("template"); t.innerHTML = frag;
+  t.content.querySelectorAll(".lp-grid").forEach(g => {
+    const cards = [...g.querySelectorAll(":scope > .lp-card-foto")];
+    if (!cards.length) return;
+    const sin = cards.filter(c => !c.querySelector("img[src]"));
+    if (!sin.length) return;
+    if (cards.length - sin.length >= 2) sin.forEach(c => c.remove());
+    else cards.forEach(c => { c.classList.remove("lp-card-foto"); c.querySelectorAll("img[data-foto]").forEach(i => i.remove()); });
+  });
+  return t.innerHTML;
 }
 function htmlResenas(ctx, datos) {
   const T = ctx.T, lista = resenasValidas(ctx, datos || {}).slice(0, 3);
@@ -1384,7 +1397,7 @@ function ensamblar(frag, datos, ctx) {
     const resto = (a + b).replace(/\s(src|loading)=["'][^"']*["']/gi, "").replace(/\/\s*$/, "");
     return src ? `<img${resto} data-foto="${n}" src="${esc(src)}" loading="lazy">` : "";
   });
-  frag = frag.replace(/<div class="lp-card lp-card-foto">(?=\s*<h3)/g, '<div class="lp-card">');
+  frag = parejoConFotos(frag);
   // Reseñas reales (Playbook o copiadas textualmente del sitio del cliente)
   const res = htmlResenas(ctx, datos);
   if (/<!--\s*RESENAS\s*-->/.test(frag)) frag = frag.replace(/<!--\s*RESENAS\s*-->/, res).replace(/<!--\s*RESENAS\s*-->/g, "");
@@ -1456,7 +1469,7 @@ const ENFOQUES = {
   oferta: "Oferta / promoción: la oferta indicada es el gancho principal (etiqueta, H1 o subtítulo, sección propia y botones). Urgencia honesta, sin inventar fechas límite."
 };
 const TIPOS = {
-  completa: "LANDING PAGE COMPLETA (SEO local): 1) hero con formulario, 2) franja de confianza (3–4), 3) señales/problemas numerados (3–4) + botón de llamada, 4) servicio desglosado en 3 tarjetas (o 3 categorías con foto), 5) proceso en 3 pasos, 6) por qué elegirnos (3–4 puntos que no estén en el hero ni en la franja), 7) <!--RESENAS-->, 8) galería «Nuestro trabajo» si hay fotos (<!--GALERIA-->), 9) zonas atendidas (lp-areas) + <!--MAPA-->, 10) 4–5 preguntas frecuentes, 11) llamado final en fondo lp-dark con botones.",
+  completa: "LANDING PAGE COMPLETA (SEO local): 1) hero con formulario, 2) franja de confianza (3–4), 3) señales/problemas numerados (3–4) + botón de llamada, 4) servicio desglosado en 3–4 tarjetas (o 3–4 categorías con foto), 5) proceso en 3 pasos, 6) por qué elegirnos (3–4 puntos que no estén en el hero ni en la franja), 7) <!--RESENAS-->, 8) galería «Nuestro trabajo» si hay fotos (<!--GALERIA-->), 9) zonas atendidas (lp-areas) + <!--MAPA-->, 10) 4–5 preguntas frecuentes, 11) llamado final en fondo lp-dark con botones.",
   ads: "LANDING CORTA PARA GOOGLE ADS: 1) hero con formulario, 2) franja de confianza (3–4), 3) señales del problema o beneficios (3–4), 4) <!--RESENAS-->, 5) 4–5 preguntas frecuentes, 6) llamado final. Un solo objetivo, textos cortos.",
   captura: "PÁGINA DE CAPTURA MÍNIMA: 1) hero con formulario (muy claro y persuasivo), 2) franja de confianza (3–4), 3) <!--RESENAS-->, 4) un llamado final corto. Nada más."
 };

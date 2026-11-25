@@ -75,7 +75,7 @@ como app con el botón «Instalar app». También sigue disponible en `https://<
    La cabecera, el formulario, el mapa, el pie y la barra fija los arma la app, así siempre quedan bien.
 5. **Criterios fijos del builder** (no hay que pedirlos): títulos contenidos (H1 44–48 px en escritorio,
    30–34 px en móvil; secciones 30–34 / 25–28), secciones de 48–60 px de alto (32–40 en móvil), 3–4 puntos
-   por sección (3 categorías con foto), 4–5 preguntas, sin repetir beneficios, y todo coherente con el
+   por sección (máximo 4 tarjetas, también las de categorías con foto), 4–5 preguntas, sin repetir beneficios, y todo coherente con el
    servicio de la landing (también las opciones del formulario y el nombre del archivo). Si la IA se pasa,
    la app recorta.
 6. **Contenido real**: en el Playbook, el **sitio web del cliente** («Leer sitio») da servicios, datos,
