@@ -162,11 +162,12 @@
       <label class="l" for="estilo">Estilo visual</label>
       <select id="estilo" name="estilo"></select>
       <div class="hint" id="hintEstilo"></div>
-      <label class="l" for="fotoFile">Foto principal <small>(fondo del encabezado)</small></label>
+      <div class="hint" id="hintFotosPb"></div>
+      <label class="l" for="fotoFile">Foto principal <small>(solo para esta landing; si no subes, se usa la del Playbook)</small></label>
       <input type="file" id="fotoFile" accept="image/*">
       <input type="url" id="fotoUrl" name="fotoUrl" placeholder="…o pega la URL de la foto" style="margin-top:8px">
       <div class="refs" id="fotoPrev"></div>
-      <label class="l" for="galeriaFile">Fotos de trabajos <small>(galería — hasta 12: súbelas desde tu equipo o pega URLs)</small></label>
+      <label class="l" for="galeriaFile">Fotos de trabajos <small>(se suman a las del Playbook — hasta 12 en total)</small></label>
       <input type="file" id="galeriaFile" accept="image/*" multiple>
       <div class="refs" id="galeriaPrev"></div>
       <textarea id="fotos" name="fotos" placeholder="…o pega URLs, una por línea: https://cliente.com/wp-content/uploads/trabajo1.jpg" style="margin-top:8px;min-height:56px"></textarea>
@@ -292,7 +293,13 @@
       <label class="l" for="pb_logo">Logo</label>
       <input type="file" id="pb_logo" accept="image/*">
       <div class="refs" id="pbLogoPrev"></div>
-      <label class="l" for="pb_refs">Capturas de landings de referencia <small>(para el estilo «Desde mis capturas»)</small></label>
+      <label class="l" for="pb_hero">Foto principal <small>(fondo del encabezado de sus landings; mejor horizontal)</small></label>
+      <input type="file" id="pb_hero" accept="image/*">
+      <div class="refs" id="pbHeroPrev"></div>
+      <label class="l" for="pb_fotos">Fotos del negocio <small>(trabajos, productos, equipo — hasta 12; van en tarjetas y galería)</small></label>
+      <input type="file" id="pb_fotos" accept="image/*" multiple>
+      <div class="refs" id="pbFotosPrev"></div>
+      <label class="l" for="pb_refs">Capturas de landings de referencia <small>(opcional, solo para el estilo «Desde mis capturas»)</small></label>
       <input type="file" id="pb_refs" accept="image/*" multiple>
       <div class="refs" id="pbRefs"></div>
       <h3 class="grp" style="margin-top:22px">Medición y formulario</h3>
@@ -704,6 +711,8 @@ function pintarClientes() {
   const c = cli();
   $("#cliNombre").textContent = c ? c.nombre : "Sin cliente";
   if (c && !$("#estilo").dataset.tocado) $("#estilo").value = c.estilo || "presupuesto";
+  const nf = (c?.fotos || []).length;
+  $("#hintFotosPb").textContent = c ? (c.hero || nf ? `📷 Del Playbook: ${c.hero ? "foto principal" : "sin foto principal"} y ${nf} foto${nf === 1 ? "" : "s"} del negocio. Aquí puedes cambiarlas o sumar más solo para esta landing.` : "📷 Sube la foto principal y las fotos del negocio en «Editar Playbook» para usarlas en todas sus landings.") : "";
   pintarHintEstilo();
   pintarProyectos();
 }
@@ -719,7 +728,7 @@ function pintarHintEstilo() {
 const PB_CAMPOS = ["nombre", "rubro", "servicios", "zonas", "datos", "marca", "web", "usarFotosWeb", "resenas", "calificacion", "resenasUrl", "telefono", "whatsapp", "email", "direccion", "idioma", "estilo", "c1", "c2", "colorEstilo", "awId", "awLabel", "ga4", "accion", "gracias", "privacidad", "notas"];
 let pbTmp = null;
 function abrirPlaybook(nuevo) {
-  pbTmp = nuevo ? { id: uid(), nombre: "", idioma: "Español", estilo: "presupuesto", colorEstilo: true, c1: "#232f5e", c2: "#f04a4a", refs: [], logo: null } : structuredClone(cli());
+  pbTmp = nuevo ? { id: uid(), nombre: "", idioma: "Español", estilo: "presupuesto", colorEstilo: true, c1: "#232f5e", c2: "#f04a4a", refs: [], logo: null, hero: null, fotos: [] } : structuredClone(cli());
   if (!pbTmp) { pbTmp = null; abrirPlaybook(true); return; }
   const f = $("#pbForm");
   for (const k of PB_CAMPOS) { const el = f.elements[k]; if (!el) continue; if (el.type === "checkbox") el.checked = !!pbTmp[k]; else el.value = pbTmp[k] ?? (el.tagName === "SELECT" ? el.options[0].value : ""); }
@@ -745,7 +754,20 @@ $("#pbLeerWeb").onclick = async () => {
 function pintarPbImgs() {
   $("#pbLogoPrev").innerHTML = pbTmp.logo ? `<figure><img src="${pbTmp.logo}" alt="Logo"><button type="button" data-q="logo">×</button></figure>` : "";
   $("#pbRefs").innerHTML = (pbTmp.refs || []).map((r, i) => `<figure><img src="${r.url}" alt="Referencia ${i + 1}"><button type="button" data-q="${i}">×</button></figure>`).join("");
+  $("#pbHeroPrev").innerHTML = pbTmp.hero ? `<figure><img src="${pbTmp.hero}" alt="Foto principal"><button type="button" data-q="hero">×</button></figure>` : "";
+  $("#pbFotosPrev").innerHTML = (pbTmp.fotos || []).map((f, i) => `<figure><img src="${f}" alt="Foto ${i + 1}"><button type="button" data-f="${i}">×</button></figure>`).join("");
+  $("#pb_fotos").disabled = (pbTmp.fotos || []).length >= MAX_FOTOS;
 }
+$("#pbHeroPrev").addEventListener("click", e => { if (e.target.dataset.q) { pbTmp.hero = null; pintarPbImgs(); } });
+$("#pbFotosPrev").addEventListener("click", e => { const i = e.target.dataset.f; if (i != null) { pbTmp.fotos.splice(+i, 1); pintarPbImgs(); } });
+$("#pb_hero").addEventListener("change", async e => { const f = e.target.files[0]; if (f) { pbTmp.hero = await reducirFoto(f, 1400, 0.72); pintarPbImgs(); } e.target.value = ""; });
+$("#pb_fotos").addEventListener("change", async e => {
+  for (const f of e.target.files) {
+    if ((pbTmp.fotos ||= []).length >= MAX_FOTOS) { alert(`Máximo ${MAX_FOTOS} fotos por cliente.`); break; }
+    try { pbTmp.fotos.push(await reducirFoto(f, 900, 0.7)); } catch { alert("No se pudo leer " + f.name); }
+  }
+  e.target.value = ""; pintarPbImgs();
+});
 $("#pbLogoPrev").addEventListener("click", e => { if (e.target.dataset.q) { pbTmp.logo = null; pintarPbImgs(); } });
 $("#pbRefs").addEventListener("click", e => { const i = e.target.dataset.q; if (i != null) { pbTmp.refs.splice(+i, 1); pintarPbImgs(); } });
 $("#pb_logo").addEventListener("change", async e => { const f = e.target.files[0]; if (f) { pbTmp.logo = await reducirLogo(f); pintarPbImgs(); } e.target.value = ""; });
@@ -898,8 +920,8 @@ function construirCtx(c, p) {
   return {
     estilo: p.estilo, est, u: base.u, ff: base.ff,
     c1: hexOk(c.colorEstilo === false ? c.c1 : base.c1, base.c1), c2: hexOk(c.colorEstilo === false ? c.c2 : base.c2, base.c2),
-    L, T: TXT[L], idioma, negocio: c.nombre, logo: logoLanding || c.logo || "", imagen: fotoLanding || p.fotoUrl || "",
-    fotos: [...new Set([...galeria, ...(p.fotos || "").split(/\s+/).filter(x => /^https?:\/\//.test(x)),
+    L, T: TXT[L], idioma, negocio: c.nombre, logo: logoLanding || c.logo || "", imagen: fotoLanding || p.fotoUrl || c.hero || "",
+    fotos: [...new Set([...galeria, ...(p.fotos || "").split(/\s+/).filter(x => /^https?:\/\//.test(x)), ...(c.fotos || []),
       ...(c.usarFotosWeb !== false ? c.sitio?.imagenes || [] : [])])].slice(0, MAX_FOTOS),
     servicioPrincipal: (p.servicio || "").trim(),
     resenas: parseResenas(c.resenas), calificacion: (c.calificacion || "").trim(), resenasUrl: (c.resenasUrl || "").trim(),
@@ -1637,7 +1659,14 @@ async function generar(ajusteTexto) {
   if (!c) { avisar("Primero crea un cliente (+ Nuevo cliente) y llena su Playbook.", "err"); abrirPlaybook(true); return; }
   const p = ajusteTexto ? estado.params : leerParams();
   if (!p.nombre) { avisar("Ponle un nombre a la landing.", "err"); $("#nombre").focus(); return; }
-  const ctx = construirCtx(c, p), prov = $("#proveedor").value;
+  const prov = $("#proveedor").value, avisosGen = [];
+  if (ESTILOS[p.estilo]?.libre && (!(c.refs || []).length || prov === "demo")) {
+    // Sin capturas (o sin IA) no se puede copiar un diseño: se usa el estilo del cliente en vez de bloquear.
+    const alt = c.estilo && !ESTILOS[c.estilo]?.libre ? c.estilo : "presupuesto";
+    avisosGen.push(`no hay capturas de referencia, así que usé el estilo «${ESTILOS[alt].nombre.split(" (")[0]}»`);
+    p.estilo = alt; $("#estilo").value = alt;
+  }
+  const ctx = construirCtx(c, p);
   estadoH1 = p.h1 || "";
   const btns = [$("#btnGenerar"), $("#btnAjustar"), $("#btnRegen")];
   btns.forEach(b => b.disabled = true);
@@ -1690,7 +1719,7 @@ async function generar(ajusteTexto) {
     }
     estado = { ...nuevo, ctx, params: p, nombre: p.nombre, cliId: c.id, galeria: [...galeria] };
     pintar();
-    const notas = [];
+    const notas = [...avisosGen];
     if (nuevo.tipo === "kit" && !/data-lp="resenas"/.test(nuevo.html)) notas.push("sin reseñas: agrégalas en el Playbook del cliente");
     if (!ctx.accion && !ctx.whatsapp) notas.push("el formulario no tiene destino: pon WhatsApp o un webhook en el Playbook");
     avisar(`✅ Listo en ${Math.round((Date.now() - t0) / 1000)} s.${notas.length ? " Ojo: " + notas.join("; ") + "." : " Revisa, edita y descarga."}`, "ok");
