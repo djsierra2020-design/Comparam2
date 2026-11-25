@@ -310,6 +310,25 @@ def gastos():
     return r
 
 
+@app.route("/api/leer-url", methods=["GET", "OPTIONS"])
+def leer_url():
+    """Lee una página web pública (sitio del cliente o LP de referencia) para Landings IA y
+    devuelve su texto y sus fotos. El navegador no puede leer otros sitios por CORS."""
+    from comparam.lector import LectorError, leer_pagina
+    if request.method == "OPTIONS":
+        r = app.response_class(status=204)
+    else:
+        try:
+            r = jsonify(leer_pagina(request.args.get("url", "")))
+        except LectorError as e:
+            r = jsonify({"error": str(e)})
+            r.status_code = 400
+    r.headers["Access-Control-Allow-Origin"] = "*"
+    r.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"
+    r.headers["Cache-Control"] = "no-store"
+    return r
+
+
 @app.get("/landing")
 def landing():
     """Generador de landing pages para Google Ads y WordPress. Funciona en el navegador:

@@ -73,7 +73,19 @@ como app con el botón «Instalar app». También sigue disponible en `https://<
      numeradas y barra roja «Llama al…».
    - *Desde mis capturas*: la IA copia el diseño completo de las capturas guardadas en el Playbook.
    La cabecera, el formulario, el mapa, el pie y la barra fija los arma la app, así siempre quedan bien.
-5. Revisa en **Vista previa** (escritorio/celular), edita textos sobre la página o pide cambios con
+5. **Criterios fijos del builder** (no hay que pedirlos): títulos contenidos (H1 44–48 px en escritorio,
+   30–34 px en móvil; secciones 30–34 / 25–28), secciones de 48–60 px de alto (32–40 en móvil), 3–4 puntos
+   por sección (3 categorías con foto), 4–5 preguntas, sin repetir beneficios, y todo coherente con el
+   servicio de la landing (también las opciones del formulario y el nombre del archivo). Si la IA se pasa,
+   la app recorta.
+6. **Contenido real**: en el Playbook, el **sitio web del cliente** («Leer sitio») da servicios, datos,
+   reseñas y fotos reales; las **reseñas reales** (una por línea, «texto — Nombre»), la calificación y el
+   enlace a Google arman la sección de reseñas (la IA no inventa reseñas: solo se aceptan textos que
+   estén en el Playbook o, tal cual, en el sitio). En cada landing se puede dar una **LP de referencia**
+   (URL) para imitar su estructura. El servidor lee las páginas en `/api/leer-url` (solo direcciones
+   públicas); si no responde, se usa el lector público r.jina.ai.
+7. El formulario **valida** los campos y muestra la confirmación solo si el envío funcionó.
+8. Revisa en **Vista previa** (escritorio/celular), edita textos sobre la página o pide cambios con
    «Pedir cambios a la IA», y **guarda** la landing en el cliente.
 
 Cada landing registra la conversión de Google Ads (formulario, WhatsApp, llamadas), guarda

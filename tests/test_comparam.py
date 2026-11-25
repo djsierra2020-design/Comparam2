@@ -1259,3 +1259,44 @@ def test_landing_sitio_propio(tmp_path):
     assert "Landings IA" in (dist / "index.html").read_text()
     assert '"start_url": "/"' in (dist / "static/landing.webmanifest").read_text()
     assert (dist / "sw.js").exists() and (dist / "static/landing-192.png").exists()
+
+
+def test_lector_url_saca_texto_y_fotos(monkeypatch):
+    """/api/leer-url devuelve el texto útil y las fotos de una página pública, con CORS."""
+    import app as webapp
+    from comparam import lector
+
+    html = b"""<html><head><title>Puertas OKC</title><meta name="description" content="Reparamos portones">
+    <meta property="og:image" content="/img/portada.jpg"><script>var x=1</script></head><body>
+    <h1>Reparacion de portones</h1><p>Servicio el mismo dia en Oklahoma City.</p>
+    <ul><li>Placas de circuito</li><li>Placas de circuito</li></ul>
+    <blockquote>Excelente servicio, llegaron en una hora. - Ana</blockquote>
+    <img src="/img/logo.png"><img data-src="https://cdn.x.com/trabajo1.webp"><img src="foto.gif"></body></html>"""
+
+    class Resp:
+        status_code, is_redirect = 200, False
+        headers = {"Content-Type": "text/html; charset=utf-8"}
+        class raw:
+            @staticmethod
+            def read(n, decode_content=True):
+                return html
+        def close(self):
+            pass
+
+    monkeypatch.setattr(lector, "_es_publica", lambda url: True)
+    monkeypatch.setattr(lector.requests, "get", lambda *a, **k: Resp())
+    r = webapp.app.test_client().get("/api/leer-url?url=puertas.example")
+    d = r.get_json()
+    assert r.status_code == 200 and r.headers["Access-Control-Allow-Origin"] == "*"
+    assert d["titulo"] == "Puertas OKC" and d["url"] == "https://puertas.example"
+    assert "## Reparacion de portones" in d["texto"] and "llegaron en una hora" in d["texto"]
+    assert d["texto"].count("Placas de circuito") == 1 and "var x" not in d["texto"]
+    assert d["imagenes"] == ["https://puertas.example/img/portada.jpg", "https://cdn.x.com/trabajo1.webp"]
+
+
+def test_lector_url_rechaza_direcciones_internas():
+    import app as webapp
+    c = webapp.app.test_client()
+    for u in ("http://127.0.0.1:5000/", "http://localhost/", "http://10.0.0.5/", "ftp://x.com/", ""):
+        r = c.get("/api/leer-url", query_string={"url": u})
+        assert r.status_code == 400 and r.get_json()["error"], u
