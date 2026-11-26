@@ -345,7 +345,12 @@
       </select>
       <div id="cajaClave">
         <label class="l" for="clave">Clave de API</label>
-        <input type="password" id="clave" placeholder="Pega tu clave aquí">
+        <input type="password" id="clave" placeholder="Pega tu clave aquí" autocomplete="off" spellcheck="false">
+        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+          <button type="button" class="b gris" id="claveVer">👁 Mostrar</button>
+          <button type="button" class="b gris" id="claveCopiar">📋 Copiar</button>
+          <button type="button" class="b gris" id="clavePegar">📥 Pegar</button>
+        </div>
         <div class="hint" id="hintClave"></div>
         <label class="l" for="modelo">Modelo</label>
         <input type="text" id="modelo" list="modelos"><datalist id="modelos"></datalist>
@@ -883,6 +888,22 @@ function actualizarProveedor(cambio) {
 }
 $("#proveedor").onchange = () => actualizarProveedor(true);
 $("#clave").oninput = () => { const c = LS.get("lp_claves", {}); c[$("#proveedor").value] = $("#clave").value.trim(); LS.set("lp_claves", c); };
+/* Mostrar / copiar / pegar la clave: los campos de contraseña no dejan copiar y en el celular pegar cuesta. */
+$("#claveVer").onclick = () => { const i = $("#clave"), ver = i.type === "password"; i.type = ver ? "text" : "password"; $("#claveVer").textContent = ver ? "🙈 Ocultar" : "👁 Mostrar"; };
+$("#claveCopiar").onclick = async () => {
+  const v = $("#clave").value.trim(); if (!v) { alert("No hay clave guardada para este proveedor."); return; }
+  try { await navigator.clipboard.writeText(v); $("#claveCopiar").textContent = "✅ Copiada"; }
+  catch { $("#clave").type = "text"; $("#clave").select(); $("#claveCopiar").textContent = "Selecciónala y copia"; }
+  setTimeout(() => $("#claveCopiar").textContent = "📋 Copiar", 2500);
+};
+$("#clavePegar").onclick = async () => {
+  try {
+    const t = (await navigator.clipboard.readText()).trim();
+    if (!t) { alert("No hay nada copiado."); return; }
+    $("#clave").value = t; $("#clave").oninput(); $("#clavePegar").textContent = "✅ Pegada";
+    setTimeout(() => $("#clavePegar").textContent = "📥 Pegar", 2500);
+  } catch { $("#clave").focus(); alert("El navegador no dejó leer lo copiado. Mantén presionado el campo de la clave y elige «Pegar» (en PC: Ctrl + V)."); }
+};
 $("#modelo").oninput = () => { const c = LS.get("lp_modelos", {}); c[$("#proveedor").value] = $("#modelo").value.trim(); LS.set("lp_modelos", c); };
 $("#btnAjustesIA").onclick = () => { pintarInfoDatos(); $("#dlgIA").showModal(); };
 
