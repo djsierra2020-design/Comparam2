@@ -266,10 +266,10 @@
       <div class="hint" id="pbWebInfo">La app lee el sitio y la IA usa sus servicios, datos y reseñas reales. Sus fotos pueden ir en la galería.</div>
       <div class="refs" id="pbWebFotos"></div>
       <div class="chk"><label><input type="checkbox" id="pb_usarFotosWeb" name="usarFotosWeb" checked> Usar fotos del sitio en las landings</label></div>
-      <label class="l" for="pb_resenas">Reseñas reales <small>(una por línea: «texto de la reseña — Nombre»; se muestran tal cual, máx. 3)</small></label>
-      <textarea id="pb_resenas" name="resenas" placeholder="Llegaron el mismo día y el portón quedó como nuevo. — María G.&#10;Muy profesionales y buen precio. — Carlos R."></textarea>
+      <label class="l" for="pb_resenas">Reseñas reales <small>(una por línea: «texto — Nombre — estrellas», ej. «… — María G. — 4»; se muestran tal cual, máx. 3)</small></label>
+      <textarea id="pb_resenas" name="resenas" placeholder="Llegaron el mismo día y el portón quedó como nuevo. — María G. — 5&#10;Muy profesionales, aunque tardaron un poco en llegar. — Carlos R. — 4"></textarea>
       <div class="fila">
-        <div><label class="l" for="pb_calif">Calificación <small>(opcional)</small></label><input type="text" id="pb_calif" name="calificacion" placeholder="4.9 en Google · 550 reseñas"></div>
+        <div><label class="l" for="pb_calif">Calificación real <small>(opcional)</small></label><input type="text" id="pb_calif" name="calificacion" placeholder="ej. 4.7 en Google · 132 reseñas"></div>
         <div><label class="l" for="pb_resUrl">Enlace a las reseñas</label><input type="url" id="pb_resUrl" name="resenasUrl" placeholder="https://g.page/r/…"></div>
       </div>
       <div class="fila">
@@ -299,8 +299,8 @@
       <label class="l" for="pb_fotos">Fotos del negocio <small>(trabajos, productos, equipo — hasta 12; van en tarjetas y galería)</small></label>
       <input type="file" id="pb_fotos" accept="image/*" multiple>
       <div class="refs" id="pbFotosPrev"></div>
-      <label class="l" for="pb_equipo">Foto del equipo o de los dueños <small>(sección «Quiénes somos»; genera confianza)</small></label>
-      <input type="file" id="pb_equipo" accept="image/*">
+      <label class="l" for="pb_equipo">Fotos del equipo, los dueños o el personal <small>(hasta 4; sección «Quiénes somos», genera confianza)</small></label>
+      <input type="file" id="pb_equipo" accept="image/*" multiple>
       <div class="refs" id="pbEquipoPrev"></div>
       <label class="l" for="pb_historia">Quiénes son <small>(historia real: desde cuándo, quién atiende, qué los hace distintos)</small></label>
       <textarea id="pb_historia" name="historia" placeholder="ej. Empresa familiar desde 2011. Atienden los dueños, Mike y Ana, con un equipo de 6 técnicos propios."></textarea>
@@ -761,13 +761,23 @@ $("#pbLeerWeb").onclick = async () => {
 function pintarPbImgs() {
   $("#pbLogoPrev").innerHTML = pbTmp.logo ? `<figure><img src="${pbTmp.logo}" alt="Logo"><button type="button" data-q="logo">×</button></figure>` : "";
   $("#pbRefs").innerHTML = (pbTmp.refs || []).map((r, i) => `<figure><img src="${r.url}" alt="Referencia ${i + 1}"><button type="button" data-q="${i}">×</button></figure>`).join("");
-  $("#pbEquipoPrev").innerHTML = pbTmp.equipo ? `<figure><img src="${pbTmp.equipo}" alt="Equipo"><button type="button" data-q="equipo">×</button></figure>` : "";
+  pbTmp.equipo = fotosEquipo(pbTmp.equipo);
+  $("#pbEquipoPrev").innerHTML = pbTmp.equipo.map((f, i) => `<figure><img src="${f}" alt="Equipo ${i + 1}"><button type="button" data-e="${i}">×</button></figure>`).join("");
+  $("#pb_equipo").disabled = pbTmp.equipo.length >= 4;
   $("#pbHeroPrev").innerHTML = pbTmp.hero ? `<figure><img src="${pbTmp.hero}" alt="Foto principal"><button type="button" data-q="hero">×</button></figure>` : "";
   $("#pbFotosPrev").innerHTML = (pbTmp.fotos || []).map((f, i) => `<figure><img src="${f}" alt="Foto ${i + 1}"><button type="button" data-f="${i}">×</button></figure>`).join("");
   $("#pb_fotos").disabled = (pbTmp.fotos || []).length >= MAX_FOTOS;
 }
-$("#pbEquipoPrev").addEventListener("click", e => { if (e.target.dataset.q) { pbTmp.equipo = null; pintarPbImgs(); } });
-$("#pb_equipo").addEventListener("change", async e => { const f = e.target.files[0]; if (f) { pbTmp.equipo = await reducirFoto(f, 1100, 0.75); pintarPbImgs(); } e.target.value = ""; });
+const fotosEquipo = x => (Array.isArray(x) ? x : x ? [x] : []).filter(Boolean).slice(0, 4); // antes era una sola foto
+$("#pbEquipoPrev").addEventListener("click", e => { const i = e.target.dataset.e; if (i != null) { pbTmp.equipo.splice(+i, 1); pintarPbImgs(); } });
+$("#pb_equipo").addEventListener("change", async e => {
+  pbTmp.equipo = fotosEquipo(pbTmp.equipo);
+  for (const f of e.target.files) {
+    if (pbTmp.equipo.length >= 4) { alert("Máximo 4 fotos del equipo."); break; }
+    try { pbTmp.equipo.push(await reducirFoto(f, pbTmp.equipo.length ? 800 : 1100, 0.75)); } catch { alert("No se pudo leer " + f.name); }
+  }
+  e.target.value = ""; pintarPbImgs();
+});
 $("#pbHeroPrev").addEventListener("click", e => { if (e.target.dataset.q) { pbTmp.hero = null; pintarPbImgs(); } });
 $("#pbFotosPrev").addEventListener("click", e => { const i = e.target.dataset.f; if (i != null) { pbTmp.fotos.splice(+i, 1); pintarPbImgs(); } });
 $("#pb_hero").addEventListener("change", async e => { const f = e.target.files[0]; if (f) { pbTmp.hero = await reducirFoto(f, 1400, 0.72); pintarPbImgs(); } e.target.value = ""; });
@@ -905,19 +915,29 @@ $("#btnReiniciar").onclick = () => {
    Contexto de una landing (cliente + parámetros)
    ============================================================ */
 const TXT = {
-  es: { nombre: "Nombre completo", tel: "Número de teléfono", email: "Correo electrónico", opc: "(opcional)", cp: "Código postal", barrio: "Barrio o ciudad", det: "Agregar detalles del proyecto", nec: "¿Qué necesitas?", elige: "Elige uno…", otro: "Otro / no estoy seguro", llamaAl: "Llama al", msg: "Cuéntanos qué necesitas", acepto: "Acepto la", pol: "política de privacidad", priv: "Política de privacidad", llamar: "Llamar ahora", cotizar: "Cotizar", der: "Todos los derechos reservados.", mapa: "Dónde estamos", opin: "Opiniones", resTit: "Lo que dicen nuestros clientes", verRes: "Ver todas las reseñas", nos: "Quiénes somos", resPh: "[Pega aquí una reseña real de Google]", resPhN: "[Nombre del cliente]", califPh: "[4.9] en Google · [N] reseñas", resNota: "Plantilla: reemplaza estas tarjetas por reseñas reales (y borra este aviso) antes de publicar.", ph: ["Tu nombre", "Tu teléfono", "Tu código postal", "Tu barrio o ciudad", "Tu correo"],
+  es: { nombre: "Nombre completo", tel: "Número de teléfono", email: "Correo electrónico", opc: "(opcional)", cp: "Código postal", barrio: "Barrio o ciudad", det: "Agregar detalles del proyecto", nec: "¿Qué necesitas?", elige: "Elige uno…", otro: "Otro / no estoy seguro", llamaAl: "Llama al", msg: "Cuéntanos qué necesitas", acepto: "Acepto la", pol: "política de privacidad", priv: "Política de privacidad", llamar: "Llamar ahora", cotizar: "Cotizar", der: "Todos los derechos reservados.", mapa: "Dónde estamos", opin: "Opiniones", resTit: "Lo que dicen nuestros clientes", verRes: "Ver todas las reseñas", nos: "Quiénes somos", resPh: "[Pega aquí una reseña real de Google]", resPhN: "[Nombre del cliente]", califPh: "[calificación] en Google · [N] reseñas", estPh: "[estrellas de esta reseña]", resNota: "Plantilla: reemplaza estas tarjetas por reseñas reales (y borra este aviso) antes de publicar.", ph: ["Tu nombre", "Tu teléfono", "Tu código postal", "Tu barrio o ciudad", "Tu correo"],
     privTxt: "{n} usa los datos de este formulario solo para responder tu solicitud y no los comparte con terceros.", fErr: "Revisa los campos marcados en rojo.", fFallo: "No pudimos enviar tu solicitud. Intenta de nuevo en un momento.", fWa: "Te abrimos WhatsApp con tus datos: solo toca Enviar.", fSin: "Este formulario todavía no tiene a dónde enviar los datos." },
-  en: { nombre: "Full name", tel: "Phone number", email: "Email", opc: "(optional)", cp: "ZIP code", barrio: "City / area", det: "Add project details", nec: "What do you need?", elige: "Choose one…", otro: "Other / not sure", llamaAl: "Call", msg: "Tell us what you need", acepto: "I accept the", pol: "privacy policy", priv: "Privacy policy", llamar: "Call now", cotizar: "Get a Quote", der: "All rights reserved.", mapa: "Where we are", opin: "Reviews", resTit: "What our customers say", verRes: "See all reviews", nos: "Who we are", resPh: "[Paste a real Google review here]", resPhN: "[Customer name]", califPh: "[4.9] on Google · [N] reviews", resNota: "Template: replace these cards with real reviews (and delete this note) before publishing.", ph: ["Your name", "Your phone number", "Your ZIP code", "Your city or area", "Your email"],
+  en: { nombre: "Full name", tel: "Phone number", email: "Email", opc: "(optional)", cp: "ZIP code", barrio: "City / area", det: "Add project details", nec: "What do you need?", elige: "Choose one…", otro: "Other / not sure", llamaAl: "Call", msg: "Tell us what you need", acepto: "I accept the", pol: "privacy policy", priv: "Privacy policy", llamar: "Call now", cotizar: "Get a Quote", der: "All rights reserved.", mapa: "Where we are", opin: "Reviews", resTit: "What our customers say", verRes: "See all reviews", nos: "Who we are", resPh: "[Paste a real Google review here]", resPhN: "[Customer name]", califPh: "[rating] on Google · [N] reviews", estPh: "[this review's stars]", resNota: "Template: replace these cards with real reviews (and delete this note) before publishing.", ph: ["Your name", "Your phone number", "Your ZIP code", "Your city or area", "Your email"],
     privTxt: "{n} uses the information in this form only to respond to your request and does not share it with third parties.", fErr: "Please check the fields marked in red.", fFallo: "We couldn't send your request. Please try again in a moment.", fWa: "We opened WhatsApp with your details: just tap Send.", fSin: "This form doesn't have a destination for the data yet." },
-  pt: { nombre: "Nome completo", tel: "Telefone", email: "E-mail", opc: "(opcional)", cp: "CEP", barrio: "Bairro ou cidade", det: "Adicionar detalhes", nec: "Do que você precisa?", elige: "Escolha…", otro: "Outro / não tenho certeza", llamaAl: "Ligue", msg: "Conte o que você precisa", acepto: "Aceito a", pol: "política de privacidade", priv: "Política de privacidade", llamar: "Ligar agora", cotizar: "Orçamento", der: "Todos os direitos reservados.", mapa: "Onde estamos", opin: "Avaliações", resTit: "O que dizem nossos clientes", verRes: "Ver todas as avaliações", nos: "Quem somos", resPh: "[Cole aqui uma avaliação real do Google]", resPhN: "[Nome do cliente]", califPh: "[4.9] no Google · [N] avaliações", resNota: "Modelo: substitua estes cartões por avaliações reais (e apague este aviso) antes de publicar.", ph: ["Seu nome", "Seu telefone", "Seu CEP", "Seu bairro ou cidade", "Seu e-mail"],
+  pt: { nombre: "Nome completo", tel: "Telefone", email: "E-mail", opc: "(opcional)", cp: "CEP", barrio: "Bairro ou cidade", det: "Adicionar detalhes", nec: "Do que você precisa?", elige: "Escolha…", otro: "Outro / não tenho certeza", llamaAl: "Ligue", msg: "Conte o que você precisa", acepto: "Aceito a", pol: "política de privacidade", priv: "Política de privacidade", llamar: "Ligar agora", cotizar: "Orçamento", der: "Todos os direitos reservados.", mapa: "Onde estamos", opin: "Avaliações", resTit: "O que dizem nossos clientes", verRes: "Ver todas as avaliações", nos: "Quem somos", resPh: "[Cole aqui uma avaliação real do Google]", resPhN: "[Nome do cliente]", califPh: "[nota] no Google · [N] avaliações", estPh: "[estrelas desta avaliação]", resNota: "Modelo: substitua estes cartões por avaliações reais (e apague este aviso) antes de publicar.", ph: ["Seu nome", "Seu telefone", "Seu CEP", "Seu bairro ou cidade", "Seu e-mail"],
     privTxt: "{n} usa os dados deste formulário apenas para responder à sua solicitação e não os compartilha com terceiros.", fErr: "Revise os campos marcados em vermelho.", fFallo: "Não conseguimos enviar sua solicitação. Tente novamente.", fWa: "Abrimos o WhatsApp com seus dados: é só tocar em Enviar.", fSin: "Este formulário ainda não tem para onde enviar os dados." }
 };
 /* Reseñas reales del Playbook: una por línea, «texto — Nombre». */
 function parseResenas(txt) {
   return String(txt || "").split("\n").map(l => l.trim()).filter(l => l.length > 8).map(l => {
-    const m = l.match(/^(.*\S)\s+[—–-]\s+([^—–-]{2,60})$/);
-    return { texto: (m ? m[1] : l).replace(/^["“«]|["”»]$/g, "").trim(), nombre: m ? m[2].trim() : "" };
+    const partes = l.split(/\s+[—–-]\s+/);
+    let estrellas = 0, nombre = "";
+    const ult = partes.length > 1 ? partes[partes.length - 1].trim() : "";
+    if (/^[1-5](?:[.,]\d)?\s*(?:★|estrellas?|stars?)?$/i.test(ult)) { estrellas = Math.round(parseFloat(ult.replace(",", "."))); partes.pop(); }
+    else if (/^★{1,5}$/.test(ult)) { estrellas = ult.length; partes.pop(); }
+    if (partes.length > 1 && partes[partes.length - 1].length <= 60) nombre = partes.pop().trim();
+    return { texto: partes.join(" — ").replace(/^["“«]|["”»]$/g, "").trim(), nombre, estrellas };
   });
+}
+/* Estrellas de una reseña (1–5). Sin dato no se muestran: no se asume 5. */
+function htmlEstrellas(n, cls = "", tag = "div") {
+  n = Math.max(0, Math.min(5, Math.round(n || 0)));
+  return n ? `<${tag} class="lp-stars ${cls}" aria-label="${n}/5">${"★".repeat(n)}<span class="lp-off">${"☆".repeat(5 - n)}</span></${tag}>` : "";
 }
 function construirCtx(c, p) {
   const est = ESTILOS[p.estilo] || ESTILOS.presupuesto;
@@ -933,7 +953,7 @@ function construirCtx(c, p) {
     L, T: TXT[L], idioma, negocio: c.nombre, logo: logoLanding || c.logo || "", imagen: fotoLanding || p.fotoUrl || c.hero || "",
     fotos: [...new Set([...galeria, ...(p.fotos || "").split(/\s+/).filter(x => /^https?:\/\//.test(x)), ...(c.fotos || []),
       ...(c.usarFotosWeb !== false ? c.sitio?.imagenes || [] : [])])].slice(0, MAX_FOTOS),
-    servicioPrincipal: (p.servicio || "").trim(), equipo: c.equipo || "",
+    servicioPrincipal: (p.servicio || "").trim(), equipo: fotosEquipo(c.equipo),
     resenas: parseResenas(c.resenas), calificacion: (c.calificacion || "").trim(), resenasUrl: (c.resenasUrl || "").trim(),
     sitioTexto: c.sitio?.texto || "", refTexto: "",
     tel, telTxt: c.telefono || "", whatsapp: wa, email: c.email || "", direccion: c.direccion || "",
@@ -1166,6 +1186,9 @@ function cssKit(k) {
 .lp-cols:has(>:only-child){grid-template-columns:1fr;max-width:820px;margin:0 auto}
 .lp-cols .lp-eyebrow{text-align:left}
 .lp-equipo{aspect-ratio:4/3;box-shadow:0 24px 50px -24px rgba(16,24,40,.45)}
+.lp-equipo-g{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.lp-equipo-g .lp-equipo{aspect-ratio:1/1;box-shadow:0 14px 30px -18px rgba(16,24,40,.45)}
+.lp-equipo-g .lp-equipo:first-child:nth-last-child(3){grid-column:span 2;aspect-ratio:16/9}
 .lp-plantilla{outline:2px dashed #f59e0b;outline-offset:4px}
 .lp .lp-rev-top.lp-plantilla{width:fit-content;margin:0 auto 4px;padding:2px 10px}
 .lp .lp-plantilla-nota{font-size:13px;color:#b54708;background:#fffaeb;border:1px solid #fedf89;border-radius:8px;padding:8px 12px;margin:0 auto 18px;max-width:640px;text-align:center}
@@ -1263,6 +1286,7 @@ ${u ? `
 .lp-rev-top{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 4px;color:var(--mut);font-weight:600}
 .lp-rev-top .lp-stars{margin:0}
 .lp-testi blockquote{font-style:normal}
+.lp-stars .lp-off,.lp-stars.lp-off{color:#c9ced8}
 ${u ? `.lp h3{font-size:19px}
 .lp-btn{font-size:16px;letter-spacing:.06em}
 .lp-badge{font-size:14px;padding:9px 18px}
@@ -1384,8 +1408,8 @@ function htmlResenas(ctx, datos) {
   return `<section class="lp-sec lp-alt" data-lp="resenas"><div class="lp-wrap"><p class="lp-eyebrow">${T.opin}</p>
 <h2 class="lp-c">${esc(datos?.resenas_titulo || T.resTit)}</h2>
 ${plantilla ? `<p class="lp-plantilla-nota" data-plantilla>${T.resNota}</p>` : ""}
-${calif ? `<p class="lp-rev-top${ctx.calificacion ? "" : " lp-plantilla"}"><span class="lp-stars">★★★★★</span> ${esc(calif)}</p>` : ""}
-<div class="lp-grid">${tarjetas.map(r => `<figure class="lp-card lp-testi${plantilla ? " lp-plantilla" : ""}"><div class="lp-stars">★★★★★</div><blockquote>“${esc(r.texto)}”</blockquote>${r.nombre ? `<figcaption><b>${esc(r.nombre)}</b></figcaption>` : ""}</figure>`).join("")}</div>
+${calif ? `<p class="lp-rev-top${ctx.calificacion ? "" : " lp-plantilla"}">${ctx.calificacion ? htmlEstrellas(parseFloat(String(ctx.calificacion).replace(",", ".")), "", "span") : ""} ${esc(calif)}</p>` : ""}
+<div class="lp-grid">${tarjetas.map(r => `<figure class="lp-card lp-testi${plantilla ? " lp-plantilla" : ""}">${plantilla ? `<div class="lp-stars lp-off">☆☆☆☆☆ ${T.estPh}</div>` : htmlEstrellas(r.estrellas)}<blockquote>“${esc(r.texto)}”</blockquote>${r.nombre ? `<figcaption><b>${esc(r.nombre)}</b></figcaption>` : ""}</figure>`).join("")}</div>
 ${ctx.resenasUrl ? `<p class="lp-c"><a class="lp-btn lp-btn-out" href="${esc(ctx.resenasUrl)}" target="_blank" rel="noopener">${T.verRes}</a></p>` : ""}
 </div></section>`;
 }
@@ -1442,8 +1466,10 @@ function ensamblar(frag, datos, ctx) {
   });
   frag = parejoConFotos(frag);
   // Foto del equipo (sección «Quiénes somos»); sin foto se quita y el texto queda a lo ancho
-  frag = ctx.equipo
-    ? frag.replace(/<img\b[^>]*\sdata-equipo\b[^>]*>/gi, `<img class="lp-equipo" data-equipo src="${esc(ctx.equipo)}" alt="${esc(ctx.negocio)}" loading="lazy">`)
+  const imgEq = (u, i) => `<img class="lp-equipo" src="${esc(u)}" alt="${esc(ctx.negocio)} ${i + 1}" loading="lazy">`;
+  frag = ctx.equipo.length
+    ? frag.replace(/<img\b[^>]*\sdata-equipo\b[^>]*>/i, ctx.equipo.length === 1 ? imgEq(ctx.equipo[0], 0).replace("<img ", "<img data-equipo ")
+        : `<div class="lp-equipo-g" data-equipo-g>${ctx.equipo.map(imgEq).join("")}</div>`).replace(/<img\b[^>]*\sdata-equipo\b[^>]*>/gi, (m) => /class="lp-equipo"/.test(m) ? m : "")
     : frag.replace(/<div>\s*<img\b[^>]*\sdata-equipo\b[^>]*>\s*<\/div>/gi, "").replace(/<img\b[^>]*\sdata-equipo\b[^>]*>/gi, "");
   // Reseñas reales (Playbook o copiadas textualmente del sitio del cliente)
   const res = htmlResenas(ctx, datos);
@@ -1530,7 +1556,7 @@ function datosCliente(c) {
 - Datos reales (ÚNICAS cifras/logros que puedes usar): ${c.datos || "(ninguno: no inventes años, reseñas, premios ni precios)"}
 - Diferenciadores y tono: ${c.marca || "(deducir)"}
 - Teléfono: ${c.telefono || "(no tiene: no pongas enlaces tel:)"} · WhatsApp: ${c.whatsapp ? "sí" : "no"} · Dirección: ${c.direccion || "-"}
-- Quiénes son: ${c.historia || "(sin datos: no inventes historia, años ni nombres)"} · Foto del equipo: ${c.equipo ? "sí" : "no"}
+- Quiénes son: ${c.historia || "(sin datos: no inventes historia, años ni nombres)"} · Fotos del equipo: ${fotosEquipo(c.equipo).length}
 - Reseñas reales cargadas: ${parseResenas(c.resenas).length} (las muestro yo en <!--RESENAS-->)${c.calificacion ? " · Calificación: " + c.calificacion : ""}
 ${c.notas ? "- REGLAS DEL CLIENTE (obligatorias): " + c.notas : ""}${c.sitio?.texto ? `
 
@@ -1672,7 +1698,7 @@ ${!u && tel ? `<a href="tel:${esc(tel)}" class="lp-call lp-tel"><span><i data-ic
     if (ctx.fotos.length) s.push(`<section class="lp-sec lp-dark"><div class="lp-wrap lp-c">${ceja("Nuestro trabajo")}<h2>Trabajos recientes en ${esc(ctx.ciudad)}</h2><!--GALERIA--></div></section>`);
     s.push(`<section class="lp-sec lp-alt"><div class="lp-wrap lp-c">${ceja("Zonas que atendemos")}<h2>Cerca de ti en ${esc(ctx.ciudad)}</h2>${ctx.zonas ? `<ul class="lp-areas">${ctx.zonas.split(",").map(z => `<li>${esc(z.trim())}</li>`).join("")}</ul>` : ""}<!--MAPA--></div></section>`);
   }
-  if (tipo !== "captura" && (ctx.equipo || d.nosotros)) s.push(`<section class="lp-sec"><div class="lp-wrap lp-cols"><div>${ceja(ctx.T.nos || "Quiénes somos")}<h2>${esc(d.nosotros?.titulo || "Tu equipo local")}</h2><p class="lp-lead">${esc(d.nosotros?.texto || "")}</p>${btnTel}</div><div><img data-equipo alt=""></div></div></section>`);
+  if (tipo !== "captura" && (ctx.equipo.length || d.nosotros)) s.push(`<section class="lp-sec"><div class="lp-wrap lp-cols"><div>${ceja(ctx.T.nos || "Quiénes somos")}<h2>${esc(d.nosotros?.titulo || "Tu equipo local")}</h2><p class="lp-lead">${esc(d.nosotros?.texto || "")}</p>${btnTel}</div><div><img data-equipo alt=""></div></div></section>`);
   s.push("<!--RESENAS-->");
   if (tipo !== "captura") s.push(`<section class="lp-sec"><div class="lp-wrap lp-narrow">${ceja("Preguntas frecuentes")}<h2 class="lp-c">Resolvemos tus dudas</h2>${d.faq.map(q => `<details class="lp-faq"><summary>${esc(q.p)}</summary><p>${esc(q.r)}</p></details>`).join("")}</div></section>`);
   s.push(`<section class="lp-sec lp-dark"><div class="lp-wrap lp-narrow lp-c"><h2>${esc(d.cierre.titulo)}</h2><p class="lp-lead">${esc(d.cierre.texto)}</p><div class="lp-ctas lp-ctas-c"><a href="#lp-form" class="lp-btn lp-cta">${esc(cta)}</a>${tel ? `<a href="tel:${esc(tel)}" class="lp-btn lp-btn-ghost lp-tel"><i data-icon="tel" class="lp-i"></i> ${esc(ctx.telTxt)}</a>` : ""}</div></div></section>`);
@@ -1784,6 +1810,7 @@ function fragActual() {
   m.querySelectorAll('[data-lp="resenas"]').forEach(x => x.replaceWith(doc.createComment("RESENAS")));
   m.querySelectorAll("img[data-foto]").forEach(x => { x.removeAttribute("src"); x.removeAttribute("loading"); });
   m.querySelectorAll("img[data-equipo]").forEach(x => { x.removeAttribute("src"); x.removeAttribute("loading"); x.removeAttribute("class"); });
+  m.querySelectorAll("[data-equipo-g]").forEach(x => { const i = doc.createElement("img"); i.setAttribute("data-equipo", ""); i.setAttribute("alt", ""); x.replaceWith(i); });
   m.querySelectorAll("svg[data-icon]").forEach(x => { const i = doc.createElement("i"); i.setAttribute("data-icon", x.getAttribute("data-icon")); const cl = x.getAttribute("class"); if (cl) i.setAttribute("class", cl); x.replaceWith(i); });
   const extra = doc.getElementById("lp-extra");
   return (extra ? `<style>${extra.textContent}</style>\n` : "") + m.innerHTML.trim();
@@ -1881,7 +1908,7 @@ ${(p.cuerpo + "\n" + p.scripts).replace(/<\?/g, "&lt;?")}
 const nombreArchivo = () => slug([cli()?.nombre, estado.params?.servicio || estado.nombre].filter(Boolean).join(" "));
 /* Antes de descargar: avisar si quedan reseñas de plantilla sin reemplazar. */
 function revisarPlantillas(h) {
-  if (!/\[(Pega aquí una reseña|Paste a real Google review|Cole aqui uma avaliação|Nombre del cliente|Customer name|Nome do cliente|4\.9\]|N\])/.test(h)) return true;
+  if (!/\[(Pega aquí una reseña|Paste a real Google review|Cole aqui uma avaliação|Nombre del cliente|Customer name|Nome do cliente|calificación\]|rating\]|nota\]|estrellas de esta|this review's stars|estrelas desta|N\])/.test(h)) return true;
   return confirm("Ojo: la landing todavía tiene reseñas de PLANTILLA (textos entre [corchetes]).\nReemplázalas por reseñas reales antes de publicarla (con «Editar textos» o en WordPress).\n\n¿Descargar de todas formas?");
 }
 $("#btnHtml").onclick = () => { const h = htmlActual(); if (revisarPlantillas(h)) descargar(`${nombreArchivo()}.html`, h); };
