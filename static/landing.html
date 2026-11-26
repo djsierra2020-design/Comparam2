@@ -299,6 +299,11 @@
       <label class="l" for="pb_fotos">Fotos del negocio <small>(trabajos, productos, equipo — hasta 12; van en tarjetas y galería)</small></label>
       <input type="file" id="pb_fotos" accept="image/*" multiple>
       <div class="refs" id="pbFotosPrev"></div>
+      <label class="l" for="pb_equipo">Foto del equipo o de los dueños <small>(sección «Quiénes somos»; genera confianza)</small></label>
+      <input type="file" id="pb_equipo" accept="image/*">
+      <div class="refs" id="pbEquipoPrev"></div>
+      <label class="l" for="pb_historia">Quiénes son <small>(historia real: desde cuándo, quién atiende, qué los hace distintos)</small></label>
+      <textarea id="pb_historia" name="historia" placeholder="ej. Empresa familiar desde 2011. Atienden los dueños, Mike y Ana, con un equipo de 6 técnicos propios."></textarea>
       <label class="l" for="pb_refs">Capturas de landings de referencia <small>(opcional, solo para el estilo «Desde mis capturas»)</small></label>
       <input type="file" id="pb_refs" accept="image/*" multiple>
       <div class="refs" id="pbRefs"></div>
@@ -673,6 +678,7 @@ Tarjetas: <div class="lp-grid"><div class="lp-card"><div class="lp-ico"><i data-
 Señales / problemas numerados: <div class="lp-sig"><div><b>01</b><h3>…</h3><p>…</p></div>…</div>
 Pasos: <ol class="lp-steps"><li><h3>…</h3><p>…</p></li>…</ol>
 Dos columnas: <div class="lp-cols"><div>texto</div><div>…</div></div>
+Quiénes somos (texto + foto del equipo): <section class="lp-sec"><div class="lp-wrap lp-cols"><div><p class="lp-eyebrow">Quiénes somos</p><h2>Tu equipo local de …</h2><p>…</p><ul class="lp-ul"><li>…</li></ul><a class="lp-btn lp-tel" href="tel:NUM">Llama al …</a></div><div><img data-equipo alt="Equipo de …"></div></div></section>
 Zonas atendidas: <ul class="lp-areas"><li>Ciudad</li>…</ul>
 Preguntas: <details class="lp-faq"><summary>Pregunta</summary><p>Respuesta</p></details>
 Tarjeta con foto (para categorías o tipos de producto, solo si hay fotos de trabajos): <div class="lp-card lp-card-foto"><img data-foto="1" alt="…"><h3>…</h3><p>…</p></div> (data-foto = número de la foto: 1, 2, 3…)
@@ -688,6 +694,7 @@ const CRITERIOS = `CRITERIOS DEL BUILDER (obligatorios en toda página):
 - Nada se repite: cada dato o beneficio aparece en UN solo lugar. Si está en las viñetas del hero, no lo pongas en la franja de confianza ni en «por qué elegirnos». Cada sección aporta algo nuevo.
 - Coherencia total con el SERVICIO PRINCIPAL de esta landing: títulos, textos, preguntas, CTA y las opciones del formulario (DATOS.formulario.opciones) hablan de ese servicio y no de otros del cliente.
 - Incluye siempre el marcador <!--RESENAS-->, después de los beneficios o del proceso.
+- Incluye una sección «Quiénes somos» (lp-cols con <img data-equipo>) usando SOLO lo que diga «Quiénes son» y los datos reales del Playbook o del sitio: sin inventar años, nombres ni cifras. Si no hay nada de eso, escríbela corta y general (equipo local, trato directo) sin datos concretos.
 - Categorías o tipos de producto: 3 o 4 tarjetas con foto (lp-card-foto) si hay fotos de trabajos; si no, tarjetas con ícono.
 - Mejor corto y concreto que largo: es una landing de Google Ads, no un artículo.`;
 
@@ -725,10 +732,10 @@ function pintarHintEstilo() {
 }
 
 /* Playbook */
-const PB_CAMPOS = ["nombre", "rubro", "servicios", "zonas", "datos", "marca", "web", "usarFotosWeb", "resenas", "calificacion", "resenasUrl", "telefono", "whatsapp", "email", "direccion", "idioma", "estilo", "c1", "c2", "colorEstilo", "awId", "awLabel", "ga4", "accion", "gracias", "privacidad", "notas"];
+const PB_CAMPOS = ["nombre", "rubro", "servicios", "zonas", "datos", "marca", "web", "usarFotosWeb", "historia", "resenas", "calificacion", "resenasUrl", "telefono", "whatsapp", "email", "direccion", "idioma", "estilo", "c1", "c2", "colorEstilo", "awId", "awLabel", "ga4", "accion", "gracias", "privacidad", "notas"];
 let pbTmp = null;
 function abrirPlaybook(nuevo) {
-  pbTmp = nuevo ? { id: uid(), nombre: "", idioma: "Español", estilo: "presupuesto", colorEstilo: true, c1: "#232f5e", c2: "#f04a4a", refs: [], logo: null, hero: null, fotos: [] } : structuredClone(cli());
+  pbTmp = nuevo ? { id: uid(), nombre: "", idioma: "Español", estilo: "presupuesto", colorEstilo: true, c1: "#232f5e", c2: "#f04a4a", refs: [], logo: null, hero: null, fotos: [], equipo: null } : structuredClone(cli());
   if (!pbTmp) { pbTmp = null; abrirPlaybook(true); return; }
   const f = $("#pbForm");
   for (const k of PB_CAMPOS) { const el = f.elements[k]; if (!el) continue; if (el.type === "checkbox") el.checked = !!pbTmp[k]; else el.value = pbTmp[k] ?? (el.tagName === "SELECT" ? el.options[0].value : ""); }
@@ -754,10 +761,13 @@ $("#pbLeerWeb").onclick = async () => {
 function pintarPbImgs() {
   $("#pbLogoPrev").innerHTML = pbTmp.logo ? `<figure><img src="${pbTmp.logo}" alt="Logo"><button type="button" data-q="logo">×</button></figure>` : "";
   $("#pbRefs").innerHTML = (pbTmp.refs || []).map((r, i) => `<figure><img src="${r.url}" alt="Referencia ${i + 1}"><button type="button" data-q="${i}">×</button></figure>`).join("");
+  $("#pbEquipoPrev").innerHTML = pbTmp.equipo ? `<figure><img src="${pbTmp.equipo}" alt="Equipo"><button type="button" data-q="equipo">×</button></figure>` : "";
   $("#pbHeroPrev").innerHTML = pbTmp.hero ? `<figure><img src="${pbTmp.hero}" alt="Foto principal"><button type="button" data-q="hero">×</button></figure>` : "";
   $("#pbFotosPrev").innerHTML = (pbTmp.fotos || []).map((f, i) => `<figure><img src="${f}" alt="Foto ${i + 1}"><button type="button" data-f="${i}">×</button></figure>`).join("");
   $("#pb_fotos").disabled = (pbTmp.fotos || []).length >= MAX_FOTOS;
 }
+$("#pbEquipoPrev").addEventListener("click", e => { if (e.target.dataset.q) { pbTmp.equipo = null; pintarPbImgs(); } });
+$("#pb_equipo").addEventListener("change", async e => { const f = e.target.files[0]; if (f) { pbTmp.equipo = await reducirFoto(f, 1100, 0.75); pintarPbImgs(); } e.target.value = ""; });
 $("#pbHeroPrev").addEventListener("click", e => { if (e.target.dataset.q) { pbTmp.hero = null; pintarPbImgs(); } });
 $("#pbFotosPrev").addEventListener("click", e => { const i = e.target.dataset.f; if (i != null) { pbTmp.fotos.splice(+i, 1); pintarPbImgs(); } });
 $("#pb_hero").addEventListener("change", async e => { const f = e.target.files[0]; if (f) { pbTmp.hero = await reducirFoto(f, 1400, 0.72); pintarPbImgs(); } e.target.value = ""; });
@@ -895,11 +905,11 @@ $("#btnReiniciar").onclick = () => {
    Contexto de una landing (cliente + parámetros)
    ============================================================ */
 const TXT = {
-  es: { nombre: "Nombre completo", tel: "Número de teléfono", email: "Correo electrónico", opc: "(opcional)", cp: "Código postal", barrio: "Barrio o ciudad", det: "Agregar detalles del proyecto", nec: "¿Qué necesitas?", elige: "Elige uno…", otro: "Otro / no estoy seguro", llamaAl: "Llama al", msg: "Cuéntanos qué necesitas", acepto: "Acepto la", pol: "política de privacidad", priv: "Política de privacidad", llamar: "Llamar ahora", cotizar: "Cotizar", der: "Todos los derechos reservados.", mapa: "Dónde estamos", opin: "Opiniones", resTit: "Lo que dicen nuestros clientes", verRes: "Ver todas las reseñas", ph: ["Tu nombre", "Tu teléfono", "Tu código postal", "Tu barrio o ciudad", "Tu correo"],
+  es: { nombre: "Nombre completo", tel: "Número de teléfono", email: "Correo electrónico", opc: "(opcional)", cp: "Código postal", barrio: "Barrio o ciudad", det: "Agregar detalles del proyecto", nec: "¿Qué necesitas?", elige: "Elige uno…", otro: "Otro / no estoy seguro", llamaAl: "Llama al", msg: "Cuéntanos qué necesitas", acepto: "Acepto la", pol: "política de privacidad", priv: "Política de privacidad", llamar: "Llamar ahora", cotizar: "Cotizar", der: "Todos los derechos reservados.", mapa: "Dónde estamos", opin: "Opiniones", resTit: "Lo que dicen nuestros clientes", verRes: "Ver todas las reseñas", nos: "Quiénes somos", resPh: "[Pega aquí una reseña real de Google]", resPhN: "[Nombre del cliente]", califPh: "[4.9] en Google · [N] reseñas", resNota: "Plantilla: reemplaza estas tarjetas por reseñas reales (y borra este aviso) antes de publicar.", ph: ["Tu nombre", "Tu teléfono", "Tu código postal", "Tu barrio o ciudad", "Tu correo"],
     privTxt: "{n} usa los datos de este formulario solo para responder tu solicitud y no los comparte con terceros.", fErr: "Revisa los campos marcados en rojo.", fFallo: "No pudimos enviar tu solicitud. Intenta de nuevo en un momento.", fWa: "Te abrimos WhatsApp con tus datos: solo toca Enviar.", fSin: "Este formulario todavía no tiene a dónde enviar los datos." },
-  en: { nombre: "Full name", tel: "Phone number", email: "Email", opc: "(optional)", cp: "ZIP code", barrio: "City / area", det: "Add project details", nec: "What do you need?", elige: "Choose one…", otro: "Other / not sure", llamaAl: "Call", msg: "Tell us what you need", acepto: "I accept the", pol: "privacy policy", priv: "Privacy policy", llamar: "Call now", cotizar: "Get a Quote", der: "All rights reserved.", mapa: "Where we are", opin: "Reviews", resTit: "What our customers say", verRes: "See all reviews", ph: ["Your name", "Your phone number", "Your ZIP code", "Your city or area", "Your email"],
+  en: { nombre: "Full name", tel: "Phone number", email: "Email", opc: "(optional)", cp: "ZIP code", barrio: "City / area", det: "Add project details", nec: "What do you need?", elige: "Choose one…", otro: "Other / not sure", llamaAl: "Call", msg: "Tell us what you need", acepto: "I accept the", pol: "privacy policy", priv: "Privacy policy", llamar: "Call now", cotizar: "Get a Quote", der: "All rights reserved.", mapa: "Where we are", opin: "Reviews", resTit: "What our customers say", verRes: "See all reviews", nos: "Who we are", resPh: "[Paste a real Google review here]", resPhN: "[Customer name]", califPh: "[4.9] on Google · [N] reviews", resNota: "Template: replace these cards with real reviews (and delete this note) before publishing.", ph: ["Your name", "Your phone number", "Your ZIP code", "Your city or area", "Your email"],
     privTxt: "{n} uses the information in this form only to respond to your request and does not share it with third parties.", fErr: "Please check the fields marked in red.", fFallo: "We couldn't send your request. Please try again in a moment.", fWa: "We opened WhatsApp with your details: just tap Send.", fSin: "This form doesn't have a destination for the data yet." },
-  pt: { nombre: "Nome completo", tel: "Telefone", email: "E-mail", opc: "(opcional)", cp: "CEP", barrio: "Bairro ou cidade", det: "Adicionar detalhes", nec: "Do que você precisa?", elige: "Escolha…", otro: "Outro / não tenho certeza", llamaAl: "Ligue", msg: "Conte o que você precisa", acepto: "Aceito a", pol: "política de privacidade", priv: "Política de privacidade", llamar: "Ligar agora", cotizar: "Orçamento", der: "Todos os direitos reservados.", mapa: "Onde estamos", opin: "Avaliações", resTit: "O que dizem nossos clientes", verRes: "Ver todas as avaliações", ph: ["Seu nome", "Seu telefone", "Seu CEP", "Seu bairro ou cidade", "Seu e-mail"],
+  pt: { nombre: "Nome completo", tel: "Telefone", email: "E-mail", opc: "(opcional)", cp: "CEP", barrio: "Bairro ou cidade", det: "Adicionar detalhes", nec: "Do que você precisa?", elige: "Escolha…", otro: "Outro / não tenho certeza", llamaAl: "Ligue", msg: "Conte o que você precisa", acepto: "Aceito a", pol: "política de privacidade", priv: "Política de privacidade", llamar: "Ligar agora", cotizar: "Orçamento", der: "Todos os direitos reservados.", mapa: "Onde estamos", opin: "Avaliações", resTit: "O que dizem nossos clientes", verRes: "Ver todas as avaliações", nos: "Quem somos", resPh: "[Cole aqui uma avaliação real do Google]", resPhN: "[Nome do cliente]", califPh: "[4.9] no Google · [N] avaliações", resNota: "Modelo: substitua estes cartões por avaliações reais (e apague este aviso) antes de publicar.", ph: ["Seu nome", "Seu telefone", "Seu CEP", "Seu bairro ou cidade", "Seu e-mail"],
     privTxt: "{n} usa os dados deste formulário apenas para responder à sua solicitação e não os compartilha com terceiros.", fErr: "Revise os campos marcados em vermelho.", fFallo: "Não conseguimos enviar sua solicitação. Tente novamente.", fWa: "Abrimos o WhatsApp com seus dados: é só tocar em Enviar.", fSin: "Este formulário ainda não tem para onde enviar os dados." }
 };
 /* Reseñas reales del Playbook: una por línea, «texto — Nombre». */
@@ -923,7 +933,7 @@ function construirCtx(c, p) {
     L, T: TXT[L], idioma, negocio: c.nombre, logo: logoLanding || c.logo || "", imagen: fotoLanding || p.fotoUrl || c.hero || "",
     fotos: [...new Set([...galeria, ...(p.fotos || "").split(/\s+/).filter(x => /^https?:\/\//.test(x)), ...(c.fotos || []),
       ...(c.usarFotosWeb !== false ? c.sitio?.imagenes || [] : [])])].slice(0, MAX_FOTOS),
-    servicioPrincipal: (p.servicio || "").trim(),
+    servicioPrincipal: (p.servicio || "").trim(), equipo: c.equipo || "",
     resenas: parseResenas(c.resenas), calificacion: (c.calificacion || "").trim(), resenasUrl: (c.resenasUrl || "").trim(),
     sitioTexto: c.sitio?.texto || "", refTexto: "",
     tel, telTxt: c.telefono || "", whatsapp: wa, email: c.email || "", direccion: c.direccion || "",
@@ -1153,6 +1163,12 @@ function cssKit(k) {
 .lp-ul li::before{content:"✓";color:var(--b);font-weight:800}
 .lp-cols{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
 .lp-cols img{border-radius:14px;width:100%;object-fit:cover}
+.lp-cols:has(>:only-child){grid-template-columns:1fr;max-width:820px;margin:0 auto}
+.lp-cols .lp-eyebrow{text-align:left}
+.lp-equipo{aspect-ratio:4/3;box-shadow:0 24px 50px -24px rgba(16,24,40,.45)}
+.lp-plantilla{outline:2px dashed #f59e0b;outline-offset:4px}
+.lp .lp-rev-top.lp-plantilla{width:fit-content;margin:0 auto 4px;padding:2px 10px}
+.lp .lp-plantilla-nota{font-size:13px;color:#b54708;background:#fffaeb;border:1px solid #fedf89;border-radius:8px;padding:8px 12px;margin:0 auto 18px;max-width:640px;text-align:center}
 .lp-map{margin-top:28px}
 .lp-map iframe{width:100%;height:400px;border:0;border-radius:14px;display:block}
 .lp-areas{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;list-style:none;padding:0;margin:22px 0}
@@ -1360,11 +1376,16 @@ function parejoConFotos(frag) {
 }
 function htmlResenas(ctx, datos) {
   const T = ctx.T, lista = resenasValidas(ctx, datos || {}).slice(0, 3);
-  if (!lista.length && !ctx.calificacion && !ctx.resenasUrl) return "";
+  // Sin reseñas reales: la sección sale igual, con 3 tarjetas de PLANTILLA claramente marcadas para
+  // pegar reseñas reales (en la app o en WordPress). Nunca se inventan reseñas con aspecto real.
+  const plantilla = !lista.length;
+  const tarjetas = plantilla ? [0, 1, 2].map(() => ({ texto: T.resPh, nombre: T.resPhN })) : lista;
+  const calif = ctx.calificacion || (plantilla ? T.califPh : "");
   return `<section class="lp-sec lp-alt" data-lp="resenas"><div class="lp-wrap"><p class="lp-eyebrow">${T.opin}</p>
 <h2 class="lp-c">${esc(datos?.resenas_titulo || T.resTit)}</h2>
-${ctx.calificacion ? `<p class="lp-rev-top"><span class="lp-stars">★★★★★</span> ${esc(ctx.calificacion)}</p>` : ""}
-${lista.length ? `<div class="lp-grid">${lista.map(r => `<figure class="lp-card lp-testi"><div class="lp-stars">★★★★★</div><blockquote>“${esc(r.texto)}”</blockquote>${r.nombre ? `<figcaption><b>${esc(r.nombre)}</b></figcaption>` : ""}</figure>`).join("")}</div>` : ""}
+${plantilla ? `<p class="lp-plantilla-nota" data-plantilla>${T.resNota}</p>` : ""}
+${calif ? `<p class="lp-rev-top${ctx.calificacion ? "" : " lp-plantilla"}"><span class="lp-stars">★★★★★</span> ${esc(calif)}</p>` : ""}
+<div class="lp-grid">${tarjetas.map(r => `<figure class="lp-card lp-testi${plantilla ? " lp-plantilla" : ""}"><div class="lp-stars">★★★★★</div><blockquote>“${esc(r.texto)}”</blockquote>${r.nombre ? `<figcaption><b>${esc(r.nombre)}</b></figcaption>` : ""}</figure>`).join("")}</div>
 ${ctx.resenasUrl ? `<p class="lp-c"><a class="lp-btn lp-btn-out" href="${esc(ctx.resenasUrl)}" target="_blank" rel="noopener">${T.verRes}</a></p>` : ""}
 </div></section>`;
 }
@@ -1420,6 +1441,10 @@ function ensamblar(frag, datos, ctx) {
     return src ? `<img${resto} data-foto="${n}" src="${esc(src)}" loading="lazy">` : "";
   });
   frag = parejoConFotos(frag);
+  // Foto del equipo (sección «Quiénes somos»); sin foto se quita y el texto queda a lo ancho
+  frag = ctx.equipo
+    ? frag.replace(/<img\b[^>]*\sdata-equipo\b[^>]*>/gi, `<img class="lp-equipo" data-equipo src="${esc(ctx.equipo)}" alt="${esc(ctx.negocio)}" loading="lazy">`)
+    : frag.replace(/<div>\s*<img\b[^>]*\sdata-equipo\b[^>]*>\s*<\/div>/gi, "").replace(/<img\b[^>]*\sdata-equipo\b[^>]*>/gi, "");
   // Reseñas reales (Playbook o copiadas textualmente del sitio del cliente)
   const res = htmlResenas(ctx, datos);
   if (/<!--\s*RESENAS\s*-->/.test(frag)) frag = frag.replace(/<!--\s*RESENAS\s*-->/, res).replace(/<!--\s*RESENAS\s*-->/g, "");
@@ -1491,8 +1516,8 @@ const ENFOQUES = {
   oferta: "Oferta / promoción: la oferta indicada es el gancho principal (etiqueta, H1 o subtítulo, sección propia y botones). Urgencia honesta, sin inventar fechas límite."
 };
 const TIPOS = {
-  completa: "LANDING PAGE COMPLETA (SEO local): 1) hero con formulario, 2) franja de confianza (3–4), 3) señales/problemas numerados (3–4) + botón de llamada, 4) servicio desglosado en 3–4 tarjetas (o 3–4 categorías con foto), 5) proceso en 3 pasos, 6) por qué elegirnos (3–4 puntos que no estén en el hero ni en la franja), 7) <!--RESENAS-->, 8) galería «Nuestro trabajo» si hay fotos (<!--GALERIA-->), 9) zonas atendidas (lp-areas) + <!--MAPA-->, 10) 4–5 preguntas frecuentes, 11) llamado final en fondo lp-dark con botones.",
-  ads: "LANDING CORTA PARA GOOGLE ADS: 1) hero con formulario, 2) franja de confianza (3–4), 3) señales del problema o beneficios (3–4), 4) <!--RESENAS-->, 5) 4–5 preguntas frecuentes, 6) llamado final. Un solo objetivo, textos cortos.",
+  completa: "LANDING PAGE COMPLETA (SEO local): 1) hero con formulario, 2) franja de confianza (3–4), 3) señales/problemas numerados (3–4) + botón de llamada, 4) servicio desglosado en 3–4 tarjetas (o 3–4 categorías con foto), 5) proceso en 3 pasos, 5b) quiénes somos (con <img data-equipo>), 6) por qué elegirnos (3–4 puntos que no estén en el hero ni en la franja), 7) <!--RESENAS-->, 8) galería «Nuestro trabajo» si hay fotos (<!--GALERIA-->), 9) zonas atendidas (lp-areas) + <!--MAPA-->, 10) 4–5 preguntas frecuentes, 11) llamado final en fondo lp-dark con botones.",
+  ads: "LANDING CORTA PARA GOOGLE ADS: 1) hero con formulario, 2) franja de confianza (3–4), 3) señales del problema o beneficios (3–4), 3b) quiénes somos (corta, con <img data-equipo>), 4) <!--RESENAS-->, 5) 4–5 preguntas frecuentes, 6) llamado final. Un solo objetivo, textos cortos.",
   captura: "PÁGINA DE CAPTURA MÍNIMA: 1) hero con formulario (muy claro y persuasivo), 2) franja de confianza (3–4), 3) <!--RESENAS-->, 4) un llamado final corto. Nada más."
 };
 const ESQUEMA_DATOS = `{"title":"título SEO ≤60 caracteres","description":"meta descripción ≤155","cta":"texto del botón principal (corto)","formulario":{"titulo":"…","subtitulo":"…","boton":"…","pregunta":"pregunta para el campo de detalles (p. ej. «¿Qué ocurre con tu puerta?»)","ejemplo":"ejemplo para ese campo","nota":"frase anti-fricción","gracias":"mensaje al enviar","opciones":["3–5 opciones para «¿Qué necesitas?» SOLO del servicio principal de esta landing (p. ej. para instalación: puerta nueva, reemplazo, varias puertas, no estoy seguro)"]},"resenas_titulo":"título corto para la sección de reseñas","resenas_sitio":[{"texto":"reseña copiada TEXTUAL del contenido del sitio del cliente (solo si aparece ahí; si no, deja la lista vacía)","nombre":"nombre tal como aparece"}],"privacidad":"aviso de privacidad breve","anuncios":{"titulos":["15 títulos ≤30 caracteres"],"descripciones":["4 descripciones ≤90"],"palabras_clave":["10–15"],"negativas":["5–10"]}}`;
@@ -1505,6 +1530,7 @@ function datosCliente(c) {
 - Datos reales (ÚNICAS cifras/logros que puedes usar): ${c.datos || "(ninguno: no inventes años, reseñas, premios ni precios)"}
 - Diferenciadores y tono: ${c.marca || "(deducir)"}
 - Teléfono: ${c.telefono || "(no tiene: no pongas enlaces tel:)"} · WhatsApp: ${c.whatsapp ? "sí" : "no"} · Dirección: ${c.direccion || "-"}
+- Quiénes son: ${c.historia || "(sin datos: no inventes historia, años ni nombres)"} · Foto del equipo: ${c.equipo ? "sí" : "no"}
 - Reseñas reales cargadas: ${parseResenas(c.resenas).length} (las muestro yo en <!--RESENAS-->)${c.calificacion ? " · Calificación: " + c.calificacion : ""}
 ${c.notas ? "- REGLAS DEL CLIENTE (obligatorias): " + c.notas : ""}${c.sitio?.texto ? `
 
@@ -1606,6 +1632,7 @@ function demoDatos(c, p, ctx) {
   return {
     title: `${s} en ${ciudad} | ${c.nombre}`.slice(0, 60), description: `${s} en ${ciudad}. Respuesta rápida y atención directa. Solicita tu presupuesto.`,
     cta: ctx.u ? "Solicitar servicio" : "Solicitar presupuesto",
+    nosotros: c.historia ? { titulo: `Tu equipo local en ${ciudad}`, texto: c.historia } : null,
     hero: { etiqueta: ctx.u ? "Servicio disponible el mismo día" : `Atendemos ${ctx.zonas || ciudad}`, titulo: p.h1 || `${s} en ${ciudad}`, subtitulo: ctx.u ? `¿Algo dejó de funcionar? ${c.nombre} lo resuelve rápido y bien hecho, con atención directa en ${ciudad}.` : `Te asesoramos desde la elección hasta el trabajo terminado, con un presupuesto claro y sin sorpresas.`, puntos: (datos.length ? datos : ["Atención directa", "Presupuesto sin compromiso", "Trabajo garantizado"]).slice(0, 4) },
     confianza: (datos.length ? datos : ["Atención directa", "Presupuesto claro", "Equipo local", "Trabajo garantizado"]).slice(0, 5),
     senales: { etiqueta: "¿Te suena familiar?", titulo: "Señales de que necesitas ayuda", texto: "Si notas alguna de estas señales, no esperes a que el problema empeore.", items: [{ titulo: "Funciona lento o se detiene", texto: "Tarda más de lo normal o se queda a medio camino." }, { titulo: "Hace ruidos extraños", texto: "Chirridos o golpes: piezas gastadas o mal alineadas." }, { titulo: "No responde", texto: "El control o el sistema dejó de reaccionar." }, { titulo: "Falla tras una tormenta", texto: "Picos de voltaje dañan placas y baterías." }] },
@@ -1645,6 +1672,7 @@ ${!u && tel ? `<a href="tel:${esc(tel)}" class="lp-call lp-tel"><span><i data-ic
     if (ctx.fotos.length) s.push(`<section class="lp-sec lp-dark"><div class="lp-wrap lp-c">${ceja("Nuestro trabajo")}<h2>Trabajos recientes en ${esc(ctx.ciudad)}</h2><!--GALERIA--></div></section>`);
     s.push(`<section class="lp-sec lp-alt"><div class="lp-wrap lp-c">${ceja("Zonas que atendemos")}<h2>Cerca de ti en ${esc(ctx.ciudad)}</h2>${ctx.zonas ? `<ul class="lp-areas">${ctx.zonas.split(",").map(z => `<li>${esc(z.trim())}</li>`).join("")}</ul>` : ""}<!--MAPA--></div></section>`);
   }
+  if (tipo !== "captura" && (ctx.equipo || d.nosotros)) s.push(`<section class="lp-sec"><div class="lp-wrap lp-cols"><div>${ceja(ctx.T.nos || "Quiénes somos")}<h2>${esc(d.nosotros?.titulo || "Tu equipo local")}</h2><p class="lp-lead">${esc(d.nosotros?.texto || "")}</p>${btnTel}</div><div><img data-equipo alt=""></div></div></section>`);
   s.push("<!--RESENAS-->");
   if (tipo !== "captura") s.push(`<section class="lp-sec"><div class="lp-wrap lp-narrow">${ceja("Preguntas frecuentes")}<h2 class="lp-c">Resolvemos tus dudas</h2>${d.faq.map(q => `<details class="lp-faq"><summary>${esc(q.p)}</summary><p>${esc(q.r)}</p></details>`).join("")}</div></section>`);
   s.push(`<section class="lp-sec lp-dark"><div class="lp-wrap lp-narrow lp-c"><h2>${esc(d.cierre.titulo)}</h2><p class="lp-lead">${esc(d.cierre.texto)}</p><div class="lp-ctas lp-ctas-c"><a href="#lp-form" class="lp-btn lp-cta">${esc(cta)}</a>${tel ? `<a href="tel:${esc(tel)}" class="lp-btn lp-btn-ghost lp-tel"><i data-icon="tel" class="lp-i"></i> ${esc(ctx.telTxt)}</a>` : ""}</div></div></section>`);
@@ -1720,7 +1748,7 @@ async function generar(ajusteTexto) {
     estado = { ...nuevo, ctx, params: p, nombre: p.nombre, cliId: c.id, galeria: [...galeria] };
     pintar();
     const notas = [...avisosGen];
-    if (nuevo.tipo === "kit" && !/data-lp="resenas"/.test(nuevo.html)) notas.push("sin reseñas: agrégalas en el Playbook del cliente");
+    if (nuevo.tipo === "kit" && /data-plantilla/.test(nuevo.html)) notas.push("las reseñas son de PLANTILLA: pega reseñas reales en el Playbook o edítalas antes de publicar");
     if (!ctx.accion && !ctx.whatsapp) notas.push("el formulario no tiene destino: pon WhatsApp o un webhook en el Playbook");
     avisar(`✅ Listo en ${Math.round((Date.now() - t0) / 1000)} s.${notas.length ? " Ojo: " + notas.join("; ") + "." : " Revisa, edita y descarga."}`, "ok");
     verTab("prev");
@@ -1755,6 +1783,7 @@ function fragActual() {
   m.querySelectorAll('[data-lp="galeria"]').forEach(x => x.replaceWith(doc.createComment("GALERIA")));
   m.querySelectorAll('[data-lp="resenas"]').forEach(x => x.replaceWith(doc.createComment("RESENAS")));
   m.querySelectorAll("img[data-foto]").forEach(x => { x.removeAttribute("src"); x.removeAttribute("loading"); });
+  m.querySelectorAll("img[data-equipo]").forEach(x => { x.removeAttribute("src"); x.removeAttribute("loading"); x.removeAttribute("class"); });
   m.querySelectorAll("svg[data-icon]").forEach(x => { const i = doc.createElement("i"); i.setAttribute("data-icon", x.getAttribute("data-icon")); const cl = x.getAttribute("class"); if (cl) i.setAttribute("class", cl); x.replaceWith(i); });
   const extra = doc.getElementById("lp-extra");
   return (extra ? `<style>${extra.textContent}</style>\n` : "") + m.innerHTML.trim();
@@ -1850,9 +1879,15 @@ ${(p.cuerpo + "\n" + p.scripts).replace(/<\?/g, "&lt;?")}
 `;
 }
 const nombreArchivo = () => slug([cli()?.nombre, estado.params?.servicio || estado.nombre].filter(Boolean).join(" "));
-$("#btnHtml").onclick = () => descargar(`${nombreArchivo()}.html`, htmlActual());
+/* Antes de descargar: avisar si quedan reseñas de plantilla sin reemplazar. */
+function revisarPlantillas(h) {
+  if (!/\[(Pega aquí una reseña|Paste a real Google review|Cole aqui uma avaliação|Nombre del cliente|Customer name|Nome do cliente|4\.9\]|N\])/.test(h)) return true;
+  return confirm("Ojo: la landing todavía tiene reseñas de PLANTILLA (textos entre [corchetes]).\nReemplázalas por reseñas reales antes de publicarla (con «Editar textos» o en WordPress).\n\n¿Descargar de todas formas?");
+}
+$("#btnHtml").onclick = () => { const h = htmlActual(); if (revisarPlantillas(h)) descargar(`${nombreArchivo()}.html`, h); };
 $("#btnWp").onclick = () => {
   const h = htmlActual();
+  if (!revisarPlantillas(h)) return;
   descargar(`${nombreArchivo()}-bloque-wordpress.html`, bloqueWordPress(h));
   setTimeout(() => descargar(`${nombreArchivo()}-plantilla-wordpress.php`, plantillaPHP(h), "application/x-php"), 600);
   activarTab("tWp");
