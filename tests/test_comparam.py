@@ -1319,3 +1319,9 @@ def test_barrios_vecinos(monkeypatch):
     assert r.zona.anuncios == 1  # el precio del m² de referencia es solo el de Cedritos
     # buscar una localidad no agrega vecinos aparte
     assert busqueda.buscar_con_vecinos("Usaquén", [Portal()]).vecinos == 0
+
+
+def test_localidades_en_sugerencias():
+    from comparam.barrios import BARRIOS
+    from comparam.localidades import LOCALIDADES
+    assert set(LOCALIDADES) <= set(BARRIOS) and len(BARRIOS) == len(set(BARRIOS))
