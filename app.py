@@ -59,6 +59,9 @@ def _tipo() -> str:
     return "casa" if request.args.get("tipo") == "casa" else "apartamento"
 
 
+from comparam.localidades import barrios_para_menu  # noqa: E402
+
+app.jinja_env.globals["MENU_BARRIOS"] = barrios_para_menu()
 app.jinja_env.globals["NOMBRE_TIPO"] = {"apartamento": ("Apartamento", "Apartamentos", "el apartamento"),
                                         "casa": ("Casa", "Casas", "la casa")}
 
