@@ -1110,7 +1110,8 @@ def test_filtros_se_pueden_elegir_antes_de_buscar():
     html = webapp.app.test_client().get("/").get_data(as_text=True)
     assert 'id="filtros-form"' in html and 'id="hoja"' in html and 'id="f-parq"' in html
     assert 'data-op="arriendo"' in html and 'data-op="venta"' in html
-    assert "Hasta $1,1M" in html
+    assert "Hasta 1,1 millones" in html and "300 a 500 millones" in html
+    assert 'translate="no"' in html and "notranslate" in html
 
 
 
