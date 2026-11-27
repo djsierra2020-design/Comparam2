@@ -57,6 +57,7 @@
     <label>Parqueadero<select name="parq"><option value="">Cualquiera</option><option value="si" {% if parq == 'si' %}selected{% endif %}>Con parqueadero</option><option value="no" {% if parq == 'no' %}selected{% endif %}>Sin parqueadero</option></select></label>
     <label>Nombre del cliente<input name="cliente" value="{{ cliente }}" placeholder="Opcional"></label>
     <label class="check"><input type="checkbox" name="tel" value="1" {% if solo_tel %}checked{% endif %}> Solo los que tienen teléfono publicado</label>
+    <label class="check"><input type="checkbox" name="vecinos" value="1" {% if args.get('vecinos') == '1' %}checked{% endif %}> Incluir barrios vecinos (misma localidad)</label>
     {% for f in args.getlist('fuente') %}<input type="hidden" name="fuente" value="{{ f }}">{% endfor %}
     <button type="submit">Actualizar</button>
   </form>
@@ -105,7 +106,7 @@
     <div class="t">{{ a.precio|pesos }}{% if p.operacion == 'arriendo' %}/mes{% endif %} · {{ '%g'|format(a.area_m2) }} m²
       {% if r.zona %}{% set d = r.zona.diferencia(a.precio_m2) %}<span class="tag {{ 'bajo' if d < 0 else 'alto' }}">{{ '%.0f'|format(d|abs) }}% {{ 'bajo' if d < 0 else 'sobre' }} el barrio</span>{% endif %}
       {% if h and h.baja_pct %}<span class="tag baja">Bajó {{ h.baja_pct }}%</span>{% endif %}</div>
-    <div class="m">{{ a.precio_m2|pesos }}/m²{% if a.habitaciones %} · <b>{{ a.habitaciones }}</b> hab{% endif %}{% if a.banos %} · <b>{{ a.banos }}</b> baños{% endif %}{% if a.parqueaderos %} · 🚗 <b>{{ a.parqueaderos }}</b> parq.{% elif a.parqueaderos == 0 %} · sin parqueadero{% endif %}{% if a.barrio %} · {{ a.barrio }}{% endif %}{% if h and h.dias is not none %} · {{ h.texto }}{% endif %}</div>
+    <div class="m">{{ a.precio_m2|pesos }}/m²{% if a.habitaciones %} · <b>{{ a.habitaciones }}</b> hab{% endif %}{% if a.banos %} · <b>{{ a.banos }}</b> baños{% endif %}{% if a.parqueaderos %} · 🚗 <b>{{ a.parqueaderos }}</b> parq.{% elif a.parqueaderos == 0 %} · sin parqueadero{% endif %}{% if a.vecino %} · <b>📍 {{ a.vecino }}</b> (vecino){% elif a.barrio %} · {{ a.barrio }}{% endif %}{% if h and h.dias is not none %} · {{ h.texto }}{% endif %}</div>
     {% if a.telefonos %}<div class="tel">📞 {{ a.telefonos|join(' · ') }}</div>{% endif %}
     {% if a.url %}<div><a class="ver" href="{{ a.url }}" target="_blank" rel="noopener">🔗 Ver anuncio en {{ a.fuente|portal }}</a></div>{% endif %}
   </div>

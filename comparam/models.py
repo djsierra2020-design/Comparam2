@@ -23,6 +23,7 @@ class Listing:
     descripcion: str = ""
     ubicacion: str = ""  # todo el texto de ubicación del anuncio (barrio, localidad, zona, ciudad)
     publicado: str = ""  # fecha de publicación AAAA-MM-DD, si el portal la indica
+    vecino: str = ""  # barrio vecino del que viene (búsqueda con «barrios vecinos»); vacío = el barrio buscado
 
     @property
     def precio_m2(self) -> float:
