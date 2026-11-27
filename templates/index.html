@@ -518,7 +518,7 @@ btn.addEventListener('click', function () { if (aviso) { aviso.prompt(); aviso =
   function aplicar(guardar) {
     var n = activos();
     botones.forEach(function (b) { b.textContent = '⚙ Filtros' + (n ? ' (' + n + ')' : ''); b.classList.toggle('on', n > 0); });
-    if (!lista) { $('ver').textContent = n ? 'Listo · se aplican al buscar' : 'Listo'; return; }
+    if (!lista) { $('ver').textContent = '🔍 Buscar' + (n ? ' con ' + n + ' filtro' + (n === 1 ? '' : 's') : ''); return; }
     var f = orden[$('f-orden').value] || orden.pos, vistos = 0;
     items.slice().sort(function (x, y) { return f(x.dataset) - f(y.dataset); }).forEach(function (it) {
       var ok = pasa(it); it.classList.toggle('oculto', !ok); if (ok) vistos++; lista.appendChild(it);
@@ -548,6 +548,14 @@ btn.addEventListener('click', function () { if (aviso) { aviso.prompt(); aviso =
   });
   botones.forEach(function (b) { b.addEventListener('click', function () { abrir(true); }); });
   [$('cerrar-filtros'), fondo, $('ver')].forEach(function (e) { e.addEventListener('click', function () { abrir(false); }); });
+  // Antes de buscar, el botón de la hoja busca de una vez con los filtros elegidos.
+  $('ver').addEventListener('click', function () {
+    if (lista) return;
+    var f = $('f');
+    if (!f.barrio.value.trim()) { f.barrio.focus(); f.barrio.placeholder = 'Escribe el barrio y toca Buscar'; return; }
+    if (f.requestSubmit) f.requestSubmit(f.querySelector('button[value="barrio"]'));
+    else f.querySelector('button[value="barrio"]').click();
+  });
   ['f-orden', 'f-sobre', 'f-bajo', 'f-30', 'f-baja', 'f-verif'].forEach(function (id) { $(id).addEventListener('change', aplicar); });
   ['f-min', 'f-max', 'f-area'].forEach(function (id) { $(id).addEventListener('input', aplicar); });
   $('f-rangos').addEventListener('click', function (e) {
