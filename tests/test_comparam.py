@@ -1300,3 +1300,22 @@ def test_lector_url_rechaza_direcciones_internas():
     for u in ("http://127.0.0.1:5000/", "http://localhost/", "http://10.0.0.5/", "ftp://x.com/", ""):
         r = c.get("/api/leer-url", query_string={"url": u})
         assert r.status_code == 400 and r.get_json()["error"], u
+
+
+def test_barrios_vecinos(monkeypatch):
+    from comparam import busqueda
+    class Portal:
+        nombre = "p"
+        def buscar(self, barrio, operacion="venta"):
+            if slugify(barrio) == "usaquen":
+                return [Listing("p", "Apto en Santa Bárbara, Bogotá", "Santa Bárbara", 300e6, 75, url="u2",
+                                es_dueno_directo=True, ubicacion="Santa Bárbara | Usaquén"),
+                        Listing("p", "Apto en Cedritos, Bogotá", "Cedritos", 400e6, 70, url="u1", es_dueno_directo=True)]
+            return [Listing("p", "Apto en Cedritos, Bogotá", "Cedritos", 400e6, 70, url="u1", es_dueno_directo=True)]
+    from comparam.parsing import slugify
+    r = busqueda.buscar_con_vecinos("Cedritos", [Portal()])
+    assert [a.url for a in r.anuncios] == ["u2", "u1"] and r.vecinos == 1 and r.localidad == "Usaquén"
+    assert r.anuncios[0].vecino == "Santa Bárbara" and r.anuncios[1].vecino == ""
+    assert r.zona.anuncios == 1  # el precio del m² de referencia es solo el de Cedritos
+    # buscar una localidad no agrega vecinos aparte
+    assert busqueda.buscar_con_vecinos("Usaquén", [Portal()]).vecinos == 0

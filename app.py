@@ -6,7 +6,7 @@ import os
 from flask import Flask, jsonify, render_template, request, send_from_directory
 
 from comparam.barrios import BARRIOS
-from comparam.busqueda import buscar, buscar_ciudad
+from comparam.busqueda import buscar, buscar_ciudad, buscar_con_vecinos
 from comparam.config import PAGINAS_CIUDAD, crear_fuentes
 from comparam.formato import pesos
 from comparam.sources import PORTALES
@@ -49,7 +49,8 @@ def _consulta():
     barrio = request.args.get("barrio", "").strip()
     elegidas = [f for f in request.args.getlist("fuente") if f in FUENTES] or list(PORTALES)
     params = _params()
-    resultado = buscar(barrio, crear_fuentes(elegidas, tipo=_tipo()), **params) if barrio else None
+    buscador = buscar_con_vecinos if request.args.get("vecinos") == "1" else buscar
+    resultado = buscador(barrio, crear_fuentes(elegidas, tipo=_tipo()), **params) if barrio else None
     return barrio, elegidas, params, resultado
 
 
@@ -154,12 +155,13 @@ def inicio():
 
 
 def _anuncios_cliente(barrio: str, operacion: str, precio_max=None, hab_min=None, parq: str = "",
-                      solo_tel: bool = False, elegidas=None, tipo: str = "apartamento"):
+                      solo_tel: bool = False, elegidas=None, tipo: str = "apartamento", vecinos: bool = False):
     """Búsqueda para un cliente: solo dueños directos (sin «verificar»), con los filtros pedidos,
     del más barato al más caro por m²."""
     params = {"operacion": operacion, "solo_dueno": True, "con_telefono": solo_tel,
               "area_min": None, "precio_max": precio_max}
-    resultado = buscar(barrio, crear_fuentes(elegidas or list(PORTALES), tipo=tipo), **params) if barrio else None
+    buscador = buscar_con_vecinos if vecinos else buscar
+    resultado = buscador(barrio, crear_fuentes(elegidas or list(PORTALES), tipo=tipo), **params) if barrio else None
     anuncios = []
     if resultado:
         anuncios = [a for a in resultado.anuncios if a.es_dueno_directo and not a.verificar
@@ -184,6 +186,8 @@ def _texto_lista(barrio: str, operacion: str, anuncios, resultado, fecha: str, l
             partes.append(f"{a.habitaciones} hab")
         if a.parqueaderos:
             partes.append(f"🚗 {a.parqueaderos}")
+        if a.vecino:
+            partes.append(f"📍 {a.vecino}")
         if resultado and resultado.zona:
             d = resultado.zona.diferencia(a.precio_m2)
             partes.append(f"{abs(d):.0f}% {'bajo' if d < 0 else 'sobre'} el barrio")
@@ -208,6 +212,7 @@ def _filtros_lista(args) -> dict:
         "solo_tel": args.get("tel") == "1",
         "cliente": args.get("cliente", "").strip()[:60],
         "tipo": "casa" if args.get("tipo") == "casa" else "apartamento",
+        "vecinos": args.get("vecinos") == "1",
     }
 
 
@@ -219,14 +224,14 @@ def lista_cliente():
     f = _filtros_lista(request.args)
     elegidas = [x for x in request.args.getlist("fuente") if x in FUENTES] or None
     params, resultado, anuncios = _anuncios_cliente(f["barrio"], f["operacion"], f["precio_max"], f["hab_min"],
-                                                    f["parq"], f["solo_tel"], elegidas, f["tipo"])
+                                                    f["parq"], f["solo_tel"], elegidas, f["tipo"], f["vecinos"])
     fecha = diario.hoy().strftime("%d/%m/%Y")
     link = vence = None
     dias = int(request.args.get("dias", "0")) if request.args.get("dias", "").isdigit() else 0
     if dias in enlaces.DIAS_PERMITIDOS and f["barrio"] and enlaces.disponible():
         token, vence = enlaces.crear({"b": f["barrio"], "o": f["operacion"], "pm": f["precio_max"], "h": f["hab_min"],
                                       "pq": f["parq"], "t": f["solo_tel"], "c": f["cliente"],
-                                      "ti": "c" if f["tipo"] == "casa" else ""}, dias, diario.hoy())
+                                      "ti": "c" if f["tipo"] == "casa" else "", "ve": f["vecinos"]}, dias, diario.hoy())
         link = request.host_url.rstrip("/") + "/c/" + token
     return render_template("lista.html", barrio=f["barrio"], p=params, r=resultado, anuncios=anuncios,
                            cliente=f["cliente"], hab_min=f["hab_min"], parq=f["parq"], solo_tel=f["solo_tel"],
@@ -248,7 +253,8 @@ def lista_compartida(token: str):
         return render_template("lista_vencida.html", vence=vence.strftime("%d/%m/%Y")), 410
     tipo = "casa" if d.get("ti") == "c" else "apartamento"
     params, resultado, anuncios = _anuncios_cliente(d.get("b", ""), d.get("o", "venta"), d.get("pm"), d.get("h"),
-                                                    d.get("pq", ""), bool(d.get("t")), tipo=tipo)
+                                                    d.get("pq", ""), bool(d.get("t")), tipo=tipo,
+                                                    vecinos=bool(d.get("ve")))
     r = render_template("lista.html", barrio=d.get("b", ""), p=params, r=resultado, anuncios=anuncios,
                         cliente=d.get("c", ""), hab_min=d.get("h"), parq=d.get("pq", ""), solo_tel=bool(d.get("t")),
                         fecha=diario.hoy().strftime("%d/%m/%Y"), args={}, link=None, vence=vence, dias=0, tipo=tipo,

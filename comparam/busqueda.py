@@ -25,6 +25,8 @@ class Resultado:
     por_fuente: dict[str, int] = field(default_factory=dict)  # anuncios leídos de cada portal
     publicados: int = 0  # anuncios que los portales dicen tener para la búsqueda
     ocultos: int = 0  # anuncios de inmobiliarias que no se muestran porque se pidió solo dueño directo
+    vecinos: int = 0  # anuncios agregados de barrios vecinos (misma localidad)
+    localidad: str = ""  # localidad usada para los barrios vecinos
 
 
 @dataclass
@@ -226,6 +228,32 @@ def buscar(barrio: str, fuentes: list[Source], operacion: str = "venta", solo_du
     ocultos = sum(1 for a in unicos if not (a.es_dueno_directo or a.verificar)) if solo_dueno else 0
     return Resultado(filtrados[:limite] if limite else filtrados, errores, len(unicos), valor_zona(unicos),
                      sorted(unicos, key=lambda a: a.precio_m2), otros, por_fuente, publicados, ocultos)
+
+
+def buscar_con_vecinos(barrio: str, fuentes: list[Source], **params) -> Resultado:
+    """El barrio y además los barrios vecinos (los de su misma localidad). El precio del m² de referencia
+    sigue siendo el del barrio buscado; cada anuncio vecino lleva en `vecino` el barrio del que es."""
+    r = buscar(barrio, fuentes, **params)
+    loc = localidad_de(barrio)
+    if not loc or slugify(loc) == slugify(barrio):  # se buscó una localidad: no hay «vecinos» aparte
+        return r
+    r2 = buscar(loc, fuentes, **params)
+    vistos = {(a.url or a.titulo, round(a.precio), a.area_m2) for a in r.usados_zona + r.anuncios}
+    extra = []
+    for a in r2.anuncios:
+        k = (a.url or a.titulo, round(a.precio), a.area_m2)
+        if k in vistos:
+            continue
+        vistos.add(k)
+        a.vecino = zona_de(a) or a.barrio or loc
+        if slugify(a.vecino) == slugify(barrio):
+            a.vecino = ""
+        extra.append(a)
+    r.anuncios = sorted(r.anuncios + extra, key=lambda a: a.precio_m2)
+    r.vecinos, r.localidad = len(extra), loc
+    r.total_encontrados += r2.total_encontrados
+    r.errores += [e for e in r2.errores if e not in r.errores]
+    return r
 
 
 # --------------------------------------------------------------------------- toda Bogotá

@@ -56,6 +56,7 @@
   .segmento label { text-align:center; padding:9px; border-radius:9px; font-weight:600; color:var(--mut); cursor:pointer }
   .segmento input:checked + label { background:var(--card); color:var(--tx); box-shadow:var(--sombra) }
   .chips { display:flex; flex-wrap:wrap; gap:8px }
+  .tag.vecino { background:#fff4cc; color:#7a5b00 }
   .chip-filtros { font:inherit; font-size:14px; font-weight:700; padding:8px 14px; border-radius:999px; border:1.5px solid var(--marca);
     background:transparent; color:var(--marca); cursor:pointer }
   .chip-filtros.on { background:var(--marca); color:#fff }
@@ -214,6 +215,7 @@
   <div class="chips">
     <span class="chip"><input type="checkbox" id="todos" name="todos" value="1" {% if not p.solo_dueno %}checked{% endif %}><label for="todos">Incluir inmobiliarias</label></span>
     <span class="chip"><input type="checkbox" id="ct" name="con_telefono" value="1" {% if p.con_telefono %}checked{% endif %}><label for="ct">Solo con teléfono</label></span>
+    <span class="chip"><input type="checkbox" id="vec" name="vecinos" value="1" {% if args.vecinos == '1' %}checked{% endif %}><label for="vec">Barrios vecinos</label></span>
     <button type="button" class="chip-filtros" id="filtros-form">⚙ Filtros</button>
   </div>
   <div id="filtros-ocultos"></div>
@@ -328,8 +330,9 @@
   </section>
   {% endif %}
   {% if r.anuncios %}
-  <a class="btn-lista" href="/lista?barrio={{ barrio|urlencode }}&operacion={{ p.operacion }}&tipo={{ tipo }}{% if args.area_min %}&area_min={{ args.area_min|urlencode }}{% endif %}" onclick="if(window.filtrosLista)this.href+=filtrosLista();document.getElementById('cargando-txt').textContent='Armando la lista para el cliente…';document.getElementById('cargando').style.display='grid'">📋 Lista para cliente</a>
-  <div class="titulo-lista">{{ r.anuncios|length }} resultado(s) en {{ barrio }} <span class="meta">· {{ r.total_encontrados }} anuncios revisados</span></div>
+  <a class="btn-lista" href="/lista?barrio={{ barrio|urlencode }}&operacion={{ p.operacion }}&tipo={{ tipo }}{% if args.vecinos == '1' %}&vecinos=1{% endif %}{% if args.area_min %}&area_min={{ args.area_min|urlencode }}{% endif %}" onclick="if(window.filtrosLista)this.href+=filtrosLista();document.getElementById('cargando-txt').textContent='Armando la lista para el cliente…';document.getElementById('cargando').style.display='grid'">📋 Lista para cliente</a>
+  <div class="titulo-lista">{{ r.anuncios|length }} resultado(s) en {{ barrio }}{% if r.vecinos %} y barrios vecinos{% endif %} <span class="meta">· {{ r.total_encontrados }} anuncios revisados</span></div>
+  {% if r.vecinos %}<div class="ocultos">📍 {{ r.vecinos }} de barrios vecinos de {{ r.localidad }}, comparados con el precio del m² de {{ barrio }}</div>{% endif %}
   {% if r.ocultos %}<div class="ocultos">{% set nd = r.anuncios|selectattr('es_dueno_directo')|list|length %}{% set nv = r.anuncios|selectattr('verificar')|list|length %}{{ nd }} de dueño directo{% if nv %} · {{ nv }} por verificar{% endif %} · {{ r.ocultos }} de inmobiliarias ocultos · <a href="{{ url_con_inmobiliarias() }}">Ver todos</a></div>{% endif %}
   <div class="barra-filtros"><button type="button" id="abrir-filtros">⚙ Filtros</button><span class="meta" id="conteo"></span></div>
   <ol class="lista" id="lista">
@@ -338,9 +341,9 @@
         data-area="{{ a.area_m2 }}" data-hab="{{ a.habitaciones or 0 }}" data-parq="{{ '' if a.parqueaderos is none else a.parqueaderos }}"
         data-vs="{{ r.zona.diferencia(a.precio_m2)|round(1) if r.zona else 0 }}"
         data-dias="{{ h.dias if h and h.dias is not none else -1 }}" data-baja="{{ h.baja_pct if h else 0 }}" data-verificar="{{ 1 if a.verificar else 0 }}">
-      <div class="top"><span class="pos">{{ loop.index }}</span><span class="tag portal">{{ a.fuente|portal }}</span><span class="tag {{ 'verificar' if a.verificar }}">{{ a.publicado_por or 'anunciante desconocido' }}</span></div>
+      <div class="top"><span class="pos">{{ loop.index }}</span><span class="tag portal">{{ a.fuente|portal }}</span><span class="tag {{ 'verificar' if a.verificar }}">{{ a.publicado_por or 'anunciante desconocido' }}</span>{% if a.vecino %}<span class="tag vecino">📍 {{ a.vecino }}</span>{% endif %}</div>
       <div class="tit">{% if a.url %}<a href="{{ a.url }}" target="_blank" rel="noopener">{{ a.titulo }}</a>{% else %}{{ a.titulo }}{% endif %}</div>
-      <div class="meta">{{ a.precio|pesos }} · {{ '%g'|format(a.area_m2) }} m²{% if a.habitaciones %} · {{ a.habitaciones }} hab{% endif %}{% if a.banos %} · {{ a.banos }} baños{% endif %}{% if a.parqueaderos %} · 🚗 {{ a.parqueaderos }} parq.{% elif a.parqueaderos == 0 %} · sin parqueadero{% endif %} · {{ a.barrio }}</div>
+      <div class="meta">{{ a.precio|pesos }} · {{ '%g'|format(a.area_m2) }} m²{% if a.habitaciones %} · {{ a.habitaciones }} hab{% endif %}{% if a.banos %} · {{ a.banos }} baños{% endif %}{% if a.parqueaderos %} · 🚗 {{ a.parqueaderos }} parq.{% elif a.parqueaderos == 0 %} · sin parqueadero{% endif %} · {{ a.vecino or a.barrio }}</div>
       <div class="precio">
         <div class="m2">{{ a.precio_m2|pesos }} <small>/m²</small></div>
         {% if r.zona %}{% set d = r.zona.diferencia(a.precio_m2) %}<span class="vs {{ 'bajo' if d < 0 else 'alto' }}">{{ '%.0f'|format(d|abs) }}% {{ 'bajo' if d < 0 else 'sobre' }} la zona</span>{% endif %}
