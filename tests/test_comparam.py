@@ -1325,3 +1325,14 @@ def test_localidades_en_sugerencias():
     from comparam.barrios import BARRIOS
     from comparam.localidades import LOCALIDADES
     assert set(LOCALIDADES) <= set(BARRIOS) and len(BARRIOS) == len(set(BARRIOS))
+
+
+def test_menus_de_localidad_y_barrio():
+    import app as webapp
+    from comparam.localidades import LOCALIDADES, barrios_para_menu
+    m = barrios_para_menu()
+    assert list(m) == LOCALIDADES and "Cedritos" in m["Usaquén"] and "Usaquén" not in m["Usaquén"]
+    assert "La Castellana" in m["Barrios Unidos"] and "Castellana" not in m["Barrios Unidos"]
+    assert "Chicó" in m["Chapinero"] and "El Chicó" not in m["Chapinero"]
+    html = webapp.app.test_client().get("/").get_data(as_text=True)
+    assert 'id="sel-loc"' in html and 'id="sel-bar"' in html and "Escribir otro barrio" in html

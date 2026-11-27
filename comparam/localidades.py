@@ -5,6 +5,8 @@ para calcular su precio del m², se compara con su localidad.
 """
 from __future__ import annotations
 
+import re
+
 from .parsing import slugify
 
 LOCALIDADES = [
@@ -106,3 +108,27 @@ def localidades_posibles(*textos: str) -> set[str]:
             posibles.add(_MAPA[s])
             posibles.update(_MAPA[k] for k in _MAPA if k.startswith(s + "-"))
     return posibles
+
+
+# Variantes que no se muestran en el menú (ya está la forma corta o con número).
+_SIN_MENU = {"veinte-de-julio", "doce-de-octubre", "siete-de-agosto", "parkway", "casablanca", "casa-blanca-suba",
+             "lisboa-suba", "granada-norte-engativa", "madelena-ciudad-bolivar", "el-refugio-de-fontibon",
+             "ciudad-hayuelos", "ciudad-salitre-occidental", "bosa-islandia", "bosa-el-recreo", "fontibon-centro"}
+_ARTICULO = re.compile(r"^(el|la|los|las)-")
+
+
+def barrios_para_menu() -> dict[str, list[str]]:
+    """{localidad: [barrios]} para los menús desplegables: sin repetidos («La Castellana» / «Castellana»,
+    «Chicó» / «El Chicó»), sin el nombre de la propia localidad (es la opción «Toda la localidad») y
+    en orden alfabético."""
+    menu: dict[str, list[str]] = {}
+    for loc in LOCALIDADES:
+        vistos: dict[str, str] = {}
+        for b in (x.strip() for x in _BARRIOS.get(loc, "").split(",")):
+            s = slugify(b)
+            if not s or s in _SIN_MENU or s == slugify(loc):
+                continue
+            # entre «La Castellana» y «Castellana» queda la primera de la lista (la forma más usada)
+            vistos.setdefault(_ARTICULO.sub("", s), b)
+        menu[loc] = sorted(vistos.values(), key=slugify)
+    return menu

@@ -47,6 +47,14 @@
   /* Buscador */
   .buscador { background:var(--card); border-radius:20px; padding:16px; box-shadow:var(--sombra); display:grid; gap:14px }
   .campo { position:relative }
+  .campo[hidden], .lugar[hidden] { display:none }
+  .lugar { display:grid; grid-template-columns:1fr 1fr; gap:8px }
+  .lugar select { width:100%; min-width:0; font:inherit; font-size:16px; padding:13px 10px; border-radius:14px;
+                  border:1.5px solid var(--ln); background:var(--bg); color:var(--tx); outline:none }
+  .lugar select:focus { border-color:var(--marca) }
+  .lugar select:disabled { opacity:.55 }
+  .mini-link { justify-self:start; border:0; background:none; color:var(--marca); font:inherit; font-size:13px;
+               font-weight:700; padding:0 4px; margin-top:-4px; cursor:pointer }
   .campo svg { position:absolute; left:14px; top:50%; transform:translateY(-50%); width:20px; height:20px; color:var(--mut) }
   .campo input { width:100%; font:inherit; font-size:17px; padding:14px 14px 14px 44px; border-radius:14px;
                  border:1.5px solid var(--ln); background:var(--bg); color:var(--tx); outline:none }
@@ -199,7 +207,14 @@
 
 <main>
 <form method="get" id="f" class="buscador">
-  <div class="campo">
+  {# Menús: localidad y luego sus barrios (evita errores al escribir). «Escribir otro barrio» muestra el
+     campo de texto para barrios que no están en la lista. El valor que se busca va en «barrio». #}
+  <div class="lugar" id="lugar">
+    <select id="sel-loc" aria-label="Localidad"><option value="">📍 Localidad</option>{% for loc in MENU_BARRIOS %}<option>{{ loc }}</option>{% endfor %}</select>
+    <select id="sel-bar" aria-label="Barrio" disabled><option value="">Toda la localidad</option></select>
+  </div>
+  <button type="button" class="mini-link" id="escribir">✏️ Escribir otro barrio</button>
+  <div class="campo" id="campo-txt" hidden>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
     <input type="search" name="barrio" list="barrios" value="{{ barrio }}" placeholder="¿En qué barrio buscas?" autocomplete="off" enterkeyhint="search">
     <datalist id="barrios">{% for b in barrios %}<option value="{{ b }}">{% endfor %}</datalist>
@@ -414,10 +429,47 @@
 </div>
 
 <script>
+// Menús de localidad y barrio: llenan el campo «barrio» que se envía.
+var MENU = {{ MENU_BARRIOS|tojson }};
+(function () {
+  var f = document.getElementById('f'), loc = document.getElementById('sel-loc'), bar = document.getElementById('sel-bar');
+  var lugar = document.getElementById('lugar'), campo = document.getElementById('campo-txt'), boton = document.getElementById('escribir');
+  var sinTildes = function (s) { return (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim(); };
+  function llenarBarrios(elegido) {
+    bar.innerHTML = '<option value="">Toda la localidad</option>';
+    (MENU[loc.value] || []).forEach(function (b) {
+      var o = document.createElement('option'); o.textContent = b; o.selected = b === elegido; bar.appendChild(o);
+    });
+    bar.disabled = !loc.value;
+  }
+  function pasar() { f.barrio.value = bar.value || loc.value; }
+  function modoTexto(si) {
+    lugar.hidden = si; campo.hidden = !si;
+    boton.textContent = si ? '📋 Elegir de la lista' : '✏️ Escribir otro barrio';
+  }
+  loc.addEventListener('change', function () { llenarBarrios(''); pasar(); });
+  bar.addEventListener('change', pasar);
+  boton.addEventListener('click', function () {
+    var aTexto = !lugar.hidden; modoTexto(aTexto);
+    if (aTexto) { f.barrio.focus(); } else { pasar(); }
+  });
+  window.enfocarLugar = function () { (campo.hidden ? loc : f.barrio).focus(); };
+  // Al volver con una búsqueda hecha: marcar su localidad y barrio, o mostrar el texto si no está en la lista.
+  var actual = sinTildes(f.barrio.value);
+  if (!actual) return;
+  for (var l in MENU) {
+    if (sinTildes(l) === actual) { loc.value = l; llenarBarrios(''); return; }
+    for (var i = 0; i < MENU[l].length; i++) {
+      if (sinTildes(MENU[l][i]) === actual) { loc.value = l; llenarBarrios(MENU[l][i]); return; }
+    }
+  }
+  modoTexto(true);
+})();
+
 // Buscar: valida el barrio y muestra el aviso de carga.
 document.getElementById('f').addEventListener('submit', function (e) {
   var modo = e.submitter && e.submitter.value;
-  if (modo === 'barrio' && !this.barrio.value.trim()) { e.preventDefault(); this.barrio.focus(); return; }
+  if (modo === 'barrio' && !this.barrio.value.trim()) { e.preventDefault(); enfocarLugar(); return; }
   if (modo === 'ciudad') document.getElementById('cargando-txt').textContent = 'En toda Bogotá puede tardar hasta 1 minuto.';
   document.getElementById('cargando').style.display = 'grid';
 });
@@ -555,7 +607,7 @@ btn.addEventListener('click', function () { if (aviso) { aviso.prompt(); aviso =
   $('ver').addEventListener('click', function () {
     if (lista) return;
     var f = $('f');
-    if (!f.barrio.value.trim()) { f.barrio.focus(); f.barrio.placeholder = 'Escribe el barrio y toca Buscar'; return; }
+    if (!f.barrio.value.trim()) { f.barrio.placeholder = 'Escribe el barrio y toca Buscar'; enfocarLugar(); return; }
     if (f.requestSubmit) f.requestSubmit(f.querySelector('button[value="barrio"]'));
     else f.querySelector('button[value="barrio"]').click();
   });
