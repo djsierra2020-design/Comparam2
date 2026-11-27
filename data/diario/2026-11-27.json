@@ -1,0 +1,103 @@
+{
+ "agentes": 36,
+ "base": false,
+ "errores": [
+  "venta Contador: mercadolibre: la API respondió HTTP 403 ({\"message\":\"forbidden\",\"error\":\"forbidden\",\"status\":403,\"cause\":[]})",
+  "venta Cedritos: mercadolibre: la API respondió HTTP 403 ({\"message\":\"forbidden\",\"error\":\"forbidden\",\"status\":403,\"cause\":[]})",
+  "venta Chicó: mercadolibre: la API respondió HTTP 403 ({\"message\":\"forbidden\",\"error\":\"forbidden\",\"status\":403,\"cause\":[]})",
+  "venta Santa Bárbara: mercadolibre: la API respondió HTTP 403 ({\"message\":\"forbidden\",\"error\":\"forbidden\",\"status\":403,\"cause\":[]})",
+  "arriendo Contador: mercadolibre: la API respondió HTTP 403 ({\"message\":\"forbidden\",\"error\":\"forbidden\",\"status\":403,\"cause\":[]})",
+  "arriendo Cedritos: mercadolibre: la API respondió HTTP 403 ({\"message\":\"forbidden\",\"error\":\"forbidden\",\"status\":403,\"cause\":[]})",
+  "arriendo Chicó: mercadolibre: la API respondió HTTP 403 ({\"message\":\"forbidden\",\"error\":\"forbidden\",\"status\":403,\"cause\":[]})",
+  "arriendo Santa Bárbara: mercadolibre: la API respondió HTTP 403 ({\"message\":\"forbidden\",\"error\":\"forbidden\",\"status\":403,\"cause\":[]})",
+  "venta toda Bogotá: mercadolibre: la API respondió HTTP 403 ({\"message\":\"forbidden\",\"error\":\"forbidden\",\"status\":403,\"cause\":[]})",
+  "arriendo toda Bogotá: mercadolibre: la API respondió HTTP 403 ({\"message\":\"forbidden\",\"error\":\"forbidden\",\"status\":403,\"cause\":[]})"
+ ],
+ "fecha": "2026-11-27",
+ "nuevos": [
+  "76aebb3997d12d4a",
+  "055be288987808ad",
+  "f3d32e9fcaa24250",
+  "b3cf813e3d59587a",
+  "4790e8034f62d63a",
+  "4cff8a638bc212e4",
+  "47110aaca1dac597",
+  "b1cfb94d03704ce8",
+  "bbf22e74923e8391",
+  "5179d49446070cf0",
+  "e32b313f231a7782",
+  "f3a8016669ca85af",
+  "02b915e60b92f9f8",
+  "3de27809d4ec661c",
+  "4fa7378daac80945",
+  "077084f05976748e",
+  "87d36bdd174240c7",
+  "891e4c729acf8f17",
+  "0acce74a0bfbfd60",
+  "3c7912eec2ed3459",
+  "c1704d13964fbc71",
+  "8f3f1a23eec1d0b3",
+  "3a3149694f11b780",
+  "9fb635851f38b92d",
+  "98458917dcb4e9b0",
+  "240ae068f6bf5f32",
+  "3f44c27057c1e009",
+  "793280992d5bdee0",
+  "c120230dc8f7669b",
+  "39735c55e10eb39e",
+  "1a963f085a2264bb",
+  "d9f812eb11d4e309",
+  "dcb79bc300d211f1",
+  "709fc6451cd48428",
+  "dba96cfd710b3622",
+  "f3b95cf4a1bc2627",
+  "0e9ae8ee9012bf9e",
+  "c3ab020e9a89291e",
+  "c7ad0e35c244a42d",
+  "7814fc9ba3180454",
+  "9599327cd79936f2",
+  "e775906d445696b7",
+  "fdc9f1e772fbd73d",
+  "3fac3e4ec6268e29",
+  "7bb7cb27891472b6"
+ ],
+ "nuevos_ciudad": {
+  "arriendo": 67,
+  "venta": 85
+ },
+ "revisados": 1252,
+ "zonas": {
+  "arriendo|Cedritos": {
+   "anuncios": 95,
+   "mediana_m2": 48485
+  },
+  "arriendo|Chicó": {
+   "anuncios": 97,
+   "mediana_m2": 67964
+  },
+  "arriendo|Contador": {
+   "anuncios": 26,
+   "mediana_m2": 54423
+  },
+  "arriendo|Santa Bárbara": {
+   "anuncios": 62,
+   "mediana_m2": 69122
+  },
+  "venta|Cedritos": {
+   "anuncios": 96,
+   "mediana_m2": 6985412
+  },
+  "venta|Chicó": {
+   "anuncios": 83,
+   "mediana_m2": 9779412
+  },
+  "venta|Contador": {
+   "anuncios": 69,
+   "mediana_m2": 7394366
+  },
+  "venta|Santa Bárbara": {
+   "anuncios": 73,
+   "mediana_m2": 7823494
+  }
+ }
+}
