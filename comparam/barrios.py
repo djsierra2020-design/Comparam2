@@ -11,4 +11,7 @@ BARRIOS = sorted([
     "Ciudad Jardín", "Santa Isabel", "Marsella", "Timiza", "Tunal", "Ciudad Tunal",
     "Galerías", "Nicolás de Federmán", "Puente Aranda", "Álamos", "Granada Norte",
 ])
-BARRIOS = list(dict.fromkeys(BARRIOS))
+# Las 19 localidades también se pueden buscar (los portales devuelven todos sus barrios).
+from .localidades import LOCALIDADES  # noqa: E402
+
+BARRIOS = sorted(set(BARRIOS) | set(LOCALIDADES))
