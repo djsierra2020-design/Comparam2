@@ -65,6 +65,10 @@
   .segmento input:checked + label { background:var(--card); color:var(--tx); box-shadow:var(--sombra) }
   .chips { display:flex; flex-wrap:wrap; gap:8px }
   .tag.vecino { background:#fff4cc; color:#7a5b00 }
+  .aviso-filtros { margin:8px 4px; padding:12px 14px; border-radius:14px; background:#fff4cc; color:#7a5b00; font-weight:600 }
+  .aviso-filtros[hidden] { display:none }
+  .aviso-filtros button { font:inherit; font-weight:800; border:0; border-radius:10px; padding:6px 12px; margin-left:6px;
+    background:#7a5b00; color:#fff; cursor:pointer }
   .chip-filtros { font:inherit; font-size:14px; font-weight:700; padding:8px 14px; border-radius:999px; border:1.5px solid var(--marca);
     background:transparent; color:var(--marca); cursor:pointer }
   .chip-filtros.on { background:var(--marca); color:#fff }
@@ -287,6 +291,7 @@
   <div class="titulo-lista">Los {{ rc.oportunidades|length }} más baratos frente a su barrio{% if p.solo_dueno %} · dueño directo{% endif %}</div>
   {% if rc.ocultos %}<div class="ocultos">{{ rc.ocultos|miles }} anuncios de inmobiliarias ocultos · <a href="{{ url_con_inmobiliarias() }}">Ver todos</a></div>{% endif %}
   <div class="barra-filtros"><button type="button" id="abrir-filtros">⚙ Filtros</button><span class="meta" id="conteo"></span></div>
+  <div class="aviso-filtros" id="aviso-filtros" hidden><span id="aviso-filtros-txt"></span> <button type="button" id="quitar-filtros">Quitar filtros</button></div>
   <ol class="lista" id="lista">
   {% for o in rc.oportunidades %}{% set a = o.anuncio %}{% set h = hist(a, p.operacion) %}
     <li class="item" data-pos="{{ loop.index }}" data-m2="{{ a.precio_m2|round|int }}" data-precio="{{ a.precio|int }}"
@@ -350,6 +355,7 @@
   {% if r.vecinos %}<div class="ocultos">📍 {{ r.vecinos }} de barrios vecinos de {{ r.localidad }}, comparados con el precio del m² de {{ barrio }}</div>{% endif %}
   {% if r.ocultos %}<div class="ocultos">{% set nd = r.anuncios|selectattr('es_dueno_directo')|list|length %}{% set nv = r.anuncios|selectattr('verificar')|list|length %}{{ nd }} de dueño directo{% if nv %} · {{ nv }} por verificar{% endif %} · {{ r.ocultos }} de inmobiliarias ocultos · <a href="{{ url_con_inmobiliarias() }}">Ver todos</a></div>{% endif %}
   <div class="barra-filtros"><button type="button" id="abrir-filtros">⚙ Filtros</button><span class="meta" id="conteo"></span></div>
+  <div class="aviso-filtros" id="aviso-filtros" hidden><span id="aviso-filtros-txt"></span> <button type="button" id="quitar-filtros">Quitar filtros</button></div>
   <ol class="lista" id="lista">
   {% for a in r.anuncios %}{% set h = hist(a, p.operacion) %}
     <li class="item" data-pos="{{ loop.index }}" data-m2="{{ a.precio_m2|round|int }}" data-precio="{{ a.precio|int }}"
@@ -579,6 +585,11 @@ btn.addEventListener('click', function () { if (aviso) { aviso.prompt(); aviso =
       var ok = pasa(it); it.classList.toggle('oculto', !ok); if (ok) vistos++; lista.appendChild(it);
     });
     $('conteo').textContent = 'Mostrando ' + vistos + ' de ' + items.length;
+    var ocultosPorFiltros = items.length - vistos;
+    $('aviso-filtros').hidden = !(n && ocultosPorFiltros);
+    $('aviso-filtros-txt').textContent = vistos === 0
+      ? 'Tus filtros (' + n + ') están ocultando ' + (items.length === 1 ? 'el único resultado.' : 'los ' + items.length + ' resultados.')
+      : 'Tus filtros ocultan ' + ocultosPorFiltros + ' resultado' + (ocultosPorFiltros === 1 ? '.' : 's.');
     var sinDato = parq ? items.filter(function (it) { return it.dataset.parq === ''; }).length : 0;
     $('f-parq-nota').style.display = sinDato ? 'block' : 'none';
     $('f-parq-nota').textContent = sinDato + (sinDato === 1 ? ' anuncio no dice si tiene parqueadero y no se muestra.' : ' anuncios no dicen si tienen parqueadero y no se muestran.');
@@ -626,6 +637,7 @@ btn.addEventListener('click', function () { if (aviso) { aviso.prompt(); aviso =
   $('f-parq').addEventListener('click', function (e) {
     var b = e.target.closest('button'); if (!b) return; parq = b.dataset.v; marcar('f-parq', parq); aplicar();
   });
+  if ($('quitar-filtros')) $('quitar-filtros').addEventListener('click', function () { $('limpiar').click(); });
   $('limpiar').addEventListener('click', function () {
     ['f-min', 'f-max', 'f-area'].forEach(function (id) { $(id).value = ''; });
     Object.keys(CHECKS).forEach(function (k) { $(CHECKS[k]).checked = false; }); $('f-verif').checked = true;
